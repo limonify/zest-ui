@@ -5,6 +5,7 @@ import { useControlled } from '../../hooks/useControlled';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { clamp } from '../../utils/clamp';
 import type { BaseUIComponentProps, Orientation } from '../../types';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
@@ -213,10 +214,6 @@ function toArray(value: number | readonly number[]): readonly number[] {
 
 function fromArray(values: readonly number[], isRange: boolean): number | readonly number[] {
   return isRange ? values : values[0]!;
-}
-
-function clamp(value: number, lower: number, upper: number) {
-  return Math.min(Math.max(value, lower), upper);
 }
 
 function countDecimals(value: number) {

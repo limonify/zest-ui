@@ -24,7 +24,9 @@
 
 **Milestone 7 (shipped):** the gesture tier — **`Slider`** (Root/Value/Control/Track/Indicator/Thumb) and **`Drawer`** (Root/Trigger/Portal/Backdrop/Viewport/Popup/Title/Description/Close), both on `react-native-gesture-handler`.
 
-**Current totals:** 22 components, 211 Jest tests (jest-expo + @testing-library/react-native), Expo example app in `apps/example` exercising every one.
+**Milestone 8 (shipped):** the last of the roadmap — **`Progress`** (Root/Track/Indicator/Label/Value), **`Avatar`** (Root/Image/Fallback), **`NumberField`** (Root/Group/Input/Increment/Decrement/ScrubArea), **`OTPField`** (Root/Input), **`Toast`** (Provider/Viewport/Root/Title/Description/Action/Close + `createToastManager`/`useToastManager`), and snap points on **`Drawer`**. With it the roadmap is closed: every Base UI component is either ported or excluded with a reason.
+
+**Current totals:** 25 components, 503 Jest tests (jest-expo + @testing-library/react-native), Expo example app in `apps/example` exercising every one.
 
 Notes that supersede older sections of this document:
 
@@ -534,29 +536,33 @@ These Base UI components will NOT be ported. They either don't fit the mobile in
 | `Combobox` | Mobile search pattern is different (search screen + `FlatList`). Not a 1:1 port. |
 | `Autocomplete` | Same as Combobox. Mobile uses search-as-you-type with native keyboard. |
 | `Toolbar` | Desktop toolbar pattern. Mobile uses bottom action bars or context menus. |
+| `Field`, `Fieldset`, `Form` | React Native has no HTML form submission and no Tab key. This is a standing decision — see the notes at the top of this document. |
+| `Input` | Upstream's `Input` is a 17-line alias for `Field.Control`, and `Field` is not ported. Without it there is no component left to port: use React Native's `TextInput`. |
+| `Text` | Not a Base UI package at all — this document invented it. A wrapper around React Native's `<Text>` would add nothing. |
 
 ### Mobile-Native Additions (not in Base UI)
 
-These components don't exist in Base UI but are essential for a React Native library:
+This document originally planned two components that don't exist in Base UI. Neither was built, and both decisions are recorded here rather than left as open TODOs:
 
-| Component | Purpose |
+| Component | Outcome |
 |---|---|
-| `BottomSheet` | Draggable bottom sheet with snap points (iOS-style) |
-| `SegmentedControl` | iOS-style segmented control for tab/option switching |
+| `BottomSheet` | **Superseded by `Drawer`.** Upstream's Drawer already has a snap point API and shares the Dialog store, so porting `snapPoints`/`snapPoint`/`onSnapPointChange`/`snapToSequentialPoints` onto it costs less than a second component and stays Base UI-compatible. A bottom sheet is `<Drawer.Root snapPoints={[0.25, 0.5, 0.9]}>`. |
+| `SegmentedControl` | **Not needed in a headless library.** It is `ToggleGroup` (or `Tabs`) with a particular set of styles, and styles are the consumer's job. |
 
 ---
 
 ### Full Component Count Summary
 
 ```
-Base UI (36+ components)
-  ├── Ported (same name):  29  (Button, Input, Dialog, Select, Tabs...)
-  ├── Excluded:            10  (ContextMenu, PreviewCard, Menubar...)
-  └── Added (mobile-only): +2  (BottomSheet, SegmentedControl)
+Base UI (39 components)
+  ├── Ported (same name):  25  (Button, Dialog, Select, Tabs, Toast, Drawer...)
+  ├── Excluded:            14  (ContextMenu, PreviewCard, Menubar, Field, Input...)
+  └── Added (mobile-only):  0  (BottomSheet folded into Drawer's snap points)
 
-@limonify/zest total:      31 components
-                           29 Base UI-compatible + 2 mobile-native
+@limonify/zest total:      25 components
 ```
+
+The 14 excluded: `ContextMenu`, `PreviewCard`, `Menubar`, `NavigationMenu`, `Meter`, `ScrollArea`, `CSPProvider`, `Combobox`, `Autocomplete`, `Toolbar`, `Field`, `Fieldset`, `Form`, `Input` — each with a reason in the table above. Nothing in Base UI is left unaccounted for.
 
 **29 Base UI component = 29 exact same name.** Zero naming changes.
 

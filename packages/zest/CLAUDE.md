@@ -125,14 +125,22 @@ On the web, Base UI publishes state as `data-*` attributes plus CSS variables, *
 
 1. **`useTransitionStatus` is ported verbatim** (`src/internals/useTransitionStatus.ts`) — it is DOM-free, needing only `AnimationFrame` + `useIsoLayoutEffect`. It yields `mounted` + `transitionStatus` (`'starting' | 'idle' | 'ending' | undefined`).
 2. **Measured geometry and `transitionStatus` go on the state object**, which is the RN counterpart of upstream's CSS variables. `Collapsible.Panel` publishes `height`/`width` exactly where the web version writes `--collapsible-panel-height`. The consumer reads them from `style={(state) => ...}` or `render={(props, state) => ...}` and drives their own `Animated` value. zest never animates anything itself — that is what keeps it headless and dependency-free.
-3. **Nothing can report that a closing animation finished**, so exit animations require `keepMounted`. Without it a panel unmounts the moment it closes (`useCollapsiblePanel` calls `setMounted(false)` immediately). Say this in the prop docs of any part that gains a `keepMounted`.
+3. **Nothing can report that a closing animation finished**, so exit animations require `keepMounted`. Without it a panel unmounts the moment it closes (`useCollapsiblePanel` calls `setMounted(false)` immediately). Say this in the prop docs of any part that gains a `keepMounted`. Every part with an exit needs a lever of this shape — `Toast.Root`'s is `removeOnClose` (default `true`, so a consumer who never animates needs no wiring; set it to `false` and call `useToastManager().remove(id)` when your animation ends). Whatever it is called, the default must be the one that cannot leak.
 4. **Measuring a collapsed element requires an inner wrapper.** A panel's own size is consumer-driven, so its natural content size must be measured on a child that is never size-constrained — `useCollapsiblePanel` renders `<View onLayout>` around `children` and overrides `children` in the last props slot. Yoga still lays that child out at its natural size even when the parent is clipped to zero (`flexShrink` defaults to `0` in RN), so `onLayout` reports the true height.
 
 Do not port upstream's `useCollapsiblePanel` (~550 lines): it is entirely CSS-transition/keyframe coordination, `hiddenUntilFound`, and `getComputedStyle`. The zest equivalent is ~60 lines.
 
+## Look for the verbatim port first
+
+A surprising amount of upstream is already DOM-free and should be **copied, not rewritten** — grep the file for `document|window\.|HTML` before assuming otherwise. `number-field/utils/parse.ts` + `validate.ts` (358 lines of Intl and regex) and `otp-field/utils/otp.ts` came over untouched, and their upstream test suites came with them: 130 of NumberField's 168 tests are upstream's, running unmodified against jest-expo. Two of them are `skip`ped upstream because browser Intl is inconsistent about Arabic-Indic digits; Node's Intl handles them, so they run here for real.
+
+The same goes for pure state: `toast/store.ts` and `toast/createToastManager.ts` are the queue/limit/timer machinery with only the focus management and the document listener removed.
+
 ## Portals are `Modal`, and positioning rides on that
 
 Every `Portal` part (Dialog, Drawer, Popover, Tooltip, Menu, Select) is an RN `Modal`. **Do not replace it with a state-lifting PortalHost**: a PortalHost re-parents children into a different React tree, which drops every context between a `Popover.Root` and its `Popover.Popup`. `Modal` keeps children in the same React tree, so contexts survive, and it brings focus containment plus `onRequestClose` (Android back / web Escape) → the `escape-key` reason for free.
+
+**Toast is the one exception, and it has no `Portal` part at all.** A `Modal` covers the screen and swallows every touch, which is right for a dialog and fatal for a toast — the app underneath has to stay usable. `Toast.Viewport` is instead an ordinary absolutely-positioned `View` with `pointerEvents="box-none"`, rendered inside `Toast.Provider` at the root of the app. Any future part that must overlay the app *without* blocking it belongs on this side of the line.
 
 `useAnchorPositioning` (`src/utils/useAnchorPositioning.ts`) wraps `@floating-ui/react-native`'s `useFloating` with `sameScrollView: false`, which makes it measure via `measureInWindow` and add `StatusBar.currentHeight` on Android — i.e. **screen coordinates**. That is exactly the origin of a `statusBarTranslucent` Modal, which is why the two agree. Changing either half breaks positioning on Android.
 

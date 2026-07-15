@@ -2,6 +2,7 @@
 import { View } from 'react-native';
 import { useSliderRootContext } from '../root/SliderRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { formatNumber } from '../../utils/formatNumber';
 import type { SliderRootState } from '../root/SliderRoot';
 import type { BaseUIComponentProps } from '../../types';
 
@@ -59,7 +60,7 @@ function formatValue(
     return undefined;
   }
 
-  return new Intl.NumberFormat(locale as string | string[] | undefined, format).format(value);
+  return formatNumber(value, locale, format);
 }
 
 export interface SliderThumbState extends SliderRootState {
