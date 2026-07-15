@@ -8,6 +8,7 @@ import { useCompositeListItem } from '../../internals/composite/list/useComposit
 import type { BaseUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { isSelectValueSelected, toggleSelectValue } from '../store/SelectStore';
 import { SelectItemContext } from './SelectItemContext';
 
 /**
@@ -28,6 +29,7 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
   const store = useSelectRootContext();
   const selectedValue = store.useState('value');
   const readOnly = store.useState('readOnly');
+  const multiple = store.useState('multiple');
 
   const { index, onLayout } = useCompositeListItem();
 
@@ -35,7 +37,7 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
 
   const { getButtonProps } = useButton({ disabled });
 
-  const selected = selectedValue === value;
+  const selected = isSelectValueSelected(selectedValue, value, multiple);
 
   const state: SelectItemState = { disabled, pressed, selected, index };
 
@@ -60,13 +62,17 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
           // also stops the popup from closing.
           const eventDetails = createChangeEventDetails(REASONS.itemPress, event);
 
-          store.setValue(value, eventDetails);
+          store.setValue(toggleSelectValue(selectedValue, value, multiple), eventDetails);
 
           if (eventDetails.isCanceled) {
             return;
           }
 
-          store.setOpen(false, eventDetails);
+          // Picking one of many is rarely the end of the interaction, so a
+          // multiple select stays open until it is dismissed.
+          if (!multiple) {
+            store.setOpen(false, eventDetails);
+          }
         },
         onPressIn() {
           setPressed(true);
@@ -93,7 +99,8 @@ export interface SelectItemState {
    */
   pressed: boolean;
   /**
-   * Whether the item is the selected one.
+   * Whether the item is selected. In a `multiple` select, whether it is among
+   * the selected values.
    */
   selected: boolean;
   /**

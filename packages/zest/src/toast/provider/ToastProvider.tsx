@@ -23,6 +23,7 @@ export const ToastProvider: React.FC<ToastProvider.Props> = function ToastProvid
         pressed: false,
         focused: false,
         isAppActive: AppState.currentState !== 'background',
+        viewportOrigin: { x: 0, y: 0 },
       }),
   ).current;
 

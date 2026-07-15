@@ -1,22 +1,28 @@
 'use client';
 import type * as React from 'react';
 import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { usePopupRootHandle } from '../../utils/popups/usePopupRootHandle';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import { PopoverStore } from '../store/PopoverStore';
+import type { PopoverHandle } from '../store/PopoverHandle';
 import { PopoverRootContext } from './PopoverRootContext';
 
 /**
  * Groups all parts of the popover.
  * Doesn't render its own element.
  */
-export function PopoverRoot(props: PopoverRoot.Props) {
+export function PopoverRoot<Payload = unknown>(props: PopoverRoot.Props<Payload>) {
   const {
+    actionsRef,
     children,
     defaultOpen = false,
+    defaultTriggerId = null,
     disablePointerDismissal = false,
+    handle,
     onOpenChange,
     open,
+    triggerId,
   } = props;
 
   const store = useRefWithInit(
@@ -24,15 +30,36 @@ export function PopoverRoot(props: PopoverRoot.Props) {
   ).current;
 
   store.useControlledProp('openProp', open);
+  store.useControlledProp('triggerIdProp', triggerId);
   store.useContextCallback('onOpenChange', onOpenChange);
   store.useSyncedValues({ disablePointerDismissal });
 
-  return <PopoverRootContext.Provider value={store}>{children}</PopoverRootContext.Provider>;
+  usePopupRootHandle({ store, handle, actionsRef });
+
+  const payload = store.useState('payload') as Payload;
+
+  return (
+    <PopoverRootContext.Provider value={store}>
+      {typeof children === 'function' ? children(payload) : children}
+    </PopoverRootContext.Provider>
+  );
 }
 
 export interface PopoverRootState {}
 
-export interface PopoverRootProps {
+export interface PopoverRootActions {
+  /**
+   * Unmounts the popover without firing `onOpenChange`. Call it after an externally
+   * controlled closing animation finishes.
+   */
+  unmount: () => void;
+  /**
+   * Closes the popover, reporting the `imperative-action` reason.
+   */
+  close: () => void;
+}
+
+export interface PopoverRootProps<Payload = unknown> {
   /**
    * Whether the popover is currently open.
    */
@@ -56,9 +83,28 @@ export interface PopoverRootProps {
    */
   disablePointerDismissal?: boolean | undefined;
   /**
-   * The content of the popover.
+   * A ref to imperative actions.
    */
-  children?: React.ReactNode;
+  actionsRef?: React.RefObject<PopoverRoot.Actions | null> | undefined;
+  /**
+   * A handle associating this popover with triggers rendered outside it, and letting
+   * it be opened and closed imperatively. Create one with `Popover.createHandle()`.
+   */
+  handle?: PopoverHandle<Payload> | undefined;
+  /**
+   * The id of the trigger the popover is anchored to and associated with.
+   */
+  triggerId?: string | null | undefined;
+  /**
+   * The id of the trigger the popover is initially associated with.
+   */
+  defaultTriggerId?: string | null | undefined;
+  /**
+   * The content of the popover.
+   *
+   * Pass a function to receive the payload the popover was opened with.
+   */
+  children?: React.ReactNode | ((payload: Payload) => React.ReactNode);
 }
 
 export type PopoverRootChangeEventReason =
@@ -73,7 +119,8 @@ export type PopoverRootChangeEventDetails = ZestChangeEventDetails<PopoverRootCh
 
 export namespace PopoverRoot {
   export type State = PopoverRootState;
-  export type Props = PopoverRootProps;
+  export type Props<Payload = unknown> = PopoverRootProps<Payload>;
+  export type Actions = PopoverRootActions;
   export type ChangeEventReason = PopoverRootChangeEventReason;
   export type ChangeEventDetails = PopoverRootChangeEventDetails;
 }

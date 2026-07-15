@@ -11,14 +11,14 @@ import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetail
  * An alert dialog interrupts the user and must be dismissed deliberately: it
  * never closes on an outside press, so it takes no `disablePointerDismissal`.
  */
-export function AlertDialogRoot(props: AlertDialogRoot.Props) {
+export function AlertDialogRoot<Payload = unknown>(props: AlertDialogRoot.Props<Payload>) {
   return useRenderDialogRoot(props, 'alert-dialog');
 }
 
 export interface AlertDialogRootState {}
 
-export interface AlertDialogRootProps
-  extends Omit<DialogRoot.Props, 'disablePointerDismissal' | 'onOpenChange'> {
+export interface AlertDialogRootProps<Payload = unknown>
+  extends Omit<DialogRoot.Props<Payload>, 'disablePointerDismissal' | 'onOpenChange'> {
   /**
    * Event handler called when the alert dialog is opened or closed.
    */
@@ -34,7 +34,8 @@ export type AlertDialogRootChangeEventDetails =
 
 export namespace AlertDialogRoot {
   export type State = AlertDialogRootState;
-  export type Props = AlertDialogRootProps;
+  export type Props<Payload = unknown> = AlertDialogRootProps<Payload>;
+  export type Actions = DialogRoot.Actions;
   export type ChangeEventReason = AlertDialogRootChangeEventReason;
   export type ChangeEventDetails = AlertDialogRootChangeEventDetails;
 }

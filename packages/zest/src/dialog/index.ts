@@ -1,6 +1,7 @@
 export * as Dialog from './index.parts';
 
 export type * from './root/DialogRoot';
+export { createDialogHandle, DialogHandle } from './store/DialogHandle';
 export type * from './trigger/DialogTrigger';
 export type * from './portal/DialogPortal';
 export type * from './backdrop/DialogBackdrop';

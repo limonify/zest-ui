@@ -1,6 +1,7 @@
 import { createSelector } from '../../store/createSelector';
 import { ReactStore } from '../../store/ReactStore';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
+import { PopupTriggerMap } from '../../utils/popups/PopupTriggerMap';
 import type { DialogRootChangeEventReason } from '../root/DialogRoot';
 
 export type State = {
@@ -21,17 +22,37 @@ export type State = {
    * `alertdialog` for AlertDialog, which reuses this store and every Dialog part.
    */
   role: 'dialog' | 'alertdialog';
+  /**
+   * The payload of the trigger the dialog was opened by, handed to the root's
+   * children when they are a function.
+   */
+  payload: unknown;
+  /**
+   * The id of the trigger the dialog is associated with, or `null` for none.
+   */
+  triggerId: string | null;
+  /**
+   * The controlled `triggerId` prop, when provided.
+   */
+  triggerIdProp: string | null | undefined;
 };
 
 type Context<Reason extends string> = {
   onOpenChange:
     | ((open: boolean, eventDetails: ZestChangeEventDetails<Reason>) => void)
     | undefined;
+  /**
+   * Every trigger bound to this dialog, by id. A handle resolves `open(id)`
+   * through this, which is what lets a trigger rendered outside the root open it.
+   */
+  triggerNodes: PopupTriggerMap;
 };
 
 const selectors = {
   open: createSelector((state: State) => state.openProp ?? state.open),
   titleElementId: createSelector((state: State) => state.titleElementId),
+  payload: createSelector((state: State) => state.payload),
+  triggerId: createSelector((state: State) => state.triggerIdProp ?? state.triggerId),
   descriptionElementId: createSelector((state: State) => state.descriptionElementId),
   disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
   role: createSelector((state: State) => state.role),
@@ -63,9 +84,12 @@ export class DialogStore<Reason extends string = DialogRootChangeEventReason> ex
         descriptionElementId: undefined,
         disablePointerDismissal: false,
         role: 'dialog',
+        payload: undefined,
+        triggerId: null,
+        triggerIdProp: undefined,
         ...initialState,
       },
-      { onOpenChange: undefined },
+      { onOpenChange: undefined, triggerNodes: new PopupTriggerMap() },
       selectors,
     );
   }

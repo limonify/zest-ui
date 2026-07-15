@@ -11,6 +11,42 @@ export type SelectItems =
   | ReadonlyArray<{ value: unknown; label: string }>;
 
 /**
+ * Whether `value` is selected, given the current selection. In multiple mode the
+ * selection is an array and membership is what counts.
+ */
+export function isSelectValueSelected(
+  selectedValue: unknown,
+  value: unknown,
+  multiple: boolean,
+): boolean {
+  if (multiple) {
+    return Array.isArray(selectedValue) && selectedValue.includes(value);
+  }
+
+  return selectedValue === value;
+}
+
+/**
+ * The selection after `value` is pressed: a replacement normally, a toggle in
+ * multiple mode.
+ */
+export function toggleSelectValue(
+  selectedValue: unknown,
+  value: unknown,
+  multiple: boolean,
+): unknown {
+  if (!multiple) {
+    return value;
+  }
+
+  const current = Array.isArray(selectedValue) ? selectedValue : [];
+
+  return current.includes(value)
+    ? current.filter((item) => item !== value)
+    : [...current, value];
+}
+
+/**
  * Resolves a value's label from the consumer's `items`, falling back to the
  * labels items registered as they mounted.
  */
@@ -58,6 +94,10 @@ export type State = {
    * closed select can only render its selected label from this.
    */
   items: SelectItems | undefined;
+  /**
+   * Whether more than one item can be selected, which makes `value` an array.
+   */
+  multiple: boolean;
   disabled: boolean;
   readOnly: boolean;
   required: boolean;
@@ -80,6 +120,7 @@ const selectors = {
   ),
   labelsByValue: createSelector((state: State) => state.labelsByValue),
   items: createSelector((state: State) => state.items),
+  multiple: createSelector((state: State) => state.multiple),
   disabled: createSelector((state: State) => state.disabled),
   readOnly: createSelector((state: State) => state.readOnly),
   required: createSelector((state: State) => state.required),
@@ -97,6 +138,7 @@ export class SelectStore extends ReactStore<Readonly<State>, Context, typeof sel
         valueProp: undefined,
         labelsByValue: new Map(),
         items: undefined,
+        multiple: false,
         disabled: false,
         readOnly: false,
         required: false,

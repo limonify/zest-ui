@@ -83,8 +83,11 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
         .onBegin(() => {
           setSwiping(true);
           // A finger on the toast means "not yet" — the same intent hover
-          // carries on the web.
+          // carries on the web, where upstream pairs these two exactly like this.
+          // Setting `pressed` alone would only re-render; the timers keep running
+          // until they are told to stop.
           store.set('pressed', true);
+          store.pauseTimers();
         })
         .onStart((event) => setSwipeMovement(getDisplacement(swipeDirection, event)))
         .onUpdate((event) => setSwipeMovement(getDisplacement(swipeDirection, event)))
@@ -98,7 +101,11 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
           setSwipeMovement(0);
           store.set('pressed', false);
 
-          if (!store.select('expanded')) {
+          // `expandedOrInactive`, not `expanded`: letting go while the app is in
+          // the background must not restart the countdown, or the toast spends it
+          // where nobody can see it. Upstream guards the same way, on the window
+          // being focused.
+          if (!store.select('expandedOrInactive')) {
             store.resumeTimers();
           }
         })

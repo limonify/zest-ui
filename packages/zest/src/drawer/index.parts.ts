@@ -1,4 +1,5 @@
 export { DrawerRoot as Root } from './root/DrawerRoot';
+export { createDrawerHandle as createHandle } from './handle';
 export { DrawerPopup as Popup } from './popup/DrawerPopup';
 
 // A drawer is a dialog with a swipe gesture, so every part but the Root and the

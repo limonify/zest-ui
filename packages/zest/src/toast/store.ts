@@ -26,6 +26,9 @@ type ToastInternalUpdateOptions<Data extends object> = Partial<Omit<ToastObject<
  * - `isWindowFocused` becomes `isAppActive`, driven by RN's `AppState`, so a
  *   toast does not expire while the app is in the background.
  */
+/** The screen coordinates of the viewport's top-left corner. */
+export type ToastViewportOrigin = { x: number; y: number };
+
 export type State = {
   toasts: ToastObject<any>[];
   toastMetadata: Map<string, ToastMetadata>;
@@ -34,6 +37,12 @@ export type State = {
   timeout: number;
   limit: number;
   isAppActive: boolean;
+  /**
+   * Where the viewport sits on screen. `Toast.Positioner` needs it because
+   * `useAnchorPositioning` measures anchors in screen coordinates while the
+   * viewport — not being a Modal — can be anywhere.
+   */
+  viewportOrigin: ToastViewportOrigin;
 };
 
 type ToastMetadata = {
@@ -107,6 +116,7 @@ export const selectors = {
     (toastMetadata, id: string) => toastMetadata.get(id)?.visibleIndex ?? -1,
   ),
   focused: createSelector((state: State) => state.focused),
+  viewportOrigin: createSelector((state: State) => state.viewportOrigin),
   expanded: createSelector((state: State) => state.pressed || state.focused),
   expandedOrInactive: createSelector(
     (state: State) => state.pressed || state.focused || !state.isAppActive,

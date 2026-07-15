@@ -13,6 +13,10 @@ import type { BaseUIComponentProps } from '../../types';
  * `Select.ItemText` registers as items mount. Without `items` the label is only
  * known after the popup has been opened once, since that is when the items first
  * render. Pass `children` as a function to format it yourself.
+ *
+ * In a `multiple` select there are several labels, so `label` is them joined
+ * with a comma and `labels` holds them individually — a comma is rarely the
+ * right separator, so format from `labels` when it matters.
  */
 export function SelectValue(componentProps: SelectValue.Props) {
   const { render, className, style, children, ref, ...elementProps } = componentProps;
@@ -21,10 +25,20 @@ export function SelectValue(componentProps: SelectValue.Props) {
   const value = store.useState('value');
   const labelsByValue = store.useState('labelsByValue');
   const items = store.useState('items');
+  const multiple = store.useState('multiple');
 
-  const label = resolveSelectLabel(items, labelsByValue, value);
+  const labels =
+    multiple && Array.isArray(value)
+      ? value
+          .map((item) => resolveSelectLabel(items, labelsByValue, item))
+          .filter((item): item is string => item !== undefined)
+      : [resolveSelectLabel(items, labelsByValue, value)].filter(
+          (item): item is string => item !== undefined,
+        );
 
-  const state: SelectValueState = { value, label };
+  const label = labels.length > 0 ? labels.join(', ') : undefined;
+
+  const state: SelectValueState = { value, label, labels };
 
   const resolvedChildren = typeof children === 'function' ? children(state) : (children ?? label);
 
@@ -41,9 +55,15 @@ export interface SelectValueState {
    */
   value: unknown;
   /**
-   * The label registered by the selected item's `Select.ItemText`, if any.
+   * The selected item's label, if it is known. In a `multiple` select, every
+   * selected label joined with a comma.
    */
   label: string | undefined;
+  /**
+   * Every selected label, in selection order. Empty when nothing is selected or
+   * no label is known yet.
+   */
+  labels: string[];
 }
 
 export interface SelectValueProps

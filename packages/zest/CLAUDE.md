@@ -98,6 +98,17 @@ store.useSyncedValues({ disablePointerDismissal });
 
 State changes fire through `createChangeEventDetails(REASONS.xxx, event)`; add the component's `ChangeEventReason` union next to its Root, reusing `REASONS` slugs (`trigger-press`, `outside-press`, `escape-key`, `close-press`, `imperative-action`, `none`). New reasons go into `src/utils/reason-parts.ts` / `reasons.ts`.
 
+## Handles (`src/utils/popups`)
+
+A handle is what connects a popup root to triggers rendered outside it, and what lets anything open it imperatively. `BasePopupHandle` is a near-verbatim port (it is pure state; the only DOM was the trigger's type, widened to `unknown` in `PopupTriggerMap`). Wiring a new popup family into it:
+
+1. Its store's context gains `triggerNodes: PopupTriggerMap`; its state gains `payload`, `triggerId` and `triggerIdProp`.
+2. Its Root calls `usePopupRootHandle({ store, handle, actionsRef })` and renders `typeof children === 'function' ? children(payload) : children`.
+3. Its Trigger reads `usePopupHandleStore(handle) ?? React.useContext(RootContext)` — **not** the `useXRootContext()` throwing hook, since a detached trigger legitimately has no root context — and registers itself into `store.context.triggerNodes` in an effect keyed on the store, so the registration migrates when the handle swaps stores.
+4. An **anchored** popup passes `throwOnMissingTrigger: true` and overrides `associateTrigger` to set the store's `triggerNode`; without that an imperative open would anchor to whatever was pressed last. An unanchored one (Dialog) passes `false` and warns instead.
+
+`actionsRef.unmount()` sets the uncontrolled `open` key directly rather than going through `setOpen`: the consumer already knows it closed — they animated it — so firing `onOpenChange` again would be a spurious second close.
+
 ## Group components (ToggleGroup, RadioGroup, CheckboxGroup)
 
 Upstream's grouped form controls lean on `Field`, `Form`, and `Composite` (roving tabindex). **None of these are ported** — React Native has no HTML form submission and no Tab key — so drop them along with the hidden `<input>`, `visuallyHidden*`, `name`/`form`/`uncheckedValue` props, and `dispatchClickWithModifiers`. Keep everything else identical.
@@ -141,6 +152,10 @@ The same goes for pure state: `toast/store.ts` and `toast/createToastManager.ts`
 Every `Portal` part (Dialog, Drawer, Popover, Tooltip, Menu, Select) is an RN `Modal`. **Do not replace it with a state-lifting PortalHost**: a PortalHost re-parents children into a different React tree, which drops every context between a `Popover.Root` and its `Popover.Popup`. `Modal` keeps children in the same React tree, so contexts survive, and it brings focus containment plus `onRequestClose` (Android back / web Escape) → the `escape-key` reason for free.
 
 **Toast is the one exception, and it has no `Portal` part at all.** A `Modal` covers the screen and swallows every touch, which is right for a dialog and fatal for a toast — the app underneath has to stay usable. `Toast.Viewport` is instead an ordinary absolutely-positioned `View` with `pointerEvents="box-none"`, rendered inside `Toast.Provider` at the root of the app. Any future part that must overlay the app *without* blocking it belongs on this side of the line.
+
+That exception has a cost, and `Toast.Positioner` pays it: screen coordinates only work as-is inside a Modal, so the viewport measures its own origin with `measureInWindow` and the positioner subtracts it. **Anything anchored outside a Modal needs the same correction** — `onLayout` alone cannot give it to you, since it reports a parent-relative position.
+
+**Submenus nest Modals**, which RN supports (verified before porting). `Menu.SubmenuRoot` is a `Menu.Root` that remembers its parent, so the whole tree stays in one React tree. Upstream broadcasts a `close` over its floating tree when an item is chosen; zest has no such tree, so `SubmenuRoot` exposes `closeAncestors` and each level closes its own parent, each with its own event details so one veto doesn't silently stop the rest.
 
 `useAnchorPositioning` (`src/utils/useAnchorPositioning.ts`) wraps `@floating-ui/react-native`'s `useFloating` with `sameScrollView: false`, which makes it measure via `measureInWindow` and add `StatusBar.currentHeight` on Android — i.e. **screen coordinates**. That is exactly the origin of a `statusBarTranslucent` Modal, which is why the two agree. Changing either half breaks positioning on Android.
 
@@ -206,7 +221,7 @@ Add a demo section to `apps/example/App.tsx` for every new component (plain Styl
 ## Gotchas already solved — don't re-fight these
 
 - `useIsoLayoutEffect` must check `typeof window !== 'undefined'` (RN aliases `window`), **not** `typeof document`.
-- The animation-frame scheduler is process-global, so `jest.setup.ts` calls `resetAnimationFrameScheduler()` in an `afterEach`. Without it, a frame scheduled by one test fires during a later one and surfaces as an `act(...)` warning in an unrelated file — which is why the warning only appears in a full run, never when that file runs alone.
+- The animation-frame scheduler is process-global, so `jest.setup.ts` calls `resetAnimationFrameScheduler()` in an `afterEach`. Without it, a frame scheduled by one test fires during a later one and surfaces as an `act(...)` warning in an unrelated file — which is why the warning only appears in a full run, never when that file runs alone. **Dropping the callbacks is not enough**: the reset must also `cancelAnimationFrame` the frame `tick` is scheduled on, because jest-expo implements `requestAnimationFrame` as a `setTimeout` that reads the Jest environment — leaving it queued produced a "you are trying to access ... after it has been torn down" error blamed on whichever file scheduled it.
 - bun's isolated `.bun` node_modules requires the custom `transformIgnorePatterns` in `jest.config.js`; don't replace them with jest-expo defaults.
 - Ambient globals live in `src/globals.d.ts` (no DOM lib, no @types/node). Extend that file instead of adding libs.
 - `StyleSheet.absoluteFillObject` is untyped in RN 0.86 — use `StyleSheet.absoluteFill`.

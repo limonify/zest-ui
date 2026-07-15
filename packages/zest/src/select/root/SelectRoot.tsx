@@ -20,6 +20,7 @@ export function SelectRoot<Value = any>(props: SelectRoot.Props<Value>) {
     defaultValue,
     disabled = false,
     items,
+    multiple = false,
     onOpenChange,
     onValueChange,
     open,
@@ -33,9 +34,12 @@ export function SelectRoot<Value = any>(props: SelectRoot.Props<Value>) {
       new SelectStore({
         open: defaultOpen,
         openProp: open,
-        value: defaultValue,
+        // A multiple select's selection is a list, so an omitted default is an
+        // empty one rather than "nothing selected".
+        value: defaultValue ?? (multiple ? [] : undefined),
         valueProp: value,
         items,
+        multiple,
         disabled,
         readOnly,
         required,
@@ -46,7 +50,7 @@ export function SelectRoot<Value = any>(props: SelectRoot.Props<Value>) {
   store.useControlledProp('valueProp', value);
   store.useContextCallback('onOpenChange', onOpenChange);
   store.useContextCallback('onValueChange', onValueChange);
-  store.useSyncedValues({ disabled, readOnly, required, items });
+  store.useSyncedValues({ disabled, readOnly, required, items, multiple });
 
   return <SelectRootContext.Provider value={store}>{children}</SelectRootContext.Provider>;
 }
@@ -87,6 +91,14 @@ export interface SelectRootProps<Value = any> {
   onOpenChange?:
     | ((open: boolean, eventDetails: SelectRoot.ChangeEventDetails) => void)
     | undefined;
+  /**
+   * Whether more than one item can be selected.
+   *
+   * The value becomes an array, pressing an item toggles it rather than
+   * replacing the selection, and the popup stays open until it is dismissed.
+   * @default false
+   */
+  multiple?: boolean | undefined;
   /**
    * Whether the component should ignore user interaction.
    * @default false

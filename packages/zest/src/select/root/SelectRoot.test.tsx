@@ -261,3 +261,148 @@ describe('Select', () => {
     expect(screen.getByTestId('value')).toHaveTextContent('None');
   });
 });
+
+describe('Select multiple', () => {
+  const ITEMS = [
+    { value: 'apple', label: 'Apple' },
+    { value: 'banana', label: 'Banana' },
+    { value: 'cherry', label: 'Cherry' },
+  ];
+
+  function TestMultiSelect(props: Partial<React.ComponentProps<typeof Select.Root>>) {
+    return (
+      <Select.Root multiple items={ITEMS} defaultOpen {...props}>
+        <Select.Trigger testID="trigger">
+          <Select.Value testID="value" />
+        </Select.Trigger>
+        <Select.Portal>
+          <Select.Positioner>
+            <Select.Popup testID="popup">
+              <Select.List>
+                {ITEMS.map((item) => (
+                  <Select.Item key={item.value} testID={`item-${item.value}`} value={item.value}>
+                    <Select.ItemText>{item.label}</Select.ItemText>
+                    <Select.ItemIndicator testID={`indicator-${item.value}`}>
+                      <Text>✓</Text>
+                    </Select.ItemIndicator>
+                  </Select.Item>
+                ))}
+              </Select.List>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>
+    );
+  }
+
+  function selected(value: string) {
+    return screen.getByTestId(`item-${value}`).props.accessibilityState.selected;
+  }
+
+  it('starts with nothing selected', async () => {
+    const onValueChange = jest.fn();
+    await render(<TestMultiSelect onValueChange={onValueChange} />);
+
+    expect(selected('apple')).toBe(false);
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('reports an array and keeps the popup open', async () => {
+    const user = userEvent.setup();
+    const onValueChange = jest.fn();
+    await render(<TestMultiSelect onValueChange={onValueChange} />);
+
+    await user.press(screen.getByTestId('item-apple'));
+
+    expect(onValueChange).toHaveBeenCalledWith(['apple'], expect.objectContaining({ reason: 'item-press' }));
+    expect(screen.getByTestId('popup')).toBeTruthy();
+  });
+
+  it('adds to the selection rather than replacing it', async () => {
+    const user = userEvent.setup();
+    await render(<TestMultiSelect />);
+
+    await user.press(screen.getByTestId('item-apple'));
+    await user.press(screen.getByTestId('item-cherry'));
+
+    expect(selected('apple')).toBe(true);
+    expect(selected('cherry')).toBe(true);
+    expect(selected('banana')).toBe(false);
+  });
+
+  it('toggles an already selected item off', async () => {
+    const user = userEvent.setup();
+    const onValueChange = jest.fn();
+    await render(<TestMultiSelect defaultValue={['apple', 'banana']} onValueChange={onValueChange} />);
+
+    await user.press(screen.getByTestId('item-apple'));
+
+    expect(onValueChange).toHaveBeenCalledWith(['banana'], expect.anything());
+    expect(selected('apple')).toBe(false);
+    expect(selected('banana')).toBe(true);
+  });
+
+  it('honours a defaultValue array', async () => {
+    await render(<TestMultiSelect defaultValue={['banana']} />);
+
+    expect(selected('banana')).toBe(true);
+    expect(screen.getByTestId('indicator-banana', { includeHiddenElements: true })).toBeTruthy();
+    expect(screen.queryByTestId('indicator-apple', { includeHiddenElements: true })).toBeNull();
+  });
+
+  it('holds a controlled value the consumer does not change', async () => {
+    const user = userEvent.setup();
+    const onValueChange = jest.fn();
+    await render(<TestMultiSelect value={['apple']} onValueChange={onValueChange} />);
+
+    await user.press(screen.getByTestId('item-banana'));
+
+    expect(onValueChange).toHaveBeenCalledWith(['apple', 'banana'], expect.anything());
+    expect(selected('banana')).toBe(false);
+  });
+
+  it('lets onValueChange cancel the change', async () => {
+    const user = userEvent.setup();
+    const onValueChange = jest.fn((_value, eventDetails) => eventDetails.cancel());
+    await render(<TestMultiSelect onValueChange={onValueChange} />);
+
+    await user.press(screen.getByTestId('item-apple'));
+
+    expect(selected('apple')).toBe(false);
+    expect(screen.getByTestId('popup')).toBeTruthy();
+  });
+
+  it('joins the selected labels and exposes them individually', async () => {
+    await render(<TestMultiSelect defaultValue={['apple', 'cherry']} />);
+
+    expect(screen.getByTestId('value')).toHaveTextContent('Apple, Cherry');
+  });
+
+  it('gives a children function every label', async () => {
+    const seen: string[][] = [];
+    await render(
+      <Select.Root multiple items={ITEMS} defaultValue={['apple', 'banana']}>
+        <Select.Trigger>
+          <Select.Value testID="value">
+            {(state) => {
+              seen.push(state.labels);
+              return state.labels.join(' + ');
+            }}
+          </Select.Value>
+        </Select.Trigger>
+      </Select.Root>,
+    );
+
+    expect(seen.at(-1)).toEqual(['Apple', 'Banana']);
+    expect(screen.getByTestId('value')).toHaveTextContent('Apple + Banana');
+  });
+
+  it('still closes on a single select, unlike multiple', async () => {
+    const user = userEvent.setup();
+    await render(<TestMultiSelect multiple={false} defaultValue="apple" />);
+
+    await user.press(screen.getByTestId('item-banana'));
+
+    expect(screen.queryByTestId('popup')).toBeNull();
+  });
+});

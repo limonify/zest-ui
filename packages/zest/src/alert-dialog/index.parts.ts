@@ -1,4 +1,5 @@
 export { AlertDialogRoot as Root } from './root/AlertDialogRoot';
+export { createAlertDialogHandle as createHandle } from './handle';
 export { AlertDialogTrigger as Trigger } from './trigger/AlertDialogTrigger';
 export { DialogPortal as Portal } from '../dialog/portal/DialogPortal';
 export { DialogBackdrop as Backdrop } from '../dialog/backdrop/DialogBackdrop';

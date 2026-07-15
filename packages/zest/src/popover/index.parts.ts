@@ -1,4 +1,5 @@
 export { PopoverRoot as Root } from './root/PopoverRoot';
+export { createPopoverHandle as createHandle, PopoverHandle as Handle } from './store/PopoverHandle';
 export { PopoverTrigger as Trigger } from './trigger/PopoverTrigger';
 export { PopoverPortal as Portal } from './portal/PopoverPortal';
 export { PopoverBackdrop as Backdrop } from './backdrop/PopoverBackdrop';

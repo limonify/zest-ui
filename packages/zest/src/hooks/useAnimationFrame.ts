@@ -25,8 +25,13 @@ class Scheduler {
 
   isScheduled = false;
 
+  /* The handle of the frame `tick` is scheduled on. Kept only so
+   * `resetAnimationFrameScheduler` can cancel it; the hot path never does. */
+  scheduledFrameId: AnimationFrameId | null = EMPTY;
+
   tick = (timestamp: number) => {
     this.isScheduled = false;
+    this.scheduledFrameId = EMPTY;
 
     const currentCallbacks = this.callbacks;
     const currentCallbacksCount = this.callbacksCount;
@@ -58,7 +63,7 @@ class Scheduler {
       ((LAST_RAF = requestAnimationFrame), true);
 
     if (!this.isScheduled || didRAFChange) {
-      requestAnimationFrame(this.tick);
+      this.scheduledFrameId = requestAnimationFrame(this.tick);
       this.isScheduled = true;
     }
     return id;
@@ -89,6 +94,16 @@ export function resetAnimationFrameScheduler() {
   scheduler.startId = previous.nextId;
   previous.callbacks = [];
   previous.callbacksCount = 0;
+
+  /* Dropping the callbacks is not enough: the frame `tick` is scheduled on is still pending, and
+   * jest-expo implements `requestAnimationFrame` as a `setTimeout` that reads the (by then torn
+   * down) Jest environment. Leaving it queued surfaces as a "you are trying to access ... after it
+   * has been torn down" error attributed to whichever test file scheduled it. */
+  if (previous.scheduledFrameId !== EMPTY) {
+    cancelAnimationFrame(previous.scheduledFrameId);
+    previous.scheduledFrameId = EMPTY;
+    previous.isScheduled = false;
+  }
 }
 
 export class AnimationFrame {

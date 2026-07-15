@@ -26,7 +26,9 @@
 
 **Milestone 8 (shipped):** the last of the roadmap — **`Progress`** (Root/Track/Indicator/Label/Value), **`Avatar`** (Root/Image/Fallback), **`NumberField`** (Root/Group/Input/Increment/Decrement/ScrubArea), **`OTPField`** (Root/Input), **`Toast`** (Provider/Viewport/Root/Title/Description/Action/Close + `createToastManager`/`useToastManager`), and snap points on **`Drawer`**. With it the roadmap is closed: every Base UI component is either ported or excluded with a reason.
 
-**Current totals:** 25 components, 503 Jest tests (jest-expo + @testing-library/react-native), Expo example app in `apps/example` exercising every one.
+**Milestone 9 (shipped):** the deferred sub-features, and the last bugs. **`Menu`** gains submenus (`SubmenuRoot`/`SubmenuTrigger`, opening on press since a touch screen has no hover), the checkbox/radio item family (`CheckboxItem`/`CheckboxItemIndicator`/`RadioGroup`/`RadioItem`/`RadioItemIndicator`) and `LinkItem`; **`Select`** gains `multiple`; **`Toast`** gains an anchored `Positioner`/`Arrow`; and Dialog, AlertDialog, Drawer, Popover and Menu all gain the **handle family** — `createHandle()`, `actionsRef`, `triggerId`, and payload-carrying children, which is what lets a trigger live outside its root or something else open a popup imperatively.
+
+**Current totals:** 25 components, 577 Jest tests (jest-expo + @testing-library/react-native), Expo example app in `apps/example` exercising every one.
 
 Notes that supersede older sections of this document:
 
@@ -536,6 +538,7 @@ These Base UI components will NOT be ported. They either don't fit the mobile in
 | `Combobox` | Mobile search pattern is different (search screen + `FlatList`). Not a 1:1 port. |
 | `Autocomplete` | Same as Combobox. Mobile uses search-as-you-type with native keyboard. |
 | `Toolbar` | Desktop toolbar pattern. Mobile uses bottom action bars or context menus. |
+| `Menu.Viewport` | Not a component of its own, but worth recording: it exists only to animate a content swap when one popup is opened by several triggers, and it works by capturing the previous content's DOM node and holding it on screen through a CSS transition. A rendered React Native node cannot be retained once its element is gone. |
 | `Field`, `Fieldset`, `Form` | React Native has no HTML form submission and no Tab key. This is a standing decision — see the notes at the top of this document. |
 | `Input` | Upstream's `Input` is a 17-line alias for `Field.Control`, and `Field` is not ported. Without it there is no component left to port: use React Native's `TextInput`. |
 | `Text` | Not a Base UI package at all — this document invented it. A wrapper around React Native's `<Text>` would add nothing. |
