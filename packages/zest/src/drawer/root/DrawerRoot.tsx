@@ -1,9 +1,15 @@
 'use client';
 import * as React from 'react';
 import { useRenderDialogRoot } from '../../dialog/root/useRenderDialogRoot';
+import { useControlled } from '../../hooks/useControlled';
+import { useStableCallback } from '../../hooks/useStableCallback';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
-import { DrawerRootContext, type DrawerSwipeDirection } from './DrawerRootContext';
+import {
+  DrawerRootContext,
+  type DrawerSnapPoint,
+  type DrawerSwipeDirection,
+} from './DrawerRootContext';
 
 /**
  * Groups all parts of the drawer.
@@ -15,19 +21,71 @@ import { DrawerRootContext, type DrawerSwipeDirection } from './DrawerRootContex
  * **Not ported from upstream.** `modal` (a React Native `Modal` is always modal,
  * and there is no page behind it to scroll-lock), `onOpenChangeComplete` (see the
  * animation contract in CLAUDE.md — nothing in RN reports that a closing
- * animation finished), `actionsRef`/`handle`/`triggerId` (detached triggers and
- * payloads, still unported for `Dialog` too), and the snap point family
- * (`snapPoints`, `snapPoint`, `onSnapPointChange`, `snapToSequentialPoints`).
+ * animation finished), and `actionsRef`/`handle`/`triggerId` (detached triggers
+ * and payloads, still unported for `Dialog` too).
  * Upstream's `Indent`/`IndentBackground` parts have no counterpart either: they
  * scale the page behind the drawer, which a `Modal` renders in a separate native
  * window from.
  */
 export function DrawerRoot(props: DrawerRoot.Props) {
-  const { swipeDirection = 'down', ...dialogProps } = props;
+  const {
+    swipeDirection = 'down',
+    snapPoints,
+    snapPoint,
+    defaultSnapPoint,
+    onSnapPointChange,
+    snapToSequentialPoints = false,
+    ...dialogProps
+  } = props;
+
+  const [popupHeight, setPopupHeight] = React.useState(0);
+
+  const [activeSnapPoint, setActiveSnapPointState] = useControlled<DrawerSnapPoint | null>({
+    controlled: snapPoint,
+    default: defaultSnapPoint ?? snapPoints?.[0] ?? null,
+    name: 'Drawer',
+    state: 'snapPoint',
+  });
+
+  const setActiveSnapPoint = useStableCallback(
+    (nextSnapPoint: DrawerSnapPoint | null, eventDetails: DrawerRoot.SnapPointChangeEventDetails) => {
+      if (nextSnapPoint === activeSnapPoint) {
+        return;
+      }
+
+      onSnapPointChange?.(nextSnapPoint, eventDetails);
+
+      if (eventDetails.isCanceled) {
+        return;
+      }
+
+      setActiveSnapPointState(nextSnapPoint);
+    },
+  );
+
+  const onPopupHeightChange = useStableCallback((height: number) => {
+    setPopupHeight(height);
+  });
 
   const contextValue: DrawerRootContext = React.useMemo(
-    () => ({ swipeDirection }),
-    [swipeDirection],
+    () => ({
+      swipeDirection,
+      snapPoints,
+      snapToSequentialPoints,
+      activeSnapPoint,
+      setActiveSnapPoint,
+      popupHeight,
+      onPopupHeightChange,
+    }),
+    [
+      swipeDirection,
+      snapPoints,
+      snapToSequentialPoints,
+      activeSnapPoint,
+      setActiveSnapPoint,
+      popupHeight,
+      onPopupHeightChange,
+    ],
   );
 
   const dialogRoot = useRenderDialogRoot(dialogProps, 'dialog');
@@ -69,6 +127,38 @@ export interface DrawerRootProps {
    */
   swipeDirection?: DrawerSwipeDirection | undefined;
   /**
+   * Snap points used to position the drawer. A number `<= 1` is a fraction of
+   * the viewport height, anything larger is a pixel value.
+   *
+   * A snap point describes how much of the drawer is *visible*, so snap points
+   * are vertical by nature and only apply to `swipeDirection: 'down'`.
+   */
+  snapPoints?: readonly DrawerSnapPoint[] | undefined;
+  /**
+   * The currently active snap point. Use with `onSnapPointChange` to control it.
+   */
+  snapPoint?: DrawerSnapPoint | null | undefined;
+  /**
+   * The initial snap point when uncontrolled. Defaults to the first of
+   * `snapPoints`.
+   */
+  defaultSnapPoint?: DrawerSnapPoint | null | undefined;
+  /**
+   * Event handler called when the active snap point changes.
+   */
+  onSnapPointChange?:
+    | ((
+        snapPoint: DrawerSnapPoint | null,
+        eventDetails: DrawerRoot.SnapPointChangeEventDetails,
+      ) => void)
+    | undefined;
+  /**
+   * Disables velocity-based snap skipping, so drag distance alone determines the
+   * next snap point.
+   * @default false
+   */
+  snapToSequentialPoints?: boolean | undefined;
+  /**
    * The content of the drawer.
    */
   children?: React.ReactNode;
@@ -85,10 +175,18 @@ export type DrawerRootChangeEventReason =
 
 export type DrawerRootChangeEventDetails = ZestChangeEventDetails<DrawerRootChangeEventReason>;
 
+export type DrawerRootSnapPointChangeEventReason = DrawerRootChangeEventReason;
+
+export type DrawerRootSnapPointChangeEventDetails =
+  ZestChangeEventDetails<DrawerRootSnapPointChangeEventReason>;
+
 export namespace DrawerRoot {
   export type State = DrawerRootState;
   export type Props = DrawerRootProps;
   export type ChangeEventReason = DrawerRootChangeEventReason;
   export type ChangeEventDetails = DrawerRootChangeEventDetails;
+  export type SnapPointChangeEventReason = DrawerRootSnapPointChangeEventReason;
+  export type SnapPointChangeEventDetails = DrawerRootSnapPointChangeEventDetails;
   export type SwipeDirection = DrawerSwipeDirection;
+  export type SnapPoint = DrawerSnapPoint;
 }

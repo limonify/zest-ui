@@ -13,6 +13,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   Accordion,
   AlertDialog,
+  Avatar,
   Button,
   Checkbox,
   CheckboxGroup,
@@ -20,7 +21,10 @@ import {
   Dialog,
   Drawer,
   Menu,
+  NumberField,
+  OTPField,
   Popover,
+  Progress,
   Radio,
   RadioGroup,
   Select,
@@ -28,6 +32,7 @@ import {
   Slider,
   Switch,
   Tabs,
+  Toast,
   Toggle,
   ToggleGroup,
   Tooltip,
@@ -79,6 +84,16 @@ export default function App() {
           <SliderSection />
           <Separator style={styles.separator} />
           <DrawerSection />
+          <Separator style={styles.separator} />
+          <ProgressSection />
+          <Separator style={styles.separator} />
+          <AvatarSection />
+          <Separator style={styles.separator} />
+          <NumberFieldSection />
+          <Separator style={styles.separator} />
+          <OTPFieldSection />
+          <Separator style={styles.separator} />
+          <ToastSection />
         </ScrollView>
         <StatusBar style="auto" />
       </SafeAreaView>
@@ -794,6 +809,250 @@ function DrawerSection() {
   );
 }
 
+function ProgressSection() {
+  const [value, setValue] = React.useState(30);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Progress</Text>
+
+      <Progress.Root value={value} style={styles.group}>
+        <View style={styles.row}>
+          <Progress.Label style={styles.label}>Uploading</Progress.Label>
+          <Progress.Value style={styles.label} />
+        </View>
+        <Progress.Track style={styles.progressTrack}>
+          <Progress.Indicator
+            style={(state) => [
+              styles.progressIndicator,
+              state.status === 'complete' && styles.progressIndicatorComplete,
+            ]}
+          />
+        </Progress.Track>
+      </Progress.Root>
+
+      <View style={styles.row}>
+        <Button
+          onPress={() => setValue((v) => Math.max(0, v - 25))}
+          style={(state) => [styles.button, state.pressed && styles.buttonPressed]}
+        >
+          <Text style={styles.buttonText}>-25</Text>
+        </Button>
+        <Button
+          onPress={() => setValue((v) => Math.min(100, v + 25))}
+          style={(state) => [styles.button, state.pressed && styles.buttonPressed]}
+        >
+          <Text style={styles.buttonText}>+25</Text>
+        </Button>
+      </View>
+
+      <Text style={styles.label}>
+        Indeterminate: no width is applied at all, so the appearance is entirely yours.
+      </Text>
+      <Progress.Root value={null}>
+        <Progress.Track style={styles.progressTrack}>
+          <Progress.Indicator style={styles.progressIndicatorIndeterminate} />
+        </Progress.Track>
+      </Progress.Root>
+    </View>
+  );
+}
+
+function AvatarSection() {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Avatar</Text>
+      <Text style={styles.label}>
+        The second avatar's image 404s, so its fallback stays visible.
+      </Text>
+      <View style={styles.row}>
+        <Avatar.Root style={styles.avatar}>
+          <Avatar.Image
+            source={{ uri: 'https://i.pravatar.cc/100?img=12' }}
+            style={styles.avatarImage}
+          />
+          <Avatar.Fallback style={styles.avatarFallback}>
+            <Text style={styles.avatarInitials}>EB</Text>
+          </Avatar.Fallback>
+        </Avatar.Root>
+
+        <Avatar.Root style={styles.avatar}>
+          <Avatar.Image source={{ uri: 'https://example.com/missing.png' }} style={styles.avatarImage} />
+          <Avatar.Fallback style={styles.avatarFallback}>
+            <Text style={styles.avatarInitials}>404</Text>
+          </Avatar.Fallback>
+        </Avatar.Root>
+      </View>
+    </View>
+  );
+}
+
+function NumberFieldSection() {
+  const [value, setValue] = React.useState<number | null>(2);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>NumberField</Text>
+      <Text style={styles.label}>
+        Drag the ✥ handle sideways to scrub the value, or hold a stepper to repeat.
+      </Text>
+
+      <NumberField.Root value={value} onValueChange={setValue} min={0} max={20} style={styles.group}>
+        <View style={styles.row}>
+          <NumberField.ScrubArea style={styles.scrubArea}>
+            <Text style={styles.label}>✥</Text>
+          </NumberField.ScrubArea>
+
+          <NumberField.Group style={styles.numberFieldGroup}>
+            <NumberField.Decrement
+              style={(state) => [
+                styles.stepper,
+                state.pressed && styles.buttonPressed,
+                state.disabled && styles.buttonDisabled,
+              ]}
+            >
+              <Text style={styles.buttonText}>−</Text>
+            </NumberField.Decrement>
+            <NumberField.Input style={styles.numberFieldInput} />
+            <NumberField.Increment
+              style={(state) => [
+                styles.stepper,
+                state.pressed && styles.buttonPressed,
+                state.disabled && styles.buttonDisabled,
+              ]}
+            >
+              <Text style={styles.buttonText}>+</Text>
+            </NumberField.Increment>
+          </NumberField.Group>
+        </View>
+      </NumberField.Root>
+
+      <Text style={styles.label}>Formatted as a currency:</Text>
+      <NumberField.Root
+        defaultValue={19.99}
+        step={0.5}
+        format={{ style: 'currency', currency: 'USD' }}
+        locale="en-US"
+      >
+        <NumberField.Group style={styles.numberFieldGroup}>
+          <NumberField.Decrement style={(state) => [styles.stepper, state.pressed && styles.buttonPressed]}>
+            <Text style={styles.buttonText}>−</Text>
+          </NumberField.Decrement>
+          <NumberField.Input style={styles.numberFieldInput} />
+          <NumberField.Increment style={(state) => [styles.stepper, state.pressed && styles.buttonPressed]}>
+            <Text style={styles.buttonText}>+</Text>
+          </NumberField.Increment>
+        </NumberField.Group>
+      </NumberField.Root>
+    </View>
+  );
+}
+
+function OTPFieldSection() {
+  const [completed, setCompleted] = React.useState<string | null>(null);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>OTPField</Text>
+      <Text style={styles.label}>
+        The first slot advertises `one-time-code`, so the OS offers a code it read from an SMS —
+        pasting or autofilling it spreads across every slot.
+      </Text>
+      {completed ? <Text style={styles.label}>Completed: {completed}</Text> : null}
+
+      <OTPField.Root length={6} onValueComplete={setCompleted} style={styles.row}>
+        {Array.from({ length: 6 }, (_, index) => (
+          <OTPField.Input
+            key={index}
+            style={(state) => [styles.otpSlot, state.filled && styles.otpSlotFilled]}
+          />
+        ))}
+      </OTPField.Root>
+    </View>
+  );
+}
+
+function ToastSection() {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Toast</Text>
+      <Text style={styles.label}>
+        Toasts are the one popup that is not a Modal: the app underneath has to stay usable. Swipe
+        one right to dismiss it.
+      </Text>
+
+      <Toast.Provider timeout={4000} limit={3}>
+        <ToastButtons />
+        <ToastList />
+      </Toast.Provider>
+    </View>
+  );
+}
+
+function ToastButtons() {
+  const { add, promise } = Toast.useToastManager();
+
+  return (
+    <View style={styles.row}>
+      <Button
+        onPress={() => add({ title: 'Saved', description: 'Your changes are safe.' })}
+        style={(state) => [styles.button, state.pressed && styles.buttonPressed]}
+      >
+        <Text style={styles.buttonText}>Add toast</Text>
+      </Button>
+      <Button
+        onPress={() =>
+          promise(new Promise((resolve) => setTimeout(resolve, 1500)), {
+            loading: 'Saving…',
+            success: 'Saved!',
+            error: 'Failed to save',
+          }).catch(() => {})
+        }
+        style={(state) => [styles.button, state.pressed && styles.buttonPressed]}
+      >
+        <Text style={styles.buttonText}>Promise</Text>
+      </Button>
+    </View>
+  );
+}
+
+/**
+ * The toast viewport is placed inside the Provider and positioned by the
+ * consumer. `offsetY` is how far down the stack each toast sits — the counterpart
+ * of the web version's `--toast-offset-y` CSS variable.
+ */
+function ToastList() {
+  const { toasts } = Toast.useToastManager();
+
+  return (
+    <Toast.Viewport style={styles.toastViewport}>
+      {toasts.map((toast) => (
+        <Toast.Root
+          key={toast.id}
+          toast={toast}
+          style={(state) => [
+            styles.toast,
+            state.type === 'error' && styles.toastError,
+            state.limited && styles.toastLimited,
+            {
+              transform: [
+                { translateY: -state.offsetY - state.visibleIndex * 8 },
+                { translateX: Math.max(state.swipeMovement, 0) },
+              ],
+            },
+          ]}
+        >
+          <Toast.Title style={styles.toastTitle} />
+          <Toast.Description style={styles.toastDescription} />
+          <Toast.Close style={(state) => [styles.toastClose, state.pressed && styles.buttonPressed]}>
+            <Text style={styles.toastCloseText}>✕</Text>
+          </Toast.Close>
+        </Toast.Root>
+      ))}
+    </Toast.Viewport>
+  );
+}
+
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -1103,6 +1362,129 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     alignSelf: 'center',
     marginBottom: 8,
+  },
+  progressTrack: {
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E5E5EA',
+    overflow: 'hidden',
+  },
+  progressIndicator: {
+    height: '100%',
+    borderRadius: 4,
+    backgroundColor: '#007AFF',
+  },
+  progressIndicatorComplete: {
+    backgroundColor: '#34C759',
+  },
+  progressIndicatorIndeterminate: {
+    height: '100%',
+    width: '40%',
+    borderRadius: 4,
+    backgroundColor: '#C7C7CC',
+  },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    overflow: 'hidden',
+    backgroundColor: '#E5E5EA',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  avatarFallback: {
+    ...StyleSheet.absoluteFill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#D1D1D6',
+  },
+  avatarInitials: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#3A3A3C',
+  },
+  scrubArea: {
+    padding: 12,
+  },
+  numberFieldGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    overflow: 'hidden',
+    alignSelf: 'flex-start',
+  },
+  stepper: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  numberFieldInput: {
+    minWidth: 90,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    textAlign: 'center',
+    fontSize: 15,
+    color: '#000',
+  },
+  otpSlot: {
+    width: 44,
+    height: 52,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    textAlign: 'center',
+    fontSize: 20,
+    color: '#000',
+  },
+  otpSlotFilled: {
+    borderColor: '#007AFF',
+    backgroundColor: '#EEF4FF',
+  },
+  toastViewport: {
+    // The viewport fills its parent and lets touches through; only the toasts
+    // themselves are interactive.
+    height: 220,
+    justifyContent: 'flex-end',
+  },
+  toast: {
+    backgroundColor: '#1C1C1E',
+    borderRadius: 12,
+    padding: 16,
+    paddingRight: 44,
+    gap: 4,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  toastError: {
+    backgroundColor: '#FF3B30',
+  },
+  toastLimited: {
+    opacity: 0,
+  },
+  toastTitle: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  toastDescription: {
+    color: '#EBEBF5',
+    fontSize: 13,
+  },
+  toastClose: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    padding: 8,
+  },
+  toastCloseText: {
+    color: '#fff',
+    fontSize: 14,
   },
   dialogDescription: {
     fontSize: 14,
