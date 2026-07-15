@@ -1,0 +1,9 @@
+export { AlertDialogRoot as Root } from './root/AlertDialogRoot';
+export { AlertDialogTrigger as Trigger } from './trigger/AlertDialogTrigger';
+export { DialogPortal as Portal } from '../dialog/portal/DialogPortal';
+export { DialogBackdrop as Backdrop } from '../dialog/backdrop/DialogBackdrop';
+export { DialogViewport as Viewport } from '../dialog/viewport/DialogViewport';
+export { DialogPopup as Popup } from '../dialog/popup/DialogPopup';
+export { DialogTitle as Title } from '../dialog/title/DialogTitle';
+export { DialogDescription as Description } from '../dialog/description/DialogDescription';
+export { DialogClose as Close } from '../dialog/close/DialogClose';
