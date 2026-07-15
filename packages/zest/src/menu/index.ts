@@ -1,6 +1,7 @@
 export * as Menu from './index.parts';
 
 export type * from './root/MenuRoot';
+export { createMenuHandle, MenuHandle } from './store/MenuHandle';
 export type * from './trigger/MenuTrigger';
 export type * from './portal/MenuPortal';
 export type * from './backdrop/MenuBackdrop';
@@ -8,6 +9,16 @@ export type * from './positioner/MenuPositioner';
 export type * from './popup/MenuPopup';
 export type * from './arrow/MenuArrow';
 export type * from './item/MenuItem';
+export type * from './link-item/MenuLinkItem';
+export type * from './checkbox-item/MenuCheckboxItem';
+export type * from './checkbox-item-indicator/MenuCheckboxItemIndicator';
+export type * from './radio-group/MenuRadioGroup';
+export type * from './radio-item/MenuRadioItem';
+export type * from './radio-item-indicator/MenuRadioItemIndicator';
+export { useMenuRadioGroupContext } from './radio-group/MenuRadioGroupContext';
 export type * from './group/MenuGroup';
 export type * from './group-label/MenuGroupLabel';
+export type * from './submenu-root/MenuSubmenuRoot';
+export type * from './submenu-trigger/MenuSubmenuTrigger';
+export { useMenuSubmenuRootContext } from './submenu-root/MenuSubmenuRootContext';
 export { useMenuRootContext } from './root/MenuRootContext';

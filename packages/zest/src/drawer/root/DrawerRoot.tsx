@@ -1,6 +1,8 @@
 'use client';
 import * as React from 'react';
+import type { DialogRoot } from '../../dialog/root/DialogRoot';
 import { useRenderDialogRoot } from '../../dialog/root/useRenderDialogRoot';
+import type { DrawerHandle } from '../handle';
 import { useControlled } from '../../hooks/useControlled';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
@@ -19,15 +21,14 @@ import {
  * reuses the dialog store and every dialog part but its own `Drawer.Popup`.
  *
  * **Not ported from upstream.** `modal` (a React Native `Modal` is always modal,
- * and there is no page behind it to scroll-lock), `onOpenChangeComplete` (see the
- * animation contract in CLAUDE.md — nothing in RN reports that a closing
- * animation finished), and `actionsRef`/`handle`/`triggerId` (detached triggers
- * and payloads, still unported for `Dialog` too).
+ * and there is no page behind it to scroll-lock) and `onOpenChangeComplete` (see
+ * the animation contract in CLAUDE.md — nothing in RN reports that a closing
+ * animation finished).
  * Upstream's `Indent`/`IndentBackground` parts have no counterpart either: they
  * scale the page behind the drawer, which a `Modal` renders in a separate native
  * window from.
  */
-export function DrawerRoot(props: DrawerRoot.Props) {
+export function DrawerRoot<Payload = unknown>(props: DrawerRoot.Props<Payload>) {
   const {
     swipeDirection = 'down',
     snapPoints,
@@ -97,7 +98,7 @@ export function DrawerRoot(props: DrawerRoot.Props) {
 
 export interface DrawerRootState {}
 
-export interface DrawerRootProps {
+export interface DrawerRootProps<Payload = unknown> {
   /**
    * Whether the drawer is currently open.
    */
@@ -159,9 +160,29 @@ export interface DrawerRootProps {
    */
   snapToSequentialPoints?: boolean | undefined;
   /**
-   * The content of the drawer.
+   * A ref to imperative actions.
    */
-  children?: React.ReactNode;
+  actionsRef?: React.RefObject<DialogRoot.Actions | null> | undefined;
+  /**
+   * A handle associating this drawer with triggers rendered outside it, and
+   * letting it be opened and closed imperatively. Create one with
+   * `Drawer.createHandle()`.
+   */
+  handle?: DrawerHandle<Payload> | undefined;
+  /**
+   * The id of the trigger the drawer is associated with.
+   */
+  triggerId?: string | null | undefined;
+  /**
+   * The id of the trigger the drawer is initially associated with.
+   */
+  defaultTriggerId?: string | null | undefined;
+  /**
+   * The content of the drawer.
+   *
+   * Pass a function to receive the payload the drawer was opened with.
+   */
+  children?: React.ReactNode | ((payload: Payload) => React.ReactNode);
 }
 
 export type DrawerRootChangeEventReason =
@@ -182,7 +203,8 @@ export type DrawerRootSnapPointChangeEventDetails =
 
 export namespace DrawerRoot {
   export type State = DrawerRootState;
-  export type Props = DrawerRootProps;
+  export type Props<Payload = unknown> = DrawerRootProps<Payload>;
+  export type Actions = DialogRoot.Actions;
   export type ChangeEventReason = DrawerRootChangeEventReason;
   export type ChangeEventDetails = DrawerRootChangeEventDetails;
   export type SnapPointChangeEventReason = DrawerRootSnapPointChangeEventReason;

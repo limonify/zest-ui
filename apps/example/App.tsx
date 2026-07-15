@@ -18,6 +18,7 @@ import {
   Checkbox,
   CheckboxGroup,
   Collapsible,
+  createDialogHandle,
   Dialog,
   Drawer,
   Menu,
@@ -80,6 +81,10 @@ export default function App() {
           <MenuSection />
           <Separator style={styles.separator} />
           <SelectSection />
+          <Separator style={styles.separator} />
+          <MultiSelectSection />
+          <Separator style={styles.separator} />
+          <HandleSection />
           <Separator style={styles.separator} />
           <SliderSection />
           <Separator style={styles.separator} />
@@ -628,10 +633,15 @@ function TooltipSection() {
 
 function MenuSection() {
   const [lastAction, setLastAction] = React.useState<string | null>(null);
+  const [gridlines, setGridlines] = React.useState(false);
+  const [size, setSize] = React.useState('md');
 
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Menu</Text>
+      <Text style={styles.label}>
+        Submenus open on press, not hover — and each one is a Modal nested inside its parent's.
+      </Text>
       {lastAction ? <Text style={styles.label}>Last action: {lastAction}</Text> : null}
 
       <Menu.Root>
@@ -655,6 +665,61 @@ function MenuSection() {
                   </Menu.Item>
                 ))}
               </Menu.Group>
+              <Menu.Separator style={styles.separator} />
+
+              <Menu.CheckboxItem
+                checked={gridlines}
+                onCheckedChange={setGridlines}
+                style={(state) => [styles.menuItem, state.pressed && styles.menuItemPressed]}
+              >
+                <Text style={styles.label}>Show gridlines</Text>
+                <Menu.CheckboxItemIndicator>
+                  <Text style={styles.label}>✓</Text>
+                </Menu.CheckboxItemIndicator>
+              </Menu.CheckboxItem>
+
+              <Menu.Separator style={styles.separator} />
+              <Menu.RadioGroup value={size} onValueChange={setSize}>
+                <Menu.GroupLabel style={styles.groupLabel}>Size</Menu.GroupLabel>
+                {['sm', 'md', 'lg'].map((option) => (
+                  <Menu.RadioItem
+                    key={option}
+                    value={option}
+                    style={(state) => [styles.menuItem, state.pressed && styles.menuItemPressed]}
+                  >
+                    <Text style={styles.label}>{option}</Text>
+                    <Menu.RadioItemIndicator>
+                      <Text style={styles.label}>•</Text>
+                    </Menu.RadioItemIndicator>
+                  </Menu.RadioItem>
+                ))}
+              </Menu.RadioGroup>
+
+              <Menu.Separator style={styles.separator} />
+              <Menu.SubmenuRoot>
+                <Menu.SubmenuTrigger
+                  style={(state) => [styles.menuItem, state.pressed && styles.menuItemPressed]}
+                >
+                  <Text style={styles.label}>Share</Text>
+                  <Text style={styles.label}>›</Text>
+                </Menu.SubmenuTrigger>
+                <Menu.Portal>
+                  <Menu.Positioner side="right" align="start" sideOffset={4}>
+                    <Menu.Popup style={styles.floatingPopup}>
+                      {['Email', 'Copy link'].map((action) => (
+                        <Menu.Item
+                          key={action}
+                          onPress={() => setLastAction(action)}
+                          style={(state) => [styles.menuItem, state.pressed && styles.menuItemPressed]}
+                        >
+                          <Text style={styles.label}>{action}</Text>
+                        </Menu.Item>
+                      ))}
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.SubmenuRoot>
+
               <Menu.Separator style={styles.separator} />
               <Menu.Item
                 onPress={() => setLastAction('Delete')}
@@ -719,6 +784,105 @@ function SelectSection() {
           </Select.Positioner>
         </Select.Portal>
       </Select.Root>
+    </View>
+  );
+}
+
+function MultiSelectSection() {
+  const [values, setValues] = React.useState<string[]>(['apple']);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Select (multiple)</Text>
+      <Text style={styles.label}>
+        A multiple select toggles items instead of replacing, and stays open until dismissed.
+      </Text>
+
+      <Select.Root multiple items={FRUITS} value={values} onValueChange={setValues}>
+        <Select.Trigger style={(state) => [styles.selectTrigger, state.pressed && styles.buttonPressed]}>
+          <Select.Value style={styles.label}>
+            {(state) => (state.labels.length > 0 ? state.labels.join(' + ') : 'Pick fruit')}
+          </Select.Value>
+          <Select.Icon style={styles.label}>
+            <Text style={styles.label}>▾</Text>
+          </Select.Icon>
+        </Select.Trigger>
+
+        <Select.Portal>
+          <Select.Backdrop style={styles.transparentBackdrop} />
+          <Select.Positioner side="bottom" align="start" sideOffset={4}>
+            <Select.Popup style={styles.floatingPopup}>
+              <Select.List>
+                {FRUITS.map((fruit) => (
+                  <Select.Item
+                    key={fruit.value}
+                    value={fruit.value}
+                    style={(state) => [styles.menuItem, state.selected && styles.menuItemSelected]}
+                  >
+                    <Select.ItemText style={styles.label}>{fruit.label}</Select.ItemText>
+                    <Select.ItemIndicator>
+                      <Text style={styles.label}>✓</Text>
+                    </Select.ItemIndicator>
+                  </Select.Item>
+                ))}
+              </Select.List>
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>
+    </View>
+  );
+}
+
+/**
+ * A handle is what lets a trigger live outside its root — there is no context
+ * reaching across — and lets anything else open the dialog imperatively.
+ */
+const confirmDialog = createDialogHandle<{ file: string }>();
+
+function HandleSection() {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Handles</Text>
+      <Text style={styles.label}>
+        Both buttons drive the same Dialog.Root below, which neither of them contains.
+      </Text>
+
+      <View style={styles.row}>
+        <Dialog.Trigger
+          handle={confirmDialog}
+          payload={{ file: 'report.pdf' }}
+          style={(state) => [styles.button, state.pressed && styles.buttonPressed]}
+        >
+          <Text style={styles.buttonText}>Detached trigger</Text>
+        </Dialog.Trigger>
+
+        <Button
+          onPress={() => confirmDialog.openWithPayload({ file: 'imperative.txt' })}
+          style={(state) => [styles.button, state.pressed && styles.buttonPressed]}
+        >
+          <Text style={styles.buttonText}>Imperative</Text>
+        </Button>
+      </View>
+
+      <Dialog.Root handle={confirmDialog}>
+        {(payload) => (
+          <Dialog.Portal>
+            <Dialog.Backdrop style={styles.backdrop} />
+            <Dialog.Viewport style={styles.viewport}>
+              <Dialog.Popup style={styles.popup}>
+                <Dialog.Title style={styles.dialogTitle}>Delete {payload?.file}?</Dialog.Title>
+                <Dialog.Description style={styles.dialogDescription}>
+                  The payload came from whichever button opened this dialog.
+                </Dialog.Description>
+                <Dialog.Close style={(state) => [styles.button, state.pressed && styles.buttonPressed]}>
+                  <Text style={styles.buttonText}>Close</Text>
+                </Dialog.Close>
+              </Dialog.Popup>
+            </Dialog.Viewport>
+          </Dialog.Portal>
+        )}
+      </Dialog.Root>
     </View>
   );
 }

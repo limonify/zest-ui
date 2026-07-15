@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { Text } from 'react-native';
+import { AppState, Text, type AppStateStatus } from 'react-native';
 import { act, fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { GestureHandlerRootView, State } from 'react-native-gesture-handler';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { Toast, createToastManager } from '../index';
+import { ToastStore } from '../store';
 import type { ToastProviderProps } from '../provider/ToastProvider';
 
 function ToastList({ removeOnClose }: { removeOnClose?: boolean }) {
@@ -61,6 +62,31 @@ function toastIds() {
   return screen
     .queryAllByTestId(/^toast-/)
     .map((node) => node.props.testID.replace('toast-', ''));
+}
+
+/**
+ * React Native offers no way to emit an AppState change, so every test runs with
+ * the listener `Toast.Provider` registers captured here. Installed for the whole
+ * file rather than per test: it must be in place before any Provider mounts.
+ */
+let appStateListener: ((status: AppStateStatus) => void) | undefined;
+
+beforeEach(() => {
+  appStateListener = undefined;
+  jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, handler) => {
+    appStateListener = handler as (status: AppStateStatus) => void;
+    return { remove: () => {} } as ReturnType<typeof AppState.addEventListener>;
+  });
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
+async function emitAppState(status: AppStateStatus) {
+  await act(async () => {
+    appStateListener?.(status);
+  });
 }
 
 /** Swipes a toast by `translationX` pixels and releases. */
@@ -444,6 +470,69 @@ describe('Toast', () => {
       });
 
       expect(onRemove).toHaveBeenCalled();
+    });
+  });
+
+  describe('pausing', () => {
+    // A full gesture cannot show this end to end: `fireGestureHandler` always
+    // ends the gesture it fires, and pause/resume both land in the same
+    // synchronous batch, so no fake-timer time passes while paused.
+    it('pauses the timers while a finger is on the toast, and resumes after', async () => {
+      const pauseTimers = jest.spyOn(ToastStore.prototype, 'pauseTimers');
+      const resumeTimers = jest.spyOn(ToastStore.prototype, 'resumeTimers');
+      const manager = createToastManager();
+      await render(<TestToasts toastManager={manager} timeout={1000} />);
+
+      let id = '';
+      await act(async () => {
+        id = manager.add({ title: 'Saved' });
+      });
+      pauseTimers.mockClear();
+      resumeTimers.mockClear();
+
+      await swipe(`toast-${id}`, 0);
+
+      expect(pauseTimers).toHaveBeenCalled();
+      expect(resumeTimers).toHaveBeenCalled();
+    });
+
+    it('does not resume while the app is backgrounded', async () => {
+      const resumeTimers = jest.spyOn(ToastStore.prototype, 'resumeTimers');
+      const manager = createToastManager();
+      await render(<TestToasts toastManager={manager} timeout={1000} />);
+
+      let id = '';
+      await act(async () => {
+        id = manager.add({ title: 'Saved' });
+      });
+
+      await emitAppState('background');
+      resumeTimers.mockClear();
+
+      // Letting go while the app is in the background must not restart the
+      // countdown — nobody can see the toast.
+      await swipe(`toast-${id}`, 0);
+
+      expect(resumeTimers).not.toHaveBeenCalled();
+    });
+
+    it('pauses and resumes the timers with the app going to the background', async () => {
+      const pauseTimers = jest.spyOn(ToastStore.prototype, 'pauseTimers');
+      const resumeTimers = jest.spyOn(ToastStore.prototype, 'resumeTimers');
+      const manager = createToastManager();
+      await render(<TestToasts toastManager={manager} timeout={1000} />);
+
+      await act(async () => {
+        manager.add({ title: 'Saved' });
+      });
+      pauseTimers.mockClear();
+      resumeTimers.mockClear();
+
+      await emitAppState('background');
+      expect(pauseTimers).toHaveBeenCalled();
+
+      await emitAppState('active');
+      expect(resumeTimers).toHaveBeenCalled();
     });
   });
 

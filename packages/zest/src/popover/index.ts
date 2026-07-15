@@ -1,6 +1,7 @@
 export * as Popover from './index.parts';
 
 export type * from './root/PopoverRoot';
+export { createPopoverHandle, PopoverHandle } from './store/PopoverHandle';
 export type * from './trigger/PopoverTrigger';
 export type * from './portal/PopoverPortal';
 export type * from './backdrop/PopoverBackdrop';

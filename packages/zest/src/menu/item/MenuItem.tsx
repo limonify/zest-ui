@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { Pressable, type GestureResponderEvent } from 'react-native';
 import { useMenuRootContext } from '../root/MenuRootContext';
+import { useMenuSubmenuRootContext } from '../submenu-root/MenuSubmenuRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
@@ -29,6 +30,7 @@ export function MenuItem(componentProps: MenuItem.Props) {
   } = componentProps;
 
   const store = useMenuRootContext();
+  const submenuRootContext = useMenuSubmenuRootContext();
 
   const { index, onLayout } = useCompositeListItem();
 
@@ -55,6 +57,9 @@ export function MenuItem(componentProps: MenuItem.Props) {
 
           if (closeOnClick) {
             store.setOpen(false, createChangeEventDetails(REASONS.itemPress, event));
+            // Choosing an item dismisses the whole menu, not just the submenu it
+            // happens to sit in.
+            submenuRootContext?.closeAncestors(REASONS.itemPress, event);
           }
         },
         onPressIn() {

@@ -168,7 +168,7 @@ describe('Popover', () => {
           <Text>Orphan</Text>
         </Popover.Trigger>,
       ),
-    ).rejects.toThrow(/PopoverRootContext is missing/);
+    ).rejects.toThrow(/must be placed within <Popover.Root>, or given a `handle`/);
 
     consoleError.mockRestore();
   });

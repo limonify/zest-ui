@@ -1,5 +1,6 @@
 import { createSelector } from '../../store/createSelector';
 import { ReactStore } from '../../store/ReactStore';
+import { PopupTriggerMap } from '../../utils/popups/PopupTriggerMap';
 import type { MenuRoot } from '../root/MenuRoot';
 
 export type State = {
@@ -11,10 +12,28 @@ export type State = {
    */
   triggerNode: unknown;
   update: (() => void) | undefined;
+  /**
+   * The payload of the trigger the popup was opened by, handed to the root's
+   * children when they are a function.
+   */
+  payload: unknown;
+  /**
+   * The id of the trigger the popup is associated with, or `null` for none.
+   */
+  triggerId: string | null;
+  /**
+   * The controlled `triggerId` prop, when provided.
+   */
+  triggerIdProp: string | null | undefined;
 };
 
 type Context = {
   onOpenChange: ((open: boolean, eventDetails: MenuRoot.ChangeEventDetails) => void) | undefined;
+  /**
+   * Every trigger bound to this popup, by id. A handle resolves `open(id)`
+   * through this, which is what lets a trigger rendered outside the root open it.
+   */
+  triggerNodes: PopupTriggerMap;
 };
 
 const selectors = {
@@ -22,6 +41,8 @@ const selectors = {
   disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
   triggerNode: createSelector((state: State) => state.triggerNode),
   update: createSelector((state: State) => state.update),
+  payload: createSelector((state: State) => state.payload),
+  triggerId: createSelector((state: State) => state.triggerIdProp ?? state.triggerId),
 };
 
 export class MenuStore extends ReactStore<Readonly<State>, Context, typeof selectors> {
@@ -33,9 +54,12 @@ export class MenuStore extends ReactStore<Readonly<State>, Context, typeof selec
         disablePointerDismissal: false,
         triggerNode: null,
         update: undefined,
+        payload: undefined,
+        triggerId: null,
+        triggerIdProp: undefined,
         ...initialState,
       },
-      { onOpenChange: undefined },
+      { onOpenChange: undefined, triggerNodes: new PopupTriggerMap() },
       selectors,
     );
   }
