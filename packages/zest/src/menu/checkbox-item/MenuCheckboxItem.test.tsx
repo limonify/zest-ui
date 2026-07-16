@@ -279,6 +279,31 @@ describe('Menu.RadioItem', () => {
     expect(screen.getByTestId('group').props.accessibilityRole).toBe('radiogroup');
     expect(screen.getByTestId('item-sm').props.accessibilityRole).toBe('menuitem');
   });
+
+  // A device render surfaced this: like upstream, a RadioGroup must itself
+  // provide the group context a `Menu.GroupLabel` reads, or the label throws.
+  it('labels itself with a Menu.GroupLabel placed inside it', async () => {
+    await render(
+      <Menu.Root defaultOpen>
+        <Menu.Portal>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.RadioGroup testID="group">
+                <Menu.GroupLabel testID="label">Size</Menu.GroupLabel>
+                <Menu.RadioItem value="sm">
+                  <Text>sm</Text>
+                </Menu.RadioItem>
+              </Menu.RadioGroup>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>,
+    );
+
+    const labelId = screen.getByTestId('label').props.nativeID;
+    expect(labelId).toBeTruthy();
+    expect(screen.getByTestId('group').props.accessibilityLabelledBy).toBe(labelId);
+  });
 });
 
 describe('Menu.LinkItem', () => {
