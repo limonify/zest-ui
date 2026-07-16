@@ -84,6 +84,26 @@ describe('Combobox', () => {
     expect(screen.queryByTestId('popup')).toBeNull();
   });
 
+  it('does not warn about a changing default when a controlled value updates', async () => {
+    const warn = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      function Controlled() {
+        const [value, setValue] = React.useState<unknown>(null);
+        return <TestCombobox defaultOpen value={value} onValueChange={setValue} />;
+      }
+      await render(<Controlled />);
+
+      const user = userEvent.setup();
+      await user.press(screen.getByTestId('item-Banana'));
+
+      expect(warn).not.toHaveBeenCalledWith(
+        expect.stringContaining('changing the default'),
+      );
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
   it('closes on an outside press', async () => {
     await render(<TestCombobox defaultOpen />);
 
