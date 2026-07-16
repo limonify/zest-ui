@@ -30,7 +30,9 @@
 
 **Milestone 10 (shipped):** the four sub-parts overlooked in the earlier per-component sweep, each now with tests and an `apps/example` demo. **`Select`** gains `Label` (associates a `Text` with the trigger via `accessibilityLabelledBy`) and `Arrow` (positioned against the popup anchor, `aria-hidden`); **`Slider`** gains `Label` (associated with the thumbs); **`Drawer`** gains `SwipeArea` (an edge strip whose swipe *opens* the drawer, defaulting to the opposite of the dismiss `swipeDirection`). See "Excluded sub-parts" below for what remains deliberately unported and why — that list, previously undocumented, is now complete.
 
-**Current totals:** 25 components, 594 Jest tests (jest-expo + @testing-library/react-native), Expo example app in `apps/example` exercising every one.
+**Milestone 11 (shipped):** parity port of six components previously excluded, added after confirming they *are* portable to React Native. **`Field`** (Root/Label/Control/Description/Error/Validity), **`Fieldset`** (Root/Legend) and **`Input`** — an accessibility + validation wrapper around `TextInput`, with validation adapted to a `validate` function (no HTML constraint API). **`ContextMenu`** (Root/Trigger/Positioner + the reused menu parts) — a menu opened by long press, anchored to the touch point. **`Combobox`** and **`Autocomplete`** (Root/Input/Portal/Backdrop/Positioner/Popup/List/Item/Empty/Value) — a text input filtering a list, in single-select and free-text modes. Only genuinely desktop-only components remain excluded.
+
+**Current totals:** 31 components, 616 Jest tests (jest-expo + @testing-library/react-native), Expo example app in `apps/example` exercising every one.
 
 Notes that supersede older sections of this document:
 
@@ -528,20 +530,18 @@ These components are React Native-specific. They don't exist in Base UI but fill
 
 These Base UI components will NOT be ported. They either don't fit the mobile interaction model or have better native alternatives.
 
+> **Update:** `ContextMenu`, `Combobox`, `Autocomplete`, `Field`, `Fieldset` and `Input` were added later for parity — they *are* portable to React Native (a long-press menu, a filtered-list input, an accessibility/validation wrapper). ContextMenu opens on long press; Field/Fieldset adapt validation to a `validate` function since RN has no HTML constraint API; Input is the standalone `TextInput`. `Form` stays excluded — it aggregates submit-time validation across a `<form>`, which RN has no counterpart for.
+
 | Component | Reason for Exclusion |
 |---|---|
-| `ContextMenu` | Right-click menu doesn't exist on mobile. Native `UIContextMenu` (iOS) / `PopupMenu` (Android) are the platform-appropriate patterns. |
 | `PreviewCard` | Hover card. Mobile has no hover interaction. A long-press equivalent would be a different UX. |
 | `Menubar` | Desktop-only navigation pattern. Mobile uses bottom tabs, hamburger menus, or tab bars. |
 | `NavigationMenu` | Desktop multi-level hover menu. Mobile navigation uses different patterns (stack navigators, drawers). |
 | `Meter` | Rarely used on mobile. Not worth the port effort. |
 | `ScrollArea` | React Native has native scrolling (`ScrollView`, `FlatList`). No custom scroll area needed. |
+| `Toolbar` | Desktop toolbar pattern (roving tabindex). Mobile uses bottom action bars or context menus. |
+| `Form` | Aggregates constraint-validation errors across an HTML `<form>` on submit. React Native has no form submission; `Field`'s own `validate` covers per-field validation. |
 | `CSPProvider` | Content Security Policy is a web-only concept. |
-| `Combobox` | Mobile search pattern is different (search screen + `FlatList`). Not a 1:1 port. |
-| `Autocomplete` | Same as Combobox. Mobile uses search-as-you-type with native keyboard. |
-| `Toolbar` | Desktop toolbar pattern. Mobile uses bottom action bars or context menus. |
-| `Field`, `Fieldset`, `Form` | React Native has no HTML form submission and no Tab key. This is a standing decision — see the notes at the top of this document. |
-| `Input` | Upstream's `Input` is a 17-line alias for `Field.Control`, and `Field` is not ported. Without it there is no component left to port: use React Native's `TextInput`. |
 | `Text` | Not a Base UI package at all — this document invented it. A wrapper around React Native's `<Text>` would add nothing. |
 
 ### Excluded sub-parts (of ported components)
@@ -572,17 +572,15 @@ This document originally planned two components that don't exist in Base UI. Nei
 ### Full Component Count Summary
 
 ```
-Base UI (39 components)
-  ├── Ported (same name):  25  (Button, Dialog, Select, Tabs, Toast, Drawer...)
-  ├── Excluded:            14  (ContextMenu, PreviewCard, Menubar, Field, Input...)
+Base UI (38 components)
+  ├── Ported (same name):  31  (Button, Dialog, Select, Field, Combobox, ContextMenu...)
+  ├── Excluded:             7  (PreviewCard, Menubar, NavigationMenu, Meter, ScrollArea, Toolbar, Form)
   └── Added (mobile-only):  0  (BottomSheet folded into Drawer's snap points)
 
-@limonify/zest total:      25 components
+@limonify/zest total:      31 components
 ```
 
-The 14 excluded: `ContextMenu`, `PreviewCard`, `Menubar`, `NavigationMenu`, `Meter`, `ScrollArea`, `CSPProvider`, `Combobox`, `Autocomplete`, `Toolbar`, `Field`, `Fieldset`, `Form`, `Input` — each with a reason in the table above. Nothing in Base UI is left unaccounted for.
-
-**29 Base UI component = 29 exact same name.** Zero naming changes.
+The 7 excluded: `PreviewCard`, `Menubar`, `NavigationMenu`, `Meter`, `ScrollArea`, `Toolbar`, `Form` (plus the web-only `CSPProvider` and the non-existent `Text`) — each with a reason in the table above. Everything else is ported under its exact Base UI name. Nothing in Base UI is left unaccounted for.
 
 ---
 
