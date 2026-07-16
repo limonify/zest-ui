@@ -74,15 +74,21 @@ export function useComboboxRoot(parameters: UseComboboxRootParameters): Combobox
     state: 'value',
   });
 
-  const initialInput =
-    defaultInputValue ??
-    (mode === 'combobox'
-      ? (normalized.find((item) => item.value === (valueProp ?? defaultValue))?.label ?? '')
-      : '');
+  // The initial input text is only read on the first render; compute it once so
+  // it stays stable, or `useControlled` warns when a later selection changes the
+  // controlled `value` (and with it the derived label).
+  const initialInputRef = React.useRef<string | undefined>(undefined);
+  if (initialInputRef.current === undefined) {
+    initialInputRef.current =
+      defaultInputValue ??
+      (mode === 'combobox'
+        ? (normalized.find((item) => item.value === (valueProp ?? defaultValue))?.label ?? '')
+        : '');
+  }
 
   const [inputValue, setInputValueState] = useControlled<string>({
     controlled: inputValueProp,
-    default: initialInput,
+    default: initialInputRef.current,
     name: 'Combobox',
     state: 'inputValue',
   });
