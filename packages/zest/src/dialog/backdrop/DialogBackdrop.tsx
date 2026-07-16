@@ -2,7 +2,7 @@
 import { StyleSheet, View } from 'react-native';
 import { useDialogRootContext } from '../root/DialogRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A visual overlay behind the popup.
@@ -42,7 +42,7 @@ export interface DialogBackdropState {
 }
 
 export interface DialogBackdropProps
-  extends BaseUIComponentProps<typeof View, DialogBackdropState> {}
+  extends ZestUIComponentProps<typeof View, DialogBackdropState> {}
 
 export namespace DialogBackdrop {
   export type State = DialogBackdropState;

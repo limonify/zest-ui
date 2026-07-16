@@ -5,7 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { CompositeList } from '../../internals/composite/list/CompositeList';
 import type { TabsRootState } from '../root/TabsRoot';
 import { useTabsRootContext } from '../root/TabsRootContext';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import type { TabsTab } from '../tab/TabsTab';
 import { TabsListContext } from './TabsListContext';
 
@@ -54,7 +54,7 @@ export function TabsList(componentProps: TabsList.Props) {
 
 export interface TabsListState extends TabsRootState {}
 
-export interface TabsListProps extends BaseUIComponentProps<typeof View, TabsListState> {}
+export interface TabsListProps extends ZestUIComponentProps<typeof View, TabsListState> {}
 
 export namespace TabsList {
   export type State = TabsListState;

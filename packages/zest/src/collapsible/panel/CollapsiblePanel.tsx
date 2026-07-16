@@ -5,7 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useCollapsibleRootContext } from '../root/CollapsibleRootContext';
 import type { CollapsibleRootState } from '../root/CollapsibleRoot';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { useCollapsiblePanel } from './useCollapsiblePanel';
 
 /**
@@ -71,7 +71,7 @@ export interface CollapsiblePanelState extends CollapsibleRootState {
 }
 
 export interface CollapsiblePanelProps
-  extends BaseUIComponentProps<typeof View, CollapsiblePanelState> {
+  extends ZestUIComponentProps<typeof View, CollapsiblePanelState> {
   /**
    * Whether to keep the element rendered while the panel is closed.
    *

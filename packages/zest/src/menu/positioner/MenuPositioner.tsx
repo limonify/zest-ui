@@ -12,7 +12,7 @@ import {
   type Side,
   type UseAnchorPositioningSharedParameters,
 } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { MenuPositionerContext } from './MenuPositionerContext';
 
 /**
@@ -99,7 +99,7 @@ export interface MenuPositionerState {
 
 export interface MenuPositionerProps
   extends UseAnchorPositioningSharedParameters,
-    BaseUIComponentProps<typeof View, MenuPositionerState> {}
+    ZestUIComponentProps<typeof View, MenuPositionerState> {}
 
 export namespace MenuPositioner {
   export type State = MenuPositionerState;

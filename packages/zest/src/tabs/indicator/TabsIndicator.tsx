@@ -5,7 +5,7 @@ import type { TabsRoot } from '../root/TabsRoot';
 import { useTabsRootContext } from '../root/TabsRootContext';
 import { useTabsListContext } from '../list/TabsListContext';
 import type { TabsTab } from '../tab/TabsTab';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A visual indicator that can be styled to match the position of the currently
@@ -73,7 +73,7 @@ export interface TabsIndicatorState {
 }
 
 export interface TabsIndicatorProps
-  extends BaseUIComponentProps<typeof View, TabsIndicatorState> {}
+  extends ZestUIComponentProps<typeof View, TabsIndicatorState> {}
 
 export namespace TabsIndicator {
   export type State = TabsIndicatorState;

@@ -12,7 +12,7 @@ import {
   type Side,
   type UseAnchorPositioningSharedParameters,
 } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { PopoverPositionerContext } from './PopoverPositionerContext';
 
 /**
@@ -118,7 +118,7 @@ export interface PopoverPositionerState {
 
 export interface PopoverPositionerProps
   extends UseAnchorPositioningSharedParameters,
-    BaseUIComponentProps<typeof View, PopoverPositionerState> {}
+    ZestUIComponentProps<typeof View, PopoverPositionerState> {}
 
 export namespace PopoverPositioner {
   export type State = PopoverPositionerState;

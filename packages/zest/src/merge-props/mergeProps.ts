@@ -1,8 +1,8 @@
 import type * as React from 'react';
-import type { BaseUIEvent, NativeProps, WithBaseUIEvent } from '../types';
+import type { ZestUIEvent, NativeProps, WithZestUIEvent } from '../types';
 
 type ElementType = React.ElementType;
-type PropsOf<T extends React.ElementType> = WithBaseUIEvent<React.ComponentPropsWithRef<T>>;
+type PropsOf<T extends React.ElementType> = WithZestUIEvent<React.ComponentPropsWithRef<T>>;
 type InputProps<T extends React.ElementType> =
   | PropsOf<T>
   | ((otherProps: PropsOf<T>) => PropsOf<T>)
@@ -17,7 +17,7 @@ const EMPTY_PROPS = {};
  *
  * Event handlers are merged and called in right-to-left order (rightmost handler executes first, leftmost last).
  * For React synthetic events, the rightmost handler can prevent prior (left-positioned) handlers from executing
- * by calling `event.preventBaseUIHandler()`.
+ * by calling `event.preventZestUIHandler()`.
  *
  * The `className` prop is merged by concatenating classes in right-to-left order (rightmost class appears first in the string).
  * The `style` prop is merged by composing a React Native style array `[left, right]`, so the rightmost styles win
@@ -209,7 +209,7 @@ function mergeEventHandlers(ourHandler: Function | undefined, theirHandler: Func
     const event = args[0];
 
     if (isSyntheticEvent(event)) {
-      const baseUIEvent = event as BaseUIEvent<typeof event>;
+      const baseUIEvent = event as ZestUIEvent<typeof event>;
 
       makeEventPreventable(baseUIEvent);
 
@@ -237,15 +237,15 @@ function wrapEventHandler(handler: Function | undefined) {
     const event = args[0];
 
     if (isSyntheticEvent(event)) {
-      makeEventPreventable(event as BaseUIEvent<typeof event>);
+      makeEventPreventable(event as ZestUIEvent<typeof event>);
     }
 
     return handler(...args);
   };
 }
 
-export function makeEventPreventable<T extends object>(event: BaseUIEvent<T>) {
-  event.preventBaseUIHandler = () => {
+export function makeEventPreventable<T extends object>(event: ZestUIEvent<T>) {
+  event.preventZestUIHandler = () => {
     (event.baseUIHandlerPrevented as boolean) = true;
   };
 

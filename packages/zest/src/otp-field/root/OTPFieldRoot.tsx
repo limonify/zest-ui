@@ -6,7 +6,7 @@ import { useId } from '../../hooks/useId';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { CompositeList } from '../../internals/composite/list/CompositeList';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
@@ -211,7 +211,7 @@ export interface OTPFieldRootState {
 }
 
 export interface OTPFieldRootProps
-  extends Omit<BaseUIComponentProps<typeof View, OTPFieldRootState>, 'id'> {
+  extends Omit<ZestUIComponentProps<typeof View, OTPFieldRootState>, 'id'> {
   /**
    * The number of OTP input slots.
    */

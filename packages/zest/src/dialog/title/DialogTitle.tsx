@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 import { useDialogRootContext } from '../root/DialogRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A heading that labels the dialog.
@@ -24,7 +24,7 @@ export function DialogTitle(componentProps: DialogTitle.Props) {
   });
 }
 
-export interface DialogTitleProps extends BaseUIComponentProps<typeof Text, DialogTitleState> {}
+export interface DialogTitleProps extends ZestUIComponentProps<typeof Text, DialogTitleState> {}
 
 export interface DialogTitleState {}
 

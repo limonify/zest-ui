@@ -4,7 +4,7 @@ import { Pressable, type GestureResponderEvent } from 'react-native';
 import { useControlled } from '../../hooks/useControlled';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import {
   createChangeEventDetails,
   type ZestChangeEventDetails,
@@ -110,7 +110,7 @@ export interface SwitchRootState {
 }
 
 export interface SwitchRootProps
-  extends Omit<BaseUIComponentProps<typeof Pressable, SwitchRootState>, 'onPress'> {
+  extends Omit<ZestUIComponentProps<typeof Pressable, SwitchRootState>, 'onPress'> {
   /**
    * Whether the switch is currently active.
    *

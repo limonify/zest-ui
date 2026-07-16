@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { useControlled } from '../hooks/useControlled';
 import { useStableCallback } from '../hooks/useStableCallback';
 import { useRenderElement } from '../use-render/useRenderElement';
-import type { BaseUIComponentProps, Orientation } from '../types';
+import type { ZestUIComponentProps, Orientation } from '../types';
 import type { ZestChangeEventDetails } from '../utils/createChangeEventDetails';
 import type { REASONS } from '../utils/reasons';
 import { ToggleGroupContext } from './ToggleGroupContext';
@@ -114,7 +114,7 @@ export interface ToggleGroupState {
 }
 
 export interface ToggleGroupProps<Value extends string = string>
-  extends BaseUIComponentProps<typeof View, ToggleGroupState> {
+  extends ZestUIComponentProps<typeof View, ToggleGroupState> {
   /**
    * The pressed state of the toggle group represented by an array of
    * the values of all pressed toggle buttons.

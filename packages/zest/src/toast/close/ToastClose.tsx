@@ -6,7 +6,7 @@ import { useToastRootContext } from '../root/ToastRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import type { ToastRootState } from '../root/ToastRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Closes the toast.
@@ -56,7 +56,7 @@ export interface ToastCloseState extends ToastRootState {
   pressed: boolean;
 }
 
-export interface ToastCloseProps extends BaseUIComponentProps<typeof Pressable, ToastCloseState> {
+export interface ToastCloseProps extends ZestUIComponentProps<typeof Pressable, ToastCloseState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

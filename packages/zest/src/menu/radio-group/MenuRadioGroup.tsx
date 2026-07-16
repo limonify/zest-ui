@@ -5,7 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useControlled } from '../../hooks/useControlled';
 import { useId } from '../../hooks/useId';
 import { useStableCallback } from '../../hooks/useStableCallback';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import type { ZestChangeEventDetails, ZestNativeEvent } from '../../utils/createChangeEventDetails';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
@@ -92,7 +92,7 @@ export interface MenuRadioGroupState {
 }
 
 export interface MenuRadioGroupProps<Value = any>
-  extends Omit<BaseUIComponentProps<typeof View, MenuRadioGroupState>, 'value'> {
+  extends Omit<ZestUIComponentProps<typeof View, MenuRadioGroupState>, 'value'> {
   /**
    * The value of the radio item that should be currently selected.
    *

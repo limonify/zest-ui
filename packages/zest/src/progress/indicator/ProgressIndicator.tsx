@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useProgressRootContext } from '../root/ProgressRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ProgressRootState } from '../root/ProgressRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Visualizes the completion status of the task.
@@ -31,7 +31,7 @@ export function ProgressIndicator(componentProps: ProgressIndicator.Props) {
 export interface ProgressIndicatorState extends ProgressRootState {}
 
 export interface ProgressIndicatorProps
-  extends BaseUIComponentProps<typeof View, ProgressIndicatorState> {}
+  extends ZestUIComponentProps<typeof View, ProgressIndicatorState> {}
 
 export namespace ProgressIndicator {
   export type State = ProgressIndicatorState;

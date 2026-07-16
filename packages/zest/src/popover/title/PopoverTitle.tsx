@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 import { usePopoverRootContext } from '../root/PopoverRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A heading that labels the popover.
@@ -24,7 +24,7 @@ export function PopoverTitle(componentProps: PopoverTitle.Props) {
   });
 }
 
-export interface PopoverTitleProps extends BaseUIComponentProps<typeof Text, PopoverTitleState> {}
+export interface PopoverTitleProps extends ZestUIComponentProps<typeof Text, PopoverTitleState> {}
 
 export interface PopoverTitleState {}
 

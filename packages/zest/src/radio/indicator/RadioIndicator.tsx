@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useRadioRootContext } from '../root/RadioRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { RadioRootState } from '../root/RadioRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Indicates whether the radio button is selected.
@@ -32,7 +32,7 @@ export function RadioIndicator(componentProps: RadioIndicator.Props) {
 export interface RadioIndicatorState extends RadioRootState {}
 
 export interface RadioIndicatorProps
-  extends BaseUIComponentProps<typeof View, RadioIndicatorState> {
+  extends ZestUIComponentProps<typeof View, RadioIndicatorState> {
   /**
    * Whether to keep the element mounted when the radio button is inactive.
    * @default false

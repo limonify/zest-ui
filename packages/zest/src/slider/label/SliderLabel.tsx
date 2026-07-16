@@ -5,7 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import type { SliderRootState } from '../root/SliderRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * An accessible label that is automatically associated with the slider thumbs.
@@ -36,7 +36,7 @@ export function SliderLabel(componentProps: SliderLabel.Props) {
 
 export interface SliderLabelState extends SliderRootState {}
 
-export interface SliderLabelProps extends BaseUIComponentProps<typeof Text, SliderLabelState> {}
+export interface SliderLabelProps extends ZestUIComponentProps<typeof Text, SliderLabelState> {}
 
 export namespace SliderLabel {
   export type State = SliderLabelState;

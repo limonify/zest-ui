@@ -2,7 +2,7 @@
 import { Pressable, StyleSheet, type GestureResponderEvent } from 'react-native';
 import { usePopoverRootContext } from '../root/PopoverRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -50,7 +50,7 @@ export interface PopoverBackdropState {
 }
 
 export interface PopoverBackdropProps
-  extends BaseUIComponentProps<typeof Pressable, PopoverBackdropState> {}
+  extends ZestUIComponentProps<typeof Pressable, PopoverBackdropState> {}
 
 export namespace PopoverBackdrop {
   export type State = PopoverBackdropState;

@@ -5,7 +5,7 @@ import { useControlled } from '../../hooks/useControlled';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps, Orientation } from '../../types';
+import type { ZestUIComponentProps, Orientation } from '../../types';
 import {
   createChangeEventDetails,
   type ZestChangeEventDetails,
@@ -337,7 +337,7 @@ export interface TabsRootState {
   tabActivationDirection: TabsTab.ActivationDirection;
 }
 
-export interface TabsRootProps extends Omit<BaseUIComponentProps<typeof View, TabsRootState>, 'value'> {
+export interface TabsRootProps extends Omit<ZestUIComponentProps<typeof View, TabsRootState>, 'value'> {
   /**
    * The value of the currently selected Tab. Use when the component is controlled.
    * When the value is `null`, no Tab will be selected.

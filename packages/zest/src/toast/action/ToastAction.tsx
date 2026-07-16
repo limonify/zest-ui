@@ -5,7 +5,7 @@ import { useToastRootContext } from '../root/ToastRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import type { ToastRootState } from '../root/ToastRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Performs an action when pressed.
@@ -57,7 +57,7 @@ export interface ToastActionState extends ToastRootState {
   pressed: boolean;
 }
 
-export interface ToastActionProps extends BaseUIComponentProps<typeof Pressable, ToastActionState> {
+export interface ToastActionProps extends ZestUIComponentProps<typeof Pressable, ToastActionState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

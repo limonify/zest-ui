@@ -5,7 +5,7 @@ import { useSelectItemContext } from '../item/SelectItemContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import type { SelectItemState } from '../item/SelectItem';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * The text label of a select item.
@@ -36,7 +36,7 @@ export function SelectItemText(componentProps: SelectItemText.Props) {
 export interface SelectItemTextState extends SelectItemState {}
 
 export interface SelectItemTextProps
-  extends BaseUIComponentProps<typeof Text, SelectItemTextState> {}
+  extends ZestUIComponentProps<typeof Text, SelectItemTextState> {}
 
 export namespace SelectItemText {
   export type State = SelectItemTextState;

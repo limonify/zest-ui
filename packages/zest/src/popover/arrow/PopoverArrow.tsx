@@ -5,7 +5,7 @@ import { usePopoverPositionerContext } from '../positioner/PopoverPositionerCont
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Displays an element positioned against the popover anchor.
@@ -48,7 +48,7 @@ export interface PopoverArrowState {
   align: Align;
 }
 
-export interface PopoverArrowProps extends BaseUIComponentProps<typeof View, PopoverArrowState> {}
+export interface PopoverArrowProps extends ZestUIComponentProps<typeof View, PopoverArrowState> {}
 
 export namespace PopoverArrow {
   export type State = PopoverArrowState;

@@ -5,7 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { formatNumber } from '../../utils/formatNumber';
 import type { NumberFieldRootState } from '../root/NumberFieldRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { parseNumber } from '../utils/parse';
@@ -167,7 +167,7 @@ export function NumberFieldInput(componentProps: NumberFieldInput.Props) {
 export interface NumberFieldInputState extends NumberFieldRootState {}
 
 export interface NumberFieldInputProps
-  extends Omit<BaseUIComponentProps<typeof TextInput, NumberFieldInputState>, 'value'> {}
+  extends Omit<ZestUIComponentProps<typeof TextInput, NumberFieldInputState>, 'value'> {}
 
 export namespace NumberFieldInput {
   export type State = NumberFieldInputState;

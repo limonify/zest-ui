@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useCheckboxRootContext } from '../root/CheckboxRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { CheckboxRootState } from '../root/CheckboxRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Indicates whether the checkbox is ticked.
@@ -36,7 +36,7 @@ export function CheckboxIndicator(componentProps: CheckboxIndicator.Props) {
 export interface CheckboxIndicatorState extends CheckboxRootState {}
 
 export interface CheckboxIndicatorProps
-  extends BaseUIComponentProps<typeof View, CheckboxIndicatorState> {
+  extends ZestUIComponentProps<typeof View, CheckboxIndicatorState> {
   /**
    * Whether to keep the element mounted when the checkbox is not checked.
    * @default false

@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useProgressRootContext } from '../root/ProgressRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ProgressRootState } from '../root/ProgressRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Contains the progress bar indicator.
@@ -23,7 +23,7 @@ export function ProgressTrack(componentProps: ProgressTrack.Props) {
 
 export interface ProgressTrackState extends ProgressRootState {}
 
-export interface ProgressTrackProps extends BaseUIComponentProps<typeof View, ProgressTrackState> {}
+export interface ProgressTrackProps extends ZestUIComponentProps<typeof View, ProgressTrackState> {}
 
 export namespace ProgressTrack {
   export type State = ProgressTrackState;

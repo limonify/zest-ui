@@ -32,7 +32,7 @@ Simple components (Button, Separator) are a single `<component>/<Component>.tsx`
 import * as React from 'react';
 import { View } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 export function ComponentPart(componentProps: ComponentPart.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
@@ -49,7 +49,7 @@ export function ComponentPart(componentProps: ComponentPart.Props) {
 
 export interface ComponentPartState { /* fields exposed to style/render fns */ }
 export interface ComponentPartProps
-  extends BaseUIComponentProps<typeof View, ComponentPartState> { /* own props */ }
+  extends ZestUIComponentProps<typeof View, ComponentPartState> { /* own props */ }
 
 export namespace ComponentPart {
   export type State = ComponentPartState;

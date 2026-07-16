@@ -10,7 +10,7 @@ import { useMergedRefs } from '../../hooks/useMergedRefs';
 import { usePopupHandleStore } from '../../utils/popups/usePopupHandleStore';
 import type { DialogHandle } from '../store/DialogHandle';
 import type { DialogStore } from '../store/DialogStore';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -124,7 +124,7 @@ export interface DialogTriggerState {
 }
 
 export interface DialogTriggerProps<Payload = unknown>
-  extends BaseUIComponentProps<typeof Pressable, DialogTriggerState> {
+  extends ZestUIComponentProps<typeof Pressable, DialogTriggerState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

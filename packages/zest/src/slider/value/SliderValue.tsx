@@ -4,7 +4,7 @@ import { useSliderRootContext } from '../root/SliderRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { formatNumber } from '../../utils/formatNumber';
 import type { SliderRootState } from '../root/SliderRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * The formatted value of the slider.
@@ -42,7 +42,7 @@ function formatValue(
 export interface SliderValueState extends SliderRootState {}
 
 export interface SliderValueProps
-  extends Omit<BaseUIComponentProps<typeof Text, SliderValueState>, 'children'> {
+  extends Omit<ZestUIComponentProps<typeof Text, SliderValueState>, 'children'> {
   children?:
     | React.ReactNode
     | ((formattedValues: string[], values: readonly number[]) => React.ReactNode);

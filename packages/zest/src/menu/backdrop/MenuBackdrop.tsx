@@ -2,7 +2,7 @@
 import { Pressable, StyleSheet, type GestureResponderEvent } from 'react-native';
 import { useMenuRootContext } from '../root/MenuRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -43,7 +43,7 @@ export interface MenuBackdropState {
 }
 
 export interface MenuBackdropProps
-  extends BaseUIComponentProps<typeof Pressable, MenuBackdropState> {}
+  extends ZestUIComponentProps<typeof Pressable, MenuBackdropState> {}
 
 export namespace MenuBackdrop {
   export type State = MenuBackdropState;

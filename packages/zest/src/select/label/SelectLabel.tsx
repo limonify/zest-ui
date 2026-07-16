@@ -4,7 +4,7 @@ import { useSelectRootContext } from '../root/SelectRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * An accessible label that is automatically associated with the select trigger.
@@ -33,7 +33,7 @@ export function SelectLabel(componentProps: SelectLabel.Props) {
 
 export interface SelectLabelState {}
 
-export interface SelectLabelProps extends BaseUIComponentProps<typeof Text, SelectLabelState> {}
+export interface SelectLabelProps extends ZestUIComponentProps<typeof Text, SelectLabelState> {}
 
 export namespace SelectLabel {
   export type State = SelectLabelState;

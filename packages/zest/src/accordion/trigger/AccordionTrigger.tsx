@@ -6,7 +6,7 @@ import { useButton } from '../../internals/use-button/useButton';
 import { useCollapsibleRootContext } from '../../collapsible/root/CollapsibleRootContext';
 import type { AccordionItemState } from '../item/AccordionItem';
 import { useAccordionItemContext } from '../item/AccordionItemContext';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A button that opens and closes the corresponding panel.
@@ -60,7 +60,7 @@ export interface AccordionTriggerState extends AccordionItemState {
 }
 
 export interface AccordionTriggerProps
-  extends BaseUIComponentProps<typeof Pressable, AccordionTriggerState> {
+  extends ZestUIComponentProps<typeof Pressable, AccordionTriggerState> {
   /**
    * Whether the component should ignore user interaction.
    */

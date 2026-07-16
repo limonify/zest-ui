@@ -4,7 +4,7 @@ import { Pressable, type GestureResponderEvent } from 'react-native';
 import { useDialogRootContext } from '../root/DialogRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -63,7 +63,7 @@ export interface DialogCloseState {
 }
 
 export interface DialogCloseProps
-  extends BaseUIComponentProps<typeof Pressable, DialogCloseState> {
+  extends ZestUIComponentProps<typeof Pressable, DialogCloseState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

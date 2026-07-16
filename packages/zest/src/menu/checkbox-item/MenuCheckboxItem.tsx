@@ -7,7 +7,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
 import { useControlled } from '../../hooks/useControlled';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
@@ -121,7 +121,7 @@ export interface MenuCheckboxItemState {
 }
 
 export interface MenuCheckboxItemProps
-  extends BaseUIComponentProps<typeof Pressable, MenuCheckboxItemState> {
+  extends ZestUIComponentProps<typeof Pressable, MenuCheckboxItemState> {
   /**
    * Whether the checkbox item is currently ticked.
    *

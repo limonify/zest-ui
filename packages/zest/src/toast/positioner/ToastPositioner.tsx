@@ -11,7 +11,7 @@ import {
   type Side,
   type UseAnchorPositioningSharedParameters,
 } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { ToastPositionerContext } from './ToastPositionerContext';
 
 /**
@@ -106,7 +106,7 @@ export interface ToastPositionerState {
 
 export interface ToastPositionerProps
   extends UseAnchorPositioningSharedParameters,
-    BaseUIComponentProps<typeof View, ToastPositionerState> {
+    ZestUIComponentProps<typeof View, ToastPositionerState> {
   /**
    * The element to position the toast against. Unlike the other popup families
    * there is no trigger to infer it from, so it is passed in — usually a ref's

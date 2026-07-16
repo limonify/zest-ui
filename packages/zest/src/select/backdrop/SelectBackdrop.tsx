@@ -2,7 +2,7 @@
 import { Pressable, StyleSheet, type GestureResponderEvent } from 'react-native';
 import { useSelectRootContext } from '../root/SelectRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -38,7 +38,7 @@ export interface SelectBackdropState {
 }
 
 export interface SelectBackdropProps
-  extends BaseUIComponentProps<typeof Pressable, SelectBackdropState> {}
+  extends ZestUIComponentProps<typeof Pressable, SelectBackdropState> {}
 
 export namespace SelectBackdrop {
   export type State = SelectBackdropState;

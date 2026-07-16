@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useSliderRootContext } from '../root/SliderRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { SliderRootState } from '../root/SliderRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * The visual rail the thumb travels along.
@@ -23,7 +23,7 @@ export function SliderTrack(componentProps: SliderTrack.Props) {
 
 export interface SliderTrackState extends SliderRootState {}
 
-export interface SliderTrackProps extends BaseUIComponentProps<typeof View, SliderTrackState> {}
+export interface SliderTrackProps extends ZestUIComponentProps<typeof View, SliderTrackState> {}
 
 export namespace SliderTrack {
   export type State = SliderTrackState;

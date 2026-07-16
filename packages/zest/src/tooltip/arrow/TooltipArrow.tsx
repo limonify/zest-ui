@@ -6,7 +6,7 @@ import { useTooltipPositionerContext } from '../positioner/TooltipPositionerCont
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Displays an element positioned against the tooltip anchor.
@@ -37,7 +37,7 @@ export interface TooltipArrowState {
   align: Align;
 }
 
-export interface TooltipArrowProps extends BaseUIComponentProps<typeof View, TooltipArrowState> {}
+export interface TooltipArrowProps extends ZestUIComponentProps<typeof View, TooltipArrowState> {}
 
 export namespace TooltipArrow {
   export type State = TooltipArrowState;

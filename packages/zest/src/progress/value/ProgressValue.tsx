@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 import { useProgressRootContext } from '../root/ProgressRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ProgressRootState } from '../root/ProgressRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A text element displaying the current value.
@@ -41,7 +41,7 @@ export function ProgressValue(componentProps: ProgressValue.Props) {
 export interface ProgressValueState extends ProgressRootState {}
 
 export interface ProgressValueProps
-  extends Omit<BaseUIComponentProps<typeof Text, ProgressValueState>, 'children'> {
+  extends Omit<ZestUIComponentProps<typeof Text, ProgressValueState>, 'children'> {
   children?:
     | React.ReactNode
     | ((formattedValue: string, value: number | null) => React.ReactNode);

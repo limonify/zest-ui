@@ -1,6 +1,6 @@
 'use client';
 import { View } from 'react-native';
-import type { BaseUIComponentProps, Orientation } from '../types';
+import type { ZestUIComponentProps, Orientation } from '../types';
 import { useRenderElement } from '../use-render/useRenderElement';
 
 /**
@@ -28,7 +28,7 @@ export function Separator(componentProps: Separator.Props) {
   return element;
 }
 
-export interface SeparatorProps extends BaseUIComponentProps<typeof View, SeparatorState> {
+export interface SeparatorProps extends ZestUIComponentProps<typeof View, SeparatorState> {
   /**
    * The orientation of the separator.
    * @default 'horizontal'

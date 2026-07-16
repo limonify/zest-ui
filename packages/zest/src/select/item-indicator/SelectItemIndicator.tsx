@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useSelectItemContext } from '../item/SelectItemContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { SelectItemState } from '../item/SelectItem';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Indicates whether the select item is the selected one.
@@ -27,7 +27,7 @@ export function SelectItemIndicator(componentProps: SelectItemIndicator.Props) {
 export interface SelectItemIndicatorState extends SelectItemState {}
 
 export interface SelectItemIndicatorProps
-  extends BaseUIComponentProps<typeof View, SelectItemIndicatorState> {
+  extends ZestUIComponentProps<typeof View, SelectItemIndicatorState> {
   /**
    * Whether to keep the element mounted when the item is not selected.
    * @default false

@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useSliderRootContext } from '../root/SliderRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { SliderRootState } from '../root/SliderRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * The filled portion of the track.
@@ -47,7 +47,7 @@ function toPercent(value: number, min: number, max: number) {
 export interface SliderIndicatorState extends SliderRootState {}
 
 export interface SliderIndicatorProps
-  extends BaseUIComponentProps<typeof View, SliderIndicatorState> {}
+  extends ZestUIComponentProps<typeof View, SliderIndicatorState> {}
 
 export namespace SliderIndicator {
   export type State = SliderIndicatorState;

@@ -10,7 +10,7 @@ import { useMergedRefs } from '../../hooks/useMergedRefs';
 import { usePopupHandleStore } from '../../utils/popups/usePopupHandleStore';
 import type { MenuHandle } from '../store/MenuHandle';
 import type { MenuStore } from '../store/MenuStore';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -117,7 +117,7 @@ export interface MenuTriggerState {
 }
 
 export interface MenuTriggerProps<Payload = unknown>
-  extends BaseUIComponentProps<typeof Pressable, MenuTriggerState> {
+  extends ZestUIComponentProps<typeof Pressable, MenuTriggerState> {
   /**
    * A handle shared with a `Menu.Root`, which is what lets this trigger live
    * outside of it. Create one with `Menu.createHandle()`.

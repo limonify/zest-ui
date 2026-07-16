@@ -5,7 +5,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useDialogPopupProps } from '../../dialog/popup/useDialogPopupProps';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { useDrawerRootContext, type DrawerSnapPoint, type DrawerSwipeDirection } from '../root/DrawerRootContext';
@@ -218,7 +218,7 @@ export interface DrawerPopupState {
   snapPointOffset: number | null;
 }
 
-export interface DrawerPopupProps extends BaseUIComponentProps<typeof View, DrawerPopupState> {
+export interface DrawerPopupProps extends ZestUIComponentProps<typeof View, DrawerPopupState> {
   /**
    * How far a swipe must travel, in pixels, before it dismisses the drawer. With
    * snap points, how far past the most-closed one a swipe must go to dismiss

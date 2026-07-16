@@ -4,7 +4,7 @@ import { Pressable, type GestureResponderEvent } from 'react-native';
 import { useControlled } from '../../hooks/useControlled';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import {
   createChangeEventDetails,
   type ZestChangeEventDetails,
@@ -177,7 +177,7 @@ export interface CheckboxRootState {
 }
 
 export interface CheckboxRootProps
-  extends Omit<BaseUIComponentProps<typeof Pressable, CheckboxRootState>, 'onPress' | 'value'> {
+  extends Omit<ZestUIComponentProps<typeof Pressable, CheckboxRootState>, 'onPress' | 'value'> {
   /**
    * Whether the checkbox is currently ticked.
    *

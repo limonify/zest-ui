@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { AccordionItemState } from '../item/AccordionItem';
 import { useAccordionItemContext } from '../item/AccordionItemContext';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A heading that labels the corresponding panel.
@@ -24,7 +24,7 @@ export function AccordionHeader(componentProps: AccordionHeader.Props) {
 export interface AccordionHeaderState extends AccordionItemState {}
 
 export interface AccordionHeaderProps
-  extends BaseUIComponentProps<typeof View, AccordionHeaderState> {}
+  extends ZestUIComponentProps<typeof View, AccordionHeaderState> {}
 
 export namespace AccordionHeader {
   export type State = AccordionHeaderState;

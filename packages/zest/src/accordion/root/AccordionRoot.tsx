@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { useControlled } from '../../hooks/useControlled';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import { AccordionRootContext } from './AccordionRootContext';
@@ -112,7 +112,7 @@ export interface AccordionRootState<Value = any> {
 }
 
 export interface AccordionRootProps<Value = any>
-  extends Omit<BaseUIComponentProps<typeof View, AccordionRootState<Value>>, 'value'> {
+  extends Omit<ZestUIComponentProps<typeof View, AccordionRootState<Value>>, 'value'> {
   /**
    * The controlled value of the item(s) that should be expanded.
    *

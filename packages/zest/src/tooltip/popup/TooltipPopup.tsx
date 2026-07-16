@@ -4,7 +4,7 @@ import { useTooltipRootContext } from '../root/TooltipRootContext';
 import { useTooltipPositionerContext } from '../positioner/TooltipPositionerContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A container for the tooltip contents.
@@ -41,7 +41,7 @@ export interface TooltipPopupState {
   align: Align;
 }
 
-export interface TooltipPopupProps extends BaseUIComponentProps<typeof View, TooltipPopupState> {}
+export interface TooltipPopupProps extends ZestUIComponentProps<typeof View, TooltipPopupState> {}
 
 export namespace TooltipPopup {
   export type State = TooltipPopupState;

@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Pressable } from 'react-native';
 import { useButton } from '../internals/use-button/useButton';
 import { useRenderElement } from '../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../types';
+import type { ZestUIComponentProps } from '../types';
 
 /**
  * A button component that can be used to trigger actions.
@@ -50,7 +50,7 @@ export interface ButtonState {
   pressed: boolean;
 }
 
-export interface ButtonProps extends BaseUIComponentProps<typeof Pressable, ButtonState> {
+export interface ButtonProps extends ZestUIComponentProps<typeof Pressable, ButtonState> {
   /**
    * Whether the button should ignore user interaction.
    * @default false

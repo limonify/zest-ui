@@ -5,7 +5,7 @@ import { useAvatarRootContext } from '../root/AvatarRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useTimeout } from '../../hooks/useTimeout';
 import type { AvatarRootState } from '../root/AvatarRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Rendered when the image fails to load or when no image is provided.
@@ -44,7 +44,7 @@ export function AvatarFallback(componentProps: AvatarFallback.Props) {
 export interface AvatarFallbackState extends AvatarRootState {}
 
 export interface AvatarFallbackProps
-  extends BaseUIComponentProps<typeof View, AvatarFallbackState> {
+  extends ZestUIComponentProps<typeof View, AvatarFallbackState> {
   /**
    * How long to wait before showing the fallback. Specified in milliseconds.
    * @default 0

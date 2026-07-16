@@ -5,7 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import type { ProgressRootState } from '../root/ProgressRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * An accessible label for the progress bar.
@@ -32,7 +32,7 @@ export function ProgressLabel(componentProps: ProgressLabel.Props) {
 
 export interface ProgressLabelState extends ProgressRootState {}
 
-export interface ProgressLabelProps extends BaseUIComponentProps<typeof Text, ProgressLabelState> {}
+export interface ProgressLabelProps extends ZestUIComponentProps<typeof Text, ProgressLabelState> {}
 
 export namespace ProgressLabel {
   export type State = ProgressLabelState;

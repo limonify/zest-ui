@@ -4,7 +4,7 @@ import { Pressable, type GestureResponderEvent } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useRadioGroupContext } from '../../radio-group/RadioGroupContext';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { RadioRootContext } from './RadioRootContext';
@@ -95,7 +95,7 @@ export interface RadioRootState {
 }
 
 export interface RadioRootProps<Value = any>
-  extends Omit<BaseUIComponentProps<typeof Pressable, RadioRootState>, 'value' | 'onPress'> {
+  extends Omit<ZestUIComponentProps<typeof Pressable, RadioRootState>, 'value' | 'onPress'> {
   /**
    * The unique identifying value of the radio in a group.
    */

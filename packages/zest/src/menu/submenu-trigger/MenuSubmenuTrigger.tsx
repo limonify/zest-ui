@@ -7,7 +7,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -107,7 +107,7 @@ export interface MenuSubmenuTriggerState {
 }
 
 export interface MenuSubmenuTriggerProps
-  extends BaseUIComponentProps<typeof Pressable, MenuSubmenuTriggerState> {
+  extends ZestUIComponentProps<typeof Pressable, MenuSubmenuTriggerState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

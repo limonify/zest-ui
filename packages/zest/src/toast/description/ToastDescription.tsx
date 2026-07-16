@@ -5,7 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import type { ToastRootState } from '../root/ToastRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A description that gives the toast more detail.
@@ -38,7 +38,7 @@ export function ToastDescription(componentProps: ToastDescription.Props) {
 
 export interface ToastDescriptionState extends ToastRootState {}
 
-export interface ToastDescriptionProps extends BaseUIComponentProps<typeof Text, ToastDescriptionState> {}
+export interface ToastDescriptionProps extends ZestUIComponentProps<typeof Text, ToastDescriptionState> {}
 
 export namespace ToastDescription {
   export type State = ToastDescriptionState;

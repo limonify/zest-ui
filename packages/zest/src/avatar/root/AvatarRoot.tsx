@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { View } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { AvatarRootContext } from './AvatarRootContext';
 
 /**
@@ -39,7 +39,7 @@ export interface AvatarRootState {
   imageLoadingStatus: ImageLoadingStatus;
 }
 
-export interface AvatarRootProps extends BaseUIComponentProps<typeof View, AvatarRootState> {}
+export interface AvatarRootProps extends ZestUIComponentProps<typeof View, AvatarRootState> {}
 
 export namespace AvatarRoot {
   export type State = AvatarRootState;
