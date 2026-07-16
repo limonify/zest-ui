@@ -1,15 +1,8 @@
 import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import {
-  Animated,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
   Accordion,
   AlertDialog,
@@ -44,6 +37,7 @@ export default function App() {
     // Slider and Drawer are built on react-native-gesture-handler, which needs
     // this at the root of the app.
     <GestureHandlerRootView style={styles.safeArea}>
+      <SafeAreaProvider>
       {/*
         Toast is the one popup that is not a Modal, so its Provider goes at the
         very root of the app and its Viewport overlays the whole screen — that is
@@ -112,6 +106,7 @@ export default function App() {
         <ToastOverlay />
         </SafeAreaView>
       </Toast.Provider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
@@ -660,7 +655,9 @@ function MenuSection() {
         </Menu.Trigger>
 
         <Menu.Portal>
-          <Menu.Backdrop style={styles.transparentBackdrop} />
+          {/* A faint scrim, like a native dropdown. Tapping it anywhere dismisses
+              the menu — it fills the whole screen behind the popup. */}
+          <Menu.Backdrop style={styles.menuBackdrop} />
           <Menu.Positioner side="bottom" align="start" sideOffset={4}>
             <Menu.Popup style={styles.floatingPopup}>
               <Menu.Group>
@@ -1419,6 +1416,9 @@ const styles = StyleSheet.create({
   },
   transparentBackdrop: {
     backgroundColor: 'transparent',
+  },
+  menuBackdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
   },
   floatingPopup: {
     backgroundColor: '#fff',
