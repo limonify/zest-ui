@@ -32,6 +32,10 @@ export interface ComboboxRootContext {
   filteredItems: ComboboxItem[];
   disabled: boolean;
   /**
+   * Whether focusing the input opens the list.
+   */
+  openOnFocus: boolean;
+  /**
    * The anchor's native node, carried across the portal boundary.
    */
   triggerNode: unknown;

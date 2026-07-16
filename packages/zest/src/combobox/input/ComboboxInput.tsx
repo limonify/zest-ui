@@ -19,6 +19,7 @@ export function ComboboxInput(componentProps: ComboboxInput.Props) {
     inputValue,
     setInputValue,
     disabled,
+    openOnFocus,
     setTriggerNode,
     update,
   } = useComboboxRootContext();
@@ -44,7 +45,9 @@ export function ComboboxInput(componentProps: ComboboxInput.Props) {
           setInputValue(text);
         },
         onFocus() {
-          setOpen(true);
+          if (openOnFocus) {
+            setOpen(true);
+          }
         },
         onLayout() {
           update?.();
