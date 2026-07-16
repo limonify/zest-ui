@@ -3,11 +3,13 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useControlled } from '../../hooks/useControlled';
+import { useId } from '../../hooks/useId';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import type { BaseUIComponentProps } from '../../types';
 import type { ZestChangeEventDetails, ZestNativeEvent } from '../../utils/createChangeEventDetails';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { MenuGroupContext } from '../group/MenuGroupContext';
 import { MenuRadioGroupContext } from './MenuRadioGroupContext';
 
 /**
@@ -46,6 +48,11 @@ export function MenuRadioGroup<Value = any>(componentProps: MenuRadioGroup.Props
     setValueState(nextValue);
   });
 
+  // Like upstream, a radio group is labelable by a `Menu.GroupLabel` placed
+  // inside it, so it owns a label id and provides the group context the label
+  // reads — the same shape `Menu.Group` provides.
+  const labelId = useId();
+
   const state: MenuRadioGroupState = { disabled };
 
   const contextValue: MenuRadioGroupContext<Value> = React.useMemo(
@@ -53,13 +60,28 @@ export function MenuRadioGroup<Value = any>(componentProps: MenuRadioGroup.Props
     [value, disabled, setValue],
   );
 
+  const groupContextValue: MenuGroupContext = React.useMemo(() => ({ labelId }), [labelId]);
+
   const element = useRenderElement(View, componentProps, {
     state,
     ref,
-    props: [{ accessibilityRole: 'radiogroup' as const }, elementProps],
+    props: [
+      {
+        accessibilityRole: 'radiogroup' as const,
+        accessibilityLabelledBy: labelId,
+        'aria-labelledby': labelId,
+      },
+      elementProps,
+    ],
   });
 
-  return <MenuRadioGroupContext.Provider value={contextValue}>{element}</MenuRadioGroupContext.Provider>;
+  return (
+    <MenuGroupContext.Provider value={groupContextValue}>
+      <MenuRadioGroupContext.Provider value={contextValue}>
+        {element}
+      </MenuRadioGroupContext.Provider>
+    </MenuGroupContext.Provider>
+  );
 }
 
 export interface MenuRadioGroupState {
