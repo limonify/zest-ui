@@ -885,6 +885,20 @@ function FieldSection() {
       <Text style={styles.label}>A standalone Input, and a disabled Fieldset:</Text>
       <Input placeholder="Standalone input" style={styles.fieldControl} />
 
+      <Text style={styles.label}>A Checkbox inside a Field is labelled by Field.Label:</Text>
+      <Field.Root style={styles.fieldRoot}>
+        <View style={styles.row}>
+          <Checkbox.Root
+            style={(state) => [styles.checkboxBox, state.checked && styles.checkboxBoxChecked]}
+          >
+            <Checkbox.Indicator>
+              <Text style={styles.checkboxTick}>✓</Text>
+            </Checkbox.Indicator>
+          </Checkbox.Root>
+          <Field.Label style={styles.label}>I accept the terms</Field.Label>
+        </View>
+      </Field.Root>
+
       <Fieldset.Root disabled style={styles.fieldRoot}>
         <Fieldset.Legend style={styles.fieldLabel}>Disabled group</Fieldset.Legend>
         <Field.Root>

@@ -5,6 +5,7 @@ import { useControlled } from '../../hooks/useControlled';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import { formatNumber } from '../../utils/formatNumber';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
@@ -33,7 +34,7 @@ export function NumberFieldRoot(componentProps: NumberFieldRoot.Props) {
     allowOutOfRange = false,
     className,
     defaultValue,
-    disabled = false,
+    disabled: disabledProp = false,
     format,
     id,
     locale,
@@ -50,6 +51,10 @@ export function NumberFieldRoot(componentProps: NumberFieldRoot.Props) {
     ref,
     ...elementProps
   } = componentProps;
+
+  const { fieldDisabled, validateField } = useFieldControlRegistration();
+
+  const disabled = disabledProp || fieldDisabled;
 
   const minWithDefault = min ?? Number.MIN_SAFE_INTEGER;
   const maxWithDefault = max ?? Number.MAX_SAFE_INTEGER;
@@ -130,6 +135,7 @@ export function NumberFieldRoot(componentProps: NumberFieldRoot.Props) {
 
         valueRef.current = validatedValue;
         setValueState(validatedValue);
+        validateField(validatedValue);
       }
 
       lastChangedValueRef.current = validatedValue;

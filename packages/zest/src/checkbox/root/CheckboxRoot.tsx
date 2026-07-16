@@ -11,13 +11,16 @@ import {
 } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { useCheckboxGroupContext } from '../../checkbox-group/CheckboxGroupContext';
+import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import { CheckboxRootContext } from './CheckboxRootContext';
 
 /**
  * Represents the checkbox itself.
  * Renders a `<Pressable>`.
  *
- * TODO(field): Field/Form integration once those components are ported.
+ * Placed inside a `Field.Root`, it is labelled by `Field.Label`, described by
+ * `Field.Description`/`Error`, inherits the field's `disabled`, and runs the
+ * field's `validate` on change.
  */
 export function CheckboxRoot(componentProps: CheckboxRoot.Props) {
   const {
@@ -41,7 +44,9 @@ export function CheckboxRoot(componentProps: CheckboxRoot.Props) {
   const parentContext = groupContext?.parent;
   const isGroupedWithParent = parentContext != null && groupContext?.allValues != null;
 
-  const disabled = (groupContext?.disabled || disabledProp) ?? false;
+  const { fieldDisabled, fieldProps, validateField } = useFieldControlRegistration();
+
+  const disabled = (groupContext?.disabled || disabledProp || fieldDisabled) ?? false;
 
   const { getButtonProps } = useButton({ disabled });
 
@@ -128,6 +133,7 @@ export function CheckboxRoot(componentProps: CheckboxRoot.Props) {
           }
 
           setCheckedState(nextChecked);
+          validateField(nextChecked);
 
           if (value && groupValue && setGroupValue && !parent && !isGroupedWithParent) {
             const nextGroupValue = nextChecked
@@ -142,6 +148,7 @@ export function CheckboxRoot(componentProps: CheckboxRoot.Props) {
           checked: computedIndeterminate ? ('mixed' as const) : computedChecked,
           disabled: disabled || undefined,
         },
+        ...fieldProps,
       },
       elementProps,
       getButtonProps,

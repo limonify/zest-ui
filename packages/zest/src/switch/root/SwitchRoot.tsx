@@ -4,6 +4,7 @@ import { Pressable, type GestureResponderEvent } from 'react-native';
 import { useControlled } from '../../hooks/useControlled';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
+import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import type { ZestUIComponentProps } from '../../types';
 import {
   createChangeEventDetails,
@@ -24,7 +25,7 @@ export function SwitchRoot(componentProps: SwitchRoot.Props) {
     checked: checkedProp,
     className,
     defaultChecked = false,
-    disabled = false,
+    disabled: disabledProp = false,
     onCheckedChange,
     readOnly = false,
     render,
@@ -33,6 +34,10 @@ export function SwitchRoot(componentProps: SwitchRoot.Props) {
     ref,
     ...elementProps
   } = componentProps;
+
+  const { fieldDisabled, fieldProps, validateField } = useFieldControlRegistration();
+
+  const disabled = disabledProp || fieldDisabled;
 
   const { getButtonProps } = useButton({ disabled });
 
@@ -73,6 +78,7 @@ export function SwitchRoot(componentProps: SwitchRoot.Props) {
           }
 
           setCheckedState(nextChecked);
+          validateField(nextChecked);
         },
         accessibilityRole: 'switch' as const,
         accessibilityState: {
@@ -81,6 +87,7 @@ export function SwitchRoot(componentProps: SwitchRoot.Props) {
         },
         'aria-readonly': readOnly || undefined,
         'aria-required': required || undefined,
+        ...fieldProps,
       },
       elementProps,
       getButtonProps,
