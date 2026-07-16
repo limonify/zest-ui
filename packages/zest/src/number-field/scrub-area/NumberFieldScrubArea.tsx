@@ -6,7 +6,7 @@ import { useNumberFieldRootContext } from '../root/NumberFieldRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import type { NumberFieldRootState } from '../root/NumberFieldRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -117,7 +117,7 @@ export function NumberFieldScrubArea(componentProps: NumberFieldScrubArea.Props)
 export interface NumberFieldScrubAreaState extends NumberFieldRootState {}
 
 export interface NumberFieldScrubAreaProps
-  extends BaseUIComponentProps<typeof View, NumberFieldScrubAreaState> {
+  extends ZestUIComponentProps<typeof View, NumberFieldScrubAreaState> {
   /**
    * The direction the drag is read along.
    * @default 'horizontal'

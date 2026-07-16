@@ -8,7 +8,7 @@ import { useCompositeListItem } from '../../internals/composite/list/useComposit
 import type { CompositeItemLayout } from '../../internals/composite/list/CompositeListContext';
 import { useTabsRootContext } from '../root/TabsRootContext';
 import type { TabsRoot } from '../root/TabsRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -127,7 +127,7 @@ export interface TabsTabState {
 }
 
 export interface TabsTabProps
-  extends Omit<BaseUIComponentProps<typeof Pressable, TabsTabState>, 'value' | 'onPress'> {
+  extends Omit<ZestUIComponentProps<typeof Pressable, TabsTabState>, 'value' | 'onPress'> {
   /**
    * The value of the Tab.
    */

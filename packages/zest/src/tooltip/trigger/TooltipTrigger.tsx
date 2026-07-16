@@ -4,7 +4,7 @@ import { Pressable, type GestureResponderEvent } from 'react-native';
 import { useTooltipRootContext } from '../root/TooltipRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -87,7 +87,7 @@ export interface TooltipTriggerState {
 }
 
 export interface TooltipTriggerProps
-  extends BaseUIComponentProps<typeof Pressable, TooltipTriggerState> {
+  extends ZestUIComponentProps<typeof Pressable, TooltipTriggerState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

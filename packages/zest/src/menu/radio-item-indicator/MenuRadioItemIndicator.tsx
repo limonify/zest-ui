@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useMenuRadioItemContext } from '../radio-item/MenuRadioItemContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { MenuRadioItemState } from '../radio-item/MenuRadioItem';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Indicates whether the radio item is selected.
@@ -25,7 +25,7 @@ export function MenuRadioItemIndicator(componentProps: MenuRadioItemIndicator.Pr
 export interface MenuRadioItemIndicatorState extends MenuRadioItemState {}
 
 export interface MenuRadioItemIndicatorProps
-  extends BaseUIComponentProps<typeof View, MenuRadioItemIndicatorState> {
+  extends ZestUIComponentProps<typeof View, MenuRadioItemIndicatorState> {
   /**
    * Whether to keep the element mounted when the radio item is not selected.
    * @default false

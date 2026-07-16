@@ -5,7 +5,7 @@ import { useSelectPositionerContext } from '../positioner/SelectPositionerContex
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { CompositeList } from '../../internals/composite/list/CompositeList';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A container for the select items.
@@ -44,7 +44,7 @@ export interface SelectPopupState {
   align: Align;
 }
 
-export interface SelectPopupProps extends BaseUIComponentProps<typeof View, SelectPopupState> {}
+export interface SelectPopupProps extends ZestUIComponentProps<typeof View, SelectPopupState> {}
 
 export namespace SelectPopup {
   export type State = SelectPopupState;

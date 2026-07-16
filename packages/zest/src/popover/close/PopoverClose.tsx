@@ -4,7 +4,7 @@ import { Pressable, type GestureResponderEvent } from 'react-native';
 import { usePopoverRootContext } from '../root/PopoverRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -56,7 +56,7 @@ export interface PopoverCloseState {
 }
 
 export interface PopoverCloseProps
-  extends BaseUIComponentProps<typeof Pressable, PopoverCloseState> {
+  extends ZestUIComponentProps<typeof Pressable, PopoverCloseState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

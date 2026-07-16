@@ -7,7 +7,7 @@ import { useButton } from '../../internals/use-button/useButton';
 import { useInterval } from '../../hooks/useInterval';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useTimeout } from '../../hooks/useTimeout';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { NumberFieldRootState } from './NumberFieldRoot';
@@ -127,7 +127,7 @@ export interface NumberFieldStepperButtonState extends NumberFieldRootState {
 }
 
 export interface NumberFieldStepperButtonProps
-  extends BaseUIComponentProps<typeof Pressable, NumberFieldStepperButtonState> {
+  extends ZestUIComponentProps<typeof Pressable, NumberFieldStepperButtonState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

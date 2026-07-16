@@ -6,7 +6,7 @@ import { useMenuPositionerContext } from '../positioner/MenuPositionerContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Displays an element positioned against the menu anchor.
@@ -37,7 +37,7 @@ export interface MenuArrowState {
   align: Align;
 }
 
-export interface MenuArrowProps extends BaseUIComponentProps<typeof View, MenuArrowState> {}
+export interface MenuArrowProps extends ZestUIComponentProps<typeof View, MenuArrowState> {}
 
 export namespace MenuArrow {
   export type State = MenuArrowState;

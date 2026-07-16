@@ -5,7 +5,7 @@ import { useToastProviderContext } from '../provider/ToastProviderContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
 import { useStableCallback } from '../../hooks/useStableCallback';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A container viewport for toasts.
@@ -82,7 +82,7 @@ export interface ToastViewportState {
 }
 
 export interface ToastViewportProps
-  extends BaseUIComponentProps<typeof View, ToastViewportState> {}
+  extends ZestUIComponentProps<typeof View, ToastViewportState> {}
 
 export namespace ToastViewport {
   export type State = ToastViewportState;

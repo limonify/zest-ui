@@ -1,7 +1,7 @@
 'use client';
 import { View } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { useDialogPopupProps } from './useDialogPopupProps';
 
 /**
@@ -29,7 +29,7 @@ export interface DialogPopupState {
   open: boolean;
 }
 
-export interface DialogPopupProps extends BaseUIComponentProps<typeof View, DialogPopupState> {}
+export interface DialogPopupProps extends ZestUIComponentProps<typeof View, DialogPopupState> {}
 
 export namespace DialogPopup {
   export type State = DialogPopupState;

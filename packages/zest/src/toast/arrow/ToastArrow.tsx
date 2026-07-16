@@ -5,7 +5,7 @@ import { useToastPositionerContext } from '../positioner/ToastPositionerContext'
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Displays an element pointing at the anchor an anchored toast belongs to.
@@ -32,7 +32,7 @@ export interface ToastArrowState {
   align: Align;
 }
 
-export interface ToastArrowProps extends BaseUIComponentProps<typeof View, ToastArrowState> {}
+export interface ToastArrowProps extends ZestUIComponentProps<typeof View, ToastArrowState> {}
 
 export namespace ToastArrow {
   export type State = ToastArrowState;

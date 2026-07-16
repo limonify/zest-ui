@@ -5,7 +5,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useDialogRootContext } from '../../dialog/root/DialogRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { useDrawerRootContext, type DrawerSwipeDirection } from '../root/DrawerRootContext';
@@ -148,7 +148,7 @@ export interface DrawerSwipeAreaState {
 }
 
 export interface DrawerSwipeAreaProps
-  extends BaseUIComponentProps<typeof View, DrawerSwipeAreaState> {
+  extends ZestUIComponentProps<typeof View, DrawerSwipeAreaState> {
   /**
    * Whether the swipe area is disabled.
    * @default false

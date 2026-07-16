@@ -8,7 +8,7 @@ import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { AccordionItemState } from '../item/AccordionItem';
 import { useAccordionItemContext } from '../item/AccordionItemContext';
 import { useAccordionRootContext } from '../root/AccordionRootContext';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A collapsible panel with the accordion item contents.
@@ -80,7 +80,7 @@ export interface AccordionPanelState extends AccordionItemState {
 }
 
 export interface AccordionPanelProps
-  extends BaseUIComponentProps<typeof View, AccordionPanelState> {
+  extends ZestUIComponentProps<typeof View, AccordionPanelState> {
   /**
    * Whether to keep the element rendered while the panel is closed.
    *

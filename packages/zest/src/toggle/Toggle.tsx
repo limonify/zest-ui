@@ -6,7 +6,7 @@ import { useIsoLayoutEffect } from '../hooks/useIsoLayoutEffect';
 import { useRenderElement } from '../use-render/useRenderElement';
 import { useButton } from '../internals/use-button/useButton';
 import { useToggleGroupContext } from '../toggle-group/ToggleGroupContext';
-import type { BaseUIComponentProps } from '../types';
+import type { ZestUIComponentProps } from '../types';
 import { error } from '../utils/error';
 import {
   createChangeEventDetails,
@@ -120,7 +120,7 @@ export interface ToggleState {
 }
 
 export interface ToggleProps<Value extends string = string>
-  extends Omit<BaseUIComponentProps<typeof Pressable, ToggleState>, 'onPress'> {
+  extends Omit<ZestUIComponentProps<typeof Pressable, ToggleState>, 'onPress'> {
   /**
    * Whether the toggle button is currently pressed.
    * This is the controlled counterpart of `defaultPressed`.

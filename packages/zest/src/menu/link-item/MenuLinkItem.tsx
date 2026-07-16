@@ -6,7 +6,7 @@ import { useMenuSubmenuRootContext } from '../submenu-root/MenuSubmenuRootContex
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -96,7 +96,7 @@ export interface MenuLinkItemState {
 }
 
 export interface MenuLinkItemProps
-  extends BaseUIComponentProps<typeof Pressable, MenuLinkItemState> {
+  extends ZestUIComponentProps<typeof Pressable, MenuLinkItemState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

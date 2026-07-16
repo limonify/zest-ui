@@ -12,7 +12,7 @@ import {
   type Side,
   type UseAnchorPositioningSharedParameters,
 } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { SelectPositionerContext } from './SelectPositionerContext';
 
 /**
@@ -101,7 +101,7 @@ export interface SelectPositionerState {
 
 export interface SelectPositionerProps
   extends UseAnchorPositioningSharedParameters,
-    BaseUIComponentProps<typeof View, SelectPositionerState> {}
+    ZestUIComponentProps<typeof View, SelectPositionerState> {}
 
 export namespace SelectPositioner {
   export type State = SelectPositionerState;

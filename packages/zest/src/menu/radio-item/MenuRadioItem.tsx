@@ -7,7 +7,7 @@ import { useMenuSubmenuRootContext } from '../submenu-root/MenuSubmenuRootContex
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { MenuRadioItemContext } from './MenuRadioItemContext';
@@ -107,7 +107,7 @@ export interface MenuRadioItemState {
 }
 
 export interface MenuRadioItemProps<Value = any>
-  extends Omit<BaseUIComponentProps<typeof Pressable, MenuRadioItemState>, 'value'> {
+  extends Omit<ZestUIComponentProps<typeof Pressable, MenuRadioItemState>, 'value'> {
   /**
    * The value this item selects in its `Menu.RadioGroup`.
    */

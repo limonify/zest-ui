@@ -7,7 +7,7 @@ import { useTransitionStatus, type TransitionStatus } from '../../internals/useT
 import type { TabsRoot } from '../root/TabsRoot';
 import { useTabsRootContext } from '../root/TabsRootContext';
 import type { TabsTab } from '../tab/TabsTab';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A panel displayed when the corresponding tab is active.
@@ -99,7 +99,7 @@ export interface TabsPanelState {
 }
 
 export interface TabsPanelProps
-  extends Omit<BaseUIComponentProps<typeof View, TabsPanelState>, 'value'> {
+  extends Omit<ZestUIComponentProps<typeof View, TabsPanelState>, 'value'> {
   /**
    * The value of the Panel, which associates it with the Tab of the same value.
    */

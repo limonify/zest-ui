@@ -4,7 +4,7 @@ import { usePopoverRootContext } from '../root/PopoverRootContext';
 import { usePopoverPositionerContext } from '../positioner/PopoverPositionerContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A container for the popover contents.
@@ -55,7 +55,7 @@ export interface PopoverPopupState {
   align: Align;
 }
 
-export interface PopoverPopupProps extends BaseUIComponentProps<typeof View, PopoverPopupState> {}
+export interface PopoverPopupProps extends ZestUIComponentProps<typeof View, PopoverPopupState> {}
 
 export namespace PopoverPopup {
   export type State = PopoverPopupState;

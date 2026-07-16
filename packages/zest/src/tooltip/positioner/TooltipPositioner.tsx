@@ -12,7 +12,7 @@ import {
   type Side,
   type UseAnchorPositioningSharedParameters,
 } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { TooltipPositionerContext } from './TooltipPositionerContext';
 
 /**
@@ -105,7 +105,7 @@ export interface TooltipPositionerState {
 
 export interface TooltipPositionerProps
   extends UseAnchorPositioningSharedParameters,
-    BaseUIComponentProps<typeof View, TooltipPositionerState> {}
+    ZestUIComponentProps<typeof View, TooltipPositionerState> {}
 
 export namespace TooltipPositioner {
   export type State = TooltipPositionerState;

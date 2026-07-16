@@ -5,7 +5,7 @@ import { useSelectRootContext } from '../root/SelectRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { isSelectValueSelected, toggleSelectValue } from '../store/SelectStore';
@@ -113,7 +113,7 @@ export interface SelectItemState {
 }
 
 export interface SelectItemProps<Value = any>
-  extends Omit<BaseUIComponentProps<typeof Pressable, SelectItemState>, 'value' | 'onPress'> {
+  extends Omit<ZestUIComponentProps<typeof Pressable, SelectItemState>, 'value' | 'onPress'> {
   /**
    * The value this item selects.
    */

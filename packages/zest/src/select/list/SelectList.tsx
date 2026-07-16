@@ -1,7 +1,7 @@
 'use client';
 import { ScrollView } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A scrollable list of the select items.
@@ -24,7 +24,7 @@ export function SelectList(componentProps: SelectList.Props) {
 
 export interface SelectListState {}
 
-export interface SelectListProps extends BaseUIComponentProps<typeof ScrollView, SelectListState> {}
+export interface SelectListProps extends ZestUIComponentProps<typeof ScrollView, SelectListState> {}
 
 export namespace SelectList {
   export type State = SelectListState;

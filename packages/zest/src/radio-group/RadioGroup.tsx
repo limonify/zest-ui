@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { useControlled } from '../hooks/useControlled';
 import { useStableCallback } from '../hooks/useStableCallback';
 import { useRenderElement } from '../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../types';
+import type { ZestUIComponentProps } from '../types';
 import type { ZestChangeEventDetails } from '../utils/createChangeEventDetails';
 import { REASONS } from '../utils/reasons';
 import { RadioGroupContext } from './RadioGroupContext';
@@ -93,7 +93,7 @@ export interface RadioGroupState {
 }
 
 export interface RadioGroupProps<Value = any>
-  extends Omit<BaseUIComponentProps<typeof View, RadioGroupState>, 'value'> {
+  extends Omit<ZestUIComponentProps<typeof View, RadioGroupState>, 'value'> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

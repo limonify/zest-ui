@@ -2,7 +2,7 @@
 import { Text } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMenuGroupContext } from '../group/MenuGroupContext';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * An accessible label that is automatically associated with its parent group.
@@ -25,7 +25,7 @@ export function MenuGroupLabel(componentProps: MenuGroupLabel.Props) {
 export interface MenuGroupLabelState {}
 
 export interface MenuGroupLabelProps
-  extends BaseUIComponentProps<typeof Text, MenuGroupLabelState> {}
+  extends ZestUIComponentProps<typeof Text, MenuGroupLabelState> {}
 
 export namespace MenuGroupLabel {
   export type State = MenuGroupLabelState;

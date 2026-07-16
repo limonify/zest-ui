@@ -5,7 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useCollapsibleRootContext } from '../root/CollapsibleRootContext';
 import type { CollapsibleRootState } from '../root/CollapsibleRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A button that opens and closes the collapsible panel.
@@ -68,7 +68,7 @@ export interface CollapsibleTriggerState extends CollapsibleRootState {
 }
 
 export interface CollapsibleTriggerProps
-  extends BaseUIComponentProps<typeof Pressable, CollapsibleTriggerState> {
+  extends ZestUIComponentProps<typeof Pressable, CollapsibleTriggerState> {
   /**
    * Whether the component should ignore user interaction.
    */

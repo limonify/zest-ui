@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { useControlled } from '../hooks/useControlled';
 import { useStableCallback } from '../hooks/useStableCallback';
 import { useRenderElement } from '../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../types';
+import type { ZestUIComponentProps } from '../types';
 import type { ZestChangeEventDetails } from '../utils/createChangeEventDetails';
 import { REASONS } from '../utils/reasons';
 import { CheckboxGroupContext } from './CheckboxGroupContext';
@@ -89,7 +89,7 @@ export interface CheckboxGroupState {
 }
 
 export interface CheckboxGroupProps
-  extends Omit<BaseUIComponentProps<typeof View, CheckboxGroupState>, 'value'> {
+  extends Omit<ZestUIComponentProps<typeof View, CheckboxGroupState>, 'value'> {
   /**
    * Names of the checkboxes in the group that should be ticked.
    *

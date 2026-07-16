@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useNumberFieldRootContext } from '../root/NumberFieldRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { NumberFieldRootState } from '../root/NumberFieldRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Groups the input with the increment and decrement buttons.
@@ -24,7 +24,7 @@ export function NumberFieldGroup(componentProps: NumberFieldGroup.Props) {
 export interface NumberFieldGroupState extends NumberFieldRootState {}
 
 export interface NumberFieldGroupProps
-  extends BaseUIComponentProps<typeof View, NumberFieldGroupState> {}
+  extends ZestUIComponentProps<typeof View, NumberFieldGroupState> {}
 
 export namespace NumberFieldGroup {
   export type State = NumberFieldGroupState;

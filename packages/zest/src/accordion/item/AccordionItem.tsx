@@ -9,7 +9,7 @@ import type { CollapsibleRoot, CollapsibleRootState } from '../../collapsible/ro
 import { CollapsibleRootContext } from '../../collapsible/root/CollapsibleRootContext';
 import type { AccordionRootState } from '../root/AccordionRoot';
 import { useAccordionRootContext } from '../root/AccordionRootContext';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import { AccordionItemContext } from './AccordionItemContext';
@@ -131,7 +131,7 @@ export interface AccordionItemState<Value = any> extends AccordionRootState<Valu
 }
 
 export interface AccordionItemProps<Value = any>
-  extends Omit<BaseUIComponentProps<typeof View, AccordionItemState<Value>>, 'value'> {
+  extends Omit<ZestUIComponentProps<typeof View, AccordionItemState<Value>>, 'value'> {
   /**
    * A unique value that identifies this accordion item.
    * If no value is provided, a unique ID will be generated automatically.

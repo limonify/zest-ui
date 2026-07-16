@@ -5,7 +5,7 @@ import { useSelectRootContext } from '../root/SelectRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -89,7 +89,7 @@ export interface SelectTriggerState {
 }
 
 export interface SelectTriggerProps
-  extends BaseUIComponentProps<typeof Pressable, SelectTriggerState> {
+  extends ZestUIComponentProps<typeof Pressable, SelectTriggerState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

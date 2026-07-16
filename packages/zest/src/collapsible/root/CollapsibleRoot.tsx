@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import { useCollapsibleRoot, type UseCollapsibleRootReturnValue } from './useCollapsibleRoot';
@@ -65,7 +65,7 @@ export interface CollapsibleRootState
 }
 
 export interface CollapsibleRootProps
-  extends BaseUIComponentProps<typeof View, CollapsibleRootState> {
+  extends ZestUIComponentProps<typeof View, CollapsibleRootState> {
   /**
    * Whether the collapsible panel is currently open.
    *

@@ -11,7 +11,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
 import type { OTPFieldRootState } from '../root/OTPFieldRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { normalizeOTPValueWithDetails, removeOTPCharacter, replaceOTPValue } from '../utils/otp';
@@ -195,7 +195,7 @@ export interface OTPFieldInputState extends OTPFieldRootState {
 }
 
 export interface OTPFieldInputProps
-  extends Omit<BaseUIComponentProps<typeof TextInput, OTPFieldInputState>, 'value'> {}
+  extends Omit<ZestUIComponentProps<typeof TextInput, OTPFieldInputState>, 'value'> {}
 
 export namespace OTPFieldInput {
   export type State = OTPFieldInputState;

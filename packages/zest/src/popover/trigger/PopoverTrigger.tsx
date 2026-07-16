@@ -10,7 +10,7 @@ import { useMergedRefs } from '../../hooks/useMergedRefs';
 import { usePopupHandleStore } from '../../utils/popups/usePopupHandleStore';
 import type { PopoverHandle } from '../store/PopoverHandle';
 import type { PopoverStore } from '../store/PopoverStore';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -129,7 +129,7 @@ export interface PopoverTriggerState {
 }
 
 export interface PopoverTriggerProps<Payload = unknown>
-  extends BaseUIComponentProps<typeof Pressable, PopoverTriggerState> {
+  extends ZestUIComponentProps<typeof Pressable, PopoverTriggerState> {
   /**
    * Whether the component should ignore user interaction.
    * @default false

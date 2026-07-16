@@ -6,7 +6,7 @@ import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { clamp } from '../../utils/clamp';
-import type { BaseUIComponentProps, Orientation } from '../../types';
+import type { ZestUIComponentProps, Orientation } from '../../types';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import { SliderRootContext } from './SliderRootContext';
@@ -254,7 +254,7 @@ export interface SliderRootState {
 }
 
 export interface SliderRootProps<Value extends number | readonly number[] = number>
-  extends Omit<BaseUIComponentProps<typeof View, SliderRootState>, 'value'> {
+  extends Omit<ZestUIComponentProps<typeof View, SliderRootState>, 'value'> {
   /**
    * The value of the slider. Pass an array for a range slider.
    *

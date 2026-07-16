@@ -2,7 +2,7 @@
 import { Text } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useSelectGroupContext } from '../group/SelectGroupContext';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * An accessible label that is automatically associated with its parent group.
@@ -25,7 +25,7 @@ export function SelectGroupLabel(componentProps: SelectGroupLabel.Props) {
 export interface SelectGroupLabelState {}
 
 export interface SelectGroupLabelProps
-  extends BaseUIComponentProps<typeof Text, SelectGroupLabelState> {}
+  extends ZestUIComponentProps<typeof Text, SelectGroupLabelState> {}
 
 export namespace SelectGroupLabel {
   export type State = SelectGroupLabelState;

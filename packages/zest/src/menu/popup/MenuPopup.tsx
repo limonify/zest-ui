@@ -5,7 +5,7 @@ import { useMenuPositionerContext } from '../positioner/MenuPositionerContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { CompositeList } from '../../internals/composite/list/CompositeList';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A container for the menu items.
@@ -45,7 +45,7 @@ export interface MenuPopupState {
   align: Align;
 }
 
-export interface MenuPopupProps extends BaseUIComponentProps<typeof View, MenuPopupState> {}
+export interface MenuPopupProps extends ZestUIComponentProps<typeof View, MenuPopupState> {}
 
 export namespace MenuPopup {
   export type State = MenuPopupState;

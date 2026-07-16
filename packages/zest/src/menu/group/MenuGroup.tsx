@@ -3,7 +3,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { MenuGroupContext } from './MenuGroupContext';
 
 /**
@@ -37,7 +37,7 @@ export function MenuGroup(componentProps: MenuGroup.Props) {
 
 export interface MenuGroupState {}
 
-export interface MenuGroupProps extends BaseUIComponentProps<typeof View, MenuGroupState> {}
+export interface MenuGroupProps extends ZestUIComponentProps<typeof View, MenuGroupState> {}
 
 export namespace MenuGroup {
   export type State = MenuGroupState;

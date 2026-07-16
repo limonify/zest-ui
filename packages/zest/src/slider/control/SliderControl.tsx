@@ -5,7 +5,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSliderRootContext } from '../root/SliderRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { SliderRootState } from '../root/SliderRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -123,7 +123,7 @@ export function SliderControl(componentProps: SliderControl.Props) {
 export interface SliderControlState extends SliderRootState {}
 
 export interface SliderControlProps
-  extends BaseUIComponentProps<typeof View, SliderControlState> {}
+  extends ZestUIComponentProps<typeof View, SliderControlState> {}
 
 export namespace SliderControl {
   export type State = SliderControlState;

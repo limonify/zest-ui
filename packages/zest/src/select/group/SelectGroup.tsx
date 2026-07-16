@@ -3,7 +3,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { SelectGroupContext } from './SelectGroupContext';
 
 /**
@@ -37,7 +37,7 @@ export function SelectGroup(componentProps: SelectGroup.Props) {
 
 export interface SelectGroupState {}
 
-export interface SelectGroupProps extends BaseUIComponentProps<typeof View, SelectGroupState> {}
+export interface SelectGroupProps extends ZestUIComponentProps<typeof View, SelectGroupState> {}
 
 export namespace SelectGroup {
   export type State = SelectGroupState;

@@ -6,7 +6,7 @@ import { useToastProviderContext } from '../provider/ToastProviderContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import type { ToastObject } from '../useToastManager';
 import { ToastRootContext } from './ToastRootContext';
 
@@ -241,7 +241,7 @@ export interface ToastRootState {
   swipeDirection: ToastSwipeDirection;
 }
 
-export interface ToastRootProps extends BaseUIComponentProps<typeof View, ToastRootState> {
+export interface ToastRootProps extends ZestUIComponentProps<typeof View, ToastRootState> {
   /**
    * The toast to render, from `useToastManager().toasts`.
    */

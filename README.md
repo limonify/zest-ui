@@ -269,7 +269,7 @@ Simple components (Button, Input, Text, Separator) use React Native core element
 │   │   └── index.ts
 │   │
 │   ├── types/
-│   │   ├── common.ts             # BaseUIComponentProps, generics
+│   │   ├── common.ts             # ZestUIComponentProps, generics
 │   │   └── index.ts
 │   │
 │   └── index.ts                  # Barrel export (all public API)
@@ -591,7 +591,7 @@ The 14 excluded: `ContextMenu`, `PreviewCard`, `Menubar`, `NavigationMenu`, `Met
 ### Simple Component: Button
 
 ```tsx
-interface ButtonProps extends BaseUIComponentProps<'button', Button.State> {
+interface ButtonProps extends ZestUIComponentProps<'button', Button.State> {
   disabled?: boolean
   onPress?: (event: GestureResponderEvent) => void
 }
@@ -613,10 +613,10 @@ namespace Button {
 import * as React from 'react'
 import { Pressable, type ViewRef } from 'react-native'
 import { useRenderElement } from '../../use-render'
-import type { BaseUIComponentProps } from '../../types'
+import type { ZestUIComponentProps } from '../../types'
 
 export interface ButtonProps
-  extends BaseUIComponentProps<'button', Button.State> {}
+  extends ZestUIComponentProps<'button', Button.State> {}
 
 export namespace Button {
   export interface State {
@@ -728,7 +728,7 @@ function DialogRoot(props: DialogRootProps) {
 }
 
 // DialogTrigger.tsx
-interface DialogTriggerProps extends BaseUIComponentProps<'button', {}> {}
+interface DialogTriggerProps extends ZestUIComponentProps<'button', {}> {}
 
 function DialogTrigger(props: DialogTriggerProps) {
   const { onOpenChange } = useDialogContext()
@@ -1289,10 +1289,10 @@ One component at a time, starting from the simplest.
 import * as React from 'react'
 import { type ViewRef /* or TextInputRef, etc */ } from 'react-native'
 import { useRenderElement } from '../../use-render'
-import type { BaseUIComponentProps } from '../../types'
+import type { ZestUIComponentProps } from '../../types'
 
 export interface MyComponentProps
-  extends BaseUIComponentProps<'view', MyComponent.State> {}
+  extends ZestUIComponentProps<'view', MyComponent.State> {}
 
 export namespace MyComponent {
   export interface State {

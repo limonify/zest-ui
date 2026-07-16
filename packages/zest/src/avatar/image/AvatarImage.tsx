@@ -7,7 +7,7 @@ import { useStableCallback } from '../../hooks/useStableCallback';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useTransitionStatus, type TransitionStatus } from '../../internals/useTransitionStatus';
 import type { AvatarRootState, ImageLoadingStatus } from '../root/AvatarRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * The image to be displayed in the avatar.
@@ -74,7 +74,7 @@ export interface AvatarImageState extends AvatarRootState {
   transitionStatus: TransitionStatus;
 }
 
-export interface AvatarImageProps extends BaseUIComponentProps<typeof Image, AvatarImageState> {
+export interface AvatarImageProps extends ZestUIComponentProps<typeof Image, AvatarImageState> {
   /**
    * Callback fired when the loading status changes.
    */

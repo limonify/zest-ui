@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useMenuCheckboxItemContext } from '../checkbox-item/MenuCheckboxItemContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { MenuCheckboxItemState } from '../checkbox-item/MenuCheckboxItem';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * Indicates whether the checkbox item is ticked.
@@ -25,7 +25,7 @@ export function MenuCheckboxItemIndicator(componentProps: MenuCheckboxItemIndica
 export interface MenuCheckboxItemIndicatorState extends MenuCheckboxItemState {}
 
 export interface MenuCheckboxItemIndicatorProps
-  extends BaseUIComponentProps<typeof View, MenuCheckboxItemIndicatorState> {
+  extends ZestUIComponentProps<typeof View, MenuCheckboxItemIndicatorState> {
   /**
    * Whether to keep the element mounted when the checkbox item is not ticked.
    * @default false

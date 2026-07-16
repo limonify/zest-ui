@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { clamp } from '../../utils/clamp';
 import { formatNumber } from '../../utils/formatNumber';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { ProgressRootContext } from './ProgressRootContext';
 
 function getDefaultAccessibilityValueText(formattedValue: string | null, value: number | null) {
@@ -104,7 +104,7 @@ export interface ProgressRootState {
   status: ProgressStatus;
 }
 
-export interface ProgressRootProps extends BaseUIComponentProps<typeof View, ProgressRootState> {
+export interface ProgressRootProps extends ZestUIComponentProps<typeof View, ProgressRootState> {
   /**
    * The current value. The component is indeterminate when value is `null`.
    */

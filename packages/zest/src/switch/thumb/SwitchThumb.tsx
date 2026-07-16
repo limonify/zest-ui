@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useSwitchRootContext } from '../root/SwitchRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { SwitchRootState } from '../root/SwitchRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * The movable part of the switch that indicates whether the switch is on or off.
@@ -24,7 +24,7 @@ export function SwitchThumb(componentProps: SwitchThumb.Props) {
 export interface SwitchThumbState extends SwitchRootState {}
 
 export interface SwitchThumbProps
-  extends BaseUIComponentProps<typeof View, SwitchThumbState> {}
+  extends ZestUIComponentProps<typeof View, SwitchThumbState> {}
 
 export namespace SwitchThumb {
   export type State = SwitchThumbState;

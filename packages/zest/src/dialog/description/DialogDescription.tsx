@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 import { useDialogRootContext } from '../root/DialogRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A paragraph with additional information about the dialog.
@@ -25,7 +25,7 @@ export function DialogDescription(componentProps: DialogDescription.Props) {
 }
 
 export interface DialogDescriptionProps
-  extends BaseUIComponentProps<typeof Text, DialogDescriptionState> {}
+  extends ZestUIComponentProps<typeof Text, DialogDescriptionState> {}
 
 export interface DialogDescriptionState {}
 

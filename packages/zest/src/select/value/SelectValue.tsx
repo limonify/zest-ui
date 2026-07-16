@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 import { useSelectRootContext } from '../root/SelectRootContext';
 import { resolveSelectLabel } from '../store/SelectStore';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * The label of the currently selected item.
@@ -67,7 +67,7 @@ export interface SelectValueState {
 }
 
 export interface SelectValueProps
-  extends Omit<BaseUIComponentProps<typeof Text, SelectValueState>, 'children'> {
+  extends Omit<ZestUIComponentProps<typeof Text, SelectValueState>, 'children'> {
   children?: React.ReactNode | ((state: SelectValueState) => React.ReactNode);
 }
 

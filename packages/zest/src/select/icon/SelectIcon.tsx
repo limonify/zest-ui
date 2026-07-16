@@ -2,7 +2,7 @@
 import { View } from 'react-native';
 import { useSelectRootContext } from '../root/SelectRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * A decorative icon inside the trigger, hidden from assistive technology.
@@ -34,7 +34,7 @@ export interface SelectIconState {
   open: boolean;
 }
 
-export interface SelectIconProps extends BaseUIComponentProps<typeof View, SelectIconState> {}
+export interface SelectIconProps extends ZestUIComponentProps<typeof View, SelectIconState> {}
 
 export namespace SelectIcon {
   export type State = SelectIconState;

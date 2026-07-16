@@ -4,7 +4,7 @@ import { useSliderRootContext } from '../root/SliderRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { formatNumber } from '../../utils/formatNumber';
 import type { SliderRootState } from '../root/SliderRoot';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 
 /**
  * The draggable handle.
@@ -75,7 +75,7 @@ export interface SliderThumbState extends SliderRootState {
   value: number;
 }
 
-export interface SliderThumbProps extends BaseUIComponentProps<typeof View, SliderThumbState> {
+export interface SliderThumbProps extends ZestUIComponentProps<typeof View, SliderThumbState> {
   /**
    * Which value this thumb controls. Range sliders give each thumb its own index.
    * @default 0

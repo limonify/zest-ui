@@ -16,21 +16,21 @@ export type ZestStyle<State> =
   | undefined;
 
 /**
- * Events emitted by Zest components carry a `preventBaseUIHandler` method that
+ * Events emitted by Zest components carry a `preventZestUIHandler` method that
  * cancels Zest's own internal handling of the event (same contract as Base UI).
  */
-export type BaseUIEvent<E> = E & {
-  preventBaseUIHandler: () => void;
+export type ZestUIEvent<E> = E & {
+  preventZestUIHandler: () => void;
   readonly baseUIHandlerPrevented?: boolean;
 };
 
 /**
- * Adds a `preventBaseUIHandler` method to all event handler props.
+ * Adds a `preventZestUIHandler` method to all event handler props.
  */
-export type WithBaseUIEvent<T> = {
+export type WithZestUIEvent<T> = {
   [K in keyof T]: T[K] extends ((event: infer E) => any) | undefined
     ? E extends object
-      ? ((event: BaseUIEvent<E>) => any) | undefined
+      ? ((event: ZestUIEvent<E>) => any) | undefined
       : T[K]
     : T[K];
 };
@@ -55,11 +55,11 @@ export type NativeProps = Record<string, any>;
  * @template C The default React Native component type (e.g. `typeof View`).
  * @template State The component's state, passed to `className`/`style`/`render` functions.
  */
-export type BaseUIComponentProps<
+export type ZestUIComponentProps<
   C extends React.ElementType,
   State,
   RenderFunctionProps = NativeProps,
-> = Omit<WithBaseUIEvent<React.ComponentPropsWithRef<C>>, 'style' | 'children' | 'className'> & {
+> = Omit<WithZestUIEvent<React.ComponentPropsWithRef<C>>, 'style' | 'children' | 'className'> & {
   /**
    * A string, or a function of the component's state returning a string.
    * Inert in plain React Native; consumed by className-based styling

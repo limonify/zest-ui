@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, type GestureResponderEvent } from 'react-native'
 import { useDialogRootContext } from '../root/DialogRootContext';
 import { useDialogPortalContext } from '../portal/DialogPortalContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -54,7 +54,7 @@ export interface DialogViewportState {
 }
 
 export interface DialogViewportProps
-  extends BaseUIComponentProps<typeof Pressable, DialogViewportState> {}
+  extends ZestUIComponentProps<typeof Pressable, DialogViewportState> {}
 
 export namespace DialogViewport {
   export type State = DialogViewportState;

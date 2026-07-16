@@ -6,7 +6,7 @@ import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { formatNumber } from '../../utils/formatNumber';
-import type { BaseUIComponentProps } from '../../types';
+import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
@@ -262,7 +262,7 @@ export interface NumberFieldRootState {
 }
 
 export interface NumberFieldRootProps
-  extends Omit<BaseUIComponentProps<typeof View, NumberFieldRootState>, 'id'> {
+  extends Omit<ZestUIComponentProps<typeof View, NumberFieldRootState>, 'id'> {
   /**
    * The raw numeric value of the field.
    */
