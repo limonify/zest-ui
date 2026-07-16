@@ -2,6 +2,7 @@
 import { TextInput, type NativeSyntheticEvent, type TextInputFocusEventData } from 'react-native';
 import { useNumberFieldRootContext } from '../root/NumberFieldRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { formatNumber } from '../../utils/formatNumber';
 import type { NumberFieldRootState } from '../root/NumberFieldRoot';
@@ -41,6 +42,8 @@ export function NumberFieldInput(componentProps: NumberFieldInput.Props) {
   } = useNumberFieldRootContext();
 
   const { disabled, readOnly, value, inputValue } = state;
+
+  const { fieldProps } = useFieldControlRegistration();
 
   const handleChangeText = useStableCallback((text: string) => {
     if (disabled || readOnly) {
@@ -158,6 +161,7 @@ export function NumberFieldInput(componentProps: NumberFieldInput.Props) {
           now: value ?? undefined,
           text: inputValue || undefined,
         },
+        ...fieldProps,
       },
       elementProps,
     ],

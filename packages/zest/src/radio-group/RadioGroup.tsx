@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { useControlled } from '../hooks/useControlled';
 import { useStableCallback } from '../hooks/useStableCallback';
 import { useRenderElement } from '../use-render/useRenderElement';
+import { useFieldControlRegistration } from '../internals/field/useFieldControlRegistration';
 import type { ZestUIComponentProps } from '../types';
 import type { ZestChangeEventDetails } from '../utils/createChangeEventDetails';
 import { REASONS } from '../utils/reasons';
@@ -17,7 +18,7 @@ export function RadioGroup<Value = any>(componentProps: RadioGroup.Props<Value>)
   const {
     className,
     defaultValue,
-    disabled = false,
+    disabled: disabledProp = false,
     onValueChange,
     readOnly = false,
     render,
@@ -27,6 +28,10 @@ export function RadioGroup<Value = any>(componentProps: RadioGroup.Props<Value>)
     ref,
     ...elementProps
   } = componentProps;
+
+  const { fieldDisabled, fieldProps, validateField } = useFieldControlRegistration();
+
+  const disabled = disabledProp || fieldDisabled;
 
   const [checkedValue, setCheckedValueUnwrapped] = useControlled<Value | undefined>({
     controlled: valueProp,
@@ -44,6 +49,7 @@ export function RadioGroup<Value = any>(componentProps: RadioGroup.Props<Value>)
       }
 
       setCheckedValueUnwrapped(value);
+      validateField(value);
     },
   );
 
@@ -69,6 +75,7 @@ export function RadioGroup<Value = any>(componentProps: RadioGroup.Props<Value>)
         accessibilityState: { disabled: disabled || undefined },
         'aria-required': required || undefined,
         'aria-readonly': readOnly || undefined,
+        ...fieldProps,
       },
       elementProps,
     ],

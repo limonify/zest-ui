@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { Field, Fieldset, Input } from '../../index';
+import { act, fireEvent, render, screen, userEvent } from '@testing-library/react-native';
+import { Checkbox, Field, Fieldset, Input, Switch } from '../../index';
 
 const hidden = { includeHiddenElements: true } as const;
 
@@ -149,6 +149,56 @@ describe('Field', () => {
     await changeText('control', '');
     expect(seen?.valid).toBe(false);
     expect(seen?.errors).toContain('Required');
+  });
+});
+
+describe('Field integration with form controls', () => {
+  it('labels a Checkbox with Field.Label', async () => {
+    await render(
+      <Field.Root>
+        <Field.Label testID="label">Accept terms</Field.Label>
+        <Checkbox.Root testID="checkbox" />
+      </Field.Root>,
+    );
+
+    const labelId = screen.getByTestId('label').props.nativeID;
+    expect(labelId).toBeTruthy();
+    expect(screen.getByTestId('checkbox').props.accessibilityLabelledBy).toBe(labelId);
+  });
+
+  it('a disabled Field disables the Checkbox and Switch inside it', async () => {
+    await render(
+      <Field.Root disabled>
+        <Checkbox.Root testID="checkbox" />
+        <Switch.Root testID="switch" />
+      </Field.Root>,
+    );
+
+    expect(screen.getByTestId('checkbox').props.accessibilityState).toMatchObject({
+      disabled: true,
+    });
+    expect(screen.getByTestId('switch').props.accessibilityState).toMatchObject({
+      disabled: true,
+    });
+  });
+
+  it('runs the field validate when a Checkbox toggles', async () => {
+    await render(
+      <Field.Root
+        validationMode="onChange"
+        validate={(checked) => (checked ? null : 'Required')}
+      >
+        <Checkbox.Root testID="checkbox" />
+        <Field.Error testID="error" />
+      </Field.Root>,
+    );
+
+    const user = userEvent.setup();
+    // Toggle on then off, so the last change is invalid.
+    await user.press(screen.getByTestId('checkbox'));
+    await user.press(screen.getByTestId('checkbox'));
+
+    expect(screen.getByTestId('error', hidden)).toHaveTextContent('Required');
   });
 });
 
