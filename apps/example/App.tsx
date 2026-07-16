@@ -6,11 +6,13 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
   Accordion,
   AlertDialog,
+  Autocomplete,
   Avatar,
   Button,
   Checkbox,
   CheckboxGroup,
   Collapsible,
+  Combobox,
   ContextMenu,
   createDialogHandle,
   Dialog,
@@ -88,6 +90,8 @@ export default function App() {
           <ContextMenuSection />
           <Separator style={styles.separator} />
           <FieldSection />
+          <Separator style={styles.separator} />
+          <ComboboxSection />
           <Separator style={styles.separator} />
           <SelectSection />
           <Separator style={styles.separator} />
@@ -812,6 +816,79 @@ function ContextMenuSection() {
           </ContextMenu.Positioner>
         </ContextMenu.Portal>
       </ContextMenu.Root>
+    </View>
+  );
+}
+
+const COUNTRIES = [
+  'Argentina', 'Australia', 'Austria', 'Belgium', 'Brazil', 'Canada', 'Chile', 'Denmark',
+  'Egypt', 'Finland', 'France', 'Germany', 'Greece', 'Iceland', 'India', 'Ireland', 'Italy',
+  'Japan', 'Mexico', 'Netherlands', 'Norway', 'Portugal', 'Spain', 'Sweden', 'Turkey',
+];
+
+function ComboboxSection() {
+  const [value, setValue] = React.useState<unknown>(null);
+  const [tag, setTag] = React.useState('');
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Combobox / Autocomplete</Text>
+      <Text style={styles.label}>
+        A text input that filters a list. Combobox selects one value; Autocomplete is free text with
+        suggestions. Type to filter, then tap a row.
+      </Text>
+      {value != null ? <Text style={styles.label}>Selected: {String(value)}</Text> : null}
+
+      <Combobox.Root items={COUNTRIES} value={value} onValueChange={setValue}>
+        <Combobox.Input placeholder="Pick a country" style={styles.fieldControl} />
+        <Combobox.Portal>
+          <Combobox.Backdrop style={styles.transparentBackdrop} />
+          <Combobox.Positioner>
+            <Combobox.Popup style={[styles.floatingPopup, styles.comboboxPopup]}>
+              <Combobox.Empty style={styles.comboboxEmpty}>
+                <Text style={styles.label}>No match</Text>
+              </Combobox.Empty>
+              <Combobox.List>
+                {(item) => (
+                  <Combobox.Item
+                    key={String(item.value)}
+                    item={item}
+                    style={(state) => [styles.menuItem, state.pressed && styles.menuItemPressed]}
+                  >
+                    <Text style={styles.label}>{item.label}</Text>
+                  </Combobox.Item>
+                )}
+              </Combobox.List>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Portal>
+      </Combobox.Root>
+
+      <Text style={styles.label}>Autocomplete (free text): {tag || '—'}</Text>
+      <Autocomplete.Root
+        items={['bug', 'feature', 'docs', 'design', 'chore']}
+        inputValue={tag}
+        onInputValueChange={setTag}
+      >
+        <Autocomplete.Input placeholder="Add a tag" style={styles.fieldControl} />
+        <Autocomplete.Portal>
+          <Autocomplete.Positioner>
+            <Autocomplete.Popup style={[styles.floatingPopup, styles.comboboxPopup]}>
+              <Autocomplete.List>
+                {(item) => (
+                  <Autocomplete.Item
+                    key={String(item.value)}
+                    item={item}
+                    style={(state) => [styles.menuItem, state.pressed && styles.menuItemPressed]}
+                  >
+                    <Text style={styles.label}>{item.label}</Text>
+                  </Autocomplete.Item>
+                )}
+              </Autocomplete.List>
+            </Autocomplete.Popup>
+          </Autocomplete.Positioner>
+        </Autocomplete.Portal>
+      </Autocomplete.Root>
     </View>
   );
 }
@@ -1541,6 +1618,13 @@ const styles = StyleSheet.create({
     paddingVertical: 32,
     alignItems: 'center',
     backgroundColor: '#F2F2F7',
+  },
+  comboboxPopup: {
+    maxHeight: 240,
+    marginTop: 4,
+  },
+  comboboxEmpty: {
+    padding: 12,
   },
   fieldRoot: {
     gap: 6,
