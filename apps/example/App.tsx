@@ -178,6 +178,16 @@ function CheckboxSection() {
 function useAnimatedPanelStyle(open: boolean, height: number | undefined) {
   const progress = React.useRef(new Animated.Value(open ? 1 : 0)).current;
 
+  // Cache the last real (non-zero) measured height. A collapsed panel clips its
+  // content, and some layout engines then re-report that content's height as 0;
+  // without caching, the next open would animate to 0 and show nothing. Keeping
+  // the last good value makes close → reopen animate correctly.
+  const measuredRef = React.useRef<number | undefined>(height || undefined);
+  if (height) {
+    measuredRef.current = height;
+  }
+  const measured = measuredRef.current;
+
   React.useEffect(() => {
     Animated.timing(progress, {
       toValue: open ? 1 : 0,
@@ -188,10 +198,15 @@ function useAnimatedPanelStyle(open: boolean, height: number | undefined) {
   }, [open, progress]);
 
   return {
+    // Once a real height is known, animate 0 ↔ height. Before it is (a panel that
+    // has never been open), fall back to the natural height while open — so the
+    // content is visible and can be measured — and to 0 while closed.
     height:
-      height === undefined
-        ? undefined
-        : progress.interpolate({ inputRange: [0, 1], outputRange: [0, height] }),
+      measured !== undefined
+        ? progress.interpolate({ inputRange: [0, 1], outputRange: [0, measured] })
+        : open
+          ? undefined
+          : 0,
     opacity: progress,
   };
 }
