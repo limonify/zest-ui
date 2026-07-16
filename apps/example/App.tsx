@@ -180,63 +180,28 @@ function CheckboxSection() {
 }
 
 /**
- * Animates a collapsible/accordion panel from the state zest publishes.
+ * Fades a collapsible/accordion panel in when it mounts.
  *
- * This is the whole React Native animation contract: the panel measures its
- * natural content and hands back `height` + `transitionStatus`; the consumer
- * owns the animation. `keepMounted` is what makes the closing animation
- * possible — an unmounted panel would simply vanish.
+ * The panel is rendered only while open (no `keepMounted`), so it lays out at
+ * its natural height — the content is always visible. This keeps the demo robust
+ * across layout engines: it does not depend on animating a measured height,
+ * which is fragile on the New Architecture. zest still publishes `height` and
+ * `transitionStatus` on the panel state for consumers who want to drive a height
+ * animation themselves — see the Collapsible docs.
  */
-function useAnimatedPanelStyle(open: boolean, height: number | undefined) {
-  const progress = React.useRef(new Animated.Value(open ? 1 : 0)).current;
-
-  // Cache the last real (non-zero) measured height. A collapsed panel clips its
-  // content, and some layout engines then re-report that content's height as 0;
-  // without caching, the next open would animate to 0 and show nothing. Keeping
-  // the last good value makes close → reopen animate correctly.
-  const measuredRef = React.useRef<number | undefined>(height || undefined);
-  if (height) {
-    measuredRef.current = height;
-  }
-  const measured = measuredRef.current;
+function AnimatedPanel(props: { style?: unknown; children?: React.ReactNode }) {
+  const { style, children, ...rest } = props;
+  const opacity = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
-    Animated.timing(progress, {
-      toValue: open ? 1 : 0,
-      duration: 200,
-      // Height isn't supported by the native driver.
-      useNativeDriver: false,
-    }).start();
-  }, [open, progress]);
+    Animated.timing(opacity, { toValue: 1, duration: 150, useNativeDriver: true }).start();
+  }, [opacity]);
 
-  return {
-    // Once a real height is known, animate 0 ↔ height. Before it is (a panel that
-    // has never been open), fall back to the natural height while open — so the
-    // content is visible and can be measured — and to 0 while closed.
-    height:
-      measured !== undefined
-        ? progress.interpolate({ inputRange: [0, 1], outputRange: [0, measured] })
-        : open
-          ? undefined
-          : 0,
-    opacity: progress,
-  };
-}
-
-/**
- * Swaps the panel's element for an `Animated.View` and drives it from the state
- * zest publishes. Used via the `render` prop by both Collapsible and Accordion.
- */
-function AnimatedPanel(props: {
-  open: boolean;
-  height: number | undefined;
-  style?: unknown;
-  children?: React.ReactNode;
-}) {
-  const { open, height, style, ...rest } = props;
-  const animatedStyle = useAnimatedPanelStyle(open, height);
-
-  return <Animated.View {...rest} style={[style as never, animatedStyle]} />;
+  return (
+    <Animated.View {...rest} style={[style as never, { opacity }]}>
+      {children}
+    </Animated.View>
+  );
 }
 
 /**
@@ -316,16 +281,12 @@ function CollapsibleSection() {
         >
           <Text style={styles.buttonText}>Toggle details</Text>
         </Collapsible.Trigger>
-        <Collapsible.Panel
-          keepMounted
-          render={(props, state) => (
-            <AnimatedPanel {...props} open={state.open} height={state.height} />
-          )}
-        >
+        <Collapsible.Panel render={(props) => <AnimatedPanel {...props} />}>
           <View style={styles.panelBody}>
             <Text style={styles.label}>
-              The panel measures its own content and publishes the height on its state; this
-              example animates it with RN's built-in Animated. No animation library involved.
+              The panel renders only while open, so it lays out at its natural height and its
+              content is always visible; this example fades it in with RN's built-in Animated. The
+              panel also publishes its measured height on state if you want to animate that instead.
             </Text>
           </View>
         </Collapsible.Panel>
@@ -344,7 +305,7 @@ function AccordionSection() {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Accordion</Text>
-      <Accordion.Root keepMounted defaultValue={['shipping']} style={styles.group}>
+      <Accordion.Root defaultValue={['shipping']} style={styles.group}>
         {items.map((item) => (
           <Accordion.Item key={item.value} value={item.value} style={styles.accordionItem}>
             <Accordion.Header>
@@ -358,11 +319,7 @@ function AccordionSection() {
                 )}
               />
             </Accordion.Header>
-            <Accordion.Panel
-              render={(props, state) => (
-                <AnimatedPanel {...props} open={state.open} height={state.height} />
-              )}
-            >
+            <Accordion.Panel render={(props) => <AnimatedPanel {...props} />}>
               <View style={styles.panelBody}>
                 <Text style={styles.label}>{item.body}</Text>
               </View>
