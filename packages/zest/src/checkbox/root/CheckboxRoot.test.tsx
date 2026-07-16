@@ -114,4 +114,45 @@ describe('Checkbox.Root', () => {
 
     expect(screen.getByText('checked')).toBeTruthy();
   });
+
+  it('keeps the Indicator mounted after uncheck when keepMounted is set', async () => {
+    await render(
+      <Checkbox.Root testID="checkbox" defaultChecked>
+        <Checkbox.Indicator testID="indicator" keepMounted />
+      </Checkbox.Root>,
+    );
+
+    expect(screen.getByTestId('indicator')).toBeTruthy();
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('checkbox'));
+
+    // Unchecked, but still mounted so the consumer can animate it out
+    // (getByTestId throws if it unmounted).
+    expect(screen.getByTestId('indicator')).toBeTruthy();
+  });
+
+  it('exposes transitionStatus on the Indicator state and reports ending on uncheck', async () => {
+    const statuses: (string | undefined)[] = [];
+    await render(
+      <Checkbox.Root testID="checkbox" defaultChecked>
+        <Checkbox.Indicator
+          keepMounted
+          render={(props, state) => {
+            statuses.push(state.transitionStatus);
+            return <Text {...props}>tick</Text>;
+          }}
+        />
+      </Checkbox.Root>,
+    );
+
+    // Mounted from the start (never transitioned in), so no status yet.
+    expect(statuses[statuses.length - 1]).toBeUndefined();
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('checkbox'));
+
+    // Kept mounted while it animates out — reports 'ending'.
+    expect(statuses[statuses.length - 1]).toBe('ending');
+  });
 });

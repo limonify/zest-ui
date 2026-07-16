@@ -104,6 +104,48 @@ describe('Combobox', () => {
     }
   });
 
+  it('reflects a controlled value change into the input text', async () => {
+    function Controlled() {
+      const [value, setValue] = React.useState<unknown>('Apple');
+      return (
+        <>
+          <Combobox.Root items={FRUITS} value={value}>
+            <Combobox.Input testID="input" />
+          </Combobox.Root>
+          <Text testID="set" onPress={() => setValue('Cherry')}>
+            set
+          </Text>
+        </>
+      );
+    }
+    await render(<Controlled />);
+
+    expect(screen.getByTestId('input').props.value).toBe('Apple');
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('set'));
+
+    expect(screen.getByTestId('input').props.value).toBe('Cherry');
+  });
+
+  it('shows every item on focus, not just the selected one', async () => {
+    await render(<TestCombobox defaultValue="Banana" />);
+
+    // The input starts showing the selection...
+    expect(screen.getByTestId('input').props.value).toBe('Banana');
+
+    // ...but focusing reveals the whole list, not just "Banana".
+    await focus('input');
+    expect(screen.getByTestId('item-Apple')).toBeTruthy();
+    expect(screen.getByTestId('item-Cherry')).toBeTruthy();
+  });
+
+  it('does not open on focus when openOnFocus is false', async () => {
+    await render(<TestCombobox openOnFocus={false} />);
+    await focus('input');
+    expect(screen.queryByTestId('popup')).toBeNull();
+  });
+
   it('closes on an outside press', async () => {
     await render(<TestCombobox defaultOpen />);
 

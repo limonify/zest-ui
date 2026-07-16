@@ -25,6 +25,7 @@ export function AutocompleteRoot(props: AutocompleteRoot.Props) {
     open,
     defaultOpen,
     onOpenChange,
+    openOnFocus,
     filter,
     disabled = false,
     children,
@@ -39,6 +40,7 @@ export function AutocompleteRoot(props: AutocompleteRoot.Props) {
     open,
     defaultOpen,
     onOpenChange,
+    openOnFocus,
     filter,
     disabled,
   });
@@ -79,6 +81,11 @@ export interface AutocompleteRootProps {
    * Called when the list opens or closes.
    */
   onOpenChange?: ((open: boolean, event?: ZestNativeEvent) => void) | undefined;
+  /**
+   * Whether focusing the input opens the list.
+   * @default true
+   */
+  openOnFocus?: boolean | undefined;
   /**
    * A custom filter predicate. Defaults to a case-insensitive label match.
    */

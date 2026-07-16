@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import { useControlled } from '../../hooks/useControlled';
+import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import type { ZestNativeEvent } from '../../utils/createChangeEventDetails';
 import { ComboboxRootContext, type ComboboxItem } from './ComboboxRootContext';
@@ -29,6 +30,7 @@ export interface UseComboboxRootParameters {
   open?: boolean | undefined;
   defaultOpen?: boolean | undefined;
   onOpenChange?: ((open: boolean, event?: ZestNativeEvent) => void) | undefined;
+  openOnFocus?: boolean | undefined;
   filter?: ((item: ComboboxItem, query: string) => boolean) | undefined;
   disabled: boolean;
 }
@@ -54,6 +56,7 @@ export function useComboboxRoot(parameters: UseComboboxRootParameters): Combobox
     open: openProp,
     defaultOpen = false,
     onOpenChange,
+    openOnFocus = true,
     filter = defaultFilter,
     disabled,
   } = parameters;
@@ -123,15 +126,34 @@ export function useComboboxRoot(parameters: UseComboboxRootParameters): Combobox
     setOpen(false, event);
   });
 
-  // Autocomplete filters against the free-text input. Combobox filters too, but
-  // once an item is chosen its label fills the input; typing again re-filters.
+  // The label of the currently selected value (combobox mode only).
+  const selectedLabel =
+    mode === 'combobox'
+      ? (normalized.find((item) => item.value === selectedValue)?.label ?? '')
+      : '';
+
+  // Reflect a controlled `value` that changed from outside into the input text.
+  // `selectItem` already sets both, so the ref guard makes that a no-op and stops
+  // this from fighting the user's typing (typing never changes `selectedValue`).
+  const lastReflectedValueRef = React.useRef(selectedValue);
+  useIsoLayoutEffect(() => {
+    if (mode !== 'combobox' || selectedValue === lastReflectedValueRef.current) {
+      return;
+    }
+    lastReflectedValueRef.current = selectedValue;
+    setInputValueState(selectedLabel);
+  }, [mode, selectedValue, selectedLabel, setInputValueState]);
+
   const filteredItems = React.useMemo(() => {
-    const query = inputValue.trim();
+    // When the input still shows the current selection, the user has not started
+    // filtering — show every item so a fresh focus reveals the whole list rather
+    // than the single selected row.
+    const query = mode === 'combobox' && inputValue === selectedLabel ? '' : inputValue.trim();
     if (query.length === 0) {
       return normalized;
     }
     return normalized.filter((item) => filter(item, query));
-  }, [normalized, inputValue, filter]);
+  }, [normalized, inputValue, selectedLabel, mode, filter]);
 
   return React.useMemo(
     () => ({
@@ -144,6 +166,7 @@ export function useComboboxRoot(parameters: UseComboboxRootParameters): Combobox
       selectItem,
       filteredItems,
       disabled,
+      openOnFocus,
       triggerNode,
       setTriggerNode,
       update,
@@ -159,6 +182,7 @@ export function useComboboxRoot(parameters: UseComboboxRootParameters): Combobox
       selectItem,
       filteredItems,
       disabled,
+      openOnFocus,
       triggerNode,
       update,
     ],
