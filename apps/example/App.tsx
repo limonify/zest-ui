@@ -14,6 +14,9 @@ import {
   createDialogHandle,
   Dialog,
   Drawer,
+  Field,
+  Fieldset,
+  Input,
   Menu,
   NumberField,
   OTPField,
@@ -80,6 +83,8 @@ export default function App() {
           <TooltipSection />
           <Separator style={styles.separator} />
           <MenuSection />
+          <Separator style={styles.separator} />
+          <FieldSection />
           <Separator style={styles.separator} />
           <SelectSection />
           <Separator style={styles.separator} />
@@ -768,6 +773,51 @@ const FRUITS = [
   { value: 'cherry', label: 'Cherry' },
 ];
 
+function FieldSection() {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Field / Input</Text>
+      <Text style={styles.label}>
+        Field wires a label, a TextInput, a description and validation together for accessibility.
+        This one validates on blur; the error shows the message `validate` returned.
+      </Text>
+
+      <Field.Root
+        validate={(value) =>
+          /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value as string) ? null : 'Enter a valid email'
+        }
+        style={styles.fieldRoot}
+      >
+        <Field.Label style={styles.fieldLabel}>Email</Field.Label>
+        <Field.Control
+          placeholder="you@example.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          style={(state) => [
+            styles.fieldControl,
+            state.focused && styles.fieldControlFocused,
+            state.valid === false && styles.fieldControlInvalid,
+          ]}
+        />
+        <Field.Description style={styles.fieldDescription}>
+          We only use it to sign you in.
+        </Field.Description>
+        <Field.Error style={styles.fieldError} />
+      </Field.Root>
+
+      <Text style={styles.label}>A standalone Input, and a disabled Fieldset:</Text>
+      <Input placeholder="Standalone input" style={styles.fieldControl} />
+
+      <Fieldset.Root disabled style={styles.fieldRoot}>
+        <Fieldset.Legend style={styles.fieldLabel}>Disabled group</Fieldset.Legend>
+        <Field.Root>
+          <Field.Control placeholder="Can't edit me" style={styles.fieldControl} />
+        </Field.Root>
+      </Fieldset.Root>
+    </View>
+  );
+}
+
 function SelectSection() {
   const [value, setValue] = React.useState<string | null>(null);
 
@@ -1439,6 +1489,36 @@ const styles = StyleSheet.create({
   },
   menuBackdrop: {
     backgroundColor: 'rgba(0, 0, 0, 0.15)',
+  },
+  fieldRoot: {
+    gap: 6,
+    marginBottom: 12,
+  },
+  fieldLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  fieldControl: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    fontSize: 15,
+  },
+  fieldControlFocused: {
+    borderColor: '#007AFF',
+  },
+  fieldControlInvalid: {
+    borderColor: '#FF3B30',
+  },
+  fieldDescription: {
+    fontSize: 12,
+    color: '#8E8E93',
+  },
+  fieldError: {
+    fontSize: 12,
+    color: '#FF3B30',
   },
   floatingPopup: {
     backgroundColor: '#fff',
