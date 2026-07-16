@@ -11,6 +11,7 @@ import {
   Checkbox,
   CheckboxGroup,
   Collapsible,
+  ContextMenu,
   createDialogHandle,
   Dialog,
   Drawer,
@@ -83,6 +84,8 @@ export default function App() {
           <TooltipSection />
           <Separator style={styles.separator} />
           <MenuSection />
+          <Separator style={styles.separator} />
+          <ContextMenuSection />
           <Separator style={styles.separator} />
           <FieldSection />
           <Separator style={styles.separator} />
@@ -772,6 +775,46 @@ const FRUITS = [
   { value: 'banana', label: 'Banana' },
   { value: 'cherry', label: 'Cherry' },
 ];
+
+function ContextMenuSection() {
+  const [lastAction, setLastAction] = React.useState<string | null>(null);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Context Menu</Text>
+      <Text style={styles.label}>
+        A menu opened by long-pressing an area rather than tapping a button. It appears where your
+        finger landed.
+      </Text>
+      {lastAction ? <Text style={styles.label}>Last action: {lastAction}</Text> : null}
+
+      <ContextMenu.Root>
+        <ContextMenu.Trigger style={styles.contextArea}>
+          <Text style={styles.label}>Long-press this card</Text>
+        </ContextMenu.Trigger>
+
+        <ContextMenu.Portal>
+          <ContextMenu.Backdrop style={styles.transparentBackdrop} />
+          <ContextMenu.Positioner>
+            <ContextMenu.Popup style={styles.floatingPopup}>
+              {['Copy', 'Duplicate', 'Delete'].map((action) => (
+                <ContextMenu.Item
+                  key={action}
+                  onPress={() => setLastAction(action)}
+                  style={(state) => [styles.menuItem, state.pressed && styles.menuItemPressed]}
+                >
+                  <Text style={[styles.label, action === 'Delete' && styles.dangerText]}>
+                    {action}
+                  </Text>
+                </ContextMenu.Item>
+              ))}
+            </ContextMenu.Popup>
+          </ContextMenu.Positioner>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>
+    </View>
+  );
+}
 
 function FieldSection() {
   return (
@@ -1489,6 +1532,15 @@ const styles = StyleSheet.create({
   },
   menuBackdrop: {
     backgroundColor: 'rgba(0, 0, 0, 0.15)',
+  },
+  contextArea: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc',
+    borderStyle: 'dashed',
+    borderRadius: 12,
+    paddingVertical: 32,
+    alignItems: 'center',
+    backgroundColor: '#F2F2F7',
   },
   fieldRoot: {
     gap: 6,
