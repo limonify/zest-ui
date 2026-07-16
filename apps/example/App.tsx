@@ -44,8 +44,15 @@ export default function App() {
     // Slider and Drawer are built on react-native-gesture-handler, which needs
     // this at the root of the app.
     <GestureHandlerRootView style={styles.safeArea}>
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.container}>
+      {/*
+        Toast is the one popup that is not a Modal, so its Provider goes at the
+        very root of the app and its Viewport overlays the whole screen — that is
+        what makes a toast appear at a fixed place regardless of scroll. The
+        buttons that raise toasts live down in ToastSection, inside this Provider.
+      */}
+      <Toast.Provider timeout={4000} limit={3}>
+        <SafeAreaView style={styles.safeArea}>
+          <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.heading}>@limonify/zest</Text>
           <Text style={styles.subheading}>
             Headless Base UI primitives for React Native. All styling below is plain StyleSheet,
@@ -101,7 +108,10 @@ export default function App() {
           <ToastSection />
         </ScrollView>
         <StatusBar style="auto" />
-      </SafeAreaView>
+        {/* Screen-anchored overlay: sits above everything, lets touches through. */}
+        <ToastOverlay />
+        </SafeAreaView>
+      </Toast.Provider>
     </GestureHandlerRootView>
   );
 }
@@ -278,7 +288,7 @@ function CollapsibleSection() {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Collapsible</Text>
-      <Collapsible.Root style={styles.group}>
+      <Collapsible.Root defaultOpen style={styles.group}>
         <Collapsible.Trigger
           style={(state) => [styles.button, state.pressed && styles.buttonPressed]}
         >
@@ -312,7 +322,7 @@ function AccordionSection() {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Accordion</Text>
-      <Accordion.Root keepMounted style={styles.group}>
+      <Accordion.Root keepMounted defaultValue={['shipping']} style={styles.group}>
         {items.map((item) => (
           <Accordion.Item key={item.value} value={item.value} style={styles.accordionItem}>
             <Accordion.Header>
@@ -1149,14 +1159,12 @@ function ToastSection() {
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Toast</Text>
       <Text style={styles.label}>
-        Toasts are the one popup that is not a Modal: the app underneath has to stay usable. Swipe
-        one right to dismiss it.
+        Toasts are the one popup that is not a Modal: the app underneath has to stay usable. The
+        Provider + Viewport live at the app root (see App above), so toasts appear pinned to the
+        bottom of the screen no matter where you have scrolled. Swipe one right to dismiss it.
       </Text>
 
-      <Toast.Provider timeout={4000} limit={3}>
-        <ToastButtons />
-        <ToastList />
-      </Toast.Provider>
+      <ToastButtons />
     </View>
   );
 }
@@ -1189,11 +1197,14 @@ function ToastButtons() {
 }
 
 /**
- * The toast viewport is placed inside the Provider and positioned by the
- * consumer. `offsetY` is how far down the stack each toast sits — the counterpart
- * of the web version's `--toast-offset-y` CSS variable.
+ * The screen-anchored toast overlay. The Viewport fills the screen and lets
+ * touches through (`pointerEvents="box-none"`); each toast pins itself to the
+ * bottom edge and the stack grows upward. To make toasts drop from the TOP
+ * instead, anchor `styles.toast` with `top: 0` and flip the `translateY` sign in
+ * the Root's style — position and direction are entirely the consumer's, since
+ * the library ships no styling.
  */
-function ToastList() {
+function ToastOverlay() {
   const { toasts } = Toast.useToastManager();
 
   return (
@@ -1640,10 +1651,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#EEF4FF',
   },
   toastViewport: {
-    // The viewport fills its parent and lets touches through; only the toasts
-    // themselves are interactive.
-    height: 220,
-    justifyContent: 'flex-end',
+    // The viewport already fills the screen (absoluteFill) and lets touches
+    // through; only the toasts themselves are interactive. Padding keeps them
+    // clear of the screen edges and the home indicator.
+    paddingHorizontal: 16,
+    paddingBottom: 48,
   },
   toast: {
     backgroundColor: '#1C1C1E',
@@ -1652,9 +1664,9 @@ const styles = StyleSheet.create({
     paddingRight: 44,
     gap: 4,
     position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
+    left: 16,
+    right: 16,
+    bottom: 48,
   },
   toastError: {
     backgroundColor: '#FF3B30',
