@@ -29,7 +29,6 @@ export function ContextMenuTrigger(componentProps: ContextMenuTrigger.Props) {
     ref,
     props: [
       {
-        
         onLongPress(event: GestureResponderEvent) {
           const { pageX, pageY } = event.nativeEvent;
           setAnchor({ x: pageX, y: pageY });
