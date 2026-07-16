@@ -2,6 +2,8 @@ node_modules/
 .expo/
 dist/
 build/
+lib/
+*.tgz
 coverage/
 .turbo/
 *.log

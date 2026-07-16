@@ -28,7 +28,9 @@
 
 **Milestone 9 (shipped):** the deferred sub-features, and the last bugs. **`Menu`** gains submenus (`SubmenuRoot`/`SubmenuTrigger`, opening on press since a touch screen has no hover), the checkbox/radio item family (`CheckboxItem`/`CheckboxItemIndicator`/`RadioGroup`/`RadioItem`/`RadioItemIndicator`) and `LinkItem`; **`Select`** gains `multiple`; **`Toast`** gains an anchored `Positioner`/`Arrow`; and Dialog, AlertDialog, Drawer, Popover and Menu all gain the **handle family** — `createHandle()`, `actionsRef`, `triggerId`, and payload-carrying children, which is what lets a trigger live outside its root or something else open a popup imperatively.
 
-**Current totals:** 25 components, 577 Jest tests (jest-expo + @testing-library/react-native), Expo example app in `apps/example` exercising every one.
+**Milestone 10 (shipped):** the four sub-parts overlooked in the earlier per-component sweep, each now with tests and an `apps/example` demo. **`Select`** gains `Label` (associates a `Text` with the trigger via `accessibilityLabelledBy`) and `Arrow` (positioned against the popup anchor, `aria-hidden`); **`Slider`** gains `Label` (associated with the thumbs); **`Drawer`** gains `SwipeArea` (an edge strip whose swipe *opens* the drawer, defaulting to the opposite of the dismiss `swipeDirection`). See "Excluded sub-parts" below for what remains deliberately unported and why — that list, previously undocumented, is now complete.
+
+**Current totals:** 25 components, 594 Jest tests (jest-expo + @testing-library/react-native), Expo example app in `apps/example` exercising every one.
 
 Notes that supersede older sections of this document:
 
@@ -538,10 +540,23 @@ These Base UI components will NOT be ported. They either don't fit the mobile in
 | `Combobox` | Mobile search pattern is different (search screen + `FlatList`). Not a 1:1 port. |
 | `Autocomplete` | Same as Combobox. Mobile uses search-as-you-type with native keyboard. |
 | `Toolbar` | Desktop toolbar pattern. Mobile uses bottom action bars or context menus. |
-| `Menu.Viewport` | Not a component of its own, but worth recording: it exists only to animate a content swap when one popup is opened by several triggers, and it works by capturing the previous content's DOM node and holding it on screen through a CSS transition. A rendered React Native node cannot be retained once its element is gone. |
 | `Field`, `Fieldset`, `Form` | React Native has no HTML form submission and no Tab key. This is a standing decision — see the notes at the top of this document. |
 | `Input` | Upstream's `Input` is a 17-line alias for `Field.Control`, and `Field` is not ported. Without it there is no component left to port: use React Native's `TextInput`. |
 | `Text` | Not a Base UI package at all — this document invented it. A wrapper around React Native's `<Text>` would add nothing. |
+
+### Excluded sub-parts (of ported components)
+
+These are individual parts of components that *are* ported. They were left out for a reason that is specific to each — recorded here so the port is fully accounted for, part by part, not just component by component.
+
+| Part | Reason for Exclusion |
+|---|---|
+| `Menu.Viewport`, `Popover.Viewport`, `Tooltip.Viewport` | A `Viewport` exists only to animate a content swap when one popup is opened by several triggers, and it works by capturing the *previous* content's DOM node and holding it on screen through a CSS transition while the new content fades in. A rendered React Native node cannot be retained once its element is gone, so there is nothing to hold. The popup swaps its content directly. |
+| `Tooltip.Provider` | Upstream's provider shares hover open/close *delays* across a group of tooltips (so moving between them skips the reopen delay). A touch screen has no hover: zest's tooltip opens on press, so there is no delay to share. |
+| `Select.ScrollUpArrow`, `Select.ScrollDownArrow` | These scroll a CSS-overflow popup list that is taller than the screen, by nudging `scrollTop` while the arrow is hovered. React Native's popup list is a native `ScrollView`, which scrolls itself with momentum and its own indicators — the arrows would fight it. |
+| `Toast.Content` | A styling wrapper upstream added so a swipeable toast could separate its swipe surface from its content box. zest's `Toast.Root` carries the gesture and the content together; a bare `View` child covers any wrapper a consumer wants. |
+| `Drawer.Provider`, `Drawer.VirtualKeyboardProvider` | The `Provider` broadcasts a nested-drawer visual state (scaling the page behind the drawer as another opens on top); the page behind a React Native `Modal` lives in a separate native window and cannot be scaled, which is why `Drawer.Indent`/`IndentBackground` are gone too. `VirtualKeyboardProvider` tracks the browser `VirtualKeyboard` API; React Native surfaces the keyboard through `KeyboardAvoidingView`/`Keyboard` instead. |
+| `Drawer.Content` | Same as `Toast.Content` — a swipe/content-separation wrapper the RN `Drawer.Popup` does not need. |
+| `NumberField.ScrubAreaCursor` | Upstream hides the pointer and renders a wrapping virtual cursor during a horizontal scrub, using Pointer Lock. React Native has no pointer to hide or lock; the scrub is a finger drag (`ScrubArea` is ported as a gesture). |
 
 ### Mobile-Native Additions (not in Base UI)
 

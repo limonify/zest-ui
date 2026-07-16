@@ -753,6 +753,7 @@ function SelectSection() {
       </Text>
 
       <Select.Root items={FRUITS} value={value} onValueChange={setValue}>
+        <Select.Label style={[styles.label, styles.selectLabel]}>Fruit</Select.Label>
         <Select.Trigger style={(state) => [styles.selectTrigger, state.pressed && styles.buttonPressed]}>
           <Select.Value style={styles.label}>
             {(state) => state.label ?? 'Pick a fruit'}
@@ -764,7 +765,8 @@ function SelectSection() {
 
         <Select.Portal>
           <Select.Backdrop style={styles.transparentBackdrop} />
-          <Select.Positioner side="bottom" align="start" sideOffset={4}>
+          <Select.Positioner side="bottom" align="start" sideOffset={8}>
+            <Select.Arrow style={styles.selectArrow} />
             <Select.Popup style={styles.floatingPopup}>
               <Select.List>
                 {FRUITS.map((fruit) => (
@@ -895,7 +897,10 @@ function SliderSection() {
       <Text style={styles.sectionTitle}>Slider</Text>
 
       <Slider.Root defaultValue={40} style={styles.group}>
-        <Slider.Value style={styles.label} />
+        <View style={styles.row}>
+          <Slider.Label style={styles.label}>Volume</Slider.Label>
+          <Slider.Value style={styles.label} />
+        </View>
         <Slider.Control style={styles.sliderControl}>
           <Slider.Track style={styles.sliderTrack}>
             <Slider.Indicator style={styles.sliderIndicator} />
@@ -947,6 +952,9 @@ function DrawerSection() {
         <Drawer.Trigger style={(state) => [styles.button, state.pressed && styles.buttonPressed]}>
           <Text style={styles.buttonText}>Open drawer</Text>
         </Drawer.Trigger>
+
+        <Text style={styles.label}>…or swipe up from the strip below to open it:</Text>
+        <Drawer.SwipeArea style={styles.drawerSwipeArea} />
 
         <Drawer.Portal>
           <Drawer.Backdrop style={styles.backdrop} />
@@ -1474,6 +1482,20 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     minWidth: 180,
   },
+  selectLabel: {
+    marginBottom: 6,
+    fontWeight: '600',
+  },
+  selectArrow: {
+    width: 12,
+    height: 12,
+    backgroundColor: '#fff',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc',
+    transform: [{ rotate: '45deg' }],
+    marginBottom: -6,
+  },
   sliderControl: {
     height: 44,
     justifyContent: 'center',
@@ -1526,6 +1548,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     alignSelf: 'center',
     marginBottom: 8,
+  },
+  drawerSwipeArea: {
+    height: 36,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc',
+    borderStyle: 'dashed',
+    backgroundColor: '#F2F2F7',
+    marginTop: 8,
   },
   progressTrack: {
     height: 8,

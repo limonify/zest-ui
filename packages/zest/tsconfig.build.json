@@ -1,0 +1,30 @@
+{
+  // Emits a CommonJS build + type declarations to `lib/` for consumers whose
+  // bundler is not Metro (Node, Jest, webpack). React Native itself never uses
+  // this output: package.json's `react-native` condition points Metro straight
+  // at `src`, which it transforms with the app's own Babel config — exactly as
+  // it did when the package shipped source only.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    // TS 6.0 deprecates the classic `node` resolver, but it is the one that
+    // keeps the source's extensionless imports resolvable in the CommonJS output.
+    "ignoreDeprecations": "6.0",
+    "target": "ES2019",
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "types": ["react"]
+  },
+  "include": ["src"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.test-d.ts",
+    "jest.setup.ts"
+  ]
+}

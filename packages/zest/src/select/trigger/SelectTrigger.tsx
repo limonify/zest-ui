@@ -28,6 +28,7 @@ export function SelectTrigger(componentProps: SelectTrigger.Props) {
   const rootDisabled = store.useState('disabled');
   const readOnly = store.useState('readOnly');
   const required = store.useState('required');
+  const labelId = store.useState('labelId');
 
   const disabled = rootDisabled || disabledProp;
 
@@ -67,6 +68,7 @@ export function SelectTrigger(componentProps: SelectTrigger.Props) {
           store.state.update?.();
         },
         accessibilityRole: 'combobox' as const,
+        accessibilityLabelledBy: labelId,
         accessibilityState: { expanded: open, disabled: disabled || undefined },
         'aria-haspopup': 'listbox' as const,
         'aria-readonly': readOnly || undefined,

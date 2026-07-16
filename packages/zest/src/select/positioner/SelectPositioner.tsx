@@ -50,7 +50,7 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
     sticky,
   });
 
-  const { positionerStyles, refs, update } = positioning;
+  const { positionerStyles, refs, update, arrowRef, arrowStyles } = positioning;
 
   useIsoLayoutEffect(() => {
     refs.setReference(triggerNode ?? null);
@@ -68,8 +68,8 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
   const state: SelectPositionerState = { open, side: positioning.side, align: positioning.align };
 
   const contextValue: SelectPositionerContext = React.useMemo(
-    () => ({ side: positioning.side, align: positioning.align }),
-    [positioning.side, positioning.align],
+    () => ({ side: positioning.side, align: positioning.align, arrowRef, arrowStyles }),
+    [positioning.side, positioning.align, arrowRef, arrowStyles],
   );
 
   const element = useRenderElement(View, componentProps, {

@@ -1,5 +1,4 @@
 'use client';
-import * as React from 'react';
 import { Pressable, type GestureResponderEvent } from 'react-native';
 import { useControlled } from '../hooks/useControlled';
 import { useId } from '../hooks/useId';

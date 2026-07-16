@@ -6,7 +6,7 @@ import { EMPTY_OBJECT } from '../utils/empty';
 import { resolveClassName } from '../utils/resolveClassName';
 import { resolveStyle } from '../utils/resolveStyle';
 import { mergeProps, mergePropsN, mergeClassNames, mergeStyles } from '../merge-props';
-import type { ComponentRenderFn, NativeProps, RenderProp, ZestStyle } from '../types';
+import type { NativeProps, RenderProp, ZestStyle } from '../types';
 
 /**
  * Renders a Zest element.

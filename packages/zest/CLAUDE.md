@@ -213,10 +213,17 @@ Minimum per component: renders, controlled + uncontrolled value, `onXxxChange` r
 ## Verify before finishing
 
 ```sh
-bunx turbo run typecheck test   # from repo root — must be fully green
+bunx turbo run typecheck lint test   # from repo root — must be fully green
 ```
 
 Add a demo section to `apps/example/App.tsx` for every new component (plain StyleSheet, exercising the state-function styling).
+
+## Packaging, lint, CI
+
+- **Lint is ESLint 9 flat config** at the repo root (`eslint.config.mjs`): `@eslint/js` + `typescript-eslint` recommended + `eslint-plugin-react-hooks`. Rules the port deliberately turns off, each with a reason in the config: `no-explicit-any`, `no-namespace`, `no-empty-object-type`, `no-unsafe-function-type`, `no-this-alias` (the last two are the store layer's verbatim-port shape). `no-unused-vars` uses `ignoreRestSiblings: true` so the universal `{ render, className, style, ...rest }` strip is not flagged. Run `bun run lint` (turbo → `eslint src` in the package).
+- **The package ships both source and a compiled fallback.** `package.json`'s `react-native` condition (and `source` field) point Metro straight at `src/index.ts` — Metro transforms it with the app's own Babel, exactly as when the package shipped source only. Everyone else (Node, Jest, webpack, react-native-web) gets `lib/`, a CommonJS + `.d.ts` build emitted by `tsc -p tsconfig.build.json` (classic `node` resolution, so the source's extensionless imports resolve). `bun run build` produces it; `prepack` rebuilds it before every publish; `lib/` is git-ignored. The `files` array whitelists `src` + `lib` and negates `src/**/*.test.*` so tests never ship.
+- **CI** is `.github/workflows/ci.yml`: Bun install (frozen lockfile), then typecheck · lint · test · build · `npm pack --dry-run` on push/PR to `main`.
+- **Never run on a real device in this environment.** The whole library has only ever been validated by Jest (native modules mocked) and `expo export` (Metro bundle builds, 1001 modules). Positioning, gestures, nested `Modal`, snap points, and `measureInWindow` have never been seen rendering on a simulator. That remains the single biggest untested risk — say so honestly, never claim a device run that did not happen.
 
 ## Gotchas already solved — don't re-fight these
 
