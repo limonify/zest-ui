@@ -711,6 +711,11 @@ function MenuSection() {
                   <Text style={styles.label}>›</Text>
                 </Menu.SubmenuTrigger>
                 <Menu.Portal>
+                  {/* Each menu level is its own Modal and needs its own backdrop
+                      to be dismissable by an outside tap — the parent's does not
+                      reach into the submenu's Modal. Tapping here closes just the
+                      submenu, back to the parent. */}
+                  <Menu.Backdrop style={styles.transparentBackdrop} />
                   <Menu.Positioner side="right" align="start" sideOffset={4}>
                     <Menu.Popup style={styles.floatingPopup}>
                       {['Email', 'Copy link'].map((action) => (

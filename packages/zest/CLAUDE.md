@@ -157,6 +157,8 @@ That exception has a cost, and `Toast.Positioner` pays it: screen coordinates on
 
 **Submenus nest Modals**, which RN supports (verified before porting). `Menu.SubmenuRoot` is a `Menu.Root` that remembers its parent, so the whole tree stays in one React tree. Upstream broadcasts a `close` over its floating tree when an item is chosen; zest has no such tree, so `SubmenuRoot` exposes `closeAncestors` and each level closes its own parent, each with its own event details so one veto doesn't silently stop the rest.
 
+Because each level is its own `Modal`, **each level that should dismiss on an outside tap needs its own `Menu.Backdrop`** — a parent's backdrop lives in the parent's Modal and cannot receive touches inside a child's Modal on top of it. A submenu `Menu.Portal` with only a `Positioner`/`Popup` (no `Backdrop`) opens fine but cannot be closed by tapping outside it. The backdrop dismisses only its own level (back to the parent), which is the expected nested-menu behaviour.
+
 `useAnchorPositioning` (`src/utils/useAnchorPositioning.ts`) wraps `@floating-ui/react-native`'s `useFloating` with `sameScrollView: false`, which makes it measure via `measureInWindow` and add `StatusBar.currentHeight` on Android — i.e. **screen coordinates**. That is exactly the origin of a `statusBarTranslucent` Modal, which is why the two agree. Changing either half breaks positioning on Android.
 
 There is no `autoUpdate` equivalent in RN: parts re-measure by calling the returned `update()` from `onLayout`.
