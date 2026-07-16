@@ -1,5 +1,4 @@
 'use client';
-import * as React from 'react';
 import { View } from 'react-native';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';

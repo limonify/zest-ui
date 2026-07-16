@@ -32,7 +32,14 @@ export function MenuRoot<Payload = unknown>(props: MenuRoot.Props<Payload>) {
   } = props;
 
   const store = useRefWithInit(
-    () => new MenuStore({ open: defaultOpen, openProp: open, disablePointerDismissal }),
+    () =>
+      new MenuStore({
+        open: defaultOpen,
+        openProp: open,
+        triggerId: defaultTriggerId,
+        triggerIdProp: triggerId,
+        disablePointerDismissal,
+      }),
   ).current;
 
   store.useControlledProp('openProp', open);

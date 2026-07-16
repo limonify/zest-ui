@@ -1,5 +1,4 @@
 'use client';
-import * as React from 'react';
 import { Text } from 'react-native';
 import { useSelectRootContext } from '../root/SelectRootContext';
 import { useSelectItemContext } from '../item/SelectItemContext';

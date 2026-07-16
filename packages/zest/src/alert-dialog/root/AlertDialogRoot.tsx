@@ -1,5 +1,4 @@
 'use client';
-import type * as React from 'react';
 import type { DialogRoot } from '../../dialog/root/DialogRoot';
 import { useRenderDialogRoot } from '../../dialog/root/useRenderDialogRoot';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';

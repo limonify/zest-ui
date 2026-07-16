@@ -22,6 +22,12 @@ export interface SliderRootContext {
   setControlSize: (size: number) => void;
   setDragging: (dragging: boolean) => void;
   /**
+   * The id of the `Slider.Label`, associated with every thumb. `undefined` when
+   * there is no label.
+   */
+  labelId: string | undefined;
+  setLabelId: (id: string | undefined) => void;
+  /**
    * Commits a value for one thumb, clamped to the range and to its neighbours.
    */
   setThumbValue: (

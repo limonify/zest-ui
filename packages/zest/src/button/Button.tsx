@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { Pressable, type GestureResponderEvent } from 'react-native';
+import { Pressable } from 'react-native';
 import { useButton } from '../internals/use-button/useButton';
 import { useRenderElement } from '../use-render/useRenderElement';
 import type { BaseUIComponentProps } from '../types';
@@ -26,10 +26,10 @@ export function Button(componentProps: Button.Props) {
     ref,
     props: [
       {
-        onPressIn(event: GestureResponderEvent) {
+        onPressIn() {
           setPressed(true);
         },
-        onPressOut(event: GestureResponderEvent) {
+        onPressOut() {
           setPressed(false);
         },
       },

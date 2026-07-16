@@ -26,7 +26,14 @@ export function PopoverRoot<Payload = unknown>(props: PopoverRoot.Props<Payload>
   } = props;
 
   const store = useRefWithInit(
-    () => new PopoverStore({ open: defaultOpen, openProp: open, disablePointerDismissal }),
+    () =>
+      new PopoverStore({
+        open: defaultOpen,
+        openProp: open,
+        triggerId: defaultTriggerId,
+        triggerIdProp: triggerId,
+        disablePointerDismissal,
+      }),
   ).current;
 
   store.useControlledProp('openProp', open);

@@ -1,6 +1,7 @@
 export { DrawerRoot as Root } from './root/DrawerRoot';
 export { createDrawerHandle as createHandle } from './handle';
 export { DrawerPopup as Popup } from './popup/DrawerPopup';
+export { DrawerSwipeArea as SwipeArea } from './swipe-area/DrawerSwipeArea';
 
 // A drawer is a dialog with a swipe gesture, so every part but the Root and the
 // Popup is the dialog's own, unchanged — they read the same store.

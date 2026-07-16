@@ -105,6 +105,11 @@ export type State = {
    * The anchor's native node, carried across the portal boundary.
    */
   triggerNode: unknown;
+  /**
+   * The id of the `Select.Label`, associated with the trigger. `undefined` when
+   * there is no label.
+   */
+  labelId: string | undefined;
   update: (() => void) | undefined;
 };
 
@@ -125,6 +130,7 @@ const selectors = {
   readOnly: createSelector((state: State) => state.readOnly),
   required: createSelector((state: State) => state.required),
   triggerNode: createSelector((state: State) => state.triggerNode),
+  labelId: createSelector((state: State) => state.labelId),
   update: createSelector((state: State) => state.update),
 };
 
@@ -143,6 +149,7 @@ export class SelectStore extends ReactStore<Readonly<State>, Context, typeof sel
         readOnly: false,
         required: false,
         triggerNode: null,
+        labelId: undefined,
         update: undefined,
         ...initialState,
       },

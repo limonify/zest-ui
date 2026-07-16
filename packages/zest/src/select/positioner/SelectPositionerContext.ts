@@ -5,6 +5,8 @@ import type { Align, Side } from '../../utils/useAnchorPositioning';
 export interface SelectPositionerContext {
   side: Side;
   align: Align;
+  arrowRef: React.RefObject<unknown>;
+  arrowStyles: { left?: number; top?: number };
 }
 
 export const SelectPositionerContext = React.createContext<SelectPositionerContext | undefined>(

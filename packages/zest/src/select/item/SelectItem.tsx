@@ -39,7 +39,10 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
 
   const selected = isSelectValueSelected(selectedValue, value, multiple);
 
-  const state: SelectItemState = { disabled, pressed, selected, index };
+  const state: SelectItemState = React.useMemo(
+    () => ({ disabled, pressed, selected, index }),
+    [disabled, pressed, selected, index],
+  );
 
   const contextValue: SelectItemContext = React.useMemo(() => ({ state, value }), [state, value]);
 

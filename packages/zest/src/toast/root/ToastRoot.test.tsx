@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AppState, Text, type AppStateStatus } from 'react-native';
-import { act, fireEvent, render, screen, userEvent } from '@testing-library/react-native';
+import { act, render, screen, userEvent } from '@testing-library/react-native';
 import { GestureHandlerRootView, State } from 'react-native-gesture-handler';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { Toast, createToastManager } from '../index';

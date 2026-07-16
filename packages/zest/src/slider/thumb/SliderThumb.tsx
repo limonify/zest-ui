@@ -17,7 +17,7 @@ import type { BaseUIComponentProps } from '../../types';
 export function SliderThumb(componentProps: SliderThumb.Props) {
   const { render, className, style, index = 0, ref, ...elementProps } = componentProps;
 
-  const { disabled, format, locale, max, min, orientation, state, values } =
+  const { disabled, format, labelId, locale, max, min, orientation, state, values } =
     useSliderRootContext();
 
   const value = values[index] ?? min;
@@ -37,6 +37,7 @@ export function SliderThumb(componentProps: SliderThumb.Props) {
       {
         style: positionStyle,
         accessibilityRole: 'adjustable' as const,
+        accessibilityLabelledBy: labelId,
         accessibilityState: { disabled: disabled || undefined },
         accessibilityValue: {
           min,

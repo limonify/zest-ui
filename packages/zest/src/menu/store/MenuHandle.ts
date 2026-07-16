@@ -1,6 +1,4 @@
 import { MenuStore } from './MenuStore';
-import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
-import { REASONS } from '../../utils/reasons';
 import { BasePopupHandle } from '../../utils/popups/BasePopupHandle';
 
 /**
@@ -11,6 +9,10 @@ import { BasePopupHandle } from '../../utils/popups/BasePopupHandle';
  * The imperative methods only take effect while a root using this handle is
  * mounted; calls made before one attaches (or after it unmounts) are ignored.
  */
+// `Payload` is unused in the class body but load-bearing in the public API: a
+// `Menu.Root`'s `handle?: MenuHandle<Payload>` prop is what infers the payload
+// type its `children(payload)` receives.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export class MenuHandle<Payload = unknown> extends BasePopupHandle<MenuStore, MenuStore> {
   constructor() {
     // `true`: a menu is anchored, so opening it by an unknown trigger id is an

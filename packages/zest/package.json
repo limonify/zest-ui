@@ -3,18 +3,32 @@
   "version": "0.1.0",
   "description": "Base UI for React Native — headless, unstyled, accessible primitive components.",
   "license": "MIT",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "source": "./src/index.ts",
+  "react-native": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./lib/index.d.ts",
+      "react-native": "./src/index.ts",
+      "default": "./lib/index.js"
+    }
   },
   "files": [
-    "src"
+    "src",
+    "lib",
+    "!src/**/*.test.ts",
+    "!src/**/*.test.tsx",
+    "!src/**/*.test-d.ts"
   ],
   "sideEffects": false,
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint src",
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf lib",
+    "prepack": "bun run clean && bun run build"
   },
   "peerDependencies": {
     "react": ">=19.0.0",

@@ -63,6 +63,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
 
   const [dragging, setDragging] = React.useState(false);
   const [controlSize, setControlSize] = React.useState<number | undefined>(undefined);
+  const [labelId, setLabelId] = React.useState<string | undefined>(undefined);
 
   // A drag emits several changes in one synchronous batch — its final move and
   // its finalize land before React re-renders — so the value logic cannot read
@@ -169,12 +170,14 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
       format,
       getClosestThumbIndex,
       getValueFromPosition,
+      labelId,
       locale,
       max,
       min,
       orientation,
       setControlSize,
       setDragging,
+      setLabelId,
       setThumbValue,
       state,
       step,
@@ -188,6 +191,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
       format,
       getClosestThumbIndex,
       getValueFromPosition,
+      labelId,
       locale,
       max,
       min,

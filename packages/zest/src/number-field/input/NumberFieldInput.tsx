@@ -1,5 +1,4 @@
 'use client';
-import * as React from 'react';
 import { TextInput, type NativeSyntheticEvent, type TextInputFocusEventData } from 'react-native';
 import { useNumberFieldRootContext } from '../root/NumberFieldRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';

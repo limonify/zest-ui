@@ -114,19 +114,34 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
     [testID, toast.id, swipeDirection, swipeThreshold, store],
   );
 
-  const state: ToastRootState = {
-    transitionStatus: toast.transitionStatus,
-    expanded,
-    limited: toast.limited ?? false,
-    type: toast.type,
-    index,
-    visibleIndex,
-    offsetY,
-    height: toast.height ?? 0,
-    swiping,
-    swipeMovement,
-    swipeDirection,
-  };
+  const state: ToastRootState = React.useMemo(
+    () => ({
+      transitionStatus: toast.transitionStatus,
+      expanded,
+      limited: toast.limited ?? false,
+      type: toast.type,
+      index,
+      visibleIndex,
+      offsetY,
+      height: toast.height ?? 0,
+      swiping,
+      swipeMovement,
+      swipeDirection,
+    }),
+    [
+      toast.transitionStatus,
+      expanded,
+      toast.limited,
+      toast.type,
+      index,
+      visibleIndex,
+      offsetY,
+      toast.height,
+      swiping,
+      swipeMovement,
+      swipeDirection,
+    ],
+  );
 
   const contextValue: ToastRootContext = React.useMemo(
     () => ({ toast, state, titleId, setTitleId, descriptionId, setDescriptionId }),
