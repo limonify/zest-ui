@@ -15,7 +15,7 @@ async function hl(code: string, lang = 'tsx'): Promise<ReactNode> {
   });
 }
 
-const HERO_CODE = `import { Switch } from '@limonify/zest';
+const HERO_CODE = `import { Switch } from '@limonify/zest-ui';
 
 // 'style' is a function of the part's state —
 // no data-attributes, no CSS. Just your StyleSheet.
@@ -38,7 +38,7 @@ export function Toggle() {
 }`;
 
 const SHOWCASE_CODE = `import { Text } from 'react-native';
-import { Select } from '@limonify/zest';
+import { Select } from '@limonify/zest-ui';
 
 <Select.Root items={fruits}>
   <Select.Trigger style={styles.trigger}>
@@ -65,7 +65,7 @@ import { Select } from '@limonify/zest';
 </Select.Root>`;
 
 const INSTALL_CODE = `# Core — zero native setup
-bun add @limonify/zest
+bun add @limonify/zest-ui
 
 # Only if you use Slider or Drawer
 bun add react-native-gesture-handler`;
@@ -81,7 +81,7 @@ export default function App() {
 }`;
 
 const USE_CODE = `import { Text } from 'react-native';
-import { Dialog } from '@limonify/zest';
+import { Dialog } from '@limonify/zest-ui';
 
 <Dialog.Root>
   <Dialog.Trigger>
@@ -224,7 +224,7 @@ export default async function HomePage() {
             </h1>
 
             <p className="max-w-md text-lg leading-relaxed text-fd-muted-foreground">
-              <span className="font-mono text-fd-foreground">@limonify/zest</span> gives you the
+              <span className="font-mono text-fd-foreground">@limonify/zest-ui</span> gives you the
               behaviour, state and accessibility of 32 components — and none of the styling. Ship your
               own design system on top.
             </p>
@@ -249,7 +249,7 @@ export default async function HomePage() {
 
             <div className="mt-1 flex w-fit items-center gap-3 rounded-lg border border-fd-border bg-fd-muted px-4 py-2.5 font-mono text-sm text-fd-foreground">
               <span className="select-none text-fd-primary">$</span>
-              bun add @limonify/zest
+              bun add @limonify/zest-ui
             </div>
           </div>
 

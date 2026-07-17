@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
-    "@limonify/zest": "workspace:*",
+    "@limonify/zest-ui": "workspace:*",
     "expo": "~57.0.6",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",

@@ -21,7 +21,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 <Tab value="Code">
 
 ```tsx
-import { RadioGroup, Radio } from '@limonify/zest';
+import { RadioGroup, Radio } from '@limonify/zest-ui';
 
 <RadioGroup defaultValue="md" onValueChange={setSize} style={styles.group}>
   {/* Radio.Root items */}
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
 <Tab value="Uniwind">
 
 ```tsx
-import { RadioGroup } from '@limonify/zest';
+import { RadioGroup } from '@limonify/zest-ui';
 
 <RadioGroup defaultValue="md" onValueChange={setSize} className="gap-1">
   {/* Radio.Root items */}
@@ -60,13 +60,13 @@ import { RadioGroup } from '@limonify/zest';
 
 `Radio Group` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
 
-<AutoType path="../../packages/zest/src/radio-group/RadioGroup.tsx" name="RadioGroupProps" />
+<AutoType path="../../packages/zest-ui/src/radio-group/RadioGroup.tsx" name="RadioGroupProps" />
 
 ## State
 
 These fields reach your `style` and `render` functions on **RadioGroup** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/radio-group/RadioGroup.tsx" name="RadioGroupState" />
+<AutoType path="../../packages/zest-ui/src/radio-group/RadioGroup.tsx" name="RadioGroupState" />
 
 ## Accessibility
 

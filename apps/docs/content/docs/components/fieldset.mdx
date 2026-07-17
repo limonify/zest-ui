@@ -23,7 +23,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Fieldset, Field } from '@limonify/zest';
+import { Fieldset, Field } from '@limonify/zest-ui';
 
 <Fieldset.Root disabled style={styles.set}>
   <Fieldset.Legend style={styles.legend}>Shipping address</Fieldset.Legend>
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
 <Tab value="Uniwind">
 
 ```tsx
-import { Fieldset, Field } from '@limonify/zest';
+import { Fieldset, Field } from '@limonify/zest-ui';
 
 <Fieldset.Root disabled className="gap-2">
   <Fieldset.Legend className="font-semibold">Shipping address</Fieldset.Legend>
@@ -70,13 +70,13 @@ import { Fieldset, Field } from '@limonify/zest';
 
 `Fieldset` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
 
-<AutoType path="../../packages/zest/src/fieldset/root/FieldsetRoot.tsx" name="FieldsetRootProps" />
+<AutoType path="../../packages/zest-ui/src/fieldset/root/FieldsetRoot.tsx" name="FieldsetRootProps" />
 
 ## State
 
 These fields reach your `style` and `render` functions on **Fieldset.Root / Legend** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/fieldset/root/FieldsetRoot.tsx" name="FieldsetRootState" />
+<AutoType path="../../packages/zest-ui/src/fieldset/root/FieldsetRoot.tsx" name="FieldsetRootState" />
 
 ## Accessibility
 

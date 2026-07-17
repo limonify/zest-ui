@@ -31,7 +31,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Combobox } from '@limonify/zest';
+import { Combobox } from '@limonify/zest-ui';
 
 <Combobox.Root items={COUNTRIES} value={value} onValueChange={setValue}>
   <Combobox.Input placeholder="Pick a country" style={styles.input} />
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Combobox } from '@limonify/zest';
+import { Combobox } from '@limonify/zest-ui';
 
 <Combobox.Root items={COUNTRIES} value={value} onValueChange={setValue}>
   <Combobox.Input placeholder="Pick a country" className="rounded-lg border border-neutral-300 px-3 py-2.5" />
@@ -118,7 +118,7 @@ import { Combobox } from '@limonify/zest';
 
 These fields reach your `style` and `render` functions on **Combobox.Input** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
+<AutoType path="../../packages/zest-ui/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
 
 ## Animation
 
@@ -126,7 +126,7 @@ These fields reach your `style` and `render` functions on **Combobox.Input** —
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { Combobox } from '@limonify/zest';
+import { Combobox } from '@limonify/zest-ui';
 
 <Combobox.Popup keepMounted render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />

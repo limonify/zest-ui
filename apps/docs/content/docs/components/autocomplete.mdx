@@ -26,7 +26,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Autocomplete } from '@limonify/zest';
+import { Autocomplete } from '@limonify/zest-ui';
 
 <Autocomplete.Root items={TAGS} inputValue={tag} onInputValueChange={setTag}>
   <Autocomplete.Input placeholder="Add a tag" style={styles.input} />
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Autocomplete } from '@limonify/zest';
+import { Autocomplete } from '@limonify/zest-ui';
 
 <Autocomplete.Root items={TAGS} inputValue={tag} onInputValueChange={setTag}>
   <Autocomplete.Input placeholder="Add a tag" className="rounded-lg border border-neutral-300 px-3 py-2.5" />
@@ -94,13 +94,13 @@ import { Autocomplete } from '@limonify/zest';
 
 `Autocomplete` — root props below. Every part also accepts the [common props](/docs/philosophy).
 
-<AutoType path="../../packages/zest/src/autocomplete/root/AutocompleteRoot.tsx" name="AutocompleteRootProps" />
+<AutoType path="../../packages/zest-ui/src/autocomplete/root/AutocompleteRoot.tsx" name="AutocompleteRootProps" />
 
 ## State
 
 These fields reach your `style` and `render` functions on **Autocomplete.Input** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
+<AutoType path="../../packages/zest-ui/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
 
 ## Animation
 
@@ -108,7 +108,7 @@ These fields reach your `style` and `render` functions on **Autocomplete.Input**
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { Autocomplete } from '@limonify/zest';
+import { Autocomplete } from '@limonify/zest-ui';
 
 <Autocomplete.Popup keepMounted render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />

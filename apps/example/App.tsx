@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { ScrollView, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { Separator, Toast } from '@limonify/zest';
+import { Separator, Toast } from '@limonify/zest-ui';
 import { styles } from './styles';
 import {
   AccordionSection,
@@ -51,7 +51,7 @@ export default function App() {
       <Toast.Provider timeout={4000} limit={3}>
         <SafeAreaView style={styles.safeArea}>
           <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.heading}>@limonify/zest</Text>
+          <Text style={styles.heading}>@limonify/zest-ui</Text>
           <Text style={styles.subheading}>
             Headless Base UI primitives for React Native. All styling below is plain StyleSheet,
             applied by the consumer.

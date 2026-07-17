@@ -30,7 +30,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Select } from '@limonify/zest';
+import { Select } from '@limonify/zest-ui';
 
 <Select.Root items={FRUITS} value={value} onValueChange={setValue}>
   <Select.Trigger style={styles.trigger}>
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Select } from '@limonify/zest';
+import { Select } from '@limonify/zest-ui';
 
 <Select.Root items={FRUITS} value={value} onValueChange={setValue}>
   <Select.Trigger className="min-w-44 flex-row items-center justify-between gap-3 rounded-lg border border-neutral-300 px-4 py-3">
@@ -110,13 +110,13 @@ import { Select } from '@limonify/zest';
 
 `Select` — root props below. Every part also accepts the [common props](/docs/philosophy).
 
-<AutoType path="../../packages/zest/src/select/root/SelectRoot.tsx" name="SelectRootProps" />
+<AutoType path="../../packages/zest-ui/src/select/root/SelectRoot.tsx" name="SelectRootProps" />
 
 ## State
 
 These fields reach your `style` and `render` functions on **Select.Trigger** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/select/trigger/SelectTrigger.tsx" name="SelectTriggerState" />
+<AutoType path="../../packages/zest-ui/src/select/trigger/SelectTrigger.tsx" name="SelectTriggerState" />
 
 ## Animation
 
@@ -124,7 +124,7 @@ These fields reach your `style` and `render` functions on **Select.Trigger** —
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { Select } from '@limonify/zest';
+import { Select } from '@limonify/zest-ui';
 
 <Select.Popup keepMounted render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />

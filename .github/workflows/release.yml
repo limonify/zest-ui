@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   publish:
-    name: Publish @limonify/zest to npm
+    name: Publish @limonify/zest-ui to npm
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
 
       - name: Guard — release tag matches package version
         if: github.event_name == 'release'
-        working-directory: packages/zest
+        working-directory: packages/zest-ui
         run: |
           PKG="$(node -p "require('./package.json').version")"
           TAG="${GITHUB_REF_NAME#v}"
@@ -52,7 +52,7 @@ jobs:
           fi
 
       - name: Publish to npm
-        working-directory: packages/zest
+        working-directory: packages/zest-ui
         run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

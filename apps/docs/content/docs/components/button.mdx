@@ -24,7 +24,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Button } from '@limonify/zest';
+import { Button } from '@limonify/zest-ui';
 
 <Button
   onPress={() => save()}
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
 ```tsx
 import { clsx } from 'clsx';
 import { Text } from 'react-native';
-import { Button } from '@limonify/zest';
+import { Button } from '@limonify/zest-ui';
 
 <Button
   onPress={() => save()}
@@ -106,5 +106,5 @@ state), `render`, and `ref`.
 
 These fields reach your `style` and `render` functions on **Button** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/button/Button.tsx" name="ButtonState" />
+<AutoType path="../../packages/zest-ui/src/button/Button.tsx" name="ButtonState" />
 

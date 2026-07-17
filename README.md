@@ -1,8 +1,8 @@
-# @limonify/zest
+# @limonify/zest-ui
 
 > Base UI for React Native — headless, unstyled, accessible primitive components.
 
-`@limonify/zest` is a React Native port of [Base UI](https://github.com/mui/base-ui) by the MUI team. It provides the same API, the same compound component pattern, and the same store-based state management — but adapted for iOS, Android, and web (via React Native).
+`@limonify/zest-ui` is a React Native port of [Base UI](https://github.com/mui/base-ui) by the MUI team. It provides the same API, the same compound component pattern, and the same store-based state management — but adapted for iOS, Android, and web (via React Native).
 
 **Zero style. Zero CSS. Zero default theme.** Just state, behavior, accessibility, and context. Bring your own styling — Uniwind, Tamagui, StyleSheet, NativeWind, whatever you prefer.
 
@@ -40,10 +40,10 @@ Notes that supersede older sections of this document:
 - **The zero-runtime-dependency goal did not survive Milestones 5–7, by decision.** zest now takes **`@floating-ui/react-native`** as a real dependency (collision-aware anchor positioning is not worth reimplementing) and **`react-native-gesture-handler`** as an *optional* peer dependency (a native gesture system cannot be reimplemented in JS; it stays optional so apps that use neither `Slider` nor `Drawer` need not configure the native module). `reanimated` is still not used and is not planned — see the animation contract below. `@gorhom/portal` is still not used.
 - **Portals are RN `Modal`, not a PortalHost.** The in-house PortalHost this document once planned was dropped: a state-lifting portal host re-parents children into a different React tree, which drops every context between a `Popover.Root` and its `Popover.Popup`. `Modal` keeps children in the same tree, so contexts survive; it also contains accessibility focus and wires the Android back button to `onRequestClose` → the `escape-key` reason. Every popup-family `Portal` (Dialog, Drawer, Popover, Tooltip, Menu, Select) uses it with `transparent`, `animationType="none"`, and `statusBarTranslucent` — the last of which makes the Modal's origin match the screen coordinates `@floating-ui/react-native` measures with `sameScrollView: false`.
 - **Testing is Jest** (jest-expo preset), not vitest.
-- Components are **React 19-only** (ref-as-prop, no `forwardRef`) and live in `packages/zest/src/<component>/<part>/` with `index.parts.ts` namespace exports, mirroring upstream's layout.
+- Components are **React 19-only** (ref-as-prop, no `forwardRef`) and live in `packages/zest-ui/src/<component>/<part>/` with `index.parts.ts` namespace exports, mirroring upstream's layout.
 - **`Field`, `Form`, and `Composite` (roving tabindex) are intentionally not ported.** React Native has no HTML form submission and no Tab key, so form controls omit `name`/`form`/`value`-for-submit props and the hidden `<input>`. One consequence: `Radio.Root` requires a `RadioGroup`, since without a hidden input it has no source of truth of its own.
 - **zest never animates anything.** On the web, Base UI publishes CSS variables and lets CSS animate. The React Native counterpart: animated parts publish `transitionStatus` and their measured geometry (`height`/`width`) on the **state object**, and the consumer drives their own `Animated` value from `style={(state) => ...}` or `render={(props, state) => ...}`. Because nothing in React Native can report that a closing animation finished, **exit animations require `keepMounted`** — otherwise the panel unmounts the instant it closes. `apps/example` shows the whole pattern with RN's built-in `Animated`.
-- See `packages/zest/CLAUDE.md` for the component porting recipe used to produce these milestones.
+- See `packages/zest-ui/CLAUDE.md` for the component porting recipe used to produce these milestones.
 
 - **Ordered lists use `CompositeList`.** Upstream learns an item's *visual order* from the DOM (`compareDocumentPosition`, plus a `MutationObserver` to catch reorders). React Native has neither, so zest derives order from **registration order** — exact at mount, since React runs layout effects in child order — and then corrects it from **measured layout** once every item has reported an `onLayout`. Layout ordering is the real visual order, so it holds under `row-reverse`, wrapping, and absolute positioning, and it repairs the case registration order cannot see: children reordered without remounting. Items must spread the `onLayout` returned by `useCompositeListItem`. Select, Menu, and Toolbar will reuse this rather than each inventing a registry.
 
@@ -58,7 +58,7 @@ Notes that supersede older sections of this document:
 - [Component Catalog](#component-catalog)
 - [Component API Patterns](#component-api-patterns)
 - [Implementation Guide](#implementation-guide)
-- [Phase 1: @limonify/zest/utils](#phase-1-liminifyzestutils)
+- [Phase 1: @limonify/zest-ui/utils](#phase-1-liminifyzestutils)
 - [Phase 2: Core Render Engine](#phase-2-core-render-engine)
 - [Phase 3: Simple Components](#phase-3-simple-components)
 - [Phase 4: Compound Components](#phase-4-compound-components)
@@ -72,7 +72,7 @@ Notes that supersede older sections of this document:
 
 ## Philosophy
 
-`@limonify/zest` follows the same principles as Base UI:
+`@limonify/zest-ui` follows the same principles as Base UI:
 
 ### Headless by Default
 
@@ -121,12 +121,12 @@ Since components are unstyled, they can be used with:
 
 ```
 ┌─────────────────────────────────────────────┐
-│             @limonify/zest                   │
+│             @limonify/zest-ui                   │
 │  Single package, monorepo-ready              │
 ├─────────────────────────────────────────────┤
 │                                             │
 │  ┌──────────────────────────────────────┐   │
-│  │         @limonify/zest/store         │   │
+│  │         @limonify/zest-ui/store         │   │
 │  │  ─ ReactStore (Base UI port)        │   │
 │  │  ─ useControlledProp                 │   │
 │  │  ─ useSyncedValues                   │   │
@@ -134,7 +134,7 @@ Since components are unstyled, they can be used with:
 │  └────────────┬─────────────────────────┘   │
 │               │                             │
 │  ┌────────────▼─────────────────────────┐   │
-│  │         @limonify/zest/hooks         │   │
+│  │         @limonify/zest-ui/hooks         │   │
 │  │  ─ useControlled, useId,             │   │
 │  │  ─ useStableCallback, useMergedRefs  │   │
 │  │  ─ useIsoLayoutEffect, useOnMount    │   │
@@ -142,7 +142,7 @@ Since components are unstyled, they can be used with:
 │  └────────────┬─────────────────────────┘   │
 │               │                             │
 │  ┌────────────▼─────────────────────────┐   │
-│  │     @limonify/zest/components       │   │
+│  │     @limonify/zest-ui/components       │   │
 │  │  ─ Button, Input, Dialog, Select...  │   │
 │  │  ─ Each = Store + Render + Context   │   │
 │  │  ─ Positioning, focus trap,          │   │
@@ -160,9 +160,9 @@ Since components are unstyled, they can be used with:
 
 ### Key Design Decision
 
-`@limonify/zest` does NOT depend on `@rn-primitives` as a runtime dependency. Instead, it **references `@rn-primitives` source code as a reference** for implementing the hard parts — positioning, focus trapping, keyboard navigation, and gesture handling. Every pattern is reimplemented in `@limonify/zest`'s own codebase with full control.
+`@limonify/zest-ui` does NOT depend on `@rn-primitives` as a runtime dependency. Instead, it **references `@rn-primitives` source code as a reference** for implementing the hard parts — positioning, focus trapping, keyboard navigation, and gesture handling. Every pattern is reimplemented in `@limonify/zest-ui`'s own codebase with full control.
 
-| Hard Part | @rn-primitives shows how | @limonify/zest implements |
+| Hard Part | @rn-primitives shows how | @limonify/zest-ui implements |
 |---|---|---|
 | Focus trapping in modals | `@rn-primitives/dialog` | Custom with RN `Modal` + focus guards |
 | Positioning with collision detection | `@rn-primitives/popover` | Custom using `onLayout` + `useWindowDimensions` |
@@ -187,7 +187,7 @@ Simple components (Button, Input, Text, Separator) use React Native core element
 ## Package Structure
 
 ```
-@limonify/zest/
+@limonify/zest-ui/
 ├── src/
 │   ├── store/                    # Base UI ReactStore port
 │   │   ├── ReactStore.ts
@@ -293,7 +293,7 @@ Simple components (Button, Input, Text, Separator) use React Native core element
 
 | Item | Convention | Example |
 |---|---|---|
-| npm package | `kebab-case` with scope | `@limonify/zest` |
+| npm package | `kebab-case` with scope | `@limonify/zest-ui` |
 | Component directories | `kebab-case` | `alert-dialog/`, `number-field/` |
 | Component files | `PascalCase.tsx` | `Button.tsx`, `DialogRoot.tsx` |
 | Hook files | `camelCase.ts` with `use` prefix | `useControlled.ts` |
@@ -308,7 +308,7 @@ Simple components (Button, Input, Text, Separator) use React Native core element
 
 **Every single component name matches Base UI exactly. Zero changes.** The API is identical to what web developers know from Base UI. Internal render elements (Pressable, TextInput, View) are implementation details — the consumer sees `Button`, `Input`, `Dialog`, never `Pressable` or `TextInput`.
 
-| Base UI | @limonify/zest | Status |
+| Base UI | @limonify/zest-ui | Status |
 |---|---|---|
 | `Button` | `Button` | Ported (same name) |
 | `Input` | `Input` | Ported (same name) |
@@ -368,7 +368,7 @@ export { DialogClose as Close } from './DialogClose'
 export type { DialogProps } from './Dialog.types'
 
 // Consumer import:
-import { Dialog } from '@limonify/zest'
+import { Dialog } from '@limonify/zest-ui'
 // Use: <Dialog.Root>, <Dialog.Trigger>, <Dialog.Popup>
 ```
 
@@ -576,7 +576,7 @@ Base UI (38 components)
   ├── Excluded:             6  (PreviewCard, Menubar, NavigationMenu, ScrollArea, Toolbar, Form)
   └── Added (mobile-only):  0  (BottomSheet folded into Drawer's snap points)
 
-@limonify/zest total:      32 components
+@limonify/zest-ui total:      32 components
 ```
 
 The 6 excluded: `PreviewCard`, `Menubar`, `NavigationMenu`, `ScrollArea`, `Toolbar`, `Form` (plus the web-only `CSPProvider` and the non-existent `Text`) — each with a reason in the table above. Everything else is ported under its exact Base UI name. Nothing in Base UI is left unaccounted for.
@@ -957,7 +957,7 @@ Milestones 1–4 shipped with zero runtime dependencies. Milestones 5–7 added 
 ### With Uniwind (Tailwind v4)
 
 ```tsx
-import { Button, Dialog, Input } from '@limonify/zest'
+import { Button, Dialog, Input } from '@limonify/zest-ui'
 
 function LoginScreen() {
   const [open, setOpen] = React.useState(false)
@@ -1009,7 +1009,7 @@ function LoginScreen() {
 
 ```tsx
 import { styled } from 'tamagui'
-import { Button, Dialog, Input } from '@limonify/zest'
+import { Button, Dialog, Input } from '@limonify/zest-ui'
 
 const StyledButton = styled(Button, {
   backgroundColor: '$blue9',
@@ -1073,7 +1073,7 @@ function App() {
 
 ```tsx
 import { StyleSheet, View } from 'react-native'
-import { Button, Tabs, Slider } from '@limonify/zest'
+import { Button, Tabs, Slider } from '@limonify/zest-ui'
 
 const styles = StyleSheet.create({
   button: {
@@ -1174,7 +1174,7 @@ function SettingsScreen() {
 
 ## Implementation Guide
 
-### Phase 1: @limonify/zest/utils (3-4 days)
+### Phase 1: @limonify/zest-ui/utils (3-4 days)
 
 Port the Base UI utility layer. This is mostly DOM-independent and can be copied directly with minimal changes.
 
@@ -1420,7 +1420,7 @@ export { DialogTrigger as Trigger }
 
 | Phase | Description | Duration | Cumulative |
 |---|---|---|---|
-| 1 | @limonify/zest/utils | 3-4 days | 1 week |
+| 1 | @limonify/zest-ui/utils | 3-4 days | 1 week |
 | 2 | Core render engine | 2 days | 1.5 weeks |
 | 3 | Simple components | 5-6 days | 2.5-3 weeks |
 | 4 | Compound components | 8-10 days | 4.5-5 weeks |
@@ -1435,9 +1435,9 @@ With two developers working in parallel (one on simple components, one on compou
 
 ### Why not just use @rn-primitives directly?
 
-`@rn-primitives` is not a dependency — it's a **code reference** for pattern implementation. `@limonify/zest` provides a **Base UI-like API** with full ownership. The key differences:
+`@rn-primitives` is not a dependency — it's a **code reference** for pattern implementation. `@limonify/zest-ui` provides a **Base UI-like API** with full ownership. The key differences:
 
-| Feature | @rn-primitives | @limonify/zest |
+| Feature | @rn-primitives | @limonify/zest-ui |
 |---|---|---|
 | Relationship | Reference (not a dependency) | Own implementation |
 | State management | Minimal (prop-driven) | ReactStore (selector-based, performant) |
@@ -1449,19 +1449,19 @@ With two developers working in parallel (one on simple components, one on compou
 
 ### Why not use Tamagui/Gluestack/NativeWind directly?
 
-Those are **styled component libraries** with their own rendering engines. `@limonify/zest` is **headless** — it provides zero style and works with ANY styling solution.
+Those are **styled component libraries** with their own rendering engines. `@limonify/zest-ui` is **headless** — it provides zero style and works with ANY styling solution.
 
 ### Will this be a dependency or copy-paste?
 
-Initial release: `npm install @limonify/zest`. Future consideration: CLI-based copy-paste like shadcn/ui, but this introduces maintenance complexity.
+Initial release: `npm install @limonify/zest-ui`. Future consideration: CLI-based copy-paste like shadcn/ui, but this introduces maintenance complexity.
 
 ### What about React Native Web?
 
-`@limonify/zest` uses React Native core APIs (`Pressable`, `View`, `Text`, `Modal`, `TextInput`) which are all supported by React Native Web. The same components work on iOS, Android, and web.
+`@limonify/zest-ui` uses React Native core APIs (`Pressable`, `View`, `Text`, `Modal`, `TextInput`) which are all supported by React Native Web. The same components work on iOS, Android, and web.
 
 ### How does positioning work without Floating UI?
 
-Base UI uses `@floating-ui/react-dom` for positioning on web. In React Native, `@limonify/zest` implements a custom positioning system referencing patterns from `@rn-primitives`:
+Base UI uses `@floating-ui/react-dom` for positioning on web. In React Native, `@limonify/zest-ui` implements a custom positioning system referencing patterns from `@rn-primitives`:
 
 - **Dialog/AlertDialog**: Uses RN's built-in `Modal` — positioning is handled by the OS
 - **Popover/Tooltip**: Custom implementation that measures the trigger element with `onLayout` and positions the popup using `useWindowDimensions` for viewport-relative positioning, with collision detection
@@ -1471,9 +1471,9 @@ Base UI uses `@floating-ui/react-dom` for positioning on web. In React Native, `
 
 ### Why not depend on @rn-primitives directly?
 
-`@limonify/zest` references `@rn-primitives` source code for **patterns and ideas** but does not list it as a runtime dependency. This approach provides:
+`@limonify/zest-ui` references `@rn-primitives` source code for **patterns and ideas** but does not list it as a runtime dependency. This approach provides:
 
-- **No upstream risk**: If `@rn-primitives` changes API, has a bug, or stops being maintained, `@limonify/zest` is unaffected — it's our code.
+- **No upstream risk**: If `@rn-primitives` changes API, has a bug, or stops being maintained, `@limonify/zest-ui` is unaffected — it's our code.
 - **Full control**: Every positioning calculation, focus trap, and gesture handler is in our codebase. We can fix, optimize, or customize without waiting for upstream.
 - **Smaller dependency tree**: No transitive dependencies we don't control.
 - **Single lincense**: MIT on our terms, no concerns about dependency license changes.
@@ -1491,7 +1491,7 @@ React Native provides a set of accessibility props that map to both iOS (UIAcces
 - `accessibilityLiveRegion` — for dynamic content (toast, progress)
 - `importantForAccessibility` — control screen reader inclusion
 
-`@rn-primitives` served as a reference for ARIA → RN accessibility mapping. `@limonify/zest` implements its own mapping and ensures the correct accessibility props are passed based on component state.
+`@rn-primitives` served as a reference for ARIA → RN accessibility mapping. `@limonify/zest-ui` implements its own mapping and ensures the correct accessibility props are passed based on component state.
 
 ---
 
@@ -1500,9 +1500,9 @@ React Native provides a set of accessibility props that map to both iOS (UIAcces
 If you're using this README as a prompt for an AI coding assistant (Claude Code, Cursor, etc.), include these instructions:
 
 ```
-# @limonify/zest — AI Implementation Guide
+# @limonify/zest-ui — AI Implementation Guide
 
-You are implementing a React Native headless UI library called @limonify/zest.
+You are implementing a React Native headless UI library called @limonify/zest-ui.
 It is a port of Base UI (https://github.com/mui/base-ui) for React Native.
 
 ## Key Principles
@@ -1515,8 +1515,8 @@ It is a port of Base UI (https://github.com/mui/base-ui) for React Native.
 
 ## Architecture
 
-- @limonify/zest/utils: ReactStore + hooks (port from @base-ui/utils)
-- @limonify/zest: All components
+- @limonify/zest-ui/utils: ReactStore + hooks (port from @base-ui/utils)
+- @limonify/zest-ui: All components
 
 ## DOM → RN Mapping
 

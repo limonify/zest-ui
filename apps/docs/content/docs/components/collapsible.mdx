@@ -23,7 +23,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Collapsible } from '@limonify/zest';
+import { Collapsible } from '@limonify/zest-ui';
 
 <Collapsible.Root defaultOpen>
   <Collapsible.Trigger style={styles.trigger}>
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Collapsible } from '@limonify/zest';
+import { Collapsible } from '@limonify/zest-ui';
 
 <Collapsible.Root defaultOpen>
   <Collapsible.Trigger className="self-start rounded-lg bg-neutral-900 p-3">
@@ -76,13 +76,13 @@ import { Collapsible } from '@limonify/zest';
 
 `Collapsible` — root props below. Every part also accepts the [common props](/docs/philosophy).
 
-<AutoType path="../../packages/zest/src/collapsible/root/CollapsibleRoot.tsx" name="CollapsibleRootProps" />
+<AutoType path="../../packages/zest-ui/src/collapsible/root/CollapsibleRoot.tsx" name="CollapsibleRootProps" />
 
 ## State
 
 These fields reach your `style` and `render` functions on **Collapsible.Panel** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/collapsible/panel/CollapsiblePanel.tsx" name="CollapsiblePanelState" />
+<AutoType path="../../packages/zest-ui/src/collapsible/panel/CollapsiblePanel.tsx" name="CollapsiblePanelState" />
 
 ## Animation
 
@@ -91,7 +91,7 @@ These fields reach your `style` and `render` functions on **Collapsible.Panel** 
 ```tsx
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useEffect } from 'react';
-import { Collapsible } from '@limonify/zest';
+import { Collapsible } from '@limonify/zest-ui';
 
 function Panel({ props, state }) {
   const progress = useSharedValue(state.open ? 1 : 0);

@@ -1,4 +1,4 @@
-# @limonify/zest — component porting guide
+# @limonify/zest-ui — component porting guide
 
 Headless React Native port of [Base UI](https://github.com/mui/base-ui). When porting a new component, follow the recipe below — it is the exact template proven by Checkbox and Dialog in Milestone 1.
 

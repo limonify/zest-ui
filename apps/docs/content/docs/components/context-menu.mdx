@@ -27,7 +27,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { ContextMenu } from '@limonify/zest';
+import { ContextMenu } from '@limonify/zest-ui';
 
 <ContextMenu.Root>
   <ContextMenu.Trigger style={styles.card}><Text>Long-press me</Text></ContextMenu.Trigger>
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { ContextMenu } from '@limonify/zest';
+import { ContextMenu } from '@limonify/zest-ui';
 
 <ContextMenu.Root>
   <ContextMenu.Trigger className="items-center rounded-xl border border-dashed border-neutral-300 bg-neutral-100 py-8"><Text>Long-press me</Text></ContextMenu.Trigger>
@@ -88,13 +88,13 @@ import { ContextMenu } from '@limonify/zest';
 
 `Context Menu` — root props below. Every part also accepts the [common props](/docs/philosophy).
 
-<AutoType path="../../packages/zest/src/context-menu/root/ContextMenuRoot.tsx" name="ContextMenuRootProps" />
+<AutoType path="../../packages/zest-ui/src/context-menu/root/ContextMenuRoot.tsx" name="ContextMenuRootProps" />
 
 ## State
 
 These fields reach your `style` and `render` functions on **ContextMenu.Positioner** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/context-menu/positioner/ContextMenuPositioner.tsx" name="ContextMenuPositionerState" />
+<AutoType path="../../packages/zest-ui/src/context-menu/positioner/ContextMenuPositioner.tsx" name="ContextMenuPositionerState" />
 
 ## Animation
 
@@ -102,7 +102,7 @@ These fields reach your `style` and `render` functions on **ContextMenu.Position
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { ContextMenu } from '@limonify/zest';
+import { ContextMenu } from '@limonify/zest-ui';
 
 <ContextMenu.Popup keepMounted render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />

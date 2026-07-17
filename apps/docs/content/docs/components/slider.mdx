@@ -26,7 +26,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 <Tab value="Code">
 
 ```tsx
-import { Slider } from '@limonify/zest';
+import { Slider } from '@limonify/zest-ui';
 
 <Slider.Root defaultValue={40}>
   <Slider.Value style={styles.value} />
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
 <Tab value="Uniwind">
 
 ```tsx
-import { Slider } from '@limonify/zest';
+import { Slider } from '@limonify/zest-ui';
 
 <Slider.Root defaultValue={40}>
   <Slider.Value className="mb-2 text-neutral-500" />
@@ -81,13 +81,13 @@ import { Slider } from '@limonify/zest';
 
 `Slider` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
 
-<AutoType path="../../packages/zest/src/slider/root/SliderRoot.tsx" name="SliderRootProps" />
+<AutoType path="../../packages/zest-ui/src/slider/root/SliderRoot.tsx" name="SliderRootProps" />
 
 ## State
 
 These fields reach your `style` and `render` functions on **every Slider part** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/slider/root/SliderRoot.tsx" name="SliderRootState" />
+<AutoType path="../../packages/zest-ui/src/slider/root/SliderRoot.tsx" name="SliderRootState" />
 
 ## Animation
 
@@ -96,7 +96,7 @@ The built-in gesture already moves the thumb live, so you rarely animate its pos
 ```tsx
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useEffect } from 'react';
-import { Slider } from '@limonify/zest';
+import { Slider } from '@limonify/zest-ui';
 
 function Thumb({ props, state }) {
   const scale = useSharedValue(1);

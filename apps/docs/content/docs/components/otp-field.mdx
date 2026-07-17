@@ -21,7 +21,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 <Tab value="Code">
 
 ```tsx
-import { OTPField } from '@limonify/zest';
+import { OTPField } from '@limonify/zest-ui';
 
 <OTPField.Root length={6} onValueChange={setCode}>
   {Array.from({ length: 6 }).map((_, i) => (
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { clsx } from 'clsx';
-import { OTPField } from '@limonify/zest';
+import { OTPField } from '@limonify/zest-ui';
 
 <OTPField.Root length={6} onValueChange={setCode}>
   {Array.from({ length: 6 }).map((_, i) => (
@@ -70,13 +70,13 @@ import { OTPField } from '@limonify/zest';
 
 `OTP Field` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
 
-<AutoType path="../../packages/zest/src/otp-field/root/OTPFieldRoot.tsx" name="OTPFieldRootProps" />
+<AutoType path="../../packages/zest-ui/src/otp-field/root/OTPFieldRoot.tsx" name="OTPFieldRootProps" />
 
 ## State
 
 These fields reach your `style` and `render` functions on **OTPField.Input** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/otp-field/root/OTPFieldRoot.tsx" name="OTPFieldRootState" />
+<AutoType path="../../packages/zest-ui/src/otp-field/root/OTPFieldRoot.tsx" name="OTPFieldRootState" />
 
 ## Accessibility
 

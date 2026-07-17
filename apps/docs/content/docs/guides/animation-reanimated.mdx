@@ -22,7 +22,7 @@ For a `Dialog`, `Drawer`, `Popover`, `Menu` or `Toast`, the simplest approach is
 
 ```tsx
 import Animated, { FadeIn, FadeOut, SlideInDown, SlideOutDown } from 'react-native-reanimated';
-import { Dialog } from '@limonify/zest';
+import { Dialog } from '@limonify/zest-ui';
 
 <Dialog.Popup
   keepMounted
@@ -54,7 +54,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useEffect } from 'react';
-import { Collapsible } from '@limonify/zest';
+import { Collapsible } from '@limonify/zest-ui';
 
 function Panel({ props, state }) {
   const progress = useSharedValue(state.open ? 1 : 0);
@@ -129,7 +129,7 @@ and springs home on release:
 ```tsx
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { useEffect } from 'react';
-import { Drawer } from '@limonify/zest';
+import { Drawer } from '@limonify/zest-ui';
 
 function Sheet({ props, state }) {
   const drag = useSharedValue(0);

@@ -20,7 +20,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 <Tab value="Code">
 
 ```tsx
-import { Input } from '@limonify/zest';
+import { Input } from '@limonify/zest-ui';
 
 <Input placeholder="Search" value={q} onValueChange={setQ} style={styles.input} />
 ```
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
 <Tab value="Uniwind">
 
 ```tsx
-import { Input } from '@limonify/zest';
+import { Input } from '@limonify/zest-ui';
 
 <Input placeholder="Search" value={q} onValueChange={setQ} className="rounded-lg border border-neutral-300 px-3 py-2.5 text-[15px]" />
 ```
@@ -55,13 +55,13 @@ import { Input } from '@limonify/zest';
 
 `Input` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
 
-<AutoType path="../../packages/zest/src/input/Input.tsx" name="InputProps" />
+<AutoType path="../../packages/zest-ui/src/input/Input.tsx" name="InputProps" />
 
 ## State
 
 These fields reach your `style` and `render` functions on **Input** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/input/Input.tsx" name="InputState" />
+<AutoType path="../../packages/zest-ui/src/input/Input.tsx" name="InputState" />
 
 ## Accessibility
 

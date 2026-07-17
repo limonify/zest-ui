@@ -33,7 +33,7 @@ import {
   Toggle,
   ToggleGroup,
   Tooltip,
-} from '@limonify/zest';
+} from '@limonify/zest-ui';
 import { styles } from './styles';
 
 export function ButtonSection() {
