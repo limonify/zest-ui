@@ -83,6 +83,38 @@ These fields reach your `style` and `render` functions on **every Progress part*
 
 <AutoType path="../../packages/zest/src/progress/root/ProgressRoot.tsx" name="ProgressRootState" />
 
+## Animation
+
+`Progress.Indicator` sizes itself to the current value. To ease the fill smoothly between values, drive a shared value from your own `value` and render the width yourself (percent = `value / max`):
+
+```tsx
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useEffect } from 'react';
+import { Progress } from '@limonify/zest';
+
+function Fill({ value }: { value: number }) {
+  const width = useSharedValue(value);
+
+  useEffect(() => {
+    width.value = withTiming(value, { duration: 300 });
+  }, [value]);
+
+  const animatedStyle = useAnimatedStyle(() => ({ width: `${width.value}%` }));
+
+  return (
+    <Progress.Indicator render={(props) => <Animated.View {...props} style={[styles.fill, animatedStyle]} />} />
+  );
+}
+
+<Progress.Root value={value}>
+  <Progress.Track style={styles.track}>
+    <Fill value={value} />
+  </Progress.Track>
+</Progress.Root>
+```
+
+Skip the animation while indeterminate (`value == null`) — there is no width to ease toward. See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 `accessibilityRole="progressbar"` with `accessibilityValue` (min/max/now/text). While indeterminate no width is applied — the appearance is yours (usually an animation).

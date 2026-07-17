@@ -105,6 +105,41 @@ These fields reach your `style` and `render` functions on **Checkbox.Root** — 
 
 <AutoType path="../../packages/zest/src/checkbox/root/CheckboxRoot.tsx" name="CheckboxRootState" />
 
+## Animation
+
+`Checkbox.Indicator` publishes `state.transitionStatus` and stays mounted with `keepMounted`, so you can scale and fade the tick in on check and out on uncheck:
+
+```tsx
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useEffect } from 'react';
+import { Text } from 'react-native';
+import { Checkbox } from '@limonify/zest';
+
+function Tick({ props, state }) {
+  const progress = useSharedValue(state.transitionStatus === 'idle' ? 1 : 0);
+
+  useEffect(() => {
+    // 'ending' means it is animating out; anything else is on its way in.
+    progress.value = withTiming(state.transitionStatus === 'ending' ? 0 : 1, { duration: 120 });
+  }, [state.transitionStatus]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: progress.value,
+    transform: [{ scale: 0.6 + progress.value * 0.4 }],
+  }));
+
+  return <Animated.View {...props} style={[props.style, animatedStyle]} />;
+}
+
+<Checkbox.Root checked={checked} onCheckedChange={setChecked} style={styles.box}>
+  <Checkbox.Indicator keepMounted render={(props, state) => <Tick props={props} state={state} />}>
+    <Text style={styles.tick}>✓</Text>
+  </Checkbox.Indicator>
+</Checkbox.Root>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 `accessibilityState.checked` is `true`, `false`, or `'mixed'` when indeterminate. Inside a `Field.Root` the checkbox is labelled by `Field.Label` automatically.

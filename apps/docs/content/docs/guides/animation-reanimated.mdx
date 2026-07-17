@@ -8,6 +8,12 @@ zest never animates. Instead, every animated part publishes its **transition sta
 `Animated`, but [`react-native-reanimated`](https://docs.swmansion.com/react-native-reanimated/) is
 a natural fit — and often cleaner, because its layout animations don't need a measured height at all.
 
+<Callout type="info">
+  Every animated component's page has its own **Animation** section with a part-specific snippet
+  (Dialog fade, Drawer slide, Collapsible height, Tabs indicator, Switch thumb, and more). This guide
+  is the shared contract and the reusable recipes behind them.
+</Callout>
+
 ## Enter / exit with layout animations
 
 For a `Dialog`, `Drawer`, `Popover`, `Menu` or `Toast`, the simplest approach is Reanimated's
@@ -76,8 +82,72 @@ function Panel({ props, state }) {
   is there when you need precise control.
 </Callout>
 
-## Slider & Drawer gestures
+## Timing vs spring
 
-`Slider.Control` and `Drawer.Popup` already use `react-native-gesture-handler`, and publish their
-drag position on state (`swipeMovement`, thumb values). Feed those into a shared value the same way
-for a spring-following thumb or sheet.
+Reach for `withTiming` when the animation has a defined start and end — enter/exit fades, a measured
+height opening, an indicator sliding to a known position:
+
+```tsx
+progress.value = withTiming(state.open ? 1 : 0, { duration: 200 });
+```
+
+Reach for `withSpring` when the target is a physical resting point the user threw something toward —
+a thumb settling after a drag, a sheet snapping to a detent:
+
+```tsx
+offset.value = withSpring(target, { damping: 18, stiffness: 180 });
+```
+
+## Respect reduced motion
+
+Users who enable *Reduce Motion* should get the end state instantly, not a shortened animation.
+Reanimated exposes `useReducedMotion()` — branch on it and assign the value directly:
+
+```tsx
+import { useReducedMotion, withTiming } from 'react-native-reanimated';
+
+function Panel({ props, state }) {
+  const reduceMotion = useReducedMotion();
+  const progress = useSharedValue(state.open ? 1 : 0);
+
+  useEffect(() => {
+    const target = state.open ? 1 : 0;
+    progress.value = reduceMotion ? target : withTiming(target, { duration: 200 });
+  }, [state.open, reduceMotion]);
+
+  // ...
+}
+```
+
+## Gesture-following values
+
+`Slider` and `Drawer` already use `react-native-gesture-handler`, and publish their live drag on the
+state object — `Drawer.Popup` as `state.swipeMovement`, `Slider` as `state.values` (plus
+`state.dragging`). Feed those straight into a shared value for a sheet or thumb that tracks the finger
+and springs home on release:
+
+```tsx
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { useEffect } from 'react';
+import { Drawer } from '@limonify/zest';
+
+function Sheet({ props, state }) {
+  const drag = useSharedValue(0);
+
+  useEffect(() => {
+    // Follow the finger 1:1 while dragging, spring back to 0 when released.
+    drag.value = state.swipeMovement ? state.swipeMovement : withSpring(0, { damping: 20 });
+  }, [state.swipeMovement]);
+
+  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ translateY: drag.value }] }));
+
+  return <Animated.View {...props} style={[props.style, animatedStyle]} />;
+}
+
+<Drawer.Popup render={(props, state) => <Sheet props={props} state={state} />} />
+```
+
+<Callout type="info">
+  The gesture drives dismissal on its own — this only adds the visual follow. Combine it with the
+  `entering`/`exiting` slide presets above for the open/close transition.
+</Callout>

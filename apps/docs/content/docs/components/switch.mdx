@@ -80,6 +80,36 @@ These fields reach your `style` and `render` functions on **Switch.Root** — th
 
 <AutoType path="../../packages/zest/src/switch/root/SwitchRoot.tsx" name="SwitchRootState" />
 
+## Animation
+
+`Switch.Thumb` state exposes `state.checked`. Slide the thumb with a shared value — the travel distance is your track width minus the thumb width:
+
+```tsx
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useEffect } from 'react';
+import { Switch } from '@limonify/zest';
+
+const TRAVEL = 20; // track width − thumb width
+
+function Thumb({ props, state }) {
+  const offset = useSharedValue(state.checked ? TRAVEL : 0);
+
+  useEffect(() => {
+    offset.value = withTiming(state.checked ? TRAVEL : 0, { duration: 160 });
+  }, [state.checked]);
+
+  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ translateX: offset.value }] }));
+
+  return <Animated.View {...props} style={[styles.thumb, animatedStyle]} />;
+}
+
+<Switch.Root checked={on} onCheckedChange={setOn} style={styles.track}>
+  <Switch.Thumb render={(props, state) => <Thumb props={props} state={state} />} />
+</Switch.Root>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 `accessibilityRole="switch"` with `accessibilityState.checked`. Field-aware inside a `Field.Root`.
