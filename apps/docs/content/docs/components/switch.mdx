@@ -85,22 +85,16 @@ These fields reach your `style` and `render` functions on **Switch.Root** (`styl
 `Switch.Thumb` state exposes `state.checked`. Slide the thumb with a shared value — the travel distance is your track width minus the thumb width:
 
 ```tsx
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { useEffect } from 'react';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
 import { Switch } from '@limonify/zest-ui';
 
 const TRAVEL = 20; // track width − thumb width
 
 function Thumb({ props, state }) {
-  const offset = useSharedValue(state.checked ? TRAVEL : 0);
-
-  useEffect(() => {
-    offset.value = withTiming(state.checked ? TRAVEL : 0, { duration: 160 });
-  }, [state.checked]);
-
-  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ translateX: offset.value }] }));
-
-  return <Animated.View {...props} style={[styles.thumb, animatedStyle]} />;
+  const offset = useAnimatedValue(state.checked ? TRAVEL : 0, { duration: 160 });
+  const style = useAnimatedStyle(() => ({ transform: [{ translateX: offset.value }] }));
+  return <Animated.View {...props} style={[styles.thumb, style]} />;
 }
 
 <Switch.Root checked={on} onCheckedChange={setOn} style={styles.track}>

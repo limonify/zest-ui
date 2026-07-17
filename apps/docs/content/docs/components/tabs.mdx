@@ -120,24 +120,15 @@ These fields reach your `style` and `render` functions on **Tabs.Tab** (`style={
 `Tabs.Indicator` publishes the active tab's `selectedTabPosition` (`{ left, right, top, bottom }`) and `selectedTabSize` (`{ width, height }`). Drive shared values from them so the bar slides between tabs instead of jumping:
 
 ```tsx
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { useEffect } from 'react';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
 import { Tabs } from '@limonify/zest-ui';
 
 function Indicator({ props, state }) {
-  const left = useSharedValue(0);
-  const width = useSharedValue(0);
-
-  useEffect(() => {
-    if (state.selectedTabPosition && state.selectedTabSize) {
-      left.value = withTiming(state.selectedTabPosition.left, { duration: 180 });
-      width.value = withTiming(state.selectedTabSize.width, { duration: 180 });
-    }
-  }, [state.selectedTabPosition, state.selectedTabSize]);
-
-  const animatedStyle = useAnimatedStyle(() => ({ left: left.value, width: width.value }));
-
-  return <Animated.View {...props} style={[styles.indicator, animatedStyle]} />;
+  const left = useAnimatedValue(state.selectedTabPosition?.left ?? 0, { duration: 180 });
+  const width = useAnimatedValue(state.selectedTabSize?.width ?? 0, { duration: 180 });
+  const style = useAnimatedStyle(() => ({ left: left.value, width: width.value }));
+  return <Animated.View {...props} style={[styles.indicator, style]} />;
 }
 
 <Tabs.Indicator render={(props, state) => <Indicator props={props} state={state} />} />

@@ -94,20 +94,14 @@ These fields reach your `style` and `render` functions on **every Slider part** 
 The built-in gesture already moves the thumb live, so you rarely animate its position. Instead react to `state.dragging` (on `Slider.Thumb`) — for example, grow the thumb while it is held:
 
 ```tsx
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { useEffect } from 'react';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
 import { Slider } from '@limonify/zest-ui';
 
 function Thumb({ props, state }) {
-  const scale = useSharedValue(1);
-
-  useEffect(() => {
-    scale.value = withTiming(state.dragging ? 1.25 : 1, { duration: 120 });
-  }, [state.dragging]);
-
-  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-
-  return <Animated.View {...props} style={[styles.thumb, animatedStyle]} />;
+  const scale = useAnimatedValue(state.dragging ? 1.25 : 1, { duration: 120 });
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  return <Animated.View {...props} style={[styles.thumb, style]} />;
 }
 
 <Slider.Thumb render={(props, state) => <Thumb props={props} state={state} />} />

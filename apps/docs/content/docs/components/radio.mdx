@@ -94,23 +94,14 @@ These fields reach your `style` and `render` functions on **Radio.Root** (`style
 `Radio.Indicator` publishes `state.transitionStatus` and stays mounted with `keepMounted`, so you can pop the dot in when the option is selected:
 
 ```tsx
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { useEffect } from 'react';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
 import { Radio } from '@limonify/zest-ui';
 
 function Dot({ props, state }) {
-  const progress = useSharedValue(state.transitionStatus === 'idle' ? 1 : 0);
-
-  useEffect(() => {
-    progress.value = withTiming(state.transitionStatus === 'ending' ? 0 : 1, { duration: 120 });
-  }, [state.transitionStatus]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    transform: [{ scale: progress.value }],
-  }));
-
-  return <Animated.View {...props} style={[props.style, animatedStyle]} />;
+  const p = useAnimatedValue(state.transitionStatus === 'ending' ? 0 : 1, { duration: 120 });
+  const style = useAnimatedStyle(() => ({ opacity: p.value, transform: [{ scale: p.value }] }));
+  return <Animated.View {...props} style={[props.style, style]} />;
 }
 
 <Radio.Indicator keepMounted render={(props, state) => <Dot props={props} state={state} />} />

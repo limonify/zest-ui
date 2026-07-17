@@ -110,25 +110,19 @@ These fields reach your `style` and `render` functions on **Checkbox.Root** (`st
 `Checkbox.Indicator` publishes `state.transitionStatus` and stays mounted with `keepMounted`, so you can scale and fade the tick in on check and out on uncheck:
 
 ```tsx
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { useEffect } from 'react';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
 import { Text } from 'react-native';
 import { Checkbox } from '@limonify/zest-ui';
 
 function Tick({ props, state }) {
-  const progress = useSharedValue(state.transitionStatus === 'idle' ? 1 : 0);
-
-  useEffect(() => {
-    // 'ending' means it is animating out; anything else is on its way in.
-    progress.value = withTiming(state.transitionStatus === 'ending' ? 0 : 1, { duration: 120 });
-  }, [state.transitionStatus]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    transform: [{ scale: 0.6 + progress.value * 0.4 }],
+  // 'ending' means animating out; anything else is on its way in.
+  const p = useAnimatedValue(state.transitionStatus === 'ending' ? 0 : 1, { duration: 120 });
+  const style = useAnimatedStyle(() => ({
+    opacity: p.value,
+    transform: [{ scale: 0.6 + p.value * 0.4 }],
   }));
-
-  return <Animated.View {...props} style={[props.style, animatedStyle]} />;
+  return <Animated.View {...props} style={[props.style, style]} />;
 }
 
 <Checkbox.Root checked={checked} onCheckedChange={setChecked} style={styles.box}>

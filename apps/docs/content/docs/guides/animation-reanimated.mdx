@@ -42,33 +42,53 @@ import { Dialog } from '@limonify/zest-ui';
 is handled by `keepMounted`. Because React Native can't report when an exit animation finished,
 `keepMounted` is what keeps the element around long enough for `exiting` to play.
 
+## Less boilerplate: `useAnimatedValue`
+
+Every state-driven animation repeats the same three steps — a shared value, a `useEffect` that
+`withTiming`s it to a target, and a `useAnimatedStyle`. Collapse the first two into one small hook,
+copied once into your app (e.g. `useAnimatedValue.ts`). It also reads `useReducedMotion()`, so every
+call respects the OS **Reduce Motion** setting for free:
+
+```tsx
+import { useEffect } from 'react';
+import {
+  useSharedValue,
+  withTiming,
+  useReducedMotion,
+  type SharedValue,
+  type WithTimingConfig,
+} from 'react-native-reanimated';
+
+export function useAnimatedValue(target: number, config?: WithTimingConfig): SharedValue<number> {
+  const reduceMotion = useReducedMotion();
+  const value = useSharedValue(target);
+  useEffect(() => {
+    value.value = reduceMotion ? target : withTiming(target, config);
+  }, [target, reduceMotion]);
+  return value;
+}
+```
+
+Every per-component **Animation** snippet below (and on each component page) uses it. All that's left
+is the component-specific `useAnimatedStyle` — Reanimated's irreducible part.
+
 ## Collapsible / Accordion height
 
 `Collapsible.Panel` and `Accordion.Panel` publish their measured content height on `state.height`.
-Drive a shared value from it:
+Drive a value from `state.open` and clip to it:
 
 ```tsx
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
-import { useEffect } from 'react';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue';
 import { Collapsible } from '@limonify/zest-ui';
 
 function Panel({ props, state }) {
-  const progress = useSharedValue(state.open ? 1 : 0);
-
-  useEffect(() => {
-    progress.value = withTiming(state.open ? 1 : 0, { duration: 200 });
-  }, [state.open]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    height: state.height != null ? progress.value * state.height : undefined,
-    opacity: progress.value,
+  const p = useAnimatedValue(state.open ? 1 : 0);
+  const style = useAnimatedStyle(() => ({
+    height: state.height != null ? p.value * state.height : undefined,
+    opacity: p.value,
   }));
-
-  return <Animated.View {...props} style={[{ overflow: 'hidden' }, animatedStyle]} />;
+  return <Animated.View {...props} style={[{ overflow: 'hidden' }, style]} />;
 }
 
 <Collapsible.Panel keepMounted render={(props, state) => <Panel props={props} state={state} />}>
@@ -100,24 +120,10 @@ offset.value = withSpring(target, { damping: 18, stiffness: 180 });
 
 ## Respect reduced motion
 
-Users who enable *Reduce Motion* should get the end state instantly, not a shortened animation.
-Reanimated exposes `useReducedMotion()` — branch on it and assign the value directly:
-
-```tsx
-import { useReducedMotion, withTiming } from 'react-native-reanimated';
-
-function Panel({ props, state }) {
-  const reduceMotion = useReducedMotion();
-  const progress = useSharedValue(state.open ? 1 : 0);
-
-  useEffect(() => {
-    const target = state.open ? 1 : 0;
-    progress.value = reduceMotion ? target : withTiming(target, { duration: 200 });
-  }, [state.open, reduceMotion]);
-
-  // ...
-}
-```
+Users who enable *Reduce Motion* should get the end state instantly. `useAnimatedValue` above already
+handles this — it reads `useReducedMotion()` and assigns the target directly instead of animating, so
+every example that uses the hook is covered. For `entering`/`exiting` presets, pass
+`.reduceMotion(ReduceMotion.System)` (or gate them on `useReducedMotion()` yourself).
 
 ## Gesture-following values
 

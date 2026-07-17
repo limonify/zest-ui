@@ -88,22 +88,14 @@ These fields reach your `style` and `render` functions on **every Progress part*
 `Progress.Indicator` sizes itself to the current value. To ease the fill smoothly between values, drive a shared value from your own `value` and render the width yourself (percent = `value / max`):
 
 ```tsx
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { useEffect } from 'react';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
 import { Progress } from '@limonify/zest-ui';
 
 function Fill({ value }: { value: number }) {
-  const width = useSharedValue(value);
-
-  useEffect(() => {
-    width.value = withTiming(value, { duration: 300 });
-  }, [value]);
-
-  const animatedStyle = useAnimatedStyle(() => ({ width: `${width.value}%` }));
-
-  return (
-    <Progress.Indicator render={(props) => <Animated.View {...props} style={[styles.fill, animatedStyle]} />} />
-  );
+  const w = useAnimatedValue(value, { duration: 300 });
+  const style = useAnimatedStyle(() => ({ width: `${w.value}%` }));
+  return <Progress.Indicator render={(props) => <Animated.View {...props} style={[styles.fill, style]} />} />;
 }
 
 <Progress.Root value={value}>
