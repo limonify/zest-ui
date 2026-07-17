@@ -96,6 +96,23 @@ These fields reach your `style` and `render` functions on **ContextMenu.Position
 
 <AutoType path="../../packages/zest/src/context-menu/positioner/ContextMenuPositioner.tsx" name="ContextMenuPositionerState" />
 
+## Animation
+
+`ContextMenu.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { ContextMenu } from '@limonify/zest';
+
+<ContextMenu.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
+)}>
+  {/* ... */}
+</ContextMenu.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 Upstream opens on right-click or long press; a touch screen only has the long press. Everything else matches `Menu`.

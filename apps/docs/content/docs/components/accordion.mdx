@@ -108,6 +108,37 @@ These fields reach your `style` and `render` functions on **Accordion.Panel** â€
 
 <AutoType path="../../packages/zest/src/accordion/panel/AccordionPanel.tsx" name="AccordionPanelState" />
 
+## Animation
+
+`Accordion.Panel` publishes its measured content height on `state.height` plus `state.transitionStatus`. Drive a shared value from `state.open` and clip to the measured height:
+
+```tsx
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useEffect } from 'react';
+import { Accordion } from '@limonify/zest';
+
+function Panel({ props, state }) {
+  const progress = useSharedValue(state.open ? 1 : 0);
+
+  useEffect(() => {
+    progress.value = withTiming(state.open ? 1 : 0, { duration: 200 });
+  }, [state.open]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: state.height != null ? progress.value * state.height : undefined,
+    opacity: progress.value,
+  }));
+
+  return <Animated.View {...props} style={[{ overflow: 'hidden' }, animatedStyle]} />;
+}
+
+<Accordion.Panel keepMounted render={(props, state) => <Panel props={props} state={state} />}>
+  {/* ... */}
+</Accordion.Panel>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 Set `openMultiple` to keep several open. See the [Reanimated guide](/docs/guides/animation-reanimated) for animating the panel; render only while open for a robust natural-height layout.

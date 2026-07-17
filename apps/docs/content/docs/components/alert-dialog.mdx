@@ -103,6 +103,26 @@ These fields reach your `style` and `render` functions on **AlertDialog.Popup** 
 
 <AutoType path="../../packages/zest/src/dialog/popup/DialogPopup.tsx" name="DialogPopupState" />
 
+## Animation
+
+`AlertDialog.Popup` and `AlertDialog.Backdrop` publish `state.transitionStatus`. Keep them mounted with `keepMounted` so Reanimated's `exiting` preset has time to play the close:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { AlertDialog } from '@limonify/zest';
+
+<AlertDialog.Backdrop keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(150)} exiting={FadeOut.duration(150)} />
+)} />
+<AlertDialog.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(150)} exiting={FadeOut.duration(150)} />
+)}>
+  {/* ... */}
+</AlertDialog.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 `accessibilityRole="alertdialog"`. Outside-press and back-button dismissal are disabled — provide an explicit `AlertDialog.Close`.

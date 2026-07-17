@@ -102,6 +102,23 @@ These fields reach your `style` and `render` functions on **Autocomplete.Input**
 
 <AutoType path="../../packages/zest/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
 
+## Animation
+
+`Autocomplete.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade the list in and out:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Autocomplete } from '@limonify/zest';
+
+<Autocomplete.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
+)}>
+  {/* ... */}
+</Autocomplete.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 See [Combobox](/docs/components/combobox) for the single-select variant — they share every part below the root.

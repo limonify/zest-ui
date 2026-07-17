@@ -120,6 +120,23 @@ These fields reach your `style` and `render` functions on **Combobox.Input** —
 
 <AutoType path="../../packages/zest/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
 
+## Animation
+
+`Combobox.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade the list in and out:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Combobox } from '@limonify/zest';
+
+<Combobox.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
+)}>
+  {/* ... */}
+</Combobox.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 The input is `accessibilityRole="search"` with `aria-expanded` and `aria-autocomplete="list"`; each

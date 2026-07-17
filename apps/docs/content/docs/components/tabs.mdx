@@ -36,7 +36,10 @@ import { Tabs } from '@limonify/zest';
     ))}
     <Tabs.Indicator
       render={(props, s) => (
-        <Animated.View {...props} style={[styles.indicator, { left: s.left, width: s.width }]} />
+        <Animated.View
+          {...props}
+          style={[styles.indicator, { left: s.selectedTabPosition?.left, width: s.selectedTabSize?.width }]}
+        />
       )}
     />
   </Tabs.List>
@@ -80,7 +83,11 @@ import { Tabs } from '@limonify/zest';
     ))}
     <Tabs.Indicator
       render={(props, s) => (
-        <Animated.View {...props} className="absolute bottom-0 h-0.5 bg-lime-700" style={{ left: s.left, width: s.width }} />
+        <Animated.View
+          {...props}
+          className="absolute bottom-0 h-0.5 bg-lime-700"
+          style={{ left: s.selectedTabPosition?.left, width: s.selectedTabSize?.width }}
+        />
       )}
     />
   </Tabs.List>
@@ -107,6 +114,36 @@ import { Tabs } from '@limonify/zest';
 These fields reach your `style` and `render` functions on **Tabs.Tab** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
 
 <AutoType path="../../packages/zest/src/tabs/tab/TabsTab.tsx" name="TabsTabState" />
+
+## Animation
+
+`Tabs.Indicator` publishes the active tab's `selectedTabPosition` (`{ left, right, top, bottom }`) and `selectedTabSize` (`{ width, height }`). Drive shared values from them so the bar slides between tabs instead of jumping:
+
+```tsx
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useEffect } from 'react';
+import { Tabs } from '@limonify/zest';
+
+function Indicator({ props, state }) {
+  const left = useSharedValue(0);
+  const width = useSharedValue(0);
+
+  useEffect(() => {
+    if (state.selectedTabPosition && state.selectedTabSize) {
+      left.value = withTiming(state.selectedTabPosition.left, { duration: 180 });
+      width.value = withTiming(state.selectedTabSize.width, { duration: 180 });
+    }
+  }, [state.selectedTabPosition, state.selectedTabSize]);
+
+  const animatedStyle = useAnimatedStyle(() => ({ left: left.value, width: width.value }));
+
+  return <Animated.View {...props} style={[styles.indicator, animatedStyle]} />;
+}
+
+<Tabs.Indicator render={(props, state) => <Indicator props={props} state={state} />} />
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

@@ -126,6 +126,26 @@ These fields reach your `style` and `render` functions on **Dialog.Popup** — t
 
 <AutoType path="../../packages/zest/src/dialog/popup/DialogPopup.tsx" name="DialogPopupState" />
 
+## Animation
+
+`Dialog.Popup` and `Dialog.Backdrop` publish `state.transitionStatus`. Keep them mounted with `keepMounted` so Reanimated's `exiting` preset has time to play the close:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Dialog } from '@limonify/zest';
+
+<Dialog.Backdrop keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(150)} exiting={FadeOut.duration(150)} />
+)} />
+<Dialog.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(150)} exiting={FadeOut.duration(150)} />
+)}>
+  {/* ... */}
+</Dialog.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 The popup is `accessibilityViewIsModal` with `accessibilityLabelledBy` pointing at `Dialog.Title`

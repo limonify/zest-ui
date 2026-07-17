@@ -84,6 +84,37 @@ These fields reach your `style` and `render` functions on **Collapsible.Panel** 
 
 <AutoType path="../../packages/zest/src/collapsible/panel/CollapsiblePanel.tsx" name="CollapsiblePanelState" />
 
+## Animation
+
+`Collapsible.Panel` publishes its measured content height on `state.height` plus `state.transitionStatus`. Drive a shared value from `state.open` and clip to the measured height:
+
+```tsx
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useEffect } from 'react';
+import { Collapsible } from '@limonify/zest';
+
+function Panel({ props, state }) {
+  const progress = useSharedValue(state.open ? 1 : 0);
+
+  useEffect(() => {
+    progress.value = withTiming(state.open ? 1 : 0, { duration: 200 });
+  }, [state.open]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    height: state.height != null ? progress.value * state.height : undefined,
+    opacity: progress.value,
+  }));
+
+  return <Animated.View {...props} style={[{ overflow: 'hidden' }, animatedStyle]} />;
+}
+
+<Collapsible.Panel keepMounted render={(props, state) => <Panel props={props} state={state} />}>
+  {/* ... */}
+</Collapsible.Panel>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
-The trigger carries `aria-expanded`; the panel is hidden from assistive tech while closed. See the [Reanimated guide](/docs/guides/animation-reanimated) for the height animation.
+The trigger carries `aria-expanded`; the panel is hidden from assistive tech while closed.

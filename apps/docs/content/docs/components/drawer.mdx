@@ -100,6 +100,26 @@ These fields reach your `style` and `render` functions on **Drawer.Popup** — t
 
 <AutoType path="../../packages/zest/src/drawer/popup/DrawerPopup.tsx" name="DrawerPopupState" />
 
+## Animation
+
+`Drawer.Popup` publishes `state.transitionStatus` and, while dragging, `state.swipeMovement`. The swipe-to-dismiss gesture is already built in; for the open/close use a slide preset matching the drawer's side, and fade the backdrop:
+
+```tsx
+import Animated, { SlideInDown, SlideOutDown, FadeIn, FadeOut } from 'react-native-reanimated';
+import { Drawer } from '@limonify/zest';
+
+<Drawer.Backdrop keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn} exiting={FadeOut} />
+)} />
+<Drawer.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={SlideInDown} exiting={SlideOutDown} />
+)}>
+  {/* ... */}
+</Drawer.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 A bottom sheet is `<Drawer.Root snapPoints={[0.25, 0.5, 0.9]}>`. Swipe dismissal reports the `swipe` reason through `onOpenChange`.

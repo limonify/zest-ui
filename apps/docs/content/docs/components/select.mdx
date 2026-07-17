@@ -118,6 +118,23 @@ These fields reach your `style` and `render` functions on **Select.Trigger** —
 
 <AutoType path="../../packages/zest/src/select/trigger/SelectTrigger.tsx" name="SelectTriggerState" />
 
+## Animation
+
+`Select.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Select } from '@limonify/zest';
+
+<Select.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
+)}>
+  {/* ... */}
+</Select.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 The trigger is `accessibilityRole="combobox"` with `aria-haspopup="listbox"`; items are `role="option"`. In `multiple` mode the popup stays open and `Select.Value` exposes `labels`.

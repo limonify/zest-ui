@@ -101,6 +101,23 @@ These fields reach your `style` and `render` functions on **Popover.Positioner /
 
 <AutoType path="../../packages/zest/src/popover/positioner/PopoverPositioner.tsx" name="PopoverPositionerState" />
 
+## Animation
+
+`Popover.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted`; a quick fade (or zoom) reads well for an anchored popup:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Popover } from '@limonify/zest';
+
+<Popover.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
+)}>
+  {/* ... */}
+</Popover.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 The trigger carries `aria-haspopup`; the popup is labelled by `Popover.Title` and described by `Popover.Description`. Use a `handle` to open it from a detached trigger.

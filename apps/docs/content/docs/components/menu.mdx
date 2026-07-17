@@ -101,6 +101,23 @@ These fields reach your `style` and `render` functions on **Menu.Popup** — the
 
 <AutoType path="../../packages/zest/src/menu/popup/MenuPopup.tsx" name="MenuPopupState" />
 
+## Animation
+
+`Menu.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out. Each submenu level is its own Modal, so add `keepMounted` on every level you animate:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Menu } from '@limonify/zest';
+
+<Menu.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
+)}>
+  {/* ... */}
+</Menu.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 Each menu level is its own `Modal`, so **every level that should dismiss on an outside tap needs its own `Menu.Backdrop`**. Items close the menu on press by default (`closeOnPress`).

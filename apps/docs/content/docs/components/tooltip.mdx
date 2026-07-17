@@ -93,6 +93,23 @@ These fields reach your `style` and `render` functions on **Tooltip parts** — 
 
 <AutoType path="../../packages/zest/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootState" />
 
+## Animation
+
+`Tooltip.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Tooltip } from '@limonify/zest';
+
+<Tooltip.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(100)} exiting={FadeOut.duration(100)} />
+)}>
+  {/* ... */}
+</Tooltip.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 The popup is `accessibilityRole="tooltip"`. Upstream's hover-delay `Tooltip.Provider` is not ported — there is no hover on touch.

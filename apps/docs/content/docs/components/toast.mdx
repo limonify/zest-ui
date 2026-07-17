@@ -97,6 +97,37 @@ These fields reach your `style` and `render` functions on **Toast.Root** — the
 
 <AutoType path="../../packages/zest/src/toast/root/ToastRoot.tsx" name="ToastRootState" />
 
+## Animation
+
+`Toast.Root` publishes `state.transitionStatus`, its stacking `offsetY`/`index`, and `swipeMovement`. Set `removeOnClose={false}` so the row survives its exit, remove it from the queue when the exit finishes, and use `LinearTransition` so the stack reflows smoothly:
+
+```tsx
+import Animated, { SlideInDown, SlideOutDown, LinearTransition, runOnJS } from 'react-native-reanimated';
+import { Toast } from '@limonify/zest';
+
+function ToastItem({ toast }) {
+  const { remove } = Toast.useToastManager();
+  return (
+    <Toast.Root
+      toast={toast}
+      removeOnClose={false}
+      render={(props) => (
+        <Animated.View
+          {...props}
+          entering={SlideInDown}
+          exiting={SlideOutDown.withCallback(() => runOnJS(remove)(toast.id))}
+          layout={LinearTransition}
+        />
+      )}
+    >
+      {/* Title / Description */}
+    </Toast.Root>
+  );
+}
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
+
 ## Accessibility
 
 The viewport uses `pointerEvents="box-none"` so touches pass through to the app; only the toasts are interactive. `accessibilityLiveRegion="polite"` announces new toasts.
