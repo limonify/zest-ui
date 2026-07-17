@@ -32,7 +32,7 @@
 
 **Milestone 11 (shipped):** parity port of six components previously excluded, added after confirming they *are* portable to React Native. **`Field`** (Root/Label/Control/Description/Error/Validity), **`Fieldset`** (Root/Legend) and **`Input`** — an accessibility + validation wrapper around `TextInput`, with validation adapted to a `validate` function (no HTML constraint API). **`ContextMenu`** (Root/Trigger/Positioner + the reused menu parts) — a menu opened by long press, anchored to the touch point. **`Combobox`** and **`Autocomplete`** (Root/Input/Portal/Backdrop/Positioner/Popup/List/Item/Empty/Value) — a text input filtering a list, in single-select and free-text modes. Only genuinely desktop-only components remain excluded.
 
-**Current totals:** 31 components, 616 Jest tests (jest-expo + @testing-library/react-native), Expo example app in `apps/example` exercising every one.
+**Current totals:** 32 components, 631 Jest tests (jest-expo + @testing-library/react-native), Expo example app in `apps/example` exercising every one.
 
 Notes that supersede older sections of this document:
 
@@ -537,7 +537,6 @@ These Base UI components will NOT be ported. They either don't fit the mobile in
 | `PreviewCard` | Hover card. Mobile has no hover interaction. A long-press equivalent would be a different UX. |
 | `Menubar` | Desktop-only navigation pattern. Mobile uses bottom tabs, hamburger menus, or tab bars. |
 | `NavigationMenu` | Desktop multi-level hover menu. Mobile navigation uses different patterns (stack navigators, drawers). |
-| `Meter` | Rarely used on mobile. Not worth the port effort. |
 | `ScrollArea` | React Native has native scrolling (`ScrollView`, `FlatList`). No custom scroll area needed. |
 | `Toolbar` | Desktop toolbar pattern (roving tabindex). Mobile uses bottom action bars or context menus. |
 | `Form` | Aggregates constraint-validation errors across an HTML `<form>` on submit. React Native has no form submission; `Field`'s own `validate` covers per-field validation. |
@@ -573,14 +572,14 @@ This document originally planned two components that don't exist in Base UI. Nei
 
 ```
 Base UI (38 components)
-  ├── Ported (same name):  31  (Button, Dialog, Select, Field, Combobox, ContextMenu...)
-  ├── Excluded:             7  (PreviewCard, Menubar, NavigationMenu, Meter, ScrollArea, Toolbar, Form)
+  ├── Ported (same name):  32  (Button, Dialog, Select, Field, Combobox, ContextMenu...)
+  ├── Excluded:             6  (PreviewCard, Menubar, NavigationMenu, ScrollArea, Toolbar, Form)
   └── Added (mobile-only):  0  (BottomSheet folded into Drawer's snap points)
 
-@limonify/zest total:      31 components
+@limonify/zest total:      32 components
 ```
 
-The 7 excluded: `PreviewCard`, `Menubar`, `NavigationMenu`, `Meter`, `ScrollArea`, `Toolbar`, `Form` (plus the web-only `CSPProvider` and the non-existent `Text`) — each with a reason in the table above. Everything else is ported under its exact Base UI name. Nothing in Base UI is left unaccounted for.
+The 6 excluded: `PreviewCard`, `Menubar`, `NavigationMenu`, `ScrollArea`, `Toolbar`, `Form` (plus the web-only `CSPProvider` and the non-existent `Text`) — each with a reason in the table above. Everything else is ported under its exact Base UI name. Nothing in Base UI is left unaccounted for.
 
 ---
 

@@ -18,6 +18,7 @@ import {
   Fieldset,
   Input,
   Menu,
+  Meter,
   NumberField,
   OTPField,
   Popover,
@@ -1057,6 +1058,27 @@ export function DrawerSection() {
           </Drawer.Viewport>
         </Drawer.Portal>
       </Drawer.Root>
+    </View>
+  );
+}
+
+export function MeterSection() {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Meter</Text>
+      <Text style={styles.label}>
+        A static gauge (like disk usage), not a task in progress — no indeterminate state.
+      </Text>
+
+      <Meter.Root value={72} style={styles.group}>
+        <View style={styles.row}>
+          <Meter.Label style={styles.label}>Storage used</Meter.Label>
+          <Meter.Value style={styles.label} />
+        </View>
+        <Meter.Track style={styles.progressTrack}>
+          <Meter.Indicator style={styles.progressIndicator} />
+        </Meter.Track>
+      </Meter.Root>
     </View>
   );
 }
