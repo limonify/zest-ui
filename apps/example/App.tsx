@@ -19,6 +19,7 @@ import {
   FieldSection,
   HandleSection,
   MenuSection,
+  MeterSection,
   MultiSelectSection,
   NumberFieldSection,
   OTPFieldSection,
@@ -101,6 +102,8 @@ export default function App() {
           <DrawerSection />
           <Separator style={styles.separator} />
           <ProgressSection />
+          <Separator style={styles.separator} />
+          <MeterSection />
           <Separator style={styles.separator} />
           <AvatarSection />
           <Separator style={styles.separator} />

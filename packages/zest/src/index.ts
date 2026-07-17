@@ -14,6 +14,7 @@ export * from './field';
 export * from './fieldset';
 export * from './input';
 export * from './menu';
+export * from './meter';
 export * from './number-field';
 export * from './otp-field';
 export * from './popover';
