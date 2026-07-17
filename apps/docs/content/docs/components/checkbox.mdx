@@ -14,20 +14,78 @@ description: A tri-state checkbox that tracks checked, indeterminate and disable
 
 ## Usage
 
+<Tabs items={['StyleSheet', 'Uniwind']}>
+
+<Tab value="StyleSheet">
+
 ```tsx
-import { Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Checkbox } from '@limonify/zest';
 
-<Checkbox.Root
-  checked={checked}
-  onCheckedChange={setChecked}
-  style={(state) => [styles.box, state.checked && styles.boxChecked]}
->
-  <Checkbox.Indicator>
-    <Text style={styles.tick}>✓</Text>
-  </Checkbox.Indicator>
-</Checkbox.Root>
+function Terms() {
+  const [checked, setChecked] = useState(false);
+  return (
+    <View style={styles.row}>
+      <Checkbox.Root
+        checked={checked}
+        onCheckedChange={setChecked}
+        style={(state) => [styles.box, state.checked && styles.boxChecked]}
+      >
+        <Checkbox.Indicator>
+          <Text style={styles.tick}>✓</Text>
+        </Checkbox.Indicator>
+      </Checkbox.Root>
+      <Text>I accept the terms</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  box: {
+    width: 22,
+    height: 22,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: '#cbcbcb',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  boxChecked: { backgroundColor: '#4c7a0b', borderColor: '#4c7a0b' },
+  tick: { color: '#fff', fontSize: 14, fontWeight: '700' },
+});
 ```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text, View } from 'react-native';
+import { Checkbox } from '@limonify/zest';
+
+<View className="flex-row items-center gap-2.5">
+  <Checkbox.Root
+    checked={checked}
+    onCheckedChange={setChecked}
+    className={(state) =>
+      [
+        'size-6 items-center justify-center rounded-md border-[1.5px]',
+        state.checked ? 'border-lime-700 bg-lime-700' : 'border-neutral-300',
+      ].join(' ')
+    }
+  >
+    <Checkbox.Indicator>
+      <Text className="text-sm font-bold text-white">✓</Text>
+    </Checkbox.Indicator>
+  </Checkbox.Root>
+  <Text>I accept the terms</Text>
+</View>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 
