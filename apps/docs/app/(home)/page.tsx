@@ -106,7 +106,7 @@ export default function HomePage() {
       {/* Features */}
       <section className="grid gap-px overflow-hidden rounded-xl border border-fd-border bg-fd-border sm:grid-cols-2">
         {FEATURES.map((f) => (
-          <div key={f.title} className="bg-fd-background p-6￼">
+          <div key={f.title} className="bg-fd-background p-6">
             <h3 className="mb-2 text-base font-semibold text-fd-foreground">{f.title}</h3>
             <p className="text-sm leading-relaxed text-fd-muted-foreground">{f.body}</p>
           </div>
