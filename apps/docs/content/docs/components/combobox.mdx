@@ -1,0 +1,75 @@
+---
+title: Combobox
+description: A text input that filters a list of items, with single selection.
+---
+
+`Combobox` is a text input paired with a filtered list. Typing filters the items; choosing one
+fills the input and closes the list. For free-text suggestions without a bound value, use
+[`Autocomplete`](/docs/components/combobox), which reuses every combobox part.
+
+<Demo>Filtering a list and selecting an item.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Combobox.Root
+  Combobox.Input
+  Combobox.Portal
+    Combobox.Backdrop
+    Combobox.Positioner
+      Combobox.Popup
+        Combobox.Empty
+        Combobox.List
+          Combobox.Item`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Combobox } from '@limonify/zest';
+
+<Combobox.Root items={COUNTRIES} value={value} onValueChange={setValue}>
+  <Combobox.Input placeholder="Pick a country" style={styles.input} />
+  <Combobox.Portal>
+    <Combobox.Backdrop style={styles.transparent} />
+    <Combobox.Positioner>
+      <Combobox.Popup style={styles.popup}>
+        <Combobox.Empty style={styles.empty}>
+          <Text>No match</Text>
+        </Combobox.Empty>
+        <Combobox.List>
+          {(item) => (
+            <Combobox.Item
+              key={String(item.value)}
+              item={item}
+              style={(state) => [styles.item, state.pressed && styles.itemPressed]}
+            >
+              <Text>{item.label}</Text>
+            </Combobox.Item>
+          )}
+        </Combobox.List>
+      </Combobox.Popup>
+    </Combobox.Positioner>
+  </Combobox.Portal>
+</Combobox.Root>
+```
+
+`items` are strings or `{ value, label }` records. `Combobox.List` renders the filtered items
+through a render function, so you control each row.
+
+## API
+
+`Combobox.Root`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `(string \| { value, label })[]` | — | The items to filter and choose from. |
+| `value` / `defaultValue` | `unknown` | — | The selected value. |
+| `onValueChange` | `(value) => void` | — | Called when the selection changes. |
+| `inputValue` / `defaultInputValue` | `string` | — | The input text. |
+| `openOnFocus` | `boolean` | `true` | Open the list when the input is focused. |
+| `filter` | `(item, query) => boolean` | label match | Custom filter predicate. |
+
+## Accessibility
+
+The input is `accessibilityRole="search"` with `aria-expanded` and `aria-autocomplete="list"`; each
+item is `role="option"` with `aria-selected`.

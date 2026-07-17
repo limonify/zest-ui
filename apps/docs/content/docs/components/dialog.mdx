@@ -1,0 +1,72 @@
+---
+title: Dialog
+description: A modal dialog built on React Native's Modal, with a backdrop and focus containment.
+---
+
+`Dialog` is a modal overlay. Its `Portal` is a React Native `Modal`, so the popup renders above the
+app with focus containment and Android back-button dismissal handled for you.
+
+<Demo>Opening and dismissing a dialog.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Dialog.Root
+  Dialog.Trigger
+  Dialog.Portal
+    Dialog.Backdrop
+    Dialog.Viewport
+      Dialog.Popup
+        Dialog.Title
+        Dialog.Description
+        Dialog.Close`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Dialog } from '@limonify/zest';
+
+<Dialog.Root>
+  <Dialog.Trigger style={styles.button}>
+    <Text style={styles.buttonText}>Open</Text>
+  </Dialog.Trigger>
+
+  <Dialog.Portal>
+    <Dialog.Backdrop style={styles.backdrop} />
+    <Dialog.Viewport style={styles.center}>
+      <Dialog.Popup style={styles.card}>
+        <Dialog.Title style={styles.title}>Delete file?</Dialog.Title>
+        <Dialog.Description style={styles.body}>
+          This can't be undone.
+        </Dialog.Description>
+        <Dialog.Close style={styles.button}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </Dialog.Close>
+      </Dialog.Popup>
+    </Dialog.Viewport>
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+## Dismissal
+
+The `Backdrop` (or a press outside the `Popup` in the `Viewport`) closes the dialog with the
+`outside-press` reason; the Android back button and the OS close it with `escape-key`. Every close
+reports through `onOpenChange(open, eventDetails)` so you can veto it with `eventDetails.cancel()`.
+
+## API
+
+`Dialog.Root`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | — | Controlled open state. |
+| `defaultOpen` | `boolean` | `false` | Initial open state when uncontrolled. |
+| `onOpenChange` | `(open, eventDetails) => void` | — | Fired when the dialog opens or closes. |
+| `disablePointerDismissal` | `boolean` | `false` | Prevent closing on an outside press. |
+
+## Accessibility
+
+The popup is `accessibilityViewIsModal` with `accessibilityLabelledBy` pointing at `Dialog.Title`
+and `accessibilityDescribedBy` at `Dialog.Description`. Unlike the web version there is no
+`aria-modal`-only fallback — the RN `Modal` contains focus natively.

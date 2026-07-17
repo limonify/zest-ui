@@ -1,0 +1,72 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+@source '../node_modules/fumadocs-ui/dist/**/*.js';
+
+/* Wire next/font faces into Tailwind + Fumadocs. */
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+  --font-display: var(--font-display), var(--font-sans), sans-serif;
+}
+
+/*
+  Warm-citrus palette. "zest" = lemon zest, so the accent is a restrained
+  citrus, not an acid neon; the neutrals are warm (paper + ink, not pure
+  white/black) for reading comfort — easy on the eyes in both themes.
+*/
+:root {
+  --color-fd-background: #fbfaf5;
+  --color-fd-foreground: #22201a;
+  --color-fd-muted: #f3f1e9;
+  --color-fd-muted-foreground: #736f63;
+  --color-fd-popover: #ffffff;
+  --color-fd-popover-foreground: #22201a;
+  --color-fd-card: #ffffff;
+  --color-fd-card-foreground: #22201a;
+  --color-fd-border: #e6e2d6;
+  --color-fd-primary: #4c7a0b;
+  --color-fd-primary-foreground: #fbfaf5;
+  --color-fd-secondary: #f3f1e9;
+  --color-fd-secondary-foreground: #22201a;
+  --color-fd-accent: #eaf3d8;
+  --color-fd-accent-foreground: #2f4a08;
+  --color-fd-ring: #4c7a0b;
+}
+
+.dark {
+  --color-fd-background: #13120c;
+  --color-fd-foreground: #eae7da;
+  --color-fd-muted: #1c1a12;
+  --color-fd-muted-foreground: #9a9683;
+  --color-fd-popover: #1a180f;
+  --color-fd-popover-foreground: #eae7da;
+  --color-fd-card: #1a180f;
+  --color-fd-card-foreground: #eae7da;
+  --color-fd-border: #2a2818;
+  --color-fd-primary: #a3d65c;
+  --color-fd-primary-foreground: #13120c;
+  --color-fd-secondary: #1c1a12;
+  --color-fd-secondary-foreground: #eae7da;
+  --color-fd-accent: #23260f;
+  --color-fd-accent-foreground: #cfe89a;
+  --color-fd-ring: #a3d65c;
+}
+
+/* Reading comfort: generous measure + line-height in the docs body. */
+#nd-docs-layout article,
+.prose {
+  --fd-prose-measure: 68ch;
+}
+
+body {
+  font-feature-settings: 'cv05', 'ss01';
+}
+
+/* Display face for the big titles. */
+h1 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
