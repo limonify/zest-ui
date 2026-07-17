@@ -46,6 +46,17 @@ import clsx from 'clsx';
 
 zest merges your `className` after its own internal props, so your classes always win.
 
+`className` accepts **either** form, so reach for the function only when a class depends on zest's
+state. For classes driven by your own props, a plain string works just as well:
+
+```tsx
+// Static — depends only on your own props:
+<Checkbox.Root className={clsx('size-6 rounded border', invalid && 'border-red-500')} />
+
+// Function — depends on the part's state:
+<Checkbox.Root className={(state) => clsx('size-6 rounded border', { 'bg-lime-600': state.checked })} />
+```
+
 ## With HeroUI Native
 
 HeroUI Native ships styled components on top of Uniwind. zest and HeroUI compose: use HeroUI's
