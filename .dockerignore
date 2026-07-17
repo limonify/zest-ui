@@ -3,7 +3,7 @@
 **/.source
 **/.turbo
 **/out
-**/lib
+packages/*/lib
 .git
 .github
 .vscode
