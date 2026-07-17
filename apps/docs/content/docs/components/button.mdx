@@ -16,21 +16,70 @@ Button is a single part.
 
 ## Usage
 
+<Tabs items={['StyleSheet', 'Uniwind']}>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet, Text } from 'react-native';
+import { Button } from '@limonify/zest';
+
+function SaveButton() {
+  return (
+    <Button
+      onPress={() => save()}
+      style={(state) => [
+        styles.button,
+        state.pressed && styles.buttonPressed,
+        state.disabled && styles.buttonDisabled,
+      ]}
+    >
+      <Text style={styles.text}>Save</Text>
+    </Button>
+  );
+}
+
+const styles = StyleSheet.create({
+  button: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#171717',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  buttonPressed: { opacity: 0.85 },
+  buttonDisabled: { opacity: 0.4 },
+  text: { color: '#fff', fontWeight: '600' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
 ```tsx
 import { Text } from 'react-native';
 import { Button } from '@limonify/zest';
 
 <Button
   onPress={() => save()}
-  style={(state) => [
-    styles.button,
-    state.pressed && styles.buttonPressed,
-    state.disabled && styles.buttonDisabled,
-  ]}
+  className={(state) =>
+    [
+      'self-start rounded-lg bg-neutral-900 px-5 py-3',
+      state.pressed && 'opacity-85',
+      state.disabled && 'opacity-40',
+    ]
+      .filter(Boolean)
+      .join(' ')
+  }
 >
-  <Text style={styles.buttonText}>Save</Text>
+  <Text className="font-semibold text-white">Save</Text>
 </Button>
 ```
+
+</Tab>
+
+</Tabs>
 
 ## API
 
