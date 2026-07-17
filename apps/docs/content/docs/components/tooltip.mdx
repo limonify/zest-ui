@@ -41,6 +41,12 @@ import { Tooltip } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **Tooltip parts** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootState" />
+
 ## Accessibility
 
 The popup is `accessibilityRole="tooltip"`. Upstream's hover-delay `Tooltip.Provider` is not ported — there is no hover on touch.

@@ -37,6 +37,12 @@ import { NumberField } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/number-field/root/NumberFieldRoot.tsx" name="NumberFieldRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **every NumberField part** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/number-field/root/NumberFieldRoot.tsx" name="NumberFieldRootState" />
+
 ## Accessibility
 
 The input is `accessibilityRole="spinbutton"` with `accessibilityValue`. Parsing/formatting is locale-aware via `format`/`locale`. Field-aware inside a `Field.Root`.

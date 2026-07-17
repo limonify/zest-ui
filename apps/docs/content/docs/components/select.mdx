@@ -55,6 +55,12 @@ import { Select } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/select/root/SelectRoot.tsx" name="SelectRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **Select.Trigger** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/select/trigger/SelectTrigger.tsx" name="SelectTriggerState" />
+
 ## Accessibility
 
 The trigger is `accessibilityRole="combobox"` with `aria-haspopup="listbox"`; items are `role="option"`. In `multiple` mode the popup stays open and `Select.Value` exposes `labels`.

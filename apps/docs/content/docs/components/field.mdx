@@ -35,6 +35,12 @@ import { Field } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/field/root/FieldRoot.tsx" name="FieldRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **every Field part** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/field/root/FieldRoot.tsx" name="FieldRootState" />
+
 ## Accessibility
 
 The control is labelled by `Field.Label` and described by `Field.Description`/`Field.Error` via `accessibilityLabelledBy`/`accessibilityDescribedBy`. `validationMode` runs `validate` on blur or change. `Checkbox`, `Switch`, `RadioGroup` and `NumberField` are also field-aware.

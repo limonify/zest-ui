@@ -32,6 +32,12 @@ import { CheckboxGroup, Checkbox } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/checkbox-group/CheckboxGroup.tsx" name="CheckboxGroupProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **each Checkbox.Root** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/checkbox/root/CheckboxRoot.tsx" name="CheckboxRootState" />
+
 ## Accessibility
 
 The parent checkbox reports `'mixed'` when only some children are checked, and toggles all of them on press.

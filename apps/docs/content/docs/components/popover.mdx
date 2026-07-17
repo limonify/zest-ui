@@ -45,6 +45,12 @@ import { Popover } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/popover/root/PopoverRoot.tsx" name="PopoverRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **Popover.Positioner / Popup** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/popover/positioner/PopoverPositioner.tsx" name="PopoverPositionerState" />
+
 ## Accessibility
 
 The trigger carries `aria-haspopup`; the popup is labelled by `Popover.Title` and described by `Popover.Description`. Use a `handle` to open it from a detached trigger.
