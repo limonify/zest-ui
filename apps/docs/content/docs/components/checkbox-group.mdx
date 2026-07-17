@@ -1,0 +1,37 @@
+---
+title: Checkbox Group
+description: A group of checkboxes sharing one value array, with an optional parent.
+---
+
+`CheckboxGroup` shares one value array across several checkboxes, with an optional parent checkbox that reflects and toggles all its children.
+
+<Demo>A parent checkbox toggling three children.</Demo>
+
+## Anatomy
+
+<Anatomy code={`CheckboxGroup
+  Checkbox.Root (parent)
+  Checkbox.Root (child, value=…)`} />
+
+## Usage
+
+```tsx
+import { CheckboxGroup, Checkbox } from '@limonify/zest';
+
+<CheckboxGroup value={value} onValueChange={setValue} allValues={COLORS}>
+  <Checkbox.Root parent>{/* indicator */}</Checkbox.Root>
+  {COLORS.map((c) => (
+    <Checkbox.Root key={c} value={c}>{/* indicator */}</Checkbox.Root>
+  ))}
+</CheckboxGroup>
+```
+
+## API
+
+`Checkbox Group` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/checkbox-group/CheckboxGroup.tsx" name="CheckboxGroupProps" />
+
+## Accessibility
+
+The parent checkbox reports `'mixed'` when only some children are checked, and toggles all of them on press.

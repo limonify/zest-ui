@@ -1,0 +1,51 @@
+---
+title: Autocomplete
+description: A free-text input with a filtered suggestion list.
+---
+
+`Autocomplete` is a `Combobox` in free-text mode: the typed string **is** the value, and choosing a suggestion fills the input rather than selecting a bound value. It reuses every combobox part.
+
+<Demo>Filtering tag suggestions as you type.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Autocomplete.Root
+  Autocomplete.Input
+  Autocomplete.Portal
+    Autocomplete.Positioner
+      Autocomplete.Popup
+        Autocomplete.List > Autocomplete.Item`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Autocomplete } from '@limonify/zest';
+
+<Autocomplete.Root items={TAGS} inputValue={tag} onInputValueChange={setTag}>
+  <Autocomplete.Input placeholder="Add a tag" style={styles.input} />
+  <Autocomplete.Portal>
+    <Autocomplete.Positioner>
+      <Autocomplete.Popup style={styles.popup}>
+        <Autocomplete.List>
+          {(item) => (
+            <Autocomplete.Item key={String(item.value)} item={item} style={styles.item}>
+              <Text>{item.label}</Text>
+            </Autocomplete.Item>
+          )}
+        </Autocomplete.List>
+      </Autocomplete.Popup>
+    </Autocomplete.Positioner>
+  </Autocomplete.Portal>
+</Autocomplete.Root>
+```
+
+## API
+
+`Autocomplete` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/autocomplete/root/AutocompleteRoot.tsx" name="AutocompleteRootProps" />
+
+## Accessibility
+
+See [Combobox](/docs/components/combobox) for the single-select variant — they share every part below the root.

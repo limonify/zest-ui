@@ -1,0 +1,60 @@
+---
+title: Select
+description: A trigger that opens a list to choose one (or several) values.
+---
+
+`Select` shows the chosen label on a trigger and opens an anchored list to pick from. `items` lets `Select.Value` render a label before the popup has ever mounted; set `multiple` for multi-select.
+
+<Demo>Choosing a fruit, and a multi-select.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Select.Root
+  Select.Label
+  Select.Trigger > Select.Value / Select.Icon
+  Select.Portal
+    Select.Backdrop
+    Select.Positioner
+      Select.Popup
+        Select.List
+          Select.Group / Select.GroupLabel
+          Select.Item > Select.ItemText / Select.ItemIndicator`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Select } from '@limonify/zest';
+
+<Select.Root items={FRUITS} value={value} onValueChange={setValue}>
+  <Select.Trigger style={styles.trigger}>
+    <Select.Value>{(s) => s.label ?? 'Pick a fruit'}</Select.Value>
+    <Select.Icon><Text>▾</Text></Select.Icon>
+  </Select.Trigger>
+  <Select.Portal>
+    <Select.Backdrop style={styles.transparent} />
+    <Select.Positioner side="bottom" sideOffset={4}>
+      <Select.Popup style={styles.popup}>
+        <Select.List>
+          {FRUITS.map((f) => (
+            <Select.Item key={f.value} value={f.value} style={styles.item}>
+              <Select.ItemText>{f.label}</Select.ItemText>
+              <Select.ItemIndicator><Text>✓</Text></Select.ItemIndicator>
+            </Select.Item>
+          ))}
+        </Select.List>
+      </Select.Popup>
+    </Select.Positioner>
+  </Select.Portal>
+</Select.Root>
+```
+
+## API
+
+`Select` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/select/root/SelectRoot.tsx" name="SelectRootProps" />
+
+## Accessibility
+
+The trigger is `accessibilityRole="combobox"` with `aria-haspopup="listbox"`; items are `role="option"`. In `multiple` mode the popup stays open and `Select.Value` exposes `labels`.

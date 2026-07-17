@@ -1,0 +1,49 @@
+---
+title: Context Menu
+description: A menu opened by long-pressing an area, anchored to the touch point.
+---
+
+`ContextMenu` is a `Menu` opened by a **long press** instead of a tapped trigger, anchored to where your finger landed. It reuses every menu part.
+
+<Demo>Long-pressing a card to open a menu at the touch point.</Demo>
+
+## Anatomy
+
+<Anatomy code={`ContextMenu.Root
+  ContextMenu.Trigger
+  ContextMenu.Portal
+    ContextMenu.Backdrop
+    ContextMenu.Positioner
+      ContextMenu.Popup
+        ContextMenu.Item …`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { ContextMenu } from '@limonify/zest';
+
+<ContextMenu.Root>
+  <ContextMenu.Trigger style={styles.card}>
+    <Text>Long-press me</Text>
+  </ContextMenu.Trigger>
+  <ContextMenu.Portal>
+    <ContextMenu.Backdrop style={styles.transparent} />
+    <ContextMenu.Positioner>
+      <ContextMenu.Popup style={styles.popup}>
+        <ContextMenu.Item onPress={copy}><Text>Copy</Text></ContextMenu.Item>
+      </ContextMenu.Popup>
+    </ContextMenu.Positioner>
+  </ContextMenu.Portal>
+</ContextMenu.Root>
+```
+
+## API
+
+`Context Menu` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/context-menu/root/ContextMenuRoot.tsx" name="ContextMenuRootProps" />
+
+## Accessibility
+
+Upstream opens on right-click or long press; a touch screen only has the long press. Everything else matches `Menu`.

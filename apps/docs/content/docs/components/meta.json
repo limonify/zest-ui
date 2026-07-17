@@ -1,4 +1,18 @@
 {
   "title": "Components",
-  "pages": ["button", "dialog", "combobox"]
+  "pages": [
+    "---Buttons & Inputs---",
+    "button", "checkbox", "checkbox-group", "radio", "radio-group", "switch",
+    "toggle", "toggle-group", "slider", "number-field", "otp-field",
+    "field", "fieldset", "input",
+    "---Overlays---",
+    "dialog", "alert-dialog", "drawer", "popover", "tooltip", "menu",
+    "context-menu", "select", "combobox", "autocomplete",
+    "---Feedback & Status---",
+    "progress", "meter", "toast",
+    "---Disclosure & Navigation---",
+    "accordion", "collapsible", "tabs",
+    "---Media & Layout---",
+    "avatar", "separator"
+  ]
 }

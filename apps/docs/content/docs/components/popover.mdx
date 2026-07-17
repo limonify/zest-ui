@@ -1,0 +1,50 @@
+---
+title: Popover
+description: A non-modal overlay anchored to a trigger.
+---
+
+`Popover` floats content next to a trigger using `@floating-ui/react-native` for collision-aware placement. `Popover.Arrow` points at the anchor.
+
+<Demo>Opening a popover above and below its trigger.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Popover.Root
+  Popover.Trigger
+  Popover.Portal
+    Popover.Backdrop
+    Popover.Positioner
+      Popover.Popup
+        Popover.Arrow
+        Popover.Title
+        Popover.Description
+        Popover.Close`} />
+
+## Usage
+
+```tsx
+import { Popover } from '@limonify/zest';
+
+<Popover.Root>
+  <Popover.Trigger style={styles.button}>{/* … */}</Popover.Trigger>
+  <Popover.Portal>
+    <Popover.Backdrop style={styles.transparent} />
+    <Popover.Positioner side="bottom" align="center" sideOffset={8}>
+      <Popover.Popup style={styles.popup}>
+        <Popover.Arrow style={styles.arrow} />
+        <Popover.Title>Settings</Popover.Title>
+      </Popover.Popup>
+    </Popover.Positioner>
+  </Popover.Portal>
+</Popover.Root>
+```
+
+## API
+
+`Popover` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/popover/root/PopoverRoot.tsx" name="PopoverRootProps" />
+
+## Accessibility
+
+The trigger carries `aria-haspopup`; the popup is labelled by `Popover.Title` and described by `Popover.Description`. Use a `handle` to open it from a detached trigger.

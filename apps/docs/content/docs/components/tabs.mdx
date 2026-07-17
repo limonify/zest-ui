@@ -1,0 +1,49 @@
+---
+title: Tabs
+description: A tab set where each panel mounts only while active.
+---
+
+`Tabs` switches between panels. `Tabs.Indicator` publishes the active tab's measured position and size on state, so you can slide an underline.
+
+<Demo>Switching tabs with a sliding indicator.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Tabs.Root
+  Tabs.List
+    Tabs.Tab
+    Tabs.Indicator
+  Tabs.Panel`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Tabs } from '@limonify/zest';
+
+<Tabs.Root defaultValue="overview">
+  <Tabs.List style={styles.list}>
+    {tabs.map((t) => (
+      <Tabs.Tab key={t.value} value={t.value} style={styles.tab}>
+        <Text>{t.label}</Text>
+      </Tabs.Tab>
+    ))}
+    <Tabs.Indicator render={(props, s) => (
+      <Animated.View {...props} style={[styles.underline, { left: s.left, width: s.width }]} />
+    )} />
+  </Tabs.List>
+  {tabs.map((t) => (
+    <Tabs.Panel key={t.value} value={t.value}><Text>{t.body}</Text></Tabs.Panel>
+  ))}
+</Tabs.Root>
+```
+
+## API
+
+`Tabs` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/tabs/root/TabsRoot.tsx" name="TabsRootProps" />
+
+## Accessibility
+
+Tabs are `accessibilityRole="tab"`, panels `role="tabpanel"`. Item order is read from measured layout via `CompositeList`, so the indicator tracks the real visual order.

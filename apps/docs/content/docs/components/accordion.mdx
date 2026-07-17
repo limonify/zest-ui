@@ -1,0 +1,48 @@
+---
+title: Accordion
+description: A set of collapsible sections, one or many open at a time.
+---
+
+`Accordion` groups several collapsible items. Each `Accordion.Panel` publishes its measured height and `transitionStatus` on state so you drive the open/close animation.
+
+<Demo>Expanding accordion sections.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Accordion.Root
+  Accordion.Item
+    Accordion.Header
+      Accordion.Trigger
+    Accordion.Panel`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Accordion } from '@limonify/zest';
+
+<Accordion.Root defaultValue={['shipping']}>
+  {items.map((item) => (
+    <Accordion.Item key={item.value} value={item.value}>
+      <Accordion.Header>
+        <Accordion.Trigger render={(props, s) => (
+          <Pressable {...props}><Text>{item.title} {s.open ? '⌃' : '⌄'}</Text></Pressable>
+        )} />
+      </Accordion.Header>
+      <Accordion.Panel>
+        <Text>{item.body}</Text>
+      </Accordion.Panel>
+    </Accordion.Item>
+  ))}
+</Accordion.Root>
+```
+
+## API
+
+`Accordion` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/accordion/root/AccordionRoot.tsx" name="AccordionRootProps" />
+
+## Accessibility
+
+Set `openMultiple` to keep several open. See the [Reanimated guide](/docs/guides/animation-reanimated) for animating the panel; render only while open for a robust natural-height layout.

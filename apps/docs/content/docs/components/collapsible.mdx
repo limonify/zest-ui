@@ -1,0 +1,40 @@
+---
+title: Collapsible
+description: A single show/hide region.
+---
+
+`Collapsible` is one open/close disclosure. `Collapsible.Panel` publishes its measured height and `transitionStatus`; keep it mounted with `keepMounted` to animate the exit.
+
+<Demo>Toggling a details region.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Collapsible.Root
+  Collapsible.Trigger
+  Collapsible.Panel`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Collapsible } from '@limonify/zest';
+
+<Collapsible.Root defaultOpen>
+  <Collapsible.Trigger style={styles.button}>
+    <Text>Toggle details</Text>
+  </Collapsible.Trigger>
+  <Collapsible.Panel>
+    <Text>The panel content.</Text>
+  </Collapsible.Panel>
+</Collapsible.Root>
+```
+
+## API
+
+`Collapsible` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/collapsible/root/CollapsibleRoot.tsx" name="CollapsibleRootProps" />
+
+## Accessibility
+
+The trigger carries `aria-expanded`; the panel is hidden from assistive tech while closed. See the [Reanimated guide](/docs/guides/animation-reanimated) for the height animation.

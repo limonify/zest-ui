@@ -1,0 +1,44 @@
+---
+title: Slider
+description: A value or range selector driven by a drag gesture.
+---
+
+`Slider` is a value (or range) selector driven by a drag gesture. It needs `react-native-gesture-handler` and the app wrapped in `GestureHandlerRootView`.
+
+<Demo>Dragging a thumb, and a range slider.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Slider.Root
+  Slider.Label
+  Slider.Value
+  Slider.Control
+    Slider.Track
+      Slider.Indicator
+      Slider.Thumb`} />
+
+## Usage
+
+```tsx
+import { Slider } from '@limonify/zest';
+
+<Slider.Root defaultValue={40}>
+  <Slider.Value />
+  <Slider.Control style={styles.control}>
+    <Slider.Track style={styles.track}>
+      <Slider.Indicator style={styles.fill} />
+      <Slider.Thumb style={styles.thumb} />
+    </Slider.Track>
+  </Slider.Control>
+</Slider.Root>
+```
+
+## API
+
+`Slider` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/slider/root/SliderRoot.tsx" name="SliderRootProps" />
+
+## Accessibility
+
+Pass an array `value` for a range slider. Each `Slider.Thumb` is `accessibilityRole="adjustable"` and labelled by `Slider.Label`. Requires `react-native-gesture-handler`.

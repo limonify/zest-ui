@@ -1,0 +1,38 @@
+---
+title: Avatar
+description: An image with a fallback for when it fails or is loading.
+---
+
+`Avatar` shows an image and reveals a fallback when it can't load. `Avatar.Image` publishes its loading status on state.
+
+<Demo>An avatar falling back to initials.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Avatar.Root
+  Avatar.Image
+  Avatar.Fallback`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Avatar } from '@limonify/zest';
+
+<Avatar.Root style={styles.avatar}>
+  <Avatar.Image source={{ uri: user.avatar }} style={styles.image} />
+  <Avatar.Fallback style={styles.fallback}>
+    <Text>{user.initials}</Text>
+  </Avatar.Fallback>
+</Avatar.Root>
+```
+
+## API
+
+`Avatar` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/avatar/root/AvatarRoot.tsx" name="AvatarRootProps" />
+
+## Accessibility
+
+The fallback shows until the image reports `loaded`. React Native's `Image` fetches only once mounted, so the fallback is visible during loading by default.

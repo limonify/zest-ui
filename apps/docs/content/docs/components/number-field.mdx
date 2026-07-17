@@ -1,0 +1,42 @@
+---
+title: Number Field
+description: A numeric input with steppers and a scrub area.
+---
+
+`NumberField` is a numeric text input with increment/decrement buttons and a drag-to-scrub area, with locale-aware parsing and formatting.
+
+<Demo>Stepping and scrubbing a number.</Demo>
+
+## Anatomy
+
+<Anatomy code={`NumberField.Root
+  NumberField.Group
+    NumberField.Decrement
+    NumberField.Input
+    NumberField.Increment
+  NumberField.ScrubArea`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { NumberField } from '@limonify/zest';
+
+<NumberField.Root defaultValue={5} min={0} max={10}>
+  <NumberField.Group style={styles.group}>
+    <NumberField.Decrement><Text>−</Text></NumberField.Decrement>
+    <NumberField.Input style={styles.input} />
+    <NumberField.Increment><Text>+</Text></NumberField.Increment>
+  </NumberField.Group>
+</NumberField.Root>
+```
+
+## API
+
+`Number Field` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/number-field/root/NumberFieldRoot.tsx" name="NumberFieldRootProps" />
+
+## Accessibility
+
+The input is `accessibilityRole="spinbutton"` with `accessibilityValue`. Parsing/formatting is locale-aware via `format`/`locale`. Field-aware inside a `Field.Root`.

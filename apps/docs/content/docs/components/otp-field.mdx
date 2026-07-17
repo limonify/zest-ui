@@ -1,0 +1,35 @@
+---
+title: OTP Field
+description: A one-time-code input of single-character slots.
+---
+
+`OTPField` is a one-time-code input: a row of single-character slots backed by one hidden input.
+
+<Demo>Typing a 6-digit code.</Demo>
+
+## Anatomy
+
+<Anatomy code={`OTPField.Root
+  OTPField.Input (× length)`} />
+
+## Usage
+
+```tsx
+import { OTPField } from '@limonify/zest';
+
+<OTPField.Root length={6} onValueChange={setCode}>
+  {Array.from({ length: 6 }).map((_, i) => (
+    <OTPField.Input key={i} index={i} style={styles.slot} />
+  ))}
+</OTPField.Root>
+```
+
+## API
+
+`OTP Field` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/otp-field/root/OTPFieldRoot.tsx" name="OTPFieldRootProps" />
+
+## Accessibility
+
+Set `validationType` to restrict input (numeric/alphabetic). `mask` replaces the visible character while keeping the real value.

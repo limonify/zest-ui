@@ -1,0 +1,65 @@
+---
+title: Styling with Uniwind
+description: Use Tailwind classes on zest parts with Uniwind (and heroui-native).
+---
+
+zest is headless — it never styles anything and passes your `className` straight through, untouched.
+That means it drops cleanly into [Uniwind](https://www.uniwind.dev/) (Tailwind CSS for React Native),
+the styling engine behind [HeroUI Native](https://www.heroui.com/native).
+
+## className passes through
+
+Every zest part forwards `className` to its underlying React Native element without inspecting it, so
+Uniwind's Babel transform picks it up:
+
+```tsx
+import { Text } from 'react-native';
+import { Checkbox } from '@limonify/zest';
+
+<Checkbox.Root className="size-6 items-center justify-center rounded border border-neutral-300">
+  <Checkbox.Indicator>
+    <Text className="text-white">✓</Text>
+  </Checkbox.Indicator>
+</Checkbox.Root>
+```
+
+## State-driven classes
+
+Because `className` (like `style`) can be a function of the part's state, you can branch classes on
+`checked`, `pressed`, `disabled`, `open`, and the rest:
+
+```tsx
+<Checkbox.Root
+  className={(state) =>
+    [
+      'size-6 items-center justify-center rounded border',
+      state.checked ? 'border-lime-600 bg-lime-600' : 'border-neutral-300',
+      state.disabled && 'opacity-40',
+    ]
+      .filter(Boolean)
+      .join(' ')
+  }
+>
+  {/* ... */}
+</Checkbox.Root>
+```
+
+zest merges your `className` after its own internal props, so your classes always win.
+
+## With HeroUI Native
+
+HeroUI Native ships styled components on top of Uniwind. zest and HeroUI compose: use HeroUI's
+styled primitives *inside* a zest part's `render`, letting zest own behaviour while HeroUI owns the
+look.
+
+```tsx
+import { Button as HeroButton } from 'heroui-native';
+import { Dialog } from '@limonify/zest';
+
+<Dialog.Trigger render={(props) => <HeroButton {...props}>Open</HeroButton>} />
+```
+
+<Callout type="info">
+  Same principle for NativeWind or any `className`-based RN styling system — zest never touches the
+  prop, so whatever transform reads `className` just works.
+</Callout>

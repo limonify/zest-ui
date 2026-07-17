@@ -1,0 +1,42 @@
+---
+title: Progress
+description: A bar that tracks a task towards completion.
+---
+
+`Progress` shows determinate or indeterminate progress. It publishes `status` (`indeterminate | progressing | complete`) and the fill percentage on state; `value={null}` is indeterminate.
+
+<Demo>A determinate bar filling, and an indeterminate one.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Progress.Root
+  Progress.Label
+  Progress.Value
+  Progress.Track
+    Progress.Indicator`} />
+
+## Usage
+
+```tsx
+import { Progress } from '@limonify/zest';
+
+<Progress.Root value={value}>
+  <Progress.Label>Uploading</Progress.Label>
+  <Progress.Value />
+  <Progress.Track style={styles.track}>
+    <Progress.Indicator
+      style={(s) => [styles.fill, s.status === 'complete' && styles.done]}
+    />
+  </Progress.Track>
+</Progress.Root>
+```
+
+## API
+
+`Progress` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/progress/root/ProgressRoot.tsx" name="ProgressRootProps" />
+
+## Accessibility
+
+`accessibilityRole="progressbar"` with `accessibilityValue` (min/max/now/text). While indeterminate no width is applied — the appearance is yours (usually an animation).

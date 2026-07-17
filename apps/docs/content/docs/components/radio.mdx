@@ -1,0 +1,39 @@
+---
+title: Radio
+description: A single radio button; requires a RadioGroup.
+---
+
+`Radio` is a single choice within a `RadioGroup`. A standalone radio has no source of truth, so `Radio.Root` requires a group and throws without one.
+
+<Demo>Selecting one of three radios.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Radio.Root
+  Radio.Indicator`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { RadioGroup, Radio } from '@limonify/zest';
+
+<RadioGroup value={value} onValueChange={setValue}>
+  {options.map((o) => (
+    <Radio.Root key={o} value={o} style={styles.radio}>
+      <Radio.Indicator style={styles.dot} />
+      <Text>{o}</Text>
+    </Radio.Root>
+  ))}
+</RadioGroup>
+```
+
+## API
+
+`Radio` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/radio/root/RadioRoot.tsx" name="RadioRootProps" />
+
+## Accessibility
+
+`Radio.Root` is `accessibilityRole="radio"` with `accessibilityState.checked`. `Radio.Indicator` supports `keepMounted` + `transitionStatus` for exit animations.

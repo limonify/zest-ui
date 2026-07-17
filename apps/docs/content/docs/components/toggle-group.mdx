@@ -1,0 +1,34 @@
+---
+title: Toggle Group
+description: Single- or multiple-selection group of toggles.
+---
+
+`ToggleGroup` coordinates a set of toggles as a single- or multiple-selection control.
+
+<Demo>A single-select formatting group.</Demo>
+
+## Anatomy
+
+<Anatomy code={`ToggleGroup
+  Toggle`} />
+
+## Usage
+
+```tsx
+import { ToggleGroup, Toggle } from '@limonify/zest';
+
+<ToggleGroup value={value} onValueChange={setValue}>
+  <Toggle value="left">{/* … */}</Toggle>
+  <Toggle value="center">{/* … */}</Toggle>
+</ToggleGroup>
+```
+
+## API
+
+`Toggle Group` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/toggle-group/ToggleGroup.tsx" name="ToggleGroupProps" />
+
+## Accessibility
+
+Set `toggleMultiple` for multiple selection. The group has `role="group"`.

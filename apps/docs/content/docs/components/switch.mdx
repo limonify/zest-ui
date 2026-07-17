@@ -1,0 +1,37 @@
+---
+title: Switch
+description: An on/off toggle.
+---
+
+`Switch` is an on/off toggle rendering a `Pressable` with `accessibilityRole="switch"`.
+
+<Demo>Toggling a switch on and off.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Switch.Root
+  Switch.Thumb`} />
+
+## Usage
+
+```tsx
+import { Switch } from '@limonify/zest';
+
+<Switch.Root
+  checked={on}
+  onCheckedChange={setOn}
+  style={(state) => [styles.track, state.checked && styles.trackOn]}
+>
+  <Switch.Thumb style={(state) => [styles.thumb, state.checked && styles.thumbOn]} />
+</Switch.Root>
+```
+
+## API
+
+`Switch` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/switch/root/SwitchRoot.tsx" name="SwitchRootProps" />
+
+## Accessibility
+
+`accessibilityRole="switch"` with `accessibilityState.checked`. Field-aware inside a `Field.Root`.

@@ -1,0 +1,30 @@
+---
+title: Separator
+description: A visual and semantic divider.
+---
+
+`Separator` draws a divider between content, with the right accessibility role and orientation.
+
+<Demo>A horizontal and a vertical separator.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Separator`} />
+
+## Usage
+
+```tsx
+import { Separator } from '@limonify/zest';
+
+<Separator orientation="horizontal" style={styles.divider} />
+```
+
+## API
+
+`Separator` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/separator/Separator.tsx" name="SeparatorProps" />
+
+## Accessibility
+
+`accessibilityRole` maps to a separator; `orientation` sets `aria-orientation`.
