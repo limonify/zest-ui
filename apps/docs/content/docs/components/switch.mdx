@@ -14,6 +14,12 @@ description: An on/off toggle.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Switch } from '@limonify/zest';
 
@@ -25,6 +31,42 @@ import { Switch } from '@limonify/zest';
   <Switch.Thumb style={(state) => [styles.thumb, state.checked && styles.thumbOn]} />
 </Switch.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  track: { width: 48, height: 28, borderRadius: 14, backgroundColor: '#d4d4d4', padding: 2, justifyContent: 'center' },
+  trackOn: { backgroundColor: '#4c7a0b' },
+  thumb: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff' },
+  thumbOn: { transform: [{ translateX: 20 }] },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { clsx } from 'clsx';
+import { Switch } from '@limonify/zest';
+
+<Switch.Root
+  checked={on}
+  onCheckedChange={setOn}
+  className={(state) => clsx('h-7 w-12 justify-center rounded-full p-0.5', state.checked ? 'bg-lime-700' : 'bg-neutral-300')}
+>
+  <Switch.Thumb className={(state) => clsx('size-6 rounded-full bg-white', state.checked && 'translate-x-5')} />
+</Switch.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

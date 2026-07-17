@@ -14,13 +14,47 @@ description: Shared state for a set of radio buttons.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { RadioGroup, Radio } from '@limonify/zest';
 
-<RadioGroup defaultValue="md" onValueChange={setSize}>
+<RadioGroup defaultValue="md" onValueChange={setSize} style={styles.group}>
   {/* Radio.Root items */}
 </RadioGroup>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  group: { gap: 4 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { RadioGroup } from '@limonify/zest';
+
+<RadioGroup defaultValue="md" onValueChange={setSize} className="gap-1">
+  {/* Radio.Root items */}
+</RadioGroup>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

@@ -13,11 +13,43 @@ description: A standalone text input that integrates with Field.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Input } from '@limonify/zest';
 
 <Input placeholder="Search" value={q} onValueChange={setQ} style={styles.input} />
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  input: { borderWidth: 1, borderColor: '#d4d4d4', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 12, fontSize: 15 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Input } from '@limonify/zest';
+
+<Input placeholder="Search" value={q} onValueChange={setQ} className="rounded-lg border border-neutral-300 px-3 py-2.5 text-[15px]" />
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

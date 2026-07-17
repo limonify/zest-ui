@@ -14,19 +14,68 @@ description: A single radio button; requires a RadioGroup.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
-import { Text } from 'react-native';
+import { Text, View } from 'react-native';
 import { RadioGroup, Radio } from '@limonify/zest';
 
 <RadioGroup value={value} onValueChange={setValue}>
   {options.map((o) => (
-    <Radio.Root key={o} value={o} style={styles.radio}>
-      <Radio.Indicator style={styles.dot} />
+    <Radio.Root key={o} value={o} style={styles.row}>
+      <View style={styles.ring}>
+        <Radio.Indicator style={styles.dot} />
+      </View>
       <Text>{o}</Text>
     </Radio.Root>
   ))}
 </RadioGroup>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6 },
+  ring: {
+    width: 20, height: 20, borderRadius: 10, borderWidth: 1.5,
+    borderColor: '#cbcbcb', alignItems: 'center', justifyContent: 'center',
+  },
+  dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#4c7a0b' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text, View } from 'react-native';
+import { RadioGroup, Radio } from '@limonify/zest';
+
+<RadioGroup value={value} onValueChange={setValue}>
+  {options.map((o) => (
+    <Radio.Root key={o} value={o} className="flex-row items-center gap-2 py-1.5">
+      <View className="size-5 items-center justify-center rounded-full border-[1.5px] border-neutral-300">
+        <Radio.Indicator className="size-2.5 rounded-full bg-lime-700" />
+      </View>
+      <Text>{o}</Text>
+    </Radio.Root>
+  ))}
+</RadioGroup>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

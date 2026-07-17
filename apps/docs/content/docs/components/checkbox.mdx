@@ -14,31 +14,36 @@ description: A tri-state checkbox that tracks checked, indeterminate and disable
 
 ## Usage
 
-<Tabs items={['StyleSheet', 'Uniwind']}>
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
+```tsx
+import { Text, View } from 'react-native';
+import { Checkbox } from '@limonify/zest';
+
+<View style={styles.row}>
+  <Checkbox.Root
+    checked={checked}
+    onCheckedChange={setChecked}
+    style={(state) => [styles.box, state.checked && styles.boxChecked]}
+  >
+    <Checkbox.Indicator>
+      <Text style={styles.tick}>✓</Text>
+    </Checkbox.Indicator>
+  </Checkbox.Root>
+  <Text>I accept the terms</Text>
+</View>
+```
+
+</Tab>
 
 <Tab value="StyleSheet">
 
 ```tsx
-import { StyleSheet, Text, View } from 'react-native';
-import { Checkbox } from '@limonify/zest';
-
-function Terms() {
-  const [checked, setChecked] = useState(false);
-  return (
-    <View style={styles.row}>
-      <Checkbox.Root
-        checked={checked}
-        onCheckedChange={setChecked}
-        style={(state) => [styles.box, state.checked && styles.boxChecked]}
-      >
-        <Checkbox.Indicator>
-          <Text style={styles.tick}>✓</Text>
-        </Checkbox.Indicator>
-      </Checkbox.Root>
-      <Text>I accept the terms</Text>
-    </View>
-  );
-}
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 10 },
@@ -61,6 +66,7 @@ const styles = StyleSheet.create({
 <Tab value="Uniwind">
 
 ```tsx
+import { clsx } from 'clsx';
 import { Text, View } from 'react-native';
 import { Checkbox } from '@limonify/zest';
 
@@ -69,10 +75,10 @@ import { Checkbox } from '@limonify/zest';
     checked={checked}
     onCheckedChange={setChecked}
     className={(state) =>
-      [
-        'size-6 items-center justify-center rounded-md border-[1.5px]',
-        state.checked ? 'border-lime-700 bg-lime-700' : 'border-neutral-300',
-      ].join(' ')
+      clsx('size-6 items-center justify-center rounded-md border-[1.5px]', {
+        'border-lime-700 bg-lime-700': state.checked,
+        'border-neutral-300': !state.checked,
+      })
     }
   >
     <Checkbox.Indicator>
