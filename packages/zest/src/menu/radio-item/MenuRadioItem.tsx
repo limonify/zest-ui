@@ -20,12 +20,13 @@ import { MenuRadioItemContext } from './MenuRadioItemContext';
  * `Radio.Root`: with no group there is no source of truth and the item would be
  * silently inert.
  *
- * Unlike `Menu.Item`, `closeOnClick` defaults to `false`.
+ * Unlike `Menu.Item`, `closeOnPress` defaults to `false`.
  */
 export function MenuRadioItem<Value = any>(componentProps: MenuRadioItem.Props<Value>) {
   const {
     className,
-    closeOnClick = false,
+    closeOnClick: closeOnClickProp,
+    closeOnPress: closeOnPressProp,
     disabled: disabledProp = false,
     onPress: onPressProp,
     render,
@@ -34,6 +35,10 @@ export function MenuRadioItem<Value = any>(componentProps: MenuRadioItem.Props<V
     ref,
     ...elementProps
   } = componentProps;
+
+  // `closeOnPress` is the React Native name; `closeOnPress` is a deprecated
+  // alias kept for Base UI parity.
+  const closeOnPress = closeOnPressProp ?? closeOnClickProp ?? false;
 
   const store = useMenuRootContext();
   const submenuRootContext = useMenuSubmenuRootContext();
@@ -67,7 +72,7 @@ export function MenuRadioItem<Value = any>(componentProps: MenuRadioItem.Props<V
           group.setValue(value, event);
           onPressProp?.(event);
 
-          if (closeOnClick) {
+          if (closeOnPress) {
             store.setOpen(false, createChangeEventDetails(REASONS.itemPress, event));
             submenuRootContext?.closeAncestors(REASONS.itemPress, event);
           }
@@ -120,6 +125,10 @@ export interface MenuRadioItemProps<Value = any>
   /**
    * Whether to close the menu when the item is pressed.
    * @default false
+   */
+  closeOnPress?: boolean | undefined;
+  /**
+   * @deprecated Use `closeOnPress`. Kept as an alias for Base UI parity.
    */
   closeOnClick?: boolean | undefined;
 }

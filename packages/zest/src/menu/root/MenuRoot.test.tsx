@@ -25,7 +25,7 @@ function TestMenu(props: React.ComponentProps<typeof Menu.Root> & { onSelect?: (
               </Menu.Item>
             </Menu.Group>
             <Menu.Separator testID="separator" />
-            <Menu.Item testID="item-stay" closeOnClick={false}>
+            <Menu.Item testID="item-stay" closeOnPress={false}>
               <Text>Stay open</Text>
             </Menu.Item>
           </Menu.Popup>
@@ -62,12 +62,36 @@ describe('Menu', () => {
     expect(screen.queryByTestId('popup')).toBeNull();
   });
 
-  it('keeps the menu open when the item sets closeOnClick to false', async () => {
+  it('keeps the menu open when the item sets closeOnPress to false', async () => {
     const onOpenChange = jest.fn();
     await render(<TestMenu defaultOpen onOpenChange={onOpenChange} />);
 
     const user = userEvent.setup();
     await user.press(screen.getByTestId('item-stay'));
+
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.getByTestId('popup')).toBeTruthy();
+  });
+
+  it('still honours the deprecated closeOnClick alias', async () => {
+    const onOpenChange = jest.fn();
+    await render(
+      <Menu.Root defaultOpen onOpenChange={onOpenChange}>
+        <Menu.Portal>
+          <Menu.Positioner>
+            <Menu.Popup testID="popup">
+              {/* deprecated name — kept as an alias for Base UI parity */}
+              <Menu.Item testID="legacy" closeOnClick={false}>
+                <Text>Stay</Text>
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Portal>
+      </Menu.Root>,
+    );
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('legacy'));
 
     expect(onOpenChange).not.toHaveBeenCalled();
     expect(screen.getByTestId('popup')).toBeTruthy();

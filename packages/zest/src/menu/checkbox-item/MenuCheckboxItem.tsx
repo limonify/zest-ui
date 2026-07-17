@@ -17,14 +17,15 @@ import { MenuCheckboxItemContext } from './MenuCheckboxItemContext';
  * A menu item that toggles a setting on and off.
  * Renders a `<Pressable>`.
  *
- * Unlike `Menu.Item`, `closeOnClick` defaults to `false`: ticking a box is
+ * Unlike `Menu.Item`, `closeOnPress` defaults to `false`: ticking a box is
  * usually not the end of the interaction.
  */
 export function MenuCheckboxItem(componentProps: MenuCheckboxItem.Props) {
   const {
     checked: checkedProp,
     className,
-    closeOnClick = false,
+    closeOnClick: closeOnClickProp,
+    closeOnPress: closeOnPressProp,
     defaultChecked = false,
     disabled = false,
     onCheckedChange,
@@ -34,6 +35,10 @@ export function MenuCheckboxItem(componentProps: MenuCheckboxItem.Props) {
     ref,
     ...elementProps
   } = componentProps;
+
+  // `closeOnPress` is the React Native name; `closeOnPress` is a deprecated
+  // alias kept for Base UI parity.
+  const closeOnPress = closeOnPressProp ?? closeOnClickProp ?? false;
 
   const store = useMenuRootContext();
   const submenuRootContext = useMenuSubmenuRootContext();
@@ -79,7 +84,7 @@ export function MenuCheckboxItem(componentProps: MenuCheckboxItem.Props) {
           setCheckedState(nextChecked);
           onPressProp?.(event);
 
-          if (closeOnClick) {
+          if (closeOnPress) {
             store.setOpen(false, createChangeEventDetails(REASONS.itemPress, event));
             submenuRootContext?.closeAncestors(REASONS.itemPress, event);
           }
@@ -149,6 +154,10 @@ export interface MenuCheckboxItemProps
   /**
    * Whether to close the menu when the item is pressed.
    * @default false
+   */
+  closeOnPress?: boolean | undefined;
+  /**
+   * @deprecated Use `closeOnPress`. Kept as an alias for Base UI parity.
    */
   closeOnClick?: boolean | undefined;
 }
