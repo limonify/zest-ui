@@ -17,25 +17,84 @@ description: A set of collapsible sections, one or many open at a time.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
-import { Text } from 'react-native';
+import { Pressable, Text } from 'react-native';
 import { Accordion } from '@limonify/zest';
 
 <Accordion.Root defaultValue={['shipping']}>
   {items.map((item) => (
-    <Accordion.Item key={item.value} value={item.value}>
+    <Accordion.Item key={item.value} value={item.value} style={styles.item}>
       <Accordion.Header>
-        <Accordion.Trigger render={(props, s) => (
-          <Pressable {...props}><Text>{item.title} {s.open ? '⌃' : '⌄'}</Text></Pressable>
-        )} />
+        <Accordion.Trigger
+          render={(props, s) => (
+            <Pressable {...props} style={styles.trigger}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text>{s.open ? '⌃' : '⌄'}</Text>
+            </Pressable>
+          )}
+        />
       </Accordion.Header>
       <Accordion.Panel>
-        <Text>{item.body}</Text>
+        <Text style={styles.body}>{item.body}</Text>
       </Accordion.Panel>
     </Accordion.Item>
   ))}
 </Accordion.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  item: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#e5e5e5' },
+  trigger: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14 },
+  title: { fontSize: 16, fontWeight: '600' },
+  body: { paddingBottom: 14, color: '#444' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Pressable, Text } from 'react-native';
+import { Accordion } from '@limonify/zest';
+
+<Accordion.Root defaultValue={['shipping']}>
+  {items.map((item) => (
+    <Accordion.Item key={item.value} value={item.value} className="border-b border-neutral-200">
+      <Accordion.Header>
+        <Accordion.Trigger
+          render={(props, s) => (
+            <Pressable {...props} className="flex-row items-center justify-between py-3.5">
+              <Text className="text-base font-semibold">{item.title}</Text>
+              <Text>{s.open ? '⌃' : '⌄'}</Text>
+            </Pressable>
+          )}
+        />
+      </Accordion.Header>
+      <Accordion.Panel>
+        <Text className="pb-3.5 text-neutral-600">{item.body}</Text>
+      </Accordion.Panel>
+    </Accordion.Item>
+  ))}
+</Accordion.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

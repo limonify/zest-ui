@@ -18,12 +18,18 @@ description: A short hint anchored to a trigger, opened on press.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { Tooltip } from '@limonify/zest';
 
 <Tooltip.Root>
-  <Tooltip.Trigger style={styles.iconButton}>{/* … */}</Tooltip.Trigger>
+  <Tooltip.Trigger style={styles.iconButton}><Text>?</Text></Tooltip.Trigger>
   <Tooltip.Portal>
     <Tooltip.Positioner side="top" sideOffset={6}>
       <Tooltip.Popup style={styles.tip}>
@@ -34,6 +40,46 @@ import { Tooltip } from '@limonify/zest';
   </Tooltip.Portal>
 </Tooltip.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  iconButton: { width: 36, height: 36, borderRadius: 8, borderWidth: 1, borderColor: '#e5e5e5', alignItems: 'center', justifyContent: 'center' },
+  tip: { backgroundColor: '#1c1c1e', borderRadius: 8, paddingVertical: 6, paddingHorizontal: 10 },
+  arrow: { width: 8, height: 8, backgroundColor: '#1c1c1e', transform: [{ rotate: '45deg' }] },
+  tipText: { color: '#fff', fontSize: 13 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { Tooltip } from '@limonify/zest';
+
+<Tooltip.Root>
+  <Tooltip.Trigger className="size-9 items-center justify-center rounded-lg border border-neutral-200"><Text>?</Text></Tooltip.Trigger>
+  <Tooltip.Portal>
+    <Tooltip.Positioner side="top" sideOffset={6}>
+      <Tooltip.Popup className="rounded-lg bg-neutral-900 px-2.5 py-1.5">
+        <Tooltip.Arrow className="size-2 rotate-45 bg-neutral-900" />
+        <Text className="text-[13px] text-white">Copy link</Text>
+      </Tooltip.Popup>
+    </Tooltip.Positioner>
+  </Tooltip.Portal>
+</Tooltip.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

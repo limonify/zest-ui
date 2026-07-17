@@ -18,18 +18,59 @@ description: A numeric input with steppers and a scrub area.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { NumberField } from '@limonify/zest';
 
 <NumberField.Root defaultValue={5} min={0} max={10}>
   <NumberField.Group style={styles.group}>
-    <NumberField.Decrement><Text>−</Text></NumberField.Decrement>
+    <NumberField.Decrement style={styles.step}><Text>−</Text></NumberField.Decrement>
     <NumberField.Input style={styles.input} />
-    <NumberField.Increment><Text>+</Text></NumberField.Increment>
+    <NumberField.Increment style={styles.step}><Text>+</Text></NumberField.Increment>
   </NumberField.Group>
 </NumberField.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  group: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#d4d4d4', borderRadius: 10, overflow: 'hidden' },
+  step: { paddingHorizontal: 14, paddingVertical: 10, backgroundColor: '#f5f5f5' },
+  input: { minWidth: 64, textAlign: 'center', paddingVertical: 10 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { NumberField } from '@limonify/zest';
+
+<NumberField.Root defaultValue={5} min={0} max={10}>
+  <NumberField.Group className="flex-row items-center overflow-hidden rounded-lg border border-neutral-300">
+    <NumberField.Decrement className="bg-neutral-100 px-3.5 py-2.5"><Text>−</Text></NumberField.Decrement>
+    <NumberField.Input className="min-w-16 py-2.5 text-center" />
+    <NumberField.Increment className="bg-neutral-100 px-3.5 py-2.5"><Text>+</Text></NumberField.Increment>
+  </NumberField.Group>
+</NumberField.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

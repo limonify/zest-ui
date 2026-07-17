@@ -17,19 +17,59 @@ description: A bar that tracks a task towards completion.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Progress } from '@limonify/zest';
 
 <Progress.Root value={value}>
-  <Progress.Label>Uploading</Progress.Label>
-  <Progress.Value />
+  <Progress.Label style={styles.label}>Uploading</Progress.Label>
+  <Progress.Value style={styles.label} />
   <Progress.Track style={styles.track}>
-    <Progress.Indicator
-      style={(s) => [styles.fill, s.status === 'complete' && styles.done]}
-    />
+    <Progress.Indicator style={(s) => [styles.fill, s.status === 'complete' && styles.done]} />
   </Progress.Track>
 </Progress.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  label: { color: '#666', marginBottom: 6 },
+  track: { height: 8, borderRadius: 4, backgroundColor: '#e5e5e5', overflow: 'hidden' },
+  fill: { height: 8, backgroundColor: '#4c7a0b' },
+  done: { backgroundColor: '#16a34a' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { clsx } from 'clsx';
+import { Progress } from '@limonify/zest';
+
+<Progress.Root value={value}>
+  <Progress.Label className="mb-1.5 text-neutral-500">Uploading</Progress.Label>
+  <Progress.Value className="text-neutral-500" />
+  <Progress.Track className="h-2 overflow-hidden rounded-full bg-neutral-200">
+    <Progress.Indicator className={(s) => clsx('h-2', s.status === 'complete' ? 'bg-green-600' : 'bg-lime-700')} />
+  </Progress.Track>
+</Progress.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

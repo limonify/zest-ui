@@ -19,11 +19,17 @@ description: A value or range selector driven by a drag gesture.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Slider } from '@limonify/zest';
 
 <Slider.Root defaultValue={40}>
-  <Slider.Value />
+  <Slider.Value style={styles.value} />
   <Slider.Control style={styles.control}>
     <Slider.Track style={styles.track}>
       <Slider.Indicator style={styles.fill} />
@@ -32,6 +38,44 @@ import { Slider } from '@limonify/zest';
   </Slider.Control>
 </Slider.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  value: { marginBottom: 8, color: '#666' },
+  control: { height: 44, justifyContent: 'center' },
+  track: { height: 4, borderRadius: 2, backgroundColor: '#e5e5e5', justifyContent: 'center' },
+  fill: { height: 4, borderRadius: 2, backgroundColor: '#4c7a0b' },
+  thumb: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#fff', borderWidth: 1, borderColor: '#ccc', marginLeft: -11, top: -9 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Slider } from '@limonify/zest';
+
+<Slider.Root defaultValue={40}>
+  <Slider.Value className="mb-2 text-neutral-500" />
+  <Slider.Control className="h-11 justify-center">
+    <Slider.Track className="h-1 justify-center rounded-full bg-neutral-200">
+      <Slider.Indicator className="h-1 rounded-full bg-lime-700" />
+      <Slider.Thumb className="-ml-[11px] -top-[9px] size-[22px] rounded-full border border-neutral-300 bg-white" />
+    </Slider.Track>
+  </Slider.Control>
+</Slider.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 
