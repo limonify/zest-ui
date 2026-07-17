@@ -1,0 +1,30 @@
+{
+  "name": "docs",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "postinstall": "fumadocs-mdx"
+  },
+  "dependencies": {
+    "next": "^16.2.10",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "fumadocs-ui": "^16.11.5",
+    "fumadocs-core": "^16.11.5",
+    "fumadocs-mdx": "^15.2.0",
+    "fumadocs-typescript": "^5.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/mdx": "^2.0.13",
+    "typescript": "~6.0.3",
+    "tailwindcss": "^4.1.0",
+    "@tailwindcss/postcss": "^4.1.0",
+    "postcss": "^8.4.0"
+  }
+}

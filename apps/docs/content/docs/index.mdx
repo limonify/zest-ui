@@ -1,0 +1,31 @@
+---
+title: Introduction
+description: Headless, accessible React Native primitives — a faithful port of MUI Base UI.
+---
+
+**zest** (`@limonify/zest`) is a headless component library for React Native: behaviour,
+state and accessibility with **zero styling**. It is a faithful port of [MUI Base UI](https://base-ui.com),
+keeping the real part names — `Dialog.Popup` and `Dialog.Backdrop`, never Radix's `Content`/`Overlay`.
+
+## Why headless
+
+Every part renders a plain React Native primitive (`View`, `Pressable`, `Text`, `TextInput`) and
+takes your `style`. State reaches your styles through a function:
+
+```tsx
+<Checkbox.Root
+  style={(state) => [styles.box, state.checked && styles.boxChecked]}
+>
+  <Checkbox.Indicator>
+    <Text>✓</Text>
+  </Checkbox.Indicator>
+</Checkbox.Root>
+```
+
+No theme, no CSS-in-JS, no animation library. You own the look; zest owns the behaviour.
+
+## What's inside
+
+32 components across forms, overlays, feedback and disclosure — everything in Base UI that has
+meaning on a touch screen. Start with [Installation](/docs/installation), then browse the
+[components](/docs/components/dialog).

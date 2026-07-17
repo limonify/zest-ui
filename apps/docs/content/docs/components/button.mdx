@@ -1,0 +1,50 @@
+---
+title: Button
+description: A pressable that tracks its own pressed and disabled state.
+---
+
+`Button` renders a `Pressable` with `accessibilityRole="button"` and exposes `pressed`/`disabled`
+on its state, so you can style each visually without tracking press state yourself.
+
+<Demo>An enabled and a disabled button.</Demo>
+
+## Anatomy
+
+Button is a single part.
+
+<Anatomy code={`Button`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Button } from '@limonify/zest';
+
+<Button
+  onPress={() => save()}
+  style={(state) => [
+    styles.button,
+    state.pressed && styles.buttonPressed,
+    state.disabled && styles.buttonDisabled,
+  ]}
+>
+  <Text style={styles.buttonText}>Save</Text>
+</Button>
+```
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | Ignore user interaction and expose `disabled` on state. |
+| `onPress` | `(event) => void` | — | Called when the button is pressed. |
+
+Every part also accepts the [common props](/docs/philosophy) — `style` (a value or a function of
+state), `render`, and `ref`.
+
+### State
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `pressed` | `boolean` | Whether the button is currently pressed. |
+| `disabled` | `boolean` | Whether the button is disabled. |

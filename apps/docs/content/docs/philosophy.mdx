@@ -1,0 +1,26 @@
+---
+title: Philosophy
+description: How zest adapts Base UI's web patterns to React Native.
+---
+
+## Portals are Modals
+
+Every `Portal` part (Dialog, Drawer, Popover, Tooltip, Menu, Select, Combobox) is a React Native
+`Modal`. A Modal keeps its children in the same React tree, so context survives the portal
+boundary, and it brings focus containment and an Android back-button handler for free.
+
+**Toast is the one exception** — it must not block the app underneath, so it is an absolutely
+positioned `View` with `pointerEvents="box-none"`, not a Modal.
+
+## The animation contract
+
+zest never animates. Animated parts publish their `transitionStatus` and measured geometry
+(height/width, positions) on the **state object** — the counterpart of Base UI's CSS variables —
+and you drive an `Animated` value from `style={(state) => ...}`. Because nothing in React Native can
+report that a closing animation finished, exit animations require `keepMounted`.
+
+## Accessibility
+
+Roles and states map to React Native's model: `accessibilityRole`, `accessibilityState`,
+`accessibilityLabelledBy`, `accessibilityValue`. The web `aria-*` props are kept too, so the same
+components work under React Native for Web.

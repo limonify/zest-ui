@@ -1,0 +1,33 @@
+---
+title: Installation
+description: Add zest to an Expo or bare React Native app.
+---
+
+## Install
+
+```bash
+bun add @limonify/zest
+# or: npm install @limonify/zest
+```
+
+### Peer dependencies
+
+zest needs React 19+ and React Native 0.79+. Two components — `Slider` and `Drawer` — use
+`react-native-gesture-handler` (an **optional** peer). Install it only if you use them:
+
+```bash
+bun add react-native-gesture-handler
+```
+
+Wrap your app once in `GestureHandlerRootView`:
+
+```tsx
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+export default function App() {
+  return <GestureHandlerRootView style={{ flex: 1 }}>{/* ... */}</GestureHandlerRootView>;
+}
+```
+
+Anchored popups (`Popover`, `Tooltip`, `Menu`, `Select`, `Combobox`) use
+`@floating-ui/react-native`, which ships as a regular dependency — nothing to install.
