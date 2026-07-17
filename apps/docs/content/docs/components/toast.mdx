@@ -41,6 +41,12 @@ add({ title: 'Saved', description: 'Your changes are safe.' });
 
 <AutoType path="../../packages/zest/src/toast/root/ToastRoot.tsx" name="ToastRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **Toast.Root** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/toast/root/ToastRoot.tsx" name="ToastRootState" />
+
 ## Accessibility
 
 The viewport uses `pointerEvents="box-none"` so touches pass through to the app; only the toasts are interactive. `accessibilityLiveRegion="polite"` announces new toasts.

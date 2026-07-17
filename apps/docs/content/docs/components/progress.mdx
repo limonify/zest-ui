@@ -37,6 +37,12 @@ import { Progress } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/progress/root/ProgressRoot.tsx" name="ProgressRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **every Progress part** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/progress/root/ProgressRoot.tsx" name="ProgressRootState" />
+
 ## Accessibility
 
 `accessibilityRole="progressbar"` with `accessibilityValue` (min/max/now/text). While indeterminate no width is applied — the appearance is yours (usually an animation).

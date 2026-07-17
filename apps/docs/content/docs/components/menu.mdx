@@ -53,6 +53,12 @@ import { Menu } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/menu/root/MenuRoot.tsx" name="MenuRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **Menu.Popup** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/menu/popup/MenuPopup.tsx" name="MenuPopupState" />
+
 ## Accessibility
 
 Each menu level is its own `Modal`, so **every level that should dismiss on an outside tap needs its own `Menu.Backdrop`**. Items close the menu on press by default (`closeOnClick`).

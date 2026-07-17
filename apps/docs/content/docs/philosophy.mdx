@@ -12,6 +12,28 @@ boundary, and it brings focus containment and an Android back-button handler for
 **Toast is the one exception** — it must not block the app underneath, so it is an absolutely
 positioned `View` with `pointerEvents="box-none"`, not a Modal.
 
+## State, not data attributes
+
+On the web, Base UI publishes each part's state as `data-*` attributes (`data-open`, `data-checked`,
+`data-disabled`) and CSS variables, which you target from CSS. React Native has neither, so **state
+reaches you through the state object instead** — the direct counterpart of those attributes.
+
+Every part accepts `style` and `className` as a **function of its state**, and a `render` prop that
+receives `(props, state)`:
+
+```tsx
+// Web (Base UI):        [data-checked] { background: … }
+// React Native (zest):
+<Checkbox.Root style={(state) => [styles.box, state.checked && styles.boxChecked]}>
+```
+
+So `data-open` becomes `state.open`, `data-checked` becomes `state.checked`, and a CSS variable like
+`--collapsible-panel-height` becomes `state.height`. Each component page lists the exact state fields
+its parts expose, under **State**.
+
+The `aria-*` props are still set on every part (alongside the native `accessibility*` props), so the
+same components also work under React Native for Web.
+
 ## The animation contract
 
 zest never animates. Animated parts publish their `transitionStatus` and measured geometry

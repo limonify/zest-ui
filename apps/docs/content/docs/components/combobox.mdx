@@ -69,6 +69,12 @@ through a render function, so you control each row.
 | `openOnFocus` | `boolean` | `true` | Open the list when the input is focused. |
 | `filter` | `(item, query) => boolean` | label match | Custom filter predicate. |
 
+## State
+
+These fields reach your `style` and `render` functions on **Combobox.Input** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
+
 ## Accessibility
 
 The input is `accessibilityRole="search"` with `aria-expanded` and `aria-autocomplete="list"`; each

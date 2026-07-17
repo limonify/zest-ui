@@ -1,18 +1,11 @@
 {
   "title": "Components",
   "pages": [
-    "---Buttons & Inputs---",
-    "button", "checkbox", "checkbox-group", "radio", "radio-group", "switch",
-    "toggle", "toggle-group", "slider", "number-field", "otp-field",
-    "field", "fieldset", "input",
-    "---Overlays---",
-    "dialog", "alert-dialog", "drawer", "popover", "tooltip", "menu",
-    "context-menu", "select", "combobox", "autocomplete",
-    "---Feedback & Status---",
-    "progress", "meter", "toast",
-    "---Disclosure & Navigation---",
-    "accordion", "collapsible", "tabs",
-    "---Media & Layout---",
-    "avatar", "separator"
+    "accordion", "alert-dialog", "autocomplete", "avatar", "button",
+    "checkbox", "checkbox-group", "collapsible", "combobox", "context-menu",
+    "dialog", "drawer", "field", "fieldset", "input", "menu", "meter",
+    "number-field", "otp-field", "popover", "progress", "radio", "radio-group",
+    "select", "separator", "slider", "switch", "tabs", "toast", "toggle",
+    "toggle-group", "tooltip"
   ]
 }

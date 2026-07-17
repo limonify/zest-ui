@@ -33,6 +33,12 @@ import { Avatar } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/avatar/root/AvatarRoot.tsx" name="AvatarRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **Avatar.Image** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/avatar/image/AvatarImage.tsx" name="AvatarImageState" />
+
 ## Accessibility
 
 The fallback shows until the image reports `loaded`. React Native's `Image` fetches only once mounted, so the fallback is visible during loading by default.

@@ -44,6 +44,12 @@ import { Tabs } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/tabs/root/TabsRoot.tsx" name="TabsRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **Tabs.Tab** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/tabs/tab/TabsTab.tsx" name="TabsTabState" />
+
 ## Accessibility
 
 Tabs are `accessibilityRole="tab"`, panels `role="tabpanel"`. Item order is read from measured layout via `CompositeList`, so the indicator tracks the real visual order.

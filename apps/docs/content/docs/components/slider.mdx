@@ -39,6 +39,12 @@ import { Slider } from '@limonify/zest';
 
 <AutoType path="../../packages/zest/src/slider/root/SliderRoot.tsx" name="SliderRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **every Slider part** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest/src/slider/root/SliderRoot.tsx" name="SliderRootState" />
+
 ## Accessibility
 
 Pass an array `value` for a range slider. Each `Slider.Thumb` is `accessibilityRole="adjustable"` and labelled by `Slider.Label`. Requires `react-native-gesture-handler`.
