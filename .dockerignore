@@ -1,0 +1,10 @@
+**/node_modules
+**/.next
+**/.source
+**/.turbo
+**/out
+**/lib
+.git
+.github
+.vscode
+**/*.log
