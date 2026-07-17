@@ -18,6 +18,12 @@ description: A free-text input with a filtered suggestion list.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { Autocomplete } from '@limonify/zest';
@@ -39,6 +45,50 @@ import { Autocomplete } from '@limonify/zest';
   </Autocomplete.Portal>
 </Autocomplete.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  input: { borderWidth: 1, borderColor: '#d4d4d4', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 12 },
+  popup: { maxHeight: 240, backgroundColor: '#fff', borderRadius: 12, padding: 6, marginTop: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: '#e5e5e5' },
+  item: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { Autocomplete } from '@limonify/zest';
+
+<Autocomplete.Root items={TAGS} inputValue={tag} onInputValueChange={setTag}>
+  <Autocomplete.Input placeholder="Add a tag" className="rounded-lg border border-neutral-300 px-3 py-2.5" />
+  <Autocomplete.Portal>
+    <Autocomplete.Positioner>
+      <Autocomplete.Popup className="mt-1 max-h-60 rounded-xl border border-neutral-200 bg-white p-1.5">
+        <Autocomplete.List>
+          {(item) => (
+            <Autocomplete.Item key={String(item.value)} item={item} className="rounded-lg px-3 py-2.5">
+              <Text>{item.label}</Text>
+            </Autocomplete.Item>
+          )}
+        </Autocomplete.List>
+      </Autocomplete.Popup>
+    </Autocomplete.Positioner>
+  </Autocomplete.Portal>
+</Autocomplete.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

@@ -19,24 +19,70 @@ description: A menu opened by long-pressing an area, anchored to the touch point
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { ContextMenu } from '@limonify/zest';
 
 <ContextMenu.Root>
-  <ContextMenu.Trigger style={styles.card}>
-    <Text>Long-press me</Text>
-  </ContextMenu.Trigger>
+  <ContextMenu.Trigger style={styles.card}><Text>Long-press me</Text></ContextMenu.Trigger>
   <ContextMenu.Portal>
     <ContextMenu.Backdrop style={styles.transparent} />
     <ContextMenu.Positioner>
       <ContextMenu.Popup style={styles.popup}>
-        <ContextMenu.Item onPress={copy}><Text>Copy</Text></ContextMenu.Item>
+        <ContextMenu.Item onPress={copy} style={styles.item}><Text>Copy</Text></ContextMenu.Item>
+        <ContextMenu.Item onPress={remove} style={styles.item}><Text style={styles.danger}>Delete</Text></ContextMenu.Item>
       </ContextMenu.Popup>
     </ContextMenu.Positioner>
   </ContextMenu.Portal>
 </ContextMenu.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  card: { borderWidth: StyleSheet.hairlineWidth, borderColor: '#ccc', borderStyle: 'dashed', borderRadius: 12, paddingVertical: 32, alignItems: 'center', backgroundColor: '#f5f5f5' },
+  transparent: { backgroundColor: 'transparent' },
+  popup: { backgroundColor: '#fff', borderRadius: 12, padding: 6, minWidth: 180, borderWidth: StyleSheet.hairlineWidth, borderColor: '#e5e5e5' },
+  item: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8 },
+  danger: { color: '#dc2626' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { ContextMenu } from '@limonify/zest';
+
+<ContextMenu.Root>
+  <ContextMenu.Trigger className="items-center rounded-xl border border-dashed border-neutral-300 bg-neutral-100 py-8"><Text>Long-press me</Text></ContextMenu.Trigger>
+  <ContextMenu.Portal>
+    <ContextMenu.Backdrop className="bg-transparent" />
+    <ContextMenu.Positioner>
+      <ContextMenu.Popup className="min-w-44 rounded-xl border border-neutral-200 bg-white p-1.5">
+        <ContextMenu.Item onPress={copy} className="rounded-lg px-3 py-2.5"><Text>Copy</Text></ContextMenu.Item>
+      </ContextMenu.Popup>
+    </ContextMenu.Positioner>
+  </ContextMenu.Portal>
+</ContextMenu.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

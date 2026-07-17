@@ -18,16 +18,64 @@ description: Labels, describes and validates a text input.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Field } from '@limonify/zest';
 
 <Field.Root validate={(v) => (isEmail(v) ? null : 'Enter a valid email')}>
-  <Field.Label>Email</Field.Label>
-  <Field.Control style={(s) => [styles.input, s.valid === false && styles.invalid]} />
-  <Field.Description>We only use it to sign you in.</Field.Description>
-  <Field.Error />
+  <Field.Label style={styles.label}>Email</Field.Label>
+  <Field.Control
+    placeholder="you@example.com"
+    style={(s) => [styles.input, s.valid === false && styles.invalid]}
+  />
+  <Field.Description style={styles.desc}>We only use it to sign you in.</Field.Description>
+  <Field.Error style={styles.error} />
 </Field.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  label: { fontWeight: '600', marginBottom: 6 },
+  input: { borderWidth: 1, borderColor: '#d4d4d4', borderRadius: 10, padding: 12 },
+  invalid: { borderColor: '#dc2626' },
+  desc: { color: '#8a8a8a', fontSize: 12, marginTop: 4 },
+  error: { color: '#dc2626', fontSize: 12, marginTop: 4 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { clsx } from 'clsx';
+import { Field } from '@limonify/zest';
+
+<Field.Root validate={(v) => (isEmail(v) ? null : 'Enter a valid email')} className="gap-1">
+  <Field.Label className="font-semibold">Email</Field.Label>
+  <Field.Control
+    placeholder="you@example.com"
+    className={(s) => clsx('rounded-lg border p-3', s.valid === false ? 'border-red-600' : 'border-neutral-300')}
+  />
+  <Field.Description className="text-xs text-neutral-400">We only use it to sign you in.</Field.Description>
+  <Field.Error className="text-xs text-red-600" />
+</Field.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

@@ -13,11 +13,43 @@ description: A visual and semantic divider.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Separator } from '@limonify/zest';
 
 <Separator orientation="horizontal" style={styles.divider} />
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  divider: { height: StyleSheet.hairlineWidth, backgroundColor: '#e5e5e5', marginVertical: 12 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Separator } from '@limonify/zest';
+
+<Separator orientation="horizontal" className="my-3 h-px bg-neutral-200" />
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

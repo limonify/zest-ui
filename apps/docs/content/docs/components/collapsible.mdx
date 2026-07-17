@@ -15,19 +15,62 @@ description: A single show/hide region.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { Collapsible } from '@limonify/zest';
 
 <Collapsible.Root defaultOpen>
-  <Collapsible.Trigger style={styles.button}>
-    <Text>Toggle details</Text>
+  <Collapsible.Trigger style={styles.trigger}>
+    <Text style={styles.triggerText}>Toggle details</Text>
   </Collapsible.Trigger>
+  {/* Rendered only while open, so it lays out at its natural height. */}
   <Collapsible.Panel>
-    <Text>The panel content.</Text>
+    <Text style={styles.body}>The panel content.</Text>
   </Collapsible.Panel>
 </Collapsible.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  trigger: { backgroundColor: '#171717', borderRadius: 10, padding: 12, alignSelf: 'flex-start' },
+  triggerText: { color: '#fff', fontWeight: '600' },
+  body: { paddingVertical: 12, color: '#444' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { Collapsible } from '@limonify/zest';
+
+<Collapsible.Root defaultOpen>
+  <Collapsible.Trigger className="self-start rounded-lg bg-neutral-900 p-3">
+    <Text className="font-semibold text-white">Toggle details</Text>
+  </Collapsible.Trigger>
+  <Collapsible.Panel>
+    <Text className="py-3 text-neutral-600">The panel content.</Text>
+  </Collapsible.Panel>
+</Collapsible.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

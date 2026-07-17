@@ -14,15 +14,57 @@ description: A one-time-code input of single-character slots.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { OTPField } from '@limonify/zest';
 
 <OTPField.Root length={6} onValueChange={setCode}>
   {Array.from({ length: 6 }).map((_, i) => (
-    <OTPField.Input key={i} index={i} style={styles.slot} />
+    <OTPField.Input key={i} index={i} style={(s) => [styles.slot, s.focused && styles.slotFocused]} />
   ))}
 </OTPField.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  slot: { width: 44, height: 52, borderWidth: 1, borderColor: '#d4d4d4', borderRadius: 10, textAlign: 'center', fontSize: 20 },
+  slotFocused: { borderColor: '#4c7a0b' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { clsx } from 'clsx';
+import { OTPField } from '@limonify/zest';
+
+<OTPField.Root length={6} onValueChange={setCode}>
+  {Array.from({ length: 6 }).map((_, i) => (
+    <OTPField.Input
+      key={i}
+      index={i}
+      className={(s) => clsx('h-13 w-11 rounded-lg border text-center text-xl', s.focused ? 'border-lime-700' : 'border-neutral-300')}
+    />
+  ))}
+</OTPField.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

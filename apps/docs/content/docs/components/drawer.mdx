@@ -21,23 +21,72 @@ description: A dialog that also opens and dismisses by swiping, with snap points
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
+import { Text } from 'react-native';
 import { Drawer } from '@limonify/zest';
 
-<Drawer.Root swipeDirection="down" snapPoints={[0.4, 0.9]}>
-  <Drawer.Trigger style={styles.button}>{/* … */}</Drawer.Trigger>
+<Drawer.Root swipeDirection="down">
+  <Drawer.Trigger style={styles.button}><Text style={styles.buttonText}>Open</Text></Drawer.Trigger>
   <Drawer.Portal>
     <Drawer.Backdrop style={styles.backdrop} />
-    <Drawer.Viewport style={styles.bottom}>
-      <Drawer.Popup
-        style={(state) => [styles.sheet, { transform: [{ translateY: state.swipeMovement }] }]}
-      >
-        {/* … */}
+    <Drawer.Viewport style={styles.viewport}>
+      <Drawer.Popup style={(s) => [styles.sheet, { transform: [{ translateY: s.swipeMovement }] }]}>
+        <Drawer.Title style={styles.title}>Swipe me down</Drawer.Title>
+        <Drawer.Close style={styles.button}><Text style={styles.buttonText}>Close</Text></Drawer.Close>
       </Drawer.Popup>
     </Drawer.Viewport>
   </Drawer.Portal>
 </Drawer.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  button: { alignSelf: 'flex-start', backgroundColor: '#171717', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 18 },
+  buttonText: { color: '#fff', fontWeight: '600' },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  viewport: { flex: 1, justifyContent: 'flex-end' },
+  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 24, gap: 12 },
+  title: { fontSize: 18, fontWeight: '700' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { Drawer } from '@limonify/zest';
+
+<Drawer.Root swipeDirection="down">
+  <Drawer.Trigger className="self-start rounded-lg bg-neutral-900 px-4 py-2.5"><Text className="font-semibold text-white">Open</Text></Drawer.Trigger>
+  <Drawer.Portal>
+    <Drawer.Backdrop className="absolute inset-0 bg-black/50" />
+    <Drawer.Viewport className="flex-1 justify-end">
+      <Drawer.Popup className="gap-3 rounded-t-3xl bg-white p-6" style={(s) => ({ transform: [{ translateY: s.swipeMovement }] })}>
+        <Drawer.Title className="text-lg font-bold">Swipe me down</Drawer.Title>
+        <Drawer.Close className="self-start rounded-lg bg-neutral-900 px-4 py-2.5"><Text className="font-semibold text-white">Close</Text></Drawer.Close>
+      </Drawer.Popup>
+    </Drawer.Viewport>
+  </Drawer.Portal>
+</Drawer.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

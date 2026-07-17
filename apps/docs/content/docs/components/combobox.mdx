@@ -23,6 +23,12 @@ fills the input and closes the list. For free-text suggestions without a bound v
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { Combobox } from '@limonify/zest';
@@ -33,16 +39,10 @@ import { Combobox } from '@limonify/zest';
     <Combobox.Backdrop style={styles.transparent} />
     <Combobox.Positioner>
       <Combobox.Popup style={styles.popup}>
-        <Combobox.Empty style={styles.empty}>
-          <Text>No match</Text>
-        </Combobox.Empty>
+        <Combobox.Empty style={styles.empty}><Text>No match</Text></Combobox.Empty>
         <Combobox.List>
           {(item) => (
-            <Combobox.Item
-              key={String(item.value)}
-              item={item}
-              style={(state) => [styles.item, state.pressed && styles.itemPressed]}
-            >
+            <Combobox.Item key={String(item.value)} item={item} style={styles.item}>
               <Text>{item.label}</Text>
             </Combobox.Item>
           )}
@@ -53,8 +53,53 @@ import { Combobox } from '@limonify/zest';
 </Combobox.Root>
 ```
 
-`items` are strings or `{ value, label }` records. `Combobox.List` renders the filtered items
-through a render function, so you control each row.
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  input: { borderWidth: 1, borderColor: '#d4d4d4', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 12 },
+  transparent: { backgroundColor: 'transparent' },
+  popup: { maxHeight: 240, backgroundColor: '#fff', borderRadius: 12, padding: 6, marginTop: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: '#e5e5e5' },
+  empty: { padding: 12 },
+  item: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { Combobox } from '@limonify/zest';
+
+<Combobox.Root items={COUNTRIES} value={value} onValueChange={setValue}>
+  <Combobox.Input placeholder="Pick a country" className="rounded-lg border border-neutral-300 px-3 py-2.5" />
+  <Combobox.Portal>
+    <Combobox.Backdrop className="bg-transparent" />
+    <Combobox.Positioner>
+      <Combobox.Popup className="mt-1 max-h-60 rounded-xl border border-neutral-200 bg-white p-1.5">
+        <Combobox.Empty className="p-3"><Text>No match</Text></Combobox.Empty>
+        <Combobox.List>
+          {(item) => (
+            <Combobox.Item key={String(item.value)} item={item} className="rounded-lg px-3 py-2.5">
+              <Text>{item.label}</Text>
+            </Combobox.Item>
+          )}
+        </Combobox.List>
+      </Combobox.Popup>
+    </Combobox.Positioner>
+  </Combobox.Portal>
+</Combobox.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

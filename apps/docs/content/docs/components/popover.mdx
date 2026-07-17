@@ -22,22 +22,72 @@ description: A non-modal overlay anchored to a trigger.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
+import { Text } from 'react-native';
 import { Popover } from '@limonify/zest';
 
 <Popover.Root>
-  <Popover.Trigger style={styles.button}>{/* … */}</Popover.Trigger>
+  <Popover.Trigger style={styles.button}><Text style={styles.buttonText}>Settings</Text></Popover.Trigger>
   <Popover.Portal>
     <Popover.Backdrop style={styles.transparent} />
     <Popover.Positioner side="bottom" align="center" sideOffset={8}>
       <Popover.Popup style={styles.popup}>
         <Popover.Arrow style={styles.arrow} />
-        <Popover.Title>Settings</Popover.Title>
+        <Popover.Title style={styles.title}>Settings</Popover.Title>
       </Popover.Popup>
     </Popover.Positioner>
   </Popover.Portal>
 </Popover.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  button: { alignSelf: 'flex-start', backgroundColor: '#171717', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 18 },
+  buttonText: { color: '#fff', fontWeight: '600' },
+  transparent: { backgroundColor: 'transparent' },
+  popup: { backgroundColor: '#fff', borderRadius: 12, padding: 14, minWidth: 180, borderWidth: StyleSheet.hairlineWidth, borderColor: '#e5e5e5' },
+  arrow: { width: 12, height: 12, backgroundColor: '#fff', transform: [{ rotate: '45deg' }] },
+  title: { fontWeight: '600' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { Popover } from '@limonify/zest';
+
+<Popover.Root>
+  <Popover.Trigger className="self-start rounded-lg bg-neutral-900 px-4 py-2.5"><Text className="font-semibold text-white">Settings</Text></Popover.Trigger>
+  <Popover.Portal>
+    <Popover.Backdrop className="bg-transparent" />
+    <Popover.Positioner side="bottom" align="center" sideOffset={8}>
+      <Popover.Popup className="min-w-44 rounded-xl border border-neutral-200 bg-white p-3.5">
+        <Popover.Arrow className="size-3 rotate-45 bg-white" />
+        <Popover.Title className="font-semibold">Settings</Popover.Title>
+      </Popover.Popup>
+    </Popover.Positioner>
+  </Popover.Portal>
+</Popover.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

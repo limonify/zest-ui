@@ -22,14 +22,20 @@ description: A trigger that opens a list to choose one (or several) values.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { Select } from '@limonify/zest';
 
 <Select.Root items={FRUITS} value={value} onValueChange={setValue}>
   <Select.Trigger style={styles.trigger}>
-    <Select.Value>{(s) => s.label ?? 'Pick a fruit'}</Select.Value>
-    <Select.Icon><Text>▾</Text></Select.Icon>
+    <Select.Value style={styles.text}>{(s) => s.label ?? 'Pick a fruit'}</Select.Value>
+    <Select.Icon style={styles.text}><Text>▾</Text></Select.Icon>
   </Select.Trigger>
   <Select.Portal>
     <Select.Backdrop style={styles.transparent} />
@@ -38,6 +44,53 @@ import { Select } from '@limonify/zest';
         <Select.List>
           {FRUITS.map((f) => (
             <Select.Item key={f.value} value={f.value} style={styles.item}>
+              <Select.ItemText style={styles.text}>{f.label}</Select.ItemText>
+              <Select.ItemIndicator><Text>✓</Text></Select.ItemIndicator>
+            </Select.Item>
+          ))}
+        </Select.List>
+      </Select.Popup>
+    </Select.Positioner>
+  </Select.Portal>
+</Select.Root>
+```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  trigger: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, borderWidth: StyleSheet.hairlineWidth, borderColor: '#ccc', borderRadius: 10, paddingVertical: 12, paddingHorizontal: 16, minWidth: 180 },
+  text: {},
+  transparent: { backgroundColor: 'transparent' },
+  popup: { backgroundColor: '#fff', borderRadius: 12, padding: 6, borderWidth: StyleSheet.hairlineWidth, borderColor: '#e5e5e5' },
+  item: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { Select } from '@limonify/zest';
+
+<Select.Root items={FRUITS} value={value} onValueChange={setValue}>
+  <Select.Trigger className="min-w-44 flex-row items-center justify-between gap-3 rounded-lg border border-neutral-300 px-4 py-3">
+    <Select.Value>{(s) => s.label ?? 'Pick a fruit'}</Select.Value>
+    <Select.Icon><Text>▾</Text></Select.Icon>
+  </Select.Trigger>
+  <Select.Portal>
+    <Select.Backdrop className="bg-transparent" />
+    <Select.Positioner side="bottom" sideOffset={4}>
+      <Select.Popup className="rounded-xl border border-neutral-200 bg-white p-1.5">
+        <Select.List>
+          {FRUITS.map((f) => (
+            <Select.Item key={f.value} value={f.value} className="flex-row items-center justify-between rounded-lg px-3 py-2.5">
               <Select.ItemText>{f.label}</Select.ItemText>
               <Select.ItemIndicator><Text>✓</Text></Select.ItemIndicator>
             </Select.Item>
@@ -48,6 +101,10 @@ import { Select } from '@limonify/zest';
   </Select.Portal>
 </Select.Root>
 ```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

@@ -17,8 +17,14 @@ description: A tab set where each panel mounts only while active.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
-import { Text } from 'react-native';
+import { Animated, Text } from 'react-native';
 import { Tabs } from '@limonify/zest';
 
 <Tabs.Root defaultValue="overview">
@@ -28,15 +34,67 @@ import { Tabs } from '@limonify/zest';
         <Text>{t.label}</Text>
       </Tabs.Tab>
     ))}
-    <Tabs.Indicator render={(props, s) => (
-      <Animated.View {...props} style={[styles.underline, { left: s.left, width: s.width }]} />
-    )} />
+    <Tabs.Indicator
+      render={(props, s) => (
+        <Animated.View {...props} style={[styles.indicator, { left: s.left, width: s.width }]} />
+      )}
+    />
   </Tabs.List>
   {tabs.map((t) => (
-    <Tabs.Panel key={t.value} value={t.value}><Text>{t.body}</Text></Tabs.Panel>
+    <Tabs.Panel key={t.value} value={t.value}>
+      <Text style={styles.body}>{t.body}</Text>
+    </Tabs.Panel>
   ))}
 </Tabs.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  list: { flexDirection: 'row', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#e5e5e5' },
+  tab: { paddingVertical: 10, paddingHorizontal: 16 },
+  indicator: { position: 'absolute', bottom: 0, height: 2, backgroundColor: '#4c7a0b' },
+  body: { paddingTop: 16, color: '#444' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Animated, Text } from 'react-native';
+import { Tabs } from '@limonify/zest';
+
+<Tabs.Root defaultValue="overview">
+  <Tabs.List className="flex-row border-b border-neutral-200">
+    {tabs.map((t) => (
+      <Tabs.Tab key={t.value} value={t.value} className="px-4 py-2.5">
+        <Text>{t.label}</Text>
+      </Tabs.Tab>
+    ))}
+    <Tabs.Indicator
+      render={(props, s) => (
+        <Animated.View {...props} className="absolute bottom-0 h-0.5 bg-lime-700" style={{ left: s.left, width: s.width }} />
+      )}
+    />
+  </Tabs.List>
+  {tabs.map((t) => (
+    <Tabs.Panel key={t.value} value={t.value}>
+      <Text className="pt-4 text-neutral-600">{t.body}</Text>
+    </Tabs.Panel>
+  ))}
+</Tabs.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

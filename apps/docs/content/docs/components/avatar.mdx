@@ -15,6 +15,12 @@ description: An image with a fallback for when it fails or is loading.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { Avatar } from '@limonify/zest';
@@ -22,10 +28,45 @@ import { Avatar } from '@limonify/zest';
 <Avatar.Root style={styles.avatar}>
   <Avatar.Image source={{ uri: user.avatar }} style={styles.image} />
   <Avatar.Fallback style={styles.fallback}>
-    <Text>{user.initials}</Text>
+    <Text style={styles.initials}>{user.initials}</Text>
   </Avatar.Fallback>
 </Avatar.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  avatar: { width: 44, height: 44, borderRadius: 22, overflow: 'hidden', backgroundColor: '#e5e5e5' },
+  image: { width: '100%', height: '100%' },
+  fallback: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  initials: { fontWeight: '600', color: '#555' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { Avatar } from '@limonify/zest';
+
+<Avatar.Root className="size-11 overflow-hidden rounded-full bg-neutral-200">
+  <Avatar.Image source={{ uri: user.avatar }} className="size-full" />
+  <Avatar.Fallback className="absolute inset-0 items-center justify-center">
+    <Text className="font-semibold text-neutral-600">{user.initials}</Text>
+  </Avatar.Fallback>
+</Avatar.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

@@ -19,21 +19,71 @@ description: Transient messages queued above the app, without blocking it.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Toast } from '@limonify/zest';
 
-// At the app root:
+// 1. At the app root:
 <Toast.Provider timeout={4000} limit={3}>
   <App />
   <Toast.Viewport style={styles.viewport}>
-    {/* map useToastManager().toasts to <Toast.Root> */}
+    {toasts.map((toast) => (
+      <Toast.Root key={toast.id} toast={toast} style={styles.toast}>
+        <Toast.Title style={styles.title} />
+        <Toast.Description style={styles.desc} />
+      </Toast.Root>
+    ))}
   </Toast.Viewport>
 </Toast.Provider>
 
-// Anywhere inside:
+// 2. Anywhere inside:
 const { add } = Toast.useToastManager();
 add({ title: 'Saved', description: 'Your changes are safe.' });
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  viewport: { paddingHorizontal: 16, paddingBottom: 48 },
+  toast: { position: 'absolute', left: 16, right: 16, bottom: 48, backgroundColor: '#1c1c1e', borderRadius: 12, padding: 16, gap: 4 },
+  title: { color: '#fff', fontWeight: '600' },
+  desc: { color: '#ebebf5', fontSize: 13 },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Toast } from '@limonify/zest';
+
+<Toast.Provider timeout={4000} limit={3}>
+  <App />
+  <Toast.Viewport className="px-4 pb-12">
+    {toasts.map((toast) => (
+      <Toast.Root key={toast.id} toast={toast} className="absolute inset-x-4 bottom-12 gap-1 rounded-xl bg-neutral-900 p-4">
+        <Toast.Title className="font-semibold text-white" />
+        <Toast.Description className="text-[13px] text-neutral-300" />
+      </Toast.Root>
+    ))}
+  </Toast.Viewport>
+</Toast.Provider>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

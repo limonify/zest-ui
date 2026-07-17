@@ -22,30 +22,72 @@ description: A list of actions opened from a trigger, with submenus and checkabl
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { Menu } from '@limonify/zest';
 
 <Menu.Root>
-  <Menu.Trigger style={styles.button}>{/* … */}</Menu.Trigger>
+  <Menu.Trigger style={styles.button}><Text style={styles.buttonText}>Open menu</Text></Menu.Trigger>
   <Menu.Portal>
     <Menu.Backdrop style={styles.scrim} />
     <Menu.Positioner side="bottom" align="start" sideOffset={4}>
       <Menu.Popup style={styles.popup}>
-        <Menu.Item onPress={rename}><Text>Rename</Text></Menu.Item>
-        <Menu.Separator style={styles.sep} />
-        <Menu.SubmenuRoot>
-          <Menu.SubmenuTrigger><Text>Share ›</Text></Menu.SubmenuTrigger>
-          <Menu.Portal>
-            <Menu.Backdrop style={styles.transparent} />
-            <Menu.Positioner side="right"><Menu.Popup style={styles.popup}>{/* items */}</Menu.Popup></Menu.Positioner>
-          </Menu.Portal>
-        </Menu.SubmenuRoot>
+        <Menu.Item onPress={rename} style={styles.item}><Text>Rename</Text></Menu.Item>
+        <Menu.Item onPress={remove} style={styles.item}><Text style={styles.danger}>Delete</Text></Menu.Item>
       </Menu.Popup>
     </Menu.Positioner>
   </Menu.Portal>
 </Menu.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  button: { alignSelf: 'flex-start', backgroundColor: '#171717', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 18 },
+  buttonText: { color: '#fff', fontWeight: '600' },
+  scrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.15)' },
+  popup: { backgroundColor: '#fff', borderRadius: 12, padding: 6, minWidth: 200, borderWidth: StyleSheet.hairlineWidth, borderColor: '#e5e5e5' },
+  item: { paddingVertical: 10, paddingHorizontal: 12, borderRadius: 8 },
+  danger: { color: '#dc2626' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { Menu } from '@limonify/zest';
+
+<Menu.Root>
+  <Menu.Trigger className="self-start rounded-lg bg-neutral-900 px-4 py-2.5"><Text className="font-semibold text-white">Open menu</Text></Menu.Trigger>
+  <Menu.Portal>
+    <Menu.Backdrop className="absolute inset-0 bg-black/15" />
+    <Menu.Positioner side="bottom" align="start" sideOffset={4}>
+      <Menu.Popup className="min-w-52 rounded-xl border border-neutral-200 bg-white p-1.5">
+        <Menu.Item onPress={rename} className="rounded-lg px-3 py-2.5"><Text>Rename</Text></Menu.Item>
+        <Menu.Item onPress={remove} className="rounded-lg px-3 py-2.5"><Text className="text-red-600">Delete</Text></Menu.Item>
+      </Menu.Popup>
+    </Menu.Positioner>
+  </Menu.Portal>
+</Menu.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

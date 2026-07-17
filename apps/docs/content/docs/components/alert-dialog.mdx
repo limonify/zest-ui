@@ -21,24 +21,75 @@ description: A modal dialog that demands a deliberate choice and ignores outside
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { AlertDialog } from '@limonify/zest';
 
 <AlertDialog.Root>
-  <AlertDialog.Trigger style={styles.button}><Text>Delete</Text></AlertDialog.Trigger>
+  <AlertDialog.Trigger style={styles.button}><Text style={styles.buttonText}>Delete</Text></AlertDialog.Trigger>
   <AlertDialog.Portal>
     <AlertDialog.Backdrop style={styles.backdrop} />
-    <AlertDialog.Viewport style={styles.center}>
+    <AlertDialog.Viewport style={styles.viewport}>
       <AlertDialog.Popup style={styles.card}>
-        <AlertDialog.Title>Delete file?</AlertDialog.Title>
-        <AlertDialog.Description>This can't be undone.</AlertDialog.Description>
-        <AlertDialog.Close style={styles.button}><Text>Cancel</Text></AlertDialog.Close>
+        <AlertDialog.Title style={styles.title}>Delete file?</AlertDialog.Title>
+        <AlertDialog.Description style={styles.body}>This can't be undone.</AlertDialog.Description>
+        <AlertDialog.Close style={styles.button}><Text style={styles.buttonText}>Cancel</Text></AlertDialog.Close>
       </AlertDialog.Popup>
     </AlertDialog.Viewport>
   </AlertDialog.Portal>
 </AlertDialog.Root>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  button: { alignSelf: 'flex-start', backgroundColor: '#171717', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 18 },
+  buttonText: { color: '#fff', fontWeight: '600' },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  viewport: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  card: { width: '100%', maxWidth: 340, gap: 8, borderRadius: 16, backgroundColor: '#fff', padding: 20 },
+  title: { fontSize: 17, fontWeight: '700' },
+  body: { color: '#666' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { AlertDialog } from '@limonify/zest';
+
+<AlertDialog.Root>
+  <AlertDialog.Trigger className="self-start rounded-lg bg-neutral-900 px-4 py-2.5"><Text className="font-semibold text-white">Delete</Text></AlertDialog.Trigger>
+  <AlertDialog.Portal>
+    <AlertDialog.Backdrop className="absolute inset-0 bg-black/50" />
+    <AlertDialog.Viewport className="flex-1 items-center justify-center p-6">
+      <AlertDialog.Popup className="w-full max-w-[340px] gap-2 rounded-2xl bg-white p-5">
+        <AlertDialog.Title className="text-[17px] font-bold">Delete file?</AlertDialog.Title>
+        <AlertDialog.Description className="text-neutral-500">This can't be undone.</AlertDialog.Description>
+        <AlertDialog.Close className="self-start rounded-lg bg-neutral-900 px-4 py-2.5"><Text className="font-semibold text-white">Cancel</Text></AlertDialog.Close>
+      </AlertDialog.Popup>
+    </AlertDialog.Viewport>
+  </AlertDialog.Portal>
+</AlertDialog.Root>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 
