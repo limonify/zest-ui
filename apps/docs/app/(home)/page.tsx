@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { highlight } from 'fumadocs-core/highlight';
 
 const STATS = [
   { value: '32', label: 'components' },
@@ -26,8 +27,8 @@ const FEATURES = [
     ),
   },
   {
-    title: 'Base UI parity',
-    body: 'A faithful port of MUI Base UI — real part names (Dialog.Popup, not Content). If you know Base UI on the web, you already know zest.',
+    title: 'Predictable, composable API',
+    body: 'Real, descriptive part names — Dialog.Popup, Menu.Item, Select.Trigger — and the same Root → parts shape on every component. Learn one, know them all.',
     icon: (
       <>
         <rect x="3" y="3" width="8" height="8" rx="1.5" strokeWidth="2" />
@@ -75,28 +76,40 @@ const GROUPS: { label: string; items: string[] }[] = [
   },
 ];
 
-const CODE = `import { Text } from 'react-native';
-import { Dialog } from '@limonify/zest';
+const CODE = `import { Switch } from '@limonify/zest';
 
-<Dialog.Root>
-  <Dialog.Trigger>
-    <Text>Open</Text>
-  </Dialog.Trigger>
+// 'style' is a function of the part's state —
+// no data-attributes, no CSS. Just your StyleSheet.
+export function Toggle() {
+  return (
+    <Switch.Root
+      style={(state) => [
+        styles.track,
+        state.checked && styles.trackOn,
+      ]}
+    >
+      <Switch.Thumb
+        style={(state) => [
+          styles.thumb,
+          state.checked && styles.thumbOn,
+        ]}
+      />
+    </Switch.Root>
+  );
+}`;
 
-  <Dialog.Portal>
-    <Dialog.Backdrop style={styles.backdrop} />
-    <Dialog.Viewport style={styles.center}>
-      <Dialog.Popup style={styles.card}>
-        <Dialog.Title>Delete file?</Dialog.Title>
-        <Dialog.Close>
-          <Text>Cancel</Text>
-        </Dialog.Close>
-      </Dialog.Popup>
-    </Dialog.Viewport>
-  </Dialog.Portal>
-</Dialog.Root>`;
+export default async function HomePage() {
+  const code = await highlight(CODE, {
+    lang: 'tsx',
+    themes: { light: 'github-light', dark: 'github-dark' },
+    defaultColor: false,
+    components: {
+      pre: (props) => (
+        <pre {...props} className="overflow-x-auto p-4 font-mono text-[12.5px] leading-6 !bg-transparent" />
+      ),
+    },
+  });
 
-export default function HomePage() {
   return (
     <main className="relative w-full overflow-hidden">
       {/* Soft citrus glow behind the hero */}
@@ -115,7 +128,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-6">
             <span className="inline-flex w-fit items-center gap-2 rounded-full border border-fd-border bg-fd-card px-3 py-1 text-xs font-medium text-fd-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-fd-primary" />
-              Base UI, ported to React Native
+              Headless UI for React Native
             </span>
 
             <h1
@@ -129,9 +142,9 @@ export default function HomePage() {
             </h1>
 
             <p className="max-w-md text-lg leading-relaxed text-fd-muted-foreground">
-              <span className="font-mono text-fd-foreground">@limonify/zest</span> is a faithful React
-              Native port of MUI Base UI — accessible, unstyled building blocks. 32 components, styled
-              entirely by you.
+              <span className="font-mono text-fd-foreground">@limonify/zest</span> gives you accessible,
+              unstyled building blocks for React Native — behaviour and a11y done, the look entirely
+              yours. 32 components, one consistent API.
             </p>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -161,11 +174,9 @@ export default function HomePage() {
               <span className="h-2.5 w-2.5 rounded-full bg-fd-border" />
               <span className="h-2.5 w-2.5 rounded-full bg-fd-border" />
               <span className="h-2.5 w-2.5 rounded-full bg-fd-border" />
-              <span className="ml-2 font-mono text-xs text-fd-muted-foreground">DeleteDialog.tsx</span>
+              <span className="ml-2 font-mono text-xs text-fd-muted-foreground">Toggle.tsx</span>
             </div>
-            <pre className="overflow-x-auto p-4 font-mono text-[12.5px] leading-6 text-fd-foreground">
-              <code>{CODE}</code>
-            </pre>
+            {code}
           </div>
         </section>
 
