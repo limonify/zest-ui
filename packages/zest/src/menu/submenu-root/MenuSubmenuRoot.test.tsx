@@ -193,7 +193,7 @@ describe('Menu submenus', () => {
       expect(screen.getByTestId('popup')).toBeTruthy();
     });
 
-    it('closeOnClick={false} leaves both menus open', async () => {
+    it('closeOnPress={false} leaves both menus open', async () => {
       const user = userEvent.setup();
       await renderMenu(
         <Menu.Root defaultOpen>
@@ -207,7 +207,7 @@ describe('Menu submenus', () => {
                   <Menu.Portal>
                     <Menu.Positioner>
                       <Menu.Popup testID="submenu-popup">
-                        <Menu.Item testID="submenu-item" closeOnClick={false}>
+                        <Menu.Item testID="submenu-item" closeOnPress={false}>
                           <Text>Email</Text>
                         </Menu.Item>
                       </Menu.Popup>

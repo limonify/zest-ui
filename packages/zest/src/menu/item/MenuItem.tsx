@@ -20,7 +20,8 @@ import { REASONS } from '../../utils/reasons';
 export function MenuItem(componentProps: MenuItem.Props) {
   const {
     className,
-    closeOnClick = true,
+    closeOnClick: closeOnClickProp,
+    closeOnPress: closeOnPressProp,
     disabled = false,
     onPress: onPressProp,
     render,
@@ -28,6 +29,10 @@ export function MenuItem(componentProps: MenuItem.Props) {
     ref,
     ...elementProps
   } = componentProps;
+
+  // `closeOnPress` is the React Native name; `closeOnPress` is a deprecated
+  // alias kept for Base UI parity.
+  const closeOnPress = closeOnPressProp ?? closeOnClickProp ?? true;
 
   const store = useMenuRootContext();
   const submenuRootContext = useMenuSubmenuRootContext();
@@ -55,7 +60,7 @@ export function MenuItem(componentProps: MenuItem.Props) {
 
           onPressProp?.(event);
 
-          if (closeOnClick) {
+          if (closeOnPress) {
             store.setOpen(false, createChangeEventDetails(REASONS.itemPress, event));
             // Choosing an item dismisses the whole menu, not just the submenu it
             // happens to sit in.
@@ -99,6 +104,10 @@ export interface MenuItemProps extends ZestUIComponentProps<typeof Pressable, Me
   /**
    * Whether to close the menu when the item is pressed.
    * @default true
+   */
+  closeOnPress?: boolean | undefined;
+  /**
+   * @deprecated Use `closeOnPress`. Kept as an alias for Base UI parity.
    */
   closeOnClick?: boolean | undefined;
 }

@@ -19,15 +19,16 @@ import { REASONS } from '../../utils/reasons';
  * own, so navigation happens in the consumer's `onPress` — this part contributes
  * the link role and the `link-press` reason.
  *
- * `closeOnClick` keeps upstream's `false` default, but for the opposite outcome:
+ * `closeOnPress` keeps upstream's `false` default, but for the opposite outcome:
  * on the web the browser navigates away and the menu goes with it, whereas an RN
  * menu is a `Modal` that would sit on top of the screen just navigated to. Set
- * `closeOnClick` when the press navigates within the app.
+ * `closeOnPress` when the press navigates within the app.
  */
 export function MenuLinkItem(componentProps: MenuLinkItem.Props) {
   const {
     className,
-    closeOnClick = false,
+    closeOnClick: closeOnClickProp,
+    closeOnPress: closeOnPressProp,
     disabled = false,
     onPress: onPressProp,
     render,
@@ -35,6 +36,10 @@ export function MenuLinkItem(componentProps: MenuLinkItem.Props) {
     ref,
     ...elementProps
   } = componentProps;
+
+  // `closeOnPress` is the React Native name; `closeOnPress` is a deprecated
+  // alias kept for Base UI parity.
+  const closeOnPress = closeOnPressProp ?? closeOnClickProp ?? false;
 
   const store = useMenuRootContext();
   const submenuRootContext = useMenuSubmenuRootContext();
@@ -62,7 +67,7 @@ export function MenuLinkItem(componentProps: MenuLinkItem.Props) {
 
           onPressProp?.(event);
 
-          if (closeOnClick) {
+          if (closeOnPress) {
             store.setOpen(false, createChangeEventDetails(REASONS.linkPress, event));
             submenuRootContext?.closeAncestors(REASONS.linkPress, event);
           }
@@ -105,6 +110,10 @@ export interface MenuLinkItemProps
   /**
    * Whether to close the menu when the item is pressed.
    * @default false
+   */
+  closeOnPress?: boolean | undefined;
+  /**
+   * @deprecated Use `closeOnPress`. Kept as an alias for Base UI parity.
    */
   closeOnClick?: boolean | undefined;
 }

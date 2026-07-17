@@ -6,7 +6,7 @@ import {
 } from '../root/useNumberFieldStepperButton';
 
 /**
- * A stepper button that increases the field value when clicked.
+ * A stepper button that increases the field value when pressed.
  * Renders a `<Pressable>`.
  */
 export function NumberFieldIncrement(componentProps: NumberFieldIncrement.Props) {
