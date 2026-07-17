@@ -1,4 +1,4 @@
 {
   "title": "Docs",
-  "pages": ["index", "installation", "philosophy", "guides", "components"]
+  "pages": ["index", "installation", "philosophy", "common-props", "guides", "components"]
 }

@@ -8,6 +8,13 @@ app with focus containment and Android back-button dismissal handled for you.
 
 <Demo>Opening and dismissing a dialog.</Demo>
 
+<Callout type="info">
+  **Dialog vs AlertDialog vs Drawer.** Use **Dialog** for general modal content;
+  **[AlertDialog](/docs/components/alert-dialog)** for a blocking confirm that must not be dismissed
+  by an outside tap; **[Drawer](/docs/components/drawer)** for a swipeable sheet anchored to a screen
+  edge.
+</Callout>
+
 ## Anatomy
 
 <Anatomy code={`Dialog.Root
@@ -116,13 +123,14 @@ reports through `onOpenChange(open, eventDetails)` so you can veto it with `even
 
 ## API
 
-`Dialog.Root`
+`Dialog.Root` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
+
 <AutoType path="../../packages/zest-ui/src/dialog/root/DialogRoot.tsx" name="DialogRootProps" />
 
 
 ## State
 
-These fields reach your `style` and `render` functions on **Dialog.Popup** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Dialog.Popup** (`style={(state) => ...}`).
 
 <AutoType path="../../packages/zest-ui/src/dialog/popup/DialogPopup.tsx" name="DialogPopupState" />
 

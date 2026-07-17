@@ -5,7 +5,7 @@ description: A text input that filters a list of items, with single selection.
 
 `Combobox` is a text input paired with a filtered list. Typing filters the items; choosing one
 fills the input and closes the list. For free-text suggestions without a bound value, use
-[`Autocomplete`](/docs/components/combobox), which reuses every combobox part.
+[`Autocomplete`](/docs/components/autocomplete), which reuses every combobox part.
 
 <Demo>Filtering a list and selecting an item.</Demo>
 
@@ -103,7 +103,7 @@ import { Combobox } from '@limonify/zest-ui';
 
 ## API
 
-`Combobox.Root`
+`Combobox.Root` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -116,7 +116,7 @@ import { Combobox } from '@limonify/zest-ui';
 
 ## State
 
-These fields reach your `style` and `render` functions on **Combobox.Input** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Combobox.Input** (`style={(state) => ...}`).
 
 <AutoType path="../../packages/zest-ui/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
 

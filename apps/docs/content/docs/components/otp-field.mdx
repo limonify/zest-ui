@@ -25,7 +25,7 @@ import { OTPField } from '@limonify/zest-ui';
 
 <OTPField.Root length={6} onValueChange={setCode}>
   {Array.from({ length: 6 }).map((_, i) => (
-    <OTPField.Input key={i} index={i} style={(s) => [styles.slot, s.focused && styles.slotFocused]} />
+    <OTPField.Input key={i} index={i} style={(s) => [styles.slot, s.activeIndex === s.index && styles.slotFocused]} />
   ))}
 </OTPField.Root>
 ```
@@ -56,7 +56,7 @@ import { OTPField } from '@limonify/zest-ui';
     <OTPField.Input
       key={i}
       index={i}
-      className={(s) => clsx('h-13 w-11 rounded-lg border text-center text-xl', s.focused ? 'border-lime-700' : 'border-neutral-300')}
+      className={(s) => clsx('h-13 w-11 rounded-lg border text-center text-xl', s.activeIndex === s.index ? 'border-lime-700' : 'border-neutral-300')}
     />
   ))}
 </OTPField.Root>
@@ -68,15 +68,15 @@ import { OTPField } from '@limonify/zest-ui';
 
 ## API
 
-`OTP Field` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+`OTP Field` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
 
 <AutoType path="../../packages/zest-ui/src/otp-field/root/OTPFieldRoot.tsx" name="OTPFieldRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **OTPField.Input** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **OTPField.Input** (a slot is focused when `state.activeIndex === state.index`).
 
-<AutoType path="../../packages/zest-ui/src/otp-field/root/OTPFieldRoot.tsx" name="OTPFieldRootState" />
+<AutoType path="../../packages/zest-ui/src/otp-field/input/OTPFieldInput.tsx" name="OTPFieldInputState" />
 
 ## Accessibility
 

@@ -91,13 +91,13 @@ import { Menu } from '@limonify/zest-ui';
 
 ## API
 
-`Menu` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Menu` — root props below. Every part also accepts the [common props](/docs/common-props).
 
 <AutoType path="../../packages/zest-ui/src/menu/root/MenuRoot.tsx" name="MenuRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Menu.Popup** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Menu.Popup** (`style={(state) => ...}`).
 
 <AutoType path="../../packages/zest-ui/src/menu/popup/MenuPopup.tsx" name="MenuPopupState" />
 
@@ -120,4 +120,5 @@ See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contr
 
 ## Accessibility
 
-Each menu level is its own `Modal`, so **every level that should dismiss on an outside tap needs its own `Menu.Backdrop`**. Items close the menu on press by default (`closeOnPress`).
+Each menu level is its own `Modal`, so **every level that should dismiss on an outside tap needs its own `Menu.Backdrop`**. Items close the menu on press by default; set `closeOnPress={false}` to keep it open (the web-era
+`closeOnClick` is still accepted as a deprecated alias).

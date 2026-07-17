@@ -7,6 +7,13 @@ description: A trigger that opens a list to choose one (or several) values.
 
 <Demo>Choosing a fruit, and a multi-select.</Demo>
 
+<Callout type="info">
+  **Select vs Combobox vs Autocomplete.** Reach for **Select** to pick from a known list with no
+  typing; **[Combobox](/docs/components/combobox)** when the user types to filter and choose a bound
+  value; **[Autocomplete](/docs/components/autocomplete)** when the typed text itself is the value
+  (free-text with suggestions).
+</Callout>
+
 ## Anatomy
 
 <Anatomy code={`Select.Root
@@ -108,13 +115,13 @@ import { Select } from '@limonify/zest-ui';
 
 ## API
 
-`Select` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Select` — root props below. Every part also accepts the [common props](/docs/common-props).
 
 <AutoType path="../../packages/zest-ui/src/select/root/SelectRoot.tsx" name="SelectRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Select.Trigger** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Select.Trigger** (`style={(state) => ...}`).
 
 <AutoType path="../../packages/zest-ui/src/select/trigger/SelectTrigger.tsx" name="SelectTriggerState" />
 
