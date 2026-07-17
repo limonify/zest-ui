@@ -29,15 +29,15 @@ Because `className` (like `style`) can be a function of the part's state, you ca
 `checked`, `pressed`, `disabled`, `open`, and the rest:
 
 ```tsx
+import clsx from 'clsx';
+
 <Checkbox.Root
   className={(state) =>
-    [
-      'size-6 items-center justify-center rounded border',
-      state.checked ? 'border-lime-600 bg-lime-600' : 'border-neutral-300',
-      state.disabled && 'opacity-40',
-    ]
-      .filter(Boolean)
-      .join(' ')
+    clsx('size-6 items-center justify-center rounded border', {
+      'border-lime-600 bg-lime-600': state.checked,
+      'border-neutral-300': !state.checked,
+      'opacity-40': state.disabled,
+    })
   }
 >
   {/* ... */}
