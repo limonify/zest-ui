@@ -22,38 +22,42 @@ app with focus containment and Android back-button dismissal handled for you.
 
 ## Usage
 
-<Tabs items={['StyleSheet', 'Uniwind']}>
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
+```tsx
+import { Text } from 'react-native';
+import { Dialog } from '@limonify/zest';
+
+<Dialog.Root>
+  <Dialog.Trigger style={styles.button}>
+    <Text style={styles.buttonText}>Delete</Text>
+  </Dialog.Trigger>
+
+  <Dialog.Portal>
+    <Dialog.Backdrop style={styles.backdrop} />
+    <Dialog.Viewport style={styles.viewport}>
+      <Dialog.Popup style={styles.card}>
+        <Dialog.Title style={styles.title}>Delete file?</Dialog.Title>
+        <Dialog.Description style={styles.body}>This can't be undone.</Dialog.Description>
+        <Dialog.Close style={styles.button}>
+          <Text style={styles.buttonText}>Cancel</Text>
+        </Dialog.Close>
+      </Dialog.Popup>
+    </Dialog.Viewport>
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+</Tab>
 
 <Tab value="StyleSheet">
 
 ```tsx
-import { StyleSheet, Text } from 'react-native';
-import { Dialog } from '@limonify/zest';
-
-function DeleteDialog() {
-  return (
-    <Dialog.Root>
-      <Dialog.Trigger style={styles.button}>
-        <Text style={styles.buttonText}>Delete</Text>
-      </Dialog.Trigger>
-
-      <Dialog.Portal>
-        <Dialog.Backdrop style={styles.backdrop} />
-        <Dialog.Viewport style={styles.viewport}>
-          <Dialog.Popup style={styles.card}>
-            <Dialog.Title style={styles.title}>Delete file?</Dialog.Title>
-            <Dialog.Description style={styles.body}>
-              This can't be undone.
-            </Dialog.Description>
-            <Dialog.Close style={styles.button}>
-              <Text style={styles.buttonText}>Cancel</Text>
-            </Dialog.Close>
-          </Dialog.Popup>
-        </Dialog.Viewport>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
-}
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   button: {
@@ -90,9 +94,7 @@ import { Dialog } from '@limonify/zest';
     <Dialog.Viewport className="flex-1 items-center justify-center p-6">
       <Dialog.Popup className="w-full max-w-[340px] gap-2 rounded-2xl bg-white p-5">
         <Dialog.Title className="text-[17px] font-bold">Delete file?</Dialog.Title>
-        <Dialog.Description className="text-neutral-500">
-          This can't be undone.
-        </Dialog.Description>
+        <Dialog.Description className="text-neutral-500">This can't be undone.</Dialog.Description>
         <Dialog.Close className="self-start rounded-lg bg-neutral-900 px-4 py-2.5">
           <Text className="font-semibold text-white">Cancel</Text>
         </Dialog.Close>

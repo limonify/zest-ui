@@ -15,16 +15,63 @@ description: A group of checkboxes sharing one value array, with an optional par
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
+import { Text } from 'react-native';
 import { CheckboxGroup, Checkbox } from '@limonify/zest';
 
 <CheckboxGroup value={value} onValueChange={setValue} allValues={COLORS}>
-  <Checkbox.Root parent>{/* indicator */}</Checkbox.Root>
+  <Checkbox.Root parent style={styles.box}>
+    <Checkbox.Indicator><Text style={styles.tick}>—</Text></Checkbox.Indicator>
+  </Checkbox.Root>
   {COLORS.map((c) => (
-    <Checkbox.Root key={c} value={c}>{/* indicator */}</Checkbox.Root>
+    <Checkbox.Root key={c} value={c} style={styles.box}>
+      <Checkbox.Indicator><Text style={styles.tick}>✓</Text></Checkbox.Indicator>
+    </Checkbox.Root>
   ))}
 </CheckboxGroup>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  box: {
+    width: 22, height: 22, borderRadius: 6, borderWidth: 1.5,
+    borderColor: '#cbcbcb', alignItems: 'center', justifyContent: 'center',
+  },
+  tick: { color: '#4c7a0b', fontWeight: '700' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { Text } from 'react-native';
+import { CheckboxGroup, Checkbox } from '@limonify/zest';
+
+<CheckboxGroup value={value} onValueChange={setValue} allValues={COLORS}>
+  <Checkbox.Root parent className="size-6 items-center justify-center rounded-md border-[1.5px] border-neutral-300">
+    <Checkbox.Indicator><Text className="font-bold text-lime-700">—</Text></Checkbox.Indicator>
+  </Checkbox.Root>
+  {/* children … */}
+</CheckboxGroup>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

@@ -13,6 +13,12 @@ description: A two-state pressable button.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
 import { Text } from 'react-native';
 import { Toggle } from '@limonify/zest';
@@ -20,11 +26,47 @@ import { Toggle } from '@limonify/zest';
 <Toggle
   pressed={bold}
   onPressedChange={setBold}
-  style={(state) => [styles.toggle, state.pressed && styles.togglePressed]}
+  style={(state) => [styles.toggle, state.pressed && styles.pressed]}
 >
-  <Text>B</Text>
+  <Text style={(state) => state.pressed && styles.textOn}>B</Text>
 </Toggle>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  toggle: { width: 40, height: 40, borderRadius: 8, borderWidth: 1, borderColor: '#e5e5e5', alignItems: 'center', justifyContent: 'center' },
+  pressed: { backgroundColor: '#4c7a0b', borderColor: '#4c7a0b' },
+  textOn: { color: '#fff', fontWeight: '700' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { clsx } from 'clsx';
+import { Text } from 'react-native';
+import { Toggle } from '@limonify/zest';
+
+<Toggle
+  pressed={bold}
+  onPressedChange={setBold}
+  className={(state) => clsx('size-10 items-center justify-center rounded-lg border', state.pressed ? 'border-lime-700 bg-lime-700' : 'border-neutral-200')}
+>
+  <Text className={clsx(bold && 'font-bold text-white')}>B</Text>
+</Toggle>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 

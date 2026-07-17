@@ -16,28 +16,34 @@ Button is a single part.
 
 ## Usage
 
-<Tabs items={['StyleSheet', 'Uniwind']}>
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
+```tsx
+import { Text } from 'react-native';
+import { Button } from '@limonify/zest';
+
+<Button
+  onPress={() => save()}
+  style={(state) => [
+    styles.button,
+    state.pressed && styles.buttonPressed,
+    state.disabled && styles.buttonDisabled,
+  ]}
+>
+  <Text style={styles.text}>Save</Text>
+</Button>
+```
+
+</Tab>
 
 <Tab value="StyleSheet">
 
 ```tsx
-import { StyleSheet, Text } from 'react-native';
-import { Button } from '@limonify/zest';
-
-function SaveButton() {
-  return (
-    <Button
-      onPress={() => save()}
-      style={(state) => [
-        styles.button,
-        state.pressed && styles.buttonPressed,
-        state.disabled && styles.buttonDisabled,
-      ]}
-    >
-      <Text style={styles.text}>Save</Text>
-    </Button>
-  );
-}
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   button: {
@@ -58,19 +64,17 @@ const styles = StyleSheet.create({
 <Tab value="Uniwind">
 
 ```tsx
+import { clsx } from 'clsx';
 import { Text } from 'react-native';
 import { Button } from '@limonify/zest';
 
 <Button
   onPress={() => save()}
   className={(state) =>
-    [
-      'self-start rounded-lg bg-neutral-900 px-5 py-3',
-      state.pressed && 'opacity-85',
-      state.disabled && 'opacity-40',
-    ]
-      .filter(Boolean)
-      .join(' ')
+    clsx('self-start rounded-lg bg-neutral-900 px-5 py-3', {
+      'opacity-85': state.pressed,
+      'opacity-40': state.disabled,
+    })
   }
 >
   <Text className="font-semibold text-white">Save</Text>

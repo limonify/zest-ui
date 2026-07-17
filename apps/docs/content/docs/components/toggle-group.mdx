@@ -14,14 +14,60 @@ description: Single- or multiple-selection group of toggles.
 
 ## Usage
 
+The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+
+<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Code">
+
 ```tsx
+import { Text } from 'react-native';
 import { ToggleGroup, Toggle } from '@limonify/zest';
 
-<ToggleGroup value={value} onValueChange={setValue}>
-  <Toggle value="left">{/* … */}</Toggle>
-  <Toggle value="center">{/* … */}</Toggle>
+<ToggleGroup value={align} onValueChange={setAlign} style={styles.group}>
+  {['left', 'center', 'right'].map((v) => (
+    <Toggle key={v} value={v} style={(s) => [styles.item, s.pressed && styles.on]}>
+      <Text>{v}</Text>
+    </Toggle>
+  ))}
 </ToggleGroup>
 ```
+
+</Tab>
+
+<Tab value="StyleSheet">
+
+```tsx
+import { StyleSheet } from 'react-native';
+
+const styles = StyleSheet.create({
+  group: { flexDirection: 'row', borderRadius: 10, borderWidth: 1, borderColor: '#e5e5e5', overflow: 'hidden' },
+  item: { paddingVertical: 8, paddingHorizontal: 14 },
+  on: { backgroundColor: '#4c7a0b' },
+});
+```
+
+</Tab>
+
+<Tab value="Uniwind">
+
+```tsx
+import { clsx } from 'clsx';
+import { Text } from 'react-native';
+import { ToggleGroup, Toggle } from '@limonify/zest';
+
+<ToggleGroup value={align} onValueChange={setAlign} className="flex-row overflow-hidden rounded-lg border border-neutral-200">
+  {['left', 'center', 'right'].map((v) => (
+    <Toggle key={v} value={v} className={(s) => clsx('px-3.5 py-2', s.pressed && 'bg-lime-700')}>
+      <Text>{v}</Text>
+    </Toggle>
+  ))}
+</ToggleGroup>
+```
+
+</Tab>
+
+</Tabs>
 
 ## API
 
