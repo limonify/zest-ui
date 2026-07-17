@@ -1,0 +1,58 @@
+---
+title: Menu
+description: A list of actions opened from a trigger, with submenus and checkable items.
+---
+
+`Menu` is an anchored list of actions. It supports submenus (each a nested `Modal`), checkbox and radio items, groups and separators.
+
+<Demo>Opening a menu with a submenu and a radio group.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Menu.Root
+  Menu.Trigger
+  Menu.Portal
+    Menu.Backdrop
+    Menu.Positioner
+      Menu.Popup
+        Menu.Group / Menu.GroupLabel
+        Menu.Item
+        Menu.CheckboxItem / Menu.RadioGroup
+        Menu.SubmenuRoot > Menu.SubmenuTrigger`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Menu } from '@limonify/zest';
+
+<Menu.Root>
+  <Menu.Trigger style={styles.button}>{/* … */}</Menu.Trigger>
+  <Menu.Portal>
+    <Menu.Backdrop style={styles.scrim} />
+    <Menu.Positioner side="bottom" align="start" sideOffset={4}>
+      <Menu.Popup style={styles.popup}>
+        <Menu.Item onPress={rename}><Text>Rename</Text></Menu.Item>
+        <Menu.Separator style={styles.sep} />
+        <Menu.SubmenuRoot>
+          <Menu.SubmenuTrigger><Text>Share ›</Text></Menu.SubmenuTrigger>
+          <Menu.Portal>
+            <Menu.Backdrop style={styles.transparent} />
+            <Menu.Positioner side="right"><Menu.Popup style={styles.popup}>{/* items */}</Menu.Popup></Menu.Positioner>
+          </Menu.Portal>
+        </Menu.SubmenuRoot>
+      </Menu.Popup>
+    </Menu.Positioner>
+  </Menu.Portal>
+</Menu.Root>
+```
+
+## API
+
+`Menu` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/menu/root/MenuRoot.tsx" name="MenuRootProps" />
+
+## Accessibility
+
+Each menu level is its own `Modal`, so **every level that should dismiss on an outside tap needs its own `Menu.Backdrop`**. Items close the menu on press by default (`closeOnClick`).

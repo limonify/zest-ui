@@ -1,0 +1,40 @@
+---
+title: Checkbox
+description: A tri-state checkbox that tracks checked, indeterminate and disabled.
+---
+
+`Checkbox` is a tri-state toggle (checked, unchecked, indeterminate). It renders a `Pressable` with `accessibilityRole="checkbox"` and exposes `checked`/`indeterminate`/`disabled` on state.
+
+<Demo>A controlled and an uncontrolled checkbox.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Checkbox.Root
+  Checkbox.Indicator`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Checkbox } from '@limonify/zest';
+
+<Checkbox.Root
+  checked={checked}
+  onCheckedChange={setChecked}
+  style={(state) => [styles.box, state.checked && styles.boxChecked]}
+>
+  <Checkbox.Indicator>
+    <Text style={styles.tick}>✓</Text>
+  </Checkbox.Indicator>
+</Checkbox.Root>
+```
+
+## API
+
+`Checkbox` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/checkbox/root/CheckboxRoot.tsx" name="CheckboxRootProps" />
+
+## Accessibility
+
+`accessibilityState.checked` is `true`, `false`, or `'mixed'` when indeterminate. Inside a `Field.Root` the checkbox is labelled by `Field.Label` automatically.

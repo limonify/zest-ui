@@ -1,0 +1,33 @@
+---
+title: Radio Group
+description: Shared state for a set of radio buttons.
+---
+
+`RadioGroup` provides the selected value to a set of `Radio` buttons and commits changes before applying them, so a handler can veto.
+
+<Demo>A radio group committing a value.</Demo>
+
+## Anatomy
+
+<Anatomy code={`RadioGroup
+  Radio.Root`} />
+
+## Usage
+
+```tsx
+import { RadioGroup, Radio } from '@limonify/zest';
+
+<RadioGroup defaultValue="md" onValueChange={setSize}>
+  {/* Radio.Root items */}
+</RadioGroup>
+```
+
+## API
+
+`Radio Group` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/radio-group/RadioGroup.tsx" name="RadioGroupProps" />
+
+## Accessibility
+
+`accessibilityRole="radiogroup"`. Inside a `Field.Root`, the group is labelled and validated by the field.

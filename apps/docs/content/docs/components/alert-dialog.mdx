@@ -1,0 +1,51 @@
+---
+title: Alert Dialog
+description: A modal dialog that demands a deliberate choice and ignores outside dismissal.
+---
+
+`AlertDialog` is a `Dialog` variant for destructive or blocking confirmations: it does **not** close on an outside press or the back button — the user must pick an action.
+
+<Demo>A confirm/cancel alert.</Demo>
+
+## Anatomy
+
+<Anatomy code={`AlertDialog.Root
+  AlertDialog.Trigger
+  AlertDialog.Portal
+    AlertDialog.Backdrop
+    AlertDialog.Viewport
+      AlertDialog.Popup
+        AlertDialog.Title
+        AlertDialog.Description
+        AlertDialog.Close`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { AlertDialog } from '@limonify/zest';
+
+<AlertDialog.Root>
+  <AlertDialog.Trigger style={styles.button}><Text>Delete</Text></AlertDialog.Trigger>
+  <AlertDialog.Portal>
+    <AlertDialog.Backdrop style={styles.backdrop} />
+    <AlertDialog.Viewport style={styles.center}>
+      <AlertDialog.Popup style={styles.card}>
+        <AlertDialog.Title>Delete file?</AlertDialog.Title>
+        <AlertDialog.Description>This can't be undone.</AlertDialog.Description>
+        <AlertDialog.Close style={styles.button}><Text>Cancel</Text></AlertDialog.Close>
+      </AlertDialog.Popup>
+    </AlertDialog.Viewport>
+  </AlertDialog.Portal>
+</AlertDialog.Root>
+```
+
+## API
+
+`Alert Dialog` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/alert-dialog/root/AlertDialogRoot.tsx" name="AlertDialogRootProps" />
+
+## Accessibility
+
+`accessibilityRole="alertdialog"`. Outside-press and back-button dismissal are disabled — provide an explicit `AlertDialog.Close`.

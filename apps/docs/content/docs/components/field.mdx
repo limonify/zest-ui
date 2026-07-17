@@ -1,0 +1,40 @@
+---
+title: Field
+description: Labels, describes and validates a text input.
+---
+
+`Field` wires a label, a text input, a description and validation together for accessibility. Validation is a `validate` function (React Native has no HTML constraint API).
+
+<Demo>Validating an email field on blur.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Field.Root
+  Field.Label
+  Field.Control
+  Field.Description
+  Field.Error
+  Field.Validity`} />
+
+## Usage
+
+```tsx
+import { Field } from '@limonify/zest';
+
+<Field.Root validate={(v) => (isEmail(v) ? null : 'Enter a valid email')}>
+  <Field.Label>Email</Field.Label>
+  <Field.Control style={(s) => [styles.input, s.valid === false && styles.invalid]} />
+  <Field.Description>We only use it to sign you in.</Field.Description>
+  <Field.Error />
+</Field.Root>
+```
+
+## API
+
+`Field` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/field/root/FieldRoot.tsx" name="FieldRootProps" />
+
+## Accessibility
+
+The control is labelled by `Field.Label` and described by `Field.Description`/`Field.Error` via `accessibilityLabelledBy`/`accessibilityDescribedBy`. `validationMode` runs `validate` on blur or change. `Checkbox`, `Switch`, `RadioGroup` and `NumberField` are also field-aware.

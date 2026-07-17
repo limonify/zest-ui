@@ -1,0 +1,35 @@
+---
+title: Fieldset
+description: Groups related fields under a legend.
+---
+
+`Fieldset` groups related fields under a legend; a disabled fieldset disables every field inside it.
+
+<Demo>A disabled fieldset.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Fieldset.Root
+  Fieldset.Legend
+  Field.Root …`} />
+
+## Usage
+
+```tsx
+import { Fieldset, Field } from '@limonify/zest';
+
+<Fieldset.Root disabled>
+  <Fieldset.Legend>Shipping address</Fieldset.Legend>
+  <Field.Root>{/* … */}</Field.Root>
+</Fieldset.Root>
+```
+
+## API
+
+`Fieldset` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/fieldset/root/FieldsetRoot.tsx" name="FieldsetRootProps" />
+
+## Accessibility
+
+`role="group"` labelled by `Fieldset.Legend`. A disabled fieldset disables every `Field.Root` inside it.

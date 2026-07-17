@@ -1,0 +1,30 @@
+---
+title: Input
+description: A standalone text input that integrates with Field.
+---
+
+`Input` is a standalone `TextInput`. Used inside a `Field.Root` it picks up the field's label, description, error and validation automatically.
+
+<Demo>A standalone input.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Input`} />
+
+## Usage
+
+```tsx
+import { Input } from '@limonify/zest';
+
+<Input placeholder="Search" value={q} onValueChange={setQ} style={styles.input} />
+```
+
+## API
+
+`Input` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest/src/input/Input.tsx" name="InputProps" />
+
+## Accessibility
+
+Used inside a `Field.Root`, `Input` is labelled and described by the field just like `Field.Control`.

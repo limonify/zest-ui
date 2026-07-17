@@ -1,0 +1,46 @@
+---
+title: Tooltip
+description: A short hint anchored to a trigger, opened on press.
+---
+
+`Tooltip` is an anchored hint. A touch screen has no hover, so it opens on press rather than hover — there is no hover-delay provider.
+
+<Demo>Tapping to reveal a tooltip.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Tooltip.Root
+  Tooltip.Trigger
+  Tooltip.Portal
+    Tooltip.Positioner
+      Tooltip.Popup
+        Tooltip.Arrow`} />
+
+## Usage
+
+```tsx
+import { Text } from 'react-native';
+import { Tooltip } from '@limonify/zest';
+
+<Tooltip.Root>
+  <Tooltip.Trigger style={styles.iconButton}>{/* … */}</Tooltip.Trigger>
+  <Tooltip.Portal>
+    <Tooltip.Positioner side="top" sideOffset={6}>
+      <Tooltip.Popup style={styles.tip}>
+        <Tooltip.Arrow style={styles.arrow} />
+        <Text style={styles.tipText}>Copy link</Text>
+      </Tooltip.Popup>
+    </Tooltip.Positioner>
+  </Tooltip.Portal>
+</Tooltip.Root>
+```
+
+## API
+
+`Tooltip` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootProps" />
+
+## Accessibility
+
+The popup is `accessibilityRole="tooltip"`. Upstream's hover-delay `Tooltip.Provider` is not ported — there is no hover on touch.

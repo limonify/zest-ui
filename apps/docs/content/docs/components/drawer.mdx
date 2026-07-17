@@ -1,0 +1,50 @@
+---
+title: Drawer
+description: A dialog that also opens and dismisses by swiping, with snap points.
+---
+
+`Drawer` is a `Dialog` you can swipe away. `Drawer.Popup` publishes `swipeMovement` on state so you drive the transform; `Drawer.SwipeArea` opens it from a screen edge. Optional `snapPoints` make it a bottom sheet. Needs `react-native-gesture-handler`.
+
+<Demo>Swiping a sheet up and down through snap points.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Drawer.Root
+  Drawer.Trigger
+  Drawer.SwipeArea
+  Drawer.Portal
+    Drawer.Backdrop
+    Drawer.Viewport
+      Drawer.Popup
+        Drawer.Title
+        Drawer.Close`} />
+
+## Usage
+
+```tsx
+import { Drawer } from '@limonify/zest';
+
+<Drawer.Root swipeDirection="down" snapPoints={[0.4, 0.9]}>
+  <Drawer.Trigger style={styles.button}>{/* … */}</Drawer.Trigger>
+  <Drawer.Portal>
+    <Drawer.Backdrop style={styles.backdrop} />
+    <Drawer.Viewport style={styles.bottom}>
+      <Drawer.Popup
+        style={(state) => [styles.sheet, { transform: [{ translateY: state.swipeMovement }] }]}
+      >
+        {/* … */}
+      </Drawer.Popup>
+    </Drawer.Viewport>
+  </Drawer.Portal>
+</Drawer.Root>
+```
+
+## API
+
+`Drawer` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/drawer/root/DrawerRoot.tsx" name="DrawerRootProps" />
+
+## Accessibility
+
+A bottom sheet is `<Drawer.Root snapPoints={[0.25, 0.5, 0.9]}>`. Swipe dismissal reports the `swipe` reason through `onOpenChange`.

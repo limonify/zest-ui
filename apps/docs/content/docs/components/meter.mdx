@@ -1,0 +1,40 @@
+---
+title: Meter
+description: A static gauge, like disk usage or battery level.
+---
+
+`Meter` is a static measurement, not a task in progress — so it has no indeterminate state and no `status`. Its parts mirror `Progress`.
+
+<Demo>A storage-used gauge.</Demo>
+
+## Anatomy
+
+<Anatomy code={`Meter.Root
+  Meter.Label
+  Meter.Value
+  Meter.Track
+    Meter.Indicator`} />
+
+## Usage
+
+```tsx
+import { Meter } from '@limonify/zest';
+
+<Meter.Root value={72}>
+  <Meter.Label>Storage used</Meter.Label>
+  <Meter.Value />
+  <Meter.Track style={styles.track}>
+    <Meter.Indicator style={styles.fill} />
+  </Meter.Track>
+</Meter.Root>
+```
+
+## API
+
+`Meter` — root props below. Every part also accepts the [common props](/docs/philosophy).
+
+<AutoType path="../../packages/zest/src/meter/root/MeterRoot.tsx" name="MeterRootProps" />
+
+## Accessibility
+
+`role="meter"` (with a `progressbar` accessibilityRole fallback) and `accessibilityValue`. The value normalizes to a percentage of `min`/`max` for the indicator width.
