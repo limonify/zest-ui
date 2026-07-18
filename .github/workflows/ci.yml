@@ -41,5 +41,5 @@ jobs:
       - name: Verify the package packs
         # `npm pack` runs the package's `prepack` (a clean rebuild) and reports the
         # exact tarball contents, catching a broken `files`/`exports` before publish.
-        working-directory: packages/zest
+        working-directory: packages/zest-ui
         run: npm pack --dry-run

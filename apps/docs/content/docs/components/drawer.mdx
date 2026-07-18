@@ -29,7 +29,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Drawer } from '@limonify/zest';
+import { Drawer } from '@limonify/zest-ui';
 
 <Drawer.Root swipeDirection="down">
   <Drawer.Trigger style={styles.button}><Text style={styles.buttonText}>Open</Text></Drawer.Trigger>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Drawer } from '@limonify/zest';
+import { Drawer } from '@limonify/zest-ui';
 
 <Drawer.Root swipeDirection="down">
   <Drawer.Trigger className="self-start rounded-lg bg-neutral-900 px-4 py-2.5"><Text className="font-semibold text-white">Open</Text></Drawer.Trigger>
@@ -90,15 +90,35 @@ import { Drawer } from '@limonify/zest';
 
 ## API
 
-`Drawer` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Drawer` — root props below. Every part also accepts the [common props](/docs/common-props).
 
-<AutoType path="../../packages/zest/src/drawer/root/DrawerRoot.tsx" name="DrawerRootProps" />
+<AutoType path="../../packages/zest-ui/src/drawer/root/DrawerRoot.tsx" name="DrawerRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Drawer.Popup** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Drawer.Popup** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/drawer/popup/DrawerPopup.tsx" name="DrawerPopupState" />
+<AutoType path="../../packages/zest-ui/src/drawer/popup/DrawerPopup.tsx" name="DrawerPopupState" />
+
+## Animation
+
+`Drawer.Popup` publishes `state.transitionStatus` and, while dragging, `state.swipeMovement`. The swipe-to-dismiss gesture is already built in; for the open/close use a slide preset matching the drawer's side, and fade the backdrop:
+
+```tsx
+import Animated, { SlideInDown, SlideOutDown, FadeIn, FadeOut } from 'react-native-reanimated';
+import { Drawer } from '@limonify/zest-ui';
+
+<Drawer.Backdrop keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn} exiting={FadeOut} />
+)} />
+<Drawer.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={SlideInDown} exiting={SlideOutDown} />
+)}>
+  {/* ... */}
+</Drawer.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

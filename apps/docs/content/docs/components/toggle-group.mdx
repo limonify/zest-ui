@@ -22,7 +22,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { ToggleGroup, Toggle } from '@limonify/zest';
+import { ToggleGroup, Toggle } from '@limonify/zest-ui';
 
 <ToggleGroup value={align} onValueChange={setAlign} style={styles.group}>
   {['left', 'center', 'right'].map((v) => (
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
 ```tsx
 import { clsx } from 'clsx';
 import { Text } from 'react-native';
-import { ToggleGroup, Toggle } from '@limonify/zest';
+import { ToggleGroup, Toggle } from '@limonify/zest-ui';
 
 <ToggleGroup value={align} onValueChange={setAlign} className="flex-row overflow-hidden rounded-lg border border-neutral-200">
   {['left', 'center', 'right'].map((v) => (
@@ -71,15 +71,15 @@ import { ToggleGroup, Toggle } from '@limonify/zest';
 
 ## API
 
-`Toggle Group` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+`Toggle Group` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
 
-<AutoType path="../../packages/zest/src/toggle-group/ToggleGroup.tsx" name="ToggleGroupProps" />
+<AutoType path="../../packages/zest-ui/src/toggle-group/ToggleGroup.tsx" name="ToggleGroupProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **ToggleGroup** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **ToggleGroup** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/toggle-group/ToggleGroup.tsx" name="ToggleGroupState" />
+<AutoType path="../../packages/zest-ui/src/toggle-group/ToggleGroup.tsx" name="ToggleGroupState" />
 
 ## Accessibility
 

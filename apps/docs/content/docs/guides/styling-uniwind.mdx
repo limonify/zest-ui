@@ -14,7 +14,7 @@ Uniwind's Babel transform picks it up:
 
 ```tsx
 import { Text } from 'react-native';
-import { Checkbox } from '@limonify/zest';
+import { Checkbox } from '@limonify/zest-ui';
 
 <Checkbox.Root className="size-6 items-center justify-center rounded border border-neutral-300">
   <Checkbox.Indicator>
@@ -29,15 +29,15 @@ Because `className` (like `style`) can be a function of the part's state, you ca
 `checked`, `pressed`, `disabled`, `open`, and the rest:
 
 ```tsx
+import clsx from 'clsx';
+
 <Checkbox.Root
   className={(state) =>
-    [
-      'size-6 items-center justify-center rounded border',
-      state.checked ? 'border-lime-600 bg-lime-600' : 'border-neutral-300',
-      state.disabled && 'opacity-40',
-    ]
-      .filter(Boolean)
-      .join(' ')
+    clsx('size-6 items-center justify-center rounded border', {
+      'border-lime-600 bg-lime-600': state.checked,
+      'border-neutral-300': !state.checked,
+      'opacity-40': state.disabled,
+    })
   }
 >
   {/* ... */}
@@ -45,6 +45,17 @@ Because `className` (like `style`) can be a function of the part's state, you ca
 ```
 
 zest merges your `className` after its own internal props, so your classes always win.
+
+`className` accepts **either** form, so reach for the function only when a class depends on zest's
+state. For classes driven by your own props, a plain string works just as well:
+
+```tsx
+// Static — depends only on your own props:
+<Checkbox.Root className={clsx('size-6 rounded border', invalid && 'border-red-500')} />
+
+// Function — depends on the part's state:
+<Checkbox.Root className={(state) => clsx('size-6 rounded border', { 'bg-lime-600': state.checked })} />
+```
 
 ## With HeroUI Native
 
@@ -54,7 +65,7 @@ look.
 
 ```tsx
 import { Button as HeroButton } from 'heroui-native';
-import { Dialog } from '@limonify/zest';
+import { Dialog } from '@limonify/zest-ui';
 
 <Dialog.Trigger render={(props) => <HeroButton {...props}>Open</HeroButton>} />
 ```

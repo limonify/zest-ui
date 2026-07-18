@@ -2,7 +2,7 @@ node_modules/
 .expo/
 dist/
 build/
-lib/
+/packages/*/lib/
 *.tgz
 coverage/
 .turbo/

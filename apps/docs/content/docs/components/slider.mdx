@@ -26,7 +26,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 <Tab value="Code">
 
 ```tsx
-import { Slider } from '@limonify/zest';
+import { Slider } from '@limonify/zest-ui';
 
 <Slider.Root defaultValue={40}>
   <Slider.Value style={styles.value} />
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
 <Tab value="Uniwind">
 
 ```tsx
-import { Slider } from '@limonify/zest';
+import { Slider } from '@limonify/zest-ui';
 
 <Slider.Root defaultValue={40}>
   <Slider.Value className="mb-2 text-neutral-500" />
@@ -79,15 +79,35 @@ import { Slider } from '@limonify/zest';
 
 ## API
 
-`Slider` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+`Slider` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
 
-<AutoType path="../../packages/zest/src/slider/root/SliderRoot.tsx" name="SliderRootProps" />
+<AutoType path="../../packages/zest-ui/src/slider/root/SliderRoot.tsx" name="SliderRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **every Slider part** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **every Slider part** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/slider/root/SliderRoot.tsx" name="SliderRootState" />
+<AutoType path="../../packages/zest-ui/src/slider/root/SliderRoot.tsx" name="SliderRootState" />
+
+## Animation
+
+The built-in gesture already moves the thumb live, so you rarely animate its position. Instead react to `state.dragging` (on `Slider.Thumb`) — for example, grow the thumb while it is held:
+
+```tsx
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
+import { Slider } from '@limonify/zest-ui';
+
+function Thumb({ props, state }) {
+  const scale = useAnimatedValue(state.dragging ? 1.25 : 1, { duration: 120 });
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  return <Animated.View {...props} style={[styles.thumb, style]} />;
+}
+
+<Slider.Thumb render={(props, state) => <Thumb props={props} state={state} />} />
+```
+
+To make the thumb *follow* the finger with spring physics instead, feed `state.values` into a shared value — see **Gesture-following values** in the [Reanimated guide](/docs/guides/animation-reanimated).
 
 ## Accessibility
 

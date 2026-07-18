@@ -23,7 +23,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Collapsible } from '@limonify/zest';
+import { Collapsible } from '@limonify/zest-ui';
 
 <Collapsible.Root defaultOpen>
   <Collapsible.Trigger style={styles.trigger}>
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Collapsible } from '@limonify/zest';
+import { Collapsible } from '@limonify/zest-ui';
 
 <Collapsible.Root defaultOpen>
   <Collapsible.Trigger className="self-start rounded-lg bg-neutral-900 p-3">
@@ -74,16 +74,41 @@ import { Collapsible } from '@limonify/zest';
 
 ## API
 
-`Collapsible` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Collapsible` — root props below. Every part also accepts the [common props](/docs/common-props).
 
-<AutoType path="../../packages/zest/src/collapsible/root/CollapsibleRoot.tsx" name="CollapsibleRootProps" />
+<AutoType path="../../packages/zest-ui/src/collapsible/root/CollapsibleRoot.tsx" name="CollapsibleRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Collapsible.Panel** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Collapsible.Panel** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/collapsible/panel/CollapsiblePanel.tsx" name="CollapsiblePanelState" />
+<AutoType path="../../packages/zest-ui/src/collapsible/panel/CollapsiblePanel.tsx" name="CollapsiblePanelState" />
+
+## Animation
+
+`Collapsible.Panel` publishes its measured content height on `state.height` plus `state.transitionStatus`. Drive a shared value from `state.open` and clip to the measured height:
+
+```tsx
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
+import { Collapsible } from '@limonify/zest-ui';
+
+function Panel({ props, state }) {
+  const p = useAnimatedValue(state.open ? 1 : 0);
+  const style = useAnimatedStyle(() => ({
+    height: state.height != null ? p.value * state.height : undefined,
+    opacity: p.value,
+  }));
+  return <Animated.View {...props} style={[{ overflow: 'hidden' }, style]} />;
+}
+
+<Collapsible.Panel keepMounted render={(props, state) => <Panel props={props} state={state} />}>
+  {/* ... */}
+</Collapsible.Panel>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 
-The trigger carries `aria-expanded`; the panel is hidden from assistive tech while closed. See the [Reanimated guide](/docs/guides/animation-reanimated) for the height animation.
+The trigger carries `aria-expanded`; the panel is hidden from assistive tech while closed.

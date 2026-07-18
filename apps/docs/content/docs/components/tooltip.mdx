@@ -26,7 +26,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Tooltip } from '@limonify/zest';
+import { Tooltip } from '@limonify/zest-ui';
 
 <Tooltip.Root>
   <Tooltip.Trigger style={styles.iconButton}><Text>?</Text></Tooltip.Trigger>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Tooltip } from '@limonify/zest';
+import { Tooltip } from '@limonify/zest-ui';
 
 <Tooltip.Root>
   <Tooltip.Trigger className="size-9 items-center justify-center rounded-lg border border-neutral-200"><Text>?</Text></Tooltip.Trigger>
@@ -83,15 +83,32 @@ import { Tooltip } from '@limonify/zest';
 
 ## API
 
-`Tooltip` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Tooltip` — root props below. Every part also accepts the [common props](/docs/common-props).
 
-<AutoType path="../../packages/zest/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootProps" />
+<AutoType path="../../packages/zest-ui/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Tooltip parts** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Tooltip parts** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootState" />
+<AutoType path="../../packages/zest-ui/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootState" />
+
+## Animation
+
+`Tooltip.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Tooltip } from '@limonify/zest-ui';
+
+<Tooltip.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(100)} exiting={FadeOut.duration(100)} />
+)}>
+  {/* ... */}
+</Tooltip.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

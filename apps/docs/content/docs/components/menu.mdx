@@ -30,7 +30,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Menu } from '@limonify/zest';
+import { Menu } from '@limonify/zest-ui';
 
 <Menu.Root>
   <Menu.Trigger style={styles.button}><Text style={styles.buttonText}>Open menu</Text></Menu.Trigger>
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Menu } from '@limonify/zest';
+import { Menu } from '@limonify/zest-ui';
 
 <Menu.Root>
   <Menu.Trigger className="self-start rounded-lg bg-neutral-900 px-4 py-2.5"><Text className="font-semibold text-white">Open menu</Text></Menu.Trigger>
@@ -91,16 +91,34 @@ import { Menu } from '@limonify/zest';
 
 ## API
 
-`Menu` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Menu` — root props below. Every part also accepts the [common props](/docs/common-props).
 
-<AutoType path="../../packages/zest/src/menu/root/MenuRoot.tsx" name="MenuRootProps" />
+<AutoType path="../../packages/zest-ui/src/menu/root/MenuRoot.tsx" name="MenuRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Menu.Popup** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Menu.Popup** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/menu/popup/MenuPopup.tsx" name="MenuPopupState" />
+<AutoType path="../../packages/zest-ui/src/menu/popup/MenuPopup.tsx" name="MenuPopupState" />
+
+## Animation
+
+`Menu.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out. Each submenu level is its own Modal, so add `keepMounted` on every level you animate:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Menu } from '@limonify/zest-ui';
+
+<Menu.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
+)}>
+  {/* ... */}
+</Menu.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 
-Each menu level is its own `Modal`, so **every level that should dismiss on an outside tap needs its own `Menu.Backdrop`**. Items close the menu on press by default (`closeOnPress`).
+Each menu level is its own `Modal`, so **every level that should dismiss on an outside tap needs its own `Menu.Backdrop`**. Items close the menu on press by default; set `closeOnPress={false}` to keep it open (the web-era
+`closeOnClick` is still accepted as a deprecated alias).

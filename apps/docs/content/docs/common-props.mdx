@@ -1,0 +1,78 @@
+---
+title: Common props
+description: The props every zest part accepts, on top of its own.
+---
+
+Every zest part renders one React Native primitive (`View`, `Pressable`, `Text`, `TextInput`) and,
+on top of the component-specific props listed on each page, accepts the same small set of shared
+props. They are documented here once so the per-component **API** tables stay focused.
+
+## `style`
+
+The underlying element's `style`, **or a function of the part's state**. The function form is how
+state reaches your styling — the React Native counterpart of Base UI's `data-*` attributes.
+
+```tsx
+// A plain style:
+<Switch.Root style={styles.track} />
+
+// Or a function of state — receives the same fields listed under the page's State section:
+<Switch.Root style={(state) => [styles.track, state.checked && styles.trackOn]} />
+```
+
+Styles merge as arrays (`[internal, yours]`), so yours always win.
+
+## `className`
+
+Passed straight through, untouched, for `className`-based styling engines
+([Uniwind](/docs/guides/styling-uniwind), NativeWind). Like `style`, it accepts a string **or** a
+function of state.
+
+```tsx
+<Switch.Root className={(state) => clsx('h-6 w-11 rounded-full', state.checked && 'bg-lime-700')} />
+```
+
+Inert in plain React Native — it only matters when a `className` transform is set up.
+
+## `render`
+
+Replaces the element the part renders, while keeping all of its behaviour, accessibility and merged
+props. It receives `(props, state)` — spread `props` onto your element and read `state` for styling.
+
+```tsx
+<Dialog.Trigger render={(props) => <MyButton {...props}>Open</MyButton>} />
+
+<Accordion.Trigger
+  render={(props, state) => (
+    <Pressable {...props}>
+      <Text>{state.open ? 'Hide' : 'Show'}</Text>
+    </Pressable>
+  )}
+/>
+```
+
+Use it to swap in a styled component (e.g. a HeroUI Native primitive) or to change the host element.
+
+## `ref`
+
+A ref to the underlying React Native element. zest targets React 19, so `ref` is a regular prop — no
+`forwardRef`.
+
+```tsx
+const ref = useRef<View>(null);
+<Popover.Popup ref={ref} />
+```
+
+## Accessibility props
+
+Every part sets the native `accessibilityRole` / `accessibilityState` / `accessibilityLabelledBy`
+for its role, and also forwards the web `aria-*` props, so the same components work under
+[React Native for Web](https://necolas.github.io/react-native-web/). You can override or extend any
+of them by passing your own.
+
+## State as a function
+
+Wherever `style`, `className`, or `render` take a function, it receives the part's **state object** —
+the exact fields are listed in each component page's **State** section. This is the whole styling
+model: no theme, no CSS, no `data-*`; just a function from state to style. See
+[Philosophy](/docs/philosophy) for why it works this way.

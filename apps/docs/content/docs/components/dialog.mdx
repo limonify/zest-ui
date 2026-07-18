@@ -8,6 +8,13 @@ app with focus containment and Android back-button dismissal handled for you.
 
 <Demo>Opening and dismissing a dialog.</Demo>
 
+<Callout type="info">
+  **Dialog vs AlertDialog vs Drawer.** Use **Dialog** for general modal content;
+  **[AlertDialog](/docs/components/alert-dialog)** for a blocking confirm that must not be dismissed
+  by an outside tap; **[Drawer](/docs/components/drawer)** for a swipeable sheet anchored to a screen
+  edge.
+</Callout>
+
 ## Anatomy
 
 <Anatomy code={`Dialog.Root
@@ -30,7 +37,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Dialog } from '@limonify/zest';
+import { Dialog } from '@limonify/zest-ui';
 
 <Dialog.Root>
   <Dialog.Trigger style={styles.button}>
@@ -82,7 +89,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Dialog } from '@limonify/zest';
+import { Dialog } from '@limonify/zest-ui';
 
 <Dialog.Root>
   <Dialog.Trigger className="self-start rounded-lg bg-neutral-900 px-4 py-2.5">
@@ -116,15 +123,36 @@ reports through `onOpenChange(open, eventDetails)` so you can veto it with `even
 
 ## API
 
-`Dialog.Root`
-<AutoType path="../../packages/zest/src/dialog/root/DialogRoot.tsx" name="DialogRootProps" />
+`Dialog.Root` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest-ui/src/dialog/root/DialogRoot.tsx" name="DialogRootProps" />
 
 
 ## State
 
-These fields reach your `style` and `render` functions on **Dialog.Popup** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Dialog.Popup** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/dialog/popup/DialogPopup.tsx" name="DialogPopupState" />
+<AutoType path="../../packages/zest-ui/src/dialog/popup/DialogPopup.tsx" name="DialogPopupState" />
+
+## Animation
+
+`Dialog.Popup` and `Dialog.Backdrop` publish `state.transitionStatus`. Keep them mounted with `keepMounted` so Reanimated's `exiting` preset has time to play the close:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Dialog } from '@limonify/zest-ui';
+
+<Dialog.Backdrop keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(150)} exiting={FadeOut.duration(150)} />
+)} />
+<Dialog.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(150)} exiting={FadeOut.duration(150)} />
+)}>
+  {/* ... */}
+</Dialog.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

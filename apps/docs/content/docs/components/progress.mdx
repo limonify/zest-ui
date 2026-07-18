@@ -24,7 +24,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 <Tab value="Code">
 
 ```tsx
-import { Progress } from '@limonify/zest';
+import { Progress } from '@limonify/zest-ui';
 
 <Progress.Root value={value}>
   <Progress.Label style={styles.label}>Uploading</Progress.Label>
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { clsx } from 'clsx';
-import { Progress } from '@limonify/zest';
+import { Progress } from '@limonify/zest-ui';
 
 <Progress.Root value={value}>
   <Progress.Label className="mb-1.5 text-neutral-500">Uploading</Progress.Label>
@@ -73,15 +73,39 @@ import { Progress } from '@limonify/zest';
 
 ## API
 
-`Progress` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Progress` — root props below. Every part also accepts the [common props](/docs/common-props).
 
-<AutoType path="../../packages/zest/src/progress/root/ProgressRoot.tsx" name="ProgressRootProps" />
+<AutoType path="../../packages/zest-ui/src/progress/root/ProgressRoot.tsx" name="ProgressRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **every Progress part** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **every Progress part** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/progress/root/ProgressRoot.tsx" name="ProgressRootState" />
+<AutoType path="../../packages/zest-ui/src/progress/root/ProgressRoot.tsx" name="ProgressRootState" />
+
+## Animation
+
+`Progress.Indicator` sizes itself to the current value. To ease the fill smoothly between values, drive a shared value from your own `value` and render the width yourself (percent = `value / max`):
+
+```tsx
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
+import { Progress } from '@limonify/zest-ui';
+
+function Fill({ value }: { value: number }) {
+  const w = useAnimatedValue(value, { duration: 300 });
+  const style = useAnimatedStyle(() => ({ width: `${w.value}%` }));
+  return <Progress.Indicator render={(props) => <Animated.View {...props} style={[styles.fill, style]} />} />;
+}
+
+<Progress.Root value={value}>
+  <Progress.Track style={styles.track}>
+    <Fill value={value} />
+  </Progress.Track>
+</Progress.Root>
+```
+
+Skip the animation while indeterminate (`value == null`) — there is no width to ease toward. See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

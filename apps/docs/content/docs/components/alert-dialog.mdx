@@ -29,7 +29,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { AlertDialog } from '@limonify/zest';
+import { AlertDialog } from '@limonify/zest-ui';
 
 <AlertDialog.Root>
   <AlertDialog.Trigger style={styles.button}><Text style={styles.buttonText}>Delete</Text></AlertDialog.Trigger>
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { AlertDialog } from '@limonify/zest';
+import { AlertDialog } from '@limonify/zest-ui';
 
 <AlertDialog.Root>
   <AlertDialog.Trigger className="self-start rounded-lg bg-neutral-900 px-4 py-2.5"><Text className="font-semibold text-white">Delete</Text></AlertDialog.Trigger>
@@ -93,15 +93,35 @@ import { AlertDialog } from '@limonify/zest';
 
 ## API
 
-`Alert Dialog` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Alert Dialog` — root props below. Every part also accepts the [common props](/docs/common-props).
 
-<AutoType path="../../packages/zest/src/alert-dialog/root/AlertDialogRoot.tsx" name="AlertDialogRootProps" />
+<AutoType path="../../packages/zest-ui/src/alert-dialog/root/AlertDialogRoot.tsx" name="AlertDialogRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **AlertDialog.Popup** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **AlertDialog.Popup** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/dialog/popup/DialogPopup.tsx" name="DialogPopupState" />
+<AutoType path="../../packages/zest-ui/src/dialog/popup/DialogPopup.tsx" name="DialogPopupState" />
+
+## Animation
+
+`AlertDialog.Popup` and `AlertDialog.Backdrop` publish `state.transitionStatus`. Keep them mounted with `keepMounted` so Reanimated's `exiting` preset has time to play the close:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { AlertDialog } from '@limonify/zest-ui';
+
+<AlertDialog.Backdrop keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(150)} exiting={FadeOut.duration(150)} />
+)} />
+<AlertDialog.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(150)} exiting={FadeOut.duration(150)} />
+)}>
+  {/* ... */}
+</AlertDialog.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

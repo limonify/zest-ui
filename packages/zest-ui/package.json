@@ -1,5 +1,5 @@
 {
-  "name": "@limonify/zest",
+  "name": "@limonify/zest-ui",
   "version": "0.1.0",
   "description": "Base UI for React Native — headless, unstyled, accessible primitive components.",
   "license": "MIT",

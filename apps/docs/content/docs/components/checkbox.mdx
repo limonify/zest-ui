@@ -22,7 +22,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text, View } from 'react-native';
-import { Checkbox } from '@limonify/zest';
+import { Checkbox } from '@limonify/zest-ui';
 
 <View style={styles.row}>
   <Checkbox.Root
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
 ```tsx
 import { clsx } from 'clsx';
 import { Text, View } from 'react-native';
-import { Checkbox } from '@limonify/zest';
+import { Checkbox } from '@limonify/zest-ui';
 
 <View className="flex-row items-center gap-2.5">
   <Checkbox.Root
@@ -95,15 +95,44 @@ import { Checkbox } from '@limonify/zest';
 
 ## API
 
-`Checkbox` — the props below sit on the root. Every part also accepts the [common props](/docs/philosophy) (`style`/`className` as a value or function of state, `render`, `ref`).
+`Checkbox` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
 
-<AutoType path="../../packages/zest/src/checkbox/root/CheckboxRoot.tsx" name="CheckboxRootProps" />
+<AutoType path="../../packages/zest-ui/src/checkbox/root/CheckboxRoot.tsx" name="CheckboxRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Checkbox.Root** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Checkbox.Root** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/checkbox/root/CheckboxRoot.tsx" name="CheckboxRootState" />
+<AutoType path="../../packages/zest-ui/src/checkbox/root/CheckboxRoot.tsx" name="CheckboxRootState" />
+
+## Animation
+
+`Checkbox.Indicator` publishes `state.transitionStatus` and stays mounted with `keepMounted`, so you can scale and fade the tick in on check and out on uncheck:
+
+```tsx
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
+import { Text } from 'react-native';
+import { Checkbox } from '@limonify/zest-ui';
+
+function Tick({ props, state }) {
+  // 'ending' means animating out; anything else is on its way in.
+  const p = useAnimatedValue(state.transitionStatus === 'ending' ? 0 : 1, { duration: 120 });
+  const style = useAnimatedStyle(() => ({
+    opacity: p.value,
+    transform: [{ scale: 0.6 + p.value * 0.4 }],
+  }));
+  return <Animated.View {...props} style={[props.style, style]} />;
+}
+
+<Checkbox.Root checked={checked} onCheckedChange={setChecked} style={styles.box}>
+  <Checkbox.Indicator keepMounted render={(props, state) => <Tick props={props} state={state} />}>
+    <Text style={styles.tick}>✓</Text>
+  </Checkbox.Indicator>
+</Checkbox.Root>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

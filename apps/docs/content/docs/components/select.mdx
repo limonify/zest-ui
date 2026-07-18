@@ -7,6 +7,13 @@ description: A trigger that opens a list to choose one (or several) values.
 
 <Demo>Choosing a fruit, and a multi-select.</Demo>
 
+<Callout type="info">
+  **Select vs Combobox vs Autocomplete.** Reach for **Select** to pick from a known list with no
+  typing; **[Combobox](/docs/components/combobox)** when the user types to filter and choose a bound
+  value; **[Autocomplete](/docs/components/autocomplete)** when the typed text itself is the value
+  (free-text with suggestions).
+</Callout>
+
 ## Anatomy
 
 <Anatomy code={`Select.Root
@@ -30,7 +37,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Select } from '@limonify/zest';
+import { Select } from '@limonify/zest-ui';
 
 <Select.Root items={FRUITS} value={value} onValueChange={setValue}>
   <Select.Trigger style={styles.trigger}>
@@ -77,7 +84,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Select } from '@limonify/zest';
+import { Select } from '@limonify/zest-ui';
 
 <Select.Root items={FRUITS} value={value} onValueChange={setValue}>
   <Select.Trigger className="min-w-44 flex-row items-center justify-between gap-3 rounded-lg border border-neutral-300 px-4 py-3">
@@ -108,15 +115,32 @@ import { Select } from '@limonify/zest';
 
 ## API
 
-`Select` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Select` — root props below. Every part also accepts the [common props](/docs/common-props).
 
-<AutoType path="../../packages/zest/src/select/root/SelectRoot.tsx" name="SelectRootProps" />
+<AutoType path="../../packages/zest-ui/src/select/root/SelectRoot.tsx" name="SelectRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Select.Trigger** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Select.Trigger** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/select/trigger/SelectTrigger.tsx" name="SelectTriggerState" />
+<AutoType path="../../packages/zest-ui/src/select/trigger/SelectTrigger.tsx" name="SelectTriggerState" />
+
+## Animation
+
+`Select.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Select } from '@limonify/zest-ui';
+
+<Select.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
+)}>
+  {/* ... */}
+</Select.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

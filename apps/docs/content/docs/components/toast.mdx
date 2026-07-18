@@ -26,7 +26,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 <Tab value="Code">
 
 ```tsx
-import { Toast } from '@limonify/zest';
+import { Toast } from '@limonify/zest-ui';
 
 // 1. At the app root:
 <Toast.Provider timeout={4000} limit={3}>
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
 <Tab value="Uniwind">
 
 ```tsx
-import { Toast } from '@limonify/zest';
+import { Toast } from '@limonify/zest-ui';
 
 <Toast.Provider timeout={4000} limit={3}>
   <App />
@@ -87,15 +87,46 @@ import { Toast } from '@limonify/zest';
 
 ## API
 
-`Toast` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Toast` — root props below. Every part also accepts the [common props](/docs/common-props).
 
-<AutoType path="../../packages/zest/src/toast/root/ToastRoot.tsx" name="ToastRootProps" />
+<AutoType path="../../packages/zest-ui/src/toast/root/ToastRoot.tsx" name="ToastRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Toast.Root** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Toast.Root** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/toast/root/ToastRoot.tsx" name="ToastRootState" />
+<AutoType path="../../packages/zest-ui/src/toast/root/ToastRoot.tsx" name="ToastRootState" />
+
+## Animation
+
+`Toast.Root` publishes `state.transitionStatus`, its stacking `offsetY`/`index`, and `swipeMovement`. Set `removeOnClose={false}` so the row survives its exit, remove it from the queue when the exit finishes, and use `LinearTransition` so the stack reflows smoothly:
+
+```tsx
+import Animated, { SlideInDown, SlideOutDown, LinearTransition, runOnJS } from 'react-native-reanimated';
+import { Toast } from '@limonify/zest-ui';
+
+function ToastItem({ toast }) {
+  const { remove } = Toast.useToastManager();
+  return (
+    <Toast.Root
+      toast={toast}
+      removeOnClose={false}
+      render={(props) => (
+        <Animated.View
+          {...props}
+          entering={SlideInDown}
+          exiting={SlideOutDown.withCallback(() => runOnJS(remove)(toast.id))}
+          layout={LinearTransition}
+        />
+      )}
+    >
+      {/* Title / Description */}
+    </Toast.Root>
+  );
+}
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

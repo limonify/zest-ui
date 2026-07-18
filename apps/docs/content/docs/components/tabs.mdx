@@ -25,7 +25,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Animated, Text } from 'react-native';
-import { Tabs } from '@limonify/zest';
+import { Tabs } from '@limonify/zest-ui';
 
 <Tabs.Root defaultValue="overview">
   <Tabs.List style={styles.list}>
@@ -36,7 +36,10 @@ import { Tabs } from '@limonify/zest';
     ))}
     <Tabs.Indicator
       render={(props, s) => (
-        <Animated.View {...props} style={[styles.indicator, { left: s.left, width: s.width }]} />
+        <Animated.View
+          {...props}
+          style={[styles.indicator, { left: s.selectedTabPosition?.left, width: s.selectedTabSize?.width }]}
+        />
       )}
     />
   </Tabs.List>
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Animated, Text } from 'react-native';
-import { Tabs } from '@limonify/zest';
+import { Tabs } from '@limonify/zest-ui';
 
 <Tabs.Root defaultValue="overview">
   <Tabs.List className="flex-row border-b border-neutral-200">
@@ -80,7 +83,11 @@ import { Tabs } from '@limonify/zest';
     ))}
     <Tabs.Indicator
       render={(props, s) => (
-        <Animated.View {...props} className="absolute bottom-0 h-0.5 bg-lime-700" style={{ left: s.left, width: s.width }} />
+        <Animated.View
+          {...props}
+          className="absolute bottom-0 h-0.5 bg-lime-700"
+          style={{ left: s.selectedTabPosition?.left, width: s.selectedTabSize?.width }}
+        />
       )}
     />
   </Tabs.List>
@@ -98,15 +105,36 @@ import { Tabs } from '@limonify/zest';
 
 ## API
 
-`Tabs` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Tabs` — root props below. Every part also accepts the [common props](/docs/common-props).
 
-<AutoType path="../../packages/zest/src/tabs/root/TabsRoot.tsx" name="TabsRootProps" />
+<AutoType path="../../packages/zest-ui/src/tabs/root/TabsRoot.tsx" name="TabsRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Tabs.Tab** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Tabs.Tab** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/tabs/tab/TabsTab.tsx" name="TabsTabState" />
+<AutoType path="../../packages/zest-ui/src/tabs/tab/TabsTab.tsx" name="TabsTabState" />
+
+## Animation
+
+`Tabs.Indicator` publishes the active tab's `selectedTabPosition` (`{ left, right, top, bottom }`) and `selectedTabSize` (`{ width, height }`). Drive shared values from them so the bar slides between tabs instead of jumping:
+
+```tsx
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
+import { Tabs } from '@limonify/zest-ui';
+
+function Indicator({ props, state }) {
+  const left = useAnimatedValue(state.selectedTabPosition?.left ?? 0, { duration: 180 });
+  const width = useAnimatedValue(state.selectedTabSize?.width ?? 0, { duration: 180 });
+  const style = useAnimatedStyle(() => ({ left: left.value, width: width.value }));
+  return <Animated.View {...props} style={[styles.indicator, style]} />;
+}
+
+<Tabs.Indicator render={(props, state) => <Indicator props={props} state={state} />} />
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

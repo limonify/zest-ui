@@ -5,7 +5,7 @@ description: A text input that filters a list of items, with single selection.
 
 `Combobox` is a text input paired with a filtered list. Typing filters the items; choosing one
 fills the input and closes the list. For free-text suggestions without a bound value, use
-[`Autocomplete`](/docs/components/combobox), which reuses every combobox part.
+[`Autocomplete`](/docs/components/autocomplete), which reuses every combobox part.
 
 <Demo>Filtering a list and selecting an item.</Demo>
 
@@ -31,7 +31,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Combobox } from '@limonify/zest';
+import { Combobox } from '@limonify/zest-ui';
 
 <Combobox.Root items={COUNTRIES} value={value} onValueChange={setValue}>
   <Combobox.Input placeholder="Pick a country" style={styles.input} />
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Combobox } from '@limonify/zest';
+import { Combobox } from '@limonify/zest-ui';
 
 <Combobox.Root items={COUNTRIES} value={value} onValueChange={setValue}>
   <Combobox.Input placeholder="Pick a country" className="rounded-lg border border-neutral-300 px-3 py-2.5" />
@@ -103,7 +103,7 @@ import { Combobox } from '@limonify/zest';
 
 ## API
 
-`Combobox.Root`
+`Combobox.Root` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -116,9 +116,26 @@ import { Combobox } from '@limonify/zest';
 
 ## State
 
-These fields reach your `style` and `render` functions on **Combobox.Input** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Combobox.Input** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
+<AutoType path="../../packages/zest-ui/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
+
+## Animation
+
+`Combobox.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade the list in and out:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Combobox } from '@limonify/zest-ui';
+
+<Combobox.Popup keepMounted render={(props) => (
+  <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
+)}>
+  {/* ... */}
+</Combobox.Popup>
+```
+
+See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
 ## Accessibility
 

@@ -6,8 +6,8 @@ description: Add zest to an Expo or bare React Native app.
 ## Install
 
 ```bash
-bun add @limonify/zest
-# or: npm install @limonify/zest
+bun add @limonify/zest-ui
+# or: npm install @limonify/zest-ui
 ```
 
 ### Peer dependencies
@@ -31,3 +31,57 @@ export default function App() {
 
 Anchored popups (`Popover`, `Tooltip`, `Menu`, `Select`, `Combobox`) use
 `@floating-ui/react-native`, which ships as a regular dependency — nothing to install.
+
+## Providers
+
+Most components need no provider. The one exception is **Toast**: it is not a Modal (so the app
+underneath stays usable), which means it needs a `Toast.Provider` and a `Toast.Viewport` mounted
+once at the root, near your `GestureHandlerRootView`:
+
+```tsx
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Toast } from '@limonify/zest-ui';
+
+export default function App() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Toast.Provider timeout={4000} limit={3}>
+        <RootNavigator />
+        <Toast.Viewport style={{ paddingHorizontal: 16, paddingBottom: 48 }}>
+          {/* render your toasts here — see the Toast page */}
+        </Toast.Viewport>
+      </Toast.Provider>
+    </GestureHandlerRootView>
+  );
+}
+```
+
+Skip `GestureHandlerRootView` if you use neither Slider nor Drawer, and skip `Toast.Provider` if you
+don't use toasts.
+
+## Your first component
+
+Import a `Root` and its parts, and style them with your own `StyleSheet`:
+
+```tsx
+import { StyleSheet } from 'react-native';
+import { Switch } from '@limonify/zest-ui';
+
+export function DarkModeToggle() {
+  return (
+    <Switch.Root style={(state) => [styles.track, state.checked && styles.trackOn]}>
+      <Switch.Thumb style={(state) => [styles.thumb, state.checked && styles.thumbOn]} />
+    </Switch.Root>
+  );
+}
+
+const styles = StyleSheet.create({
+  track: { width: 44, height: 26, borderRadius: 13, backgroundColor: '#d4d4d4', padding: 3 },
+  trackOn: { backgroundColor: '#4c7a0b' },
+  thumb: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff' },
+  thumbOn: { transform: [{ translateX: 18 }] },
+});
+```
+
+Next: skim the shared [Common props](/docs/common-props) that every part accepts, then browse the
+[components](/docs/components/dialog).

@@ -23,7 +23,7 @@ The behaviour is headless — the **Code** tab is the component; the **StyleShee
 
 ```tsx
 import { Text } from 'react-native';
-import { Avatar } from '@limonify/zest';
+import { Avatar } from '@limonify/zest-ui';
 
 <Avatar.Root style={styles.avatar}>
   <Avatar.Image source={{ uri: user.avatar }} style={styles.image} />
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
 
 ```tsx
 import { Text } from 'react-native';
-import { Avatar } from '@limonify/zest';
+import { Avatar } from '@limonify/zest-ui';
 
 <Avatar.Root className="size-11 overflow-hidden rounded-full bg-neutral-200">
   <Avatar.Image source={{ uri: user.avatar }} className="size-full" />
@@ -70,15 +70,15 @@ import { Avatar } from '@limonify/zest';
 
 ## API
 
-`Avatar` — root props below. Every part also accepts the [common props](/docs/philosophy).
+`Avatar` — root props below. Every part also accepts the [common props](/docs/common-props).
 
-<AutoType path="../../packages/zest/src/avatar/root/AvatarRoot.tsx" name="AvatarRootProps" />
+<AutoType path="../../packages/zest-ui/src/avatar/root/AvatarRoot.tsx" name="AvatarRootProps" />
 
 ## State
 
-These fields reach your `style` and `render` functions on **Avatar.Image** — the React Native counterpart of Base UI's `data-*` attributes (`style={(state) => ...}`).
+These fields reach your `style` and `render` functions on **Avatar.Image** (`style={(state) => ...}`).
 
-<AutoType path="../../packages/zest/src/avatar/image/AvatarImage.tsx" name="AvatarImageState" />
+<AutoType path="../../packages/zest-ui/src/avatar/image/AvatarImage.tsx" name="AvatarImageState" />
 
 ## Accessibility
 
