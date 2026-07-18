@@ -3,6 +3,10 @@ module.exports = {
   preset: 'jest-expo',
   testMatch: ['<rootDir>/src/**/*.test.(ts|tsx)'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  // GitHub Actions runners share a small CPU budget across Jest workers; a single
+  // userEvent press that takes ~0.5s locally can cross the 5s default there
+  // (SelectRoot's open-then-select test has already timed out under that load).
+  testTimeout: 15000,
   // jest-expo's default pattern handles .pnpm but not bun's isolated ".bun"
   // store layout, so RN/Expo sources under node_modules/.bun/<pkg>/node_modules
   // would be excluded from transformation.
