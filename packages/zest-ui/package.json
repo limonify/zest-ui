@@ -3,6 +3,15 @@
   "version": "0.1.0",
   "description": "Base UI for React Native — headless, unstyled, accessible primitive components.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/limonify/zest-ui.git",
+    "directory": "packages/zest-ui"
+  },
+  "homepage": "https://github.com/limonify/zest-ui#readme",
+  "bugs": {
+    "url": "https://github.com/limonify/zest-ui/issues"
+  },
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "source": "./src/index.ts",
