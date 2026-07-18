@@ -37,17 +37,23 @@ jobs:
 
       - name: Sync package version from release tag
         if: github.event_name == 'release'
-        working-directory: packages/zest-ui
         run: |
           TAG="${GITHUB_REF_NAME#v}"
           if ! [[ "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
             echo "::error::Release tag ${GITHUB_REF_NAME} is not a semver version (expected vX.Y.Z)"
             exit 1
           fi
-          # Publish uses whatever is in package.json — bump the working tree to the
-          # tag so creating a GitHub Release is enough; no manual edit required.
-          npm version "$TAG" --no-git-tag-version --allow-same-version
-          echo "Publishing @limonify/zest-ui@$TAG"
+          # Do not use `npm version` here: npm walks the bun workspace and dies on
+          # `workspace:*` (EUNSUPPORTEDPROTOCOL). Just rewrite the version field.
+          TAG="$TAG" node <<'EOF'
+          const fs = require('fs');
+          const path = 'packages/zest-ui/package.json';
+          const version = process.env.TAG;
+          const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
+          pkg.version = version;
+          fs.writeFileSync(path, `${JSON.stringify(pkg, null, 2)}\n`);
+          console.log(`Publishing @limonify/zest-ui@${version}`);
+          EOF
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -72,7 +78,13 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git fetch origin main
           git checkout -B main origin/main
-          npm version "$VERSION" --no-git-tag-version --allow-same-version --prefix packages/zest-ui
+          TAG="$VERSION" node <<'EOF'
+          const fs = require('fs');
+          const path = 'packages/zest-ui/package.json';
+          const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
+          pkg.version = process.env.TAG;
+          fs.writeFileSync(path, `${JSON.stringify(pkg, null, 2)}\n`);
+          EOF
           git add packages/zest-ui/package.json
           if git diff --staged --quiet; then
             echo "main already at $VERSION — nothing to commit"
