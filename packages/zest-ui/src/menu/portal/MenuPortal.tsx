@@ -31,7 +31,7 @@ export function MenuPortal(props: MenuPortal.Props) {
       <Modal
         transparent
         visible={open}
-        animationType="none"
+        animationType="fade"
         statusBarTranslucent
         navigationBarTranslucent
         onRequestClose={(event: NativeSyntheticEvent<unknown>) => {

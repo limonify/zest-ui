@@ -27,7 +27,7 @@ export function SelectPortal(props: SelectPortal.Props) {
       <Modal
         transparent
         visible={open}
-        animationType="none"
+        animationType="fade"
         statusBarTranslucent
         navigationBarTranslucent
         onRequestClose={(event: NativeSyntheticEvent<unknown>) => {

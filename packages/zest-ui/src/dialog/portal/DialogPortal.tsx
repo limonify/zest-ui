@@ -12,8 +12,10 @@ import { REASONS } from '../../utils/reasons';
  * Implemented with React Native's `Modal`, which mounts its children at the
  * root of the native view hierarchy, contains accessibility focus, and wires
  * the Android hardware back button (and Escape on web) to `onRequestClose`.
- * Rendering is headless: `animationType` is `"none"` so consumers own all
- * animation.
+ * The Modal uses `animationType="fade"` so open/close get a smooth native
+ * cross-fade (including the exit, which a consumer-driven animation can't cover
+ * because the Modal unmounts on close). Consumers still layer their own
+ * enter transitions (scale/slide) on the popup on top of this fade.
  */
 export function DialogPortal(props: DialogPortal.Props) {
   const { children, keepMounted = false } = props;
@@ -31,7 +33,7 @@ export function DialogPortal(props: DialogPortal.Props) {
       <Modal
         transparent
         visible={open}
-        animationType="none"
+        animationType="fade"
         statusBarTranslucent
         navigationBarTranslucent
         onRequestClose={(event: NativeSyntheticEvent<unknown>) => {

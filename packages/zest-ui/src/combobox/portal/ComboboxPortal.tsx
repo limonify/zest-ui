@@ -21,7 +21,7 @@ export function ComboboxPortal(props: ComboboxPortal.Props) {
     <Modal
       transparent
       visible={open}
-      animationType="none"
+      animationType="fade"
       statusBarTranslucent
       navigationBarTranslucent
       onRequestClose={(event: NativeSyntheticEvent<unknown>) => {

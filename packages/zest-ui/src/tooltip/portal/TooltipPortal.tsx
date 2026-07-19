@@ -38,7 +38,7 @@ export function TooltipPortal(props: TooltipPortal.Props) {
       <Modal
         transparent
         visible={open}
-        animationType="none"
+        animationType="fade"
         statusBarTranslucent
         navigationBarTranslucent
         onRequestClose={(event: NativeSyntheticEvent<unknown>) => {
