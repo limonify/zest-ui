@@ -26,18 +26,16 @@ export function useTransitionStatus(
   );
   const [mounted, setMounted] = React.useState(open);
 
-  if (open && !mounted) {
-    setMounted(true);
-    setTransitionStatus('starting');
-  }
-
-  if (!open && mounted && transitionStatus !== 'ending' && !deferEndingState) {
-    setTransitionStatus('ending');
-  }
-
-  if (!open && !mounted && transitionStatus === 'ending') {
-    setTransitionStatus(undefined);
-  }
+  useIsoLayoutEffect(() => {
+    if (open && !mounted) {
+      setMounted(true);
+      setTransitionStatus('starting');
+    } else if (!open && mounted && transitionStatus !== 'ending' && !deferEndingState) {
+      setTransitionStatus('ending');
+    } else if (!open && !mounted && transitionStatus === 'ending') {
+      setTransitionStatus(undefined);
+    }
+  }, [open, mounted, transitionStatus, deferEndingState]);
 
   useIsoLayoutEffect(() => {
     if (!open && mounted && transitionStatus !== 'ending' && deferEndingState) {
