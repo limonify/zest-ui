@@ -301,7 +301,7 @@ export class ToastStore extends ReactStore<State, {}, typeof selectors> {
 
     const endingToasts = toasts.map((item) =>
       closeAll || item.id === toastId
-        ? { ...item, transitionStatus: 'ending' as const, height: 0 }
+        ? { ...item, transitionStatus: 'ending' as const, height: 0, measuredHeight: item.height }
         : item,
     );
     const newToasts = applyLimited(endingToasts, limit);

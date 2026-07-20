@@ -71,6 +71,13 @@ export interface ToastObject<Data extends object> {
    */
   height?: number | undefined;
   /**
+   * The last measured height of the toast, captured at the moment it closes.
+   * Unlike `height` (which is set to `0` on close for stack collapse), this
+   * preserves the value so the consumer can use it as the starting point for
+   * an exit animation.
+   */
+  measuredHeight?: number | undefined;
+  /**
    * Callback function to be called when the toast is closed.
    */
   onClose?: (() => void) | undefined;

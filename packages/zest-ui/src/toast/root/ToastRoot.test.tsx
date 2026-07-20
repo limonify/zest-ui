@@ -1,11 +1,22 @@
 import * as React from 'react';
 import { AppState, Text, type AppStateStatus } from 'react-native';
-import { act, render, screen, userEvent } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { GestureHandlerRootView, State } from 'react-native-gesture-handler';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { Toast, createToastManager } from '../index';
 import { ToastStore } from '../store';
 import type { ToastProviderProps } from '../provider/ToastProvider';
+import { useToastProviderContext } from '../provider/ToastProviderContext';
+
+/**
+ * Renders nothing; captures the ToastStore instance so tests can inspect its
+ * internal state (transitionStatus, measuredHeight, etc.) directly.
+ */
+let testStore: ToastStore | undefined = undefined;
+function CaptureStore() {
+  testStore = useToastProviderContext();
+  return null;
+}
 
 function ToastList({ removeOnClose }: { removeOnClose?: boolean }) {
   const { toasts } = Toast.useToastManager();
@@ -41,6 +52,7 @@ function TestToasts({
   return (
     <GestureHandlerRootView>
       <Toast.Provider {...providerProps}>
+        <CaptureStore />
         {children}
         <ToastList removeOnClose={removeOnClose} />
       </Toast.Provider>
@@ -470,6 +482,76 @@ describe('Toast', () => {
       });
 
       expect(onRemove).toHaveBeenCalled();
+    });
+
+    it('preserves measuredHeight on close for exit animation', async () => {
+      const user = userEvent.setup();
+      const manager = createToastManager();
+      await render(
+        <TestToasts toastManager={manager} timeout={0} removeOnClose={false}>
+          <AddButton />
+        </TestToasts>,
+      );
+
+      await user.press(screen.getByTestId('add'));
+      const [id] = toastIds();
+
+      // Simulate a layout measurement so the toast has a known height.
+      await act(async () => {
+        fireEvent(screen.getByTestId(`toast-${id}`), 'layout', {
+          nativeEvent: { layout: { x: 0, y: 0, width: 300, height: 80 } },
+        });
+      });
+
+      expect(testStore!.select('toast', id)?.height).toBe(80);
+
+      // Close the toast.
+      await act(async () => {
+        manager.close(id);
+      });
+
+      // measuredHeight preserves the last measured height before close.
+      expect(testStore!.select('toast', id)?.measuredHeight).toBe(80);
+      // height is set to 0 for stack collapse.
+      expect(testStore!.select('toast', id)?.height).toBe(0);
+    });
+  });
+
+  describe('transition status', () => {
+    it('auto-clears from starting to undefined so enter animations do not re-trigger', async () => {
+      // In the test environment `requestAnimationFrame` fires synchronously, so
+      // the auto-clear effect completes within the same `act` block as `add`.
+      // This asserts the end-state: status is cleared after the first commit.
+      const manager = createToastManager();
+      await render(<TestToasts toastManager={manager} timeout={0} />);
+
+      let id = '';
+      await act(async () => {
+        id = manager.add({ title: 'Saved' });
+      });
+
+      // The auto-clear effect ran during the act block (sync rAF), so
+      // transitionStatus has already been cleared to undefined.
+      expect(testStore!.select('toast', id)?.transitionStatus).toBeUndefined();
+    });
+
+    it('preserves ending status when a toast is closed during the starting frame', async () => {
+      const manager = createToastManager();
+      await render(<TestToasts toastManager={manager} timeout={0} removeOnClose={false} />);
+
+      let id = '';
+      await act(async () => {
+        id = manager.add({ title: 'Saved' });
+      });
+
+      // Close before the auto-clear's rAF callback fires.
+      await act(async () => {
+        manager.close(id);
+      });
+
+      // The auto-clear effect's guard (updateToastInternal bails on 'ending')
+      // prevents the status from being overwritten back to undefined.
+      expect(testStore!.select('toast', id)?.transitionStatus).toBe('ending');
     });
   });
 

@@ -6,6 +6,7 @@ import { useToastProviderContext } from '../provider/ToastProviderContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
+import { AnimationFrame } from '../../hooks/useAnimationFrame';
 import type { ZestUIComponentProps } from '../../types';
 import type { ToastObject } from '../useToastManager';
 import { ToastRootContext } from './ToastRootContext';
@@ -23,12 +24,17 @@ export type ToastSwipeDirection = 'up' | 'down' | 'left' | 'right';
  * `transitionStatus`, its stacking `offsetY`/`index`, and how far a swipe has
  * travelled, and the consumer turns those into a transform.
  *
- * Nothing in React Native reports that a closing animation finished, so a closed
- * toast would otherwise sit in the list forever. `removeOnClose` (on by default)
- * drops it the moment it closes, which is what a consumer who does not animate
- * wants. To animate the exit, set `removeOnClose={false}`, drive the exit from
- * `state.transitionStatus === 'ending'`, and call `useToastManager().remove(id)`
- * when it finishes. This is the same lever as `Collapsible.Panel`'s `keepMounted`.
+ * **Enter:** `transitionStatus` starts as `'starting'` (auto-clears to
+ * `undefined` after one frame). Key off `state.transitionStatus === 'starting'`
+ * to trigger a slide-in or fade-in animation.
+ *
+ * **Exit:** `removeOnClose` (on by default) drops the toast the moment it
+ * closes — the right default for a consumer who does not animate. To animate
+ * the exit, set `removeOnClose={false}`, drive the exit from
+ * `state.transitionStatus === 'ending'` using `state.measuredHeight` as the
+ * starting value (the animation target is `0`), and call
+ * `useToastManager().remove(id)` when the animation finishes.
+ * This is the same lever as `Collapsible.Panel`'s `keepMounted`.
  */
 export function ToastRoot(componentProps: ToastRoot.Props) {
   const {
@@ -64,13 +70,26 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
     }
   }, [removeOnClose, toast.transitionStatus, toast.id, store]);
 
+  // `transitionStatus` starts as `'starting'` and stays that way forever.
+  // Auto-clear it after one frame so the consumer can react to `'starting'`
+  // for an enter animation without repeatedly re-triggering.
+  useIsoLayoutEffect(() => {
+    if (toast.transitionStatus === 'starting') {
+      const frame = AnimationFrame.request(() => {
+        store.updateToastInternal(toast.id, { transitionStatus: undefined });
+      });
+      return () => AnimationFrame.cancel(frame);
+    }
+    return undefined;
+  }, [toast.transitionStatus, toast.id, store]);
+
   const handleLayout = useStableCallback((event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
 
     // A closing toast reports a height of 0 through the store; measuring it again
     // here would undo that and leave a gap in the stack.
     if (toast.transitionStatus !== 'ending' && height !== toast.height) {
-      store.updateToastInternal(toast.id, { height });
+      store.updateToastInternal(toast.id, { height, measuredHeight: height });
     }
   });
 
@@ -124,6 +143,7 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
       visibleIndex,
       offsetY,
       height: toast.height ?? 0,
+      measuredHeight: toast.measuredHeight ?? toast.height ?? 0,
       swiping,
       swipeMovement,
       swipeDirection,
@@ -137,6 +157,7 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
       visibleIndex,
       offsetY,
       toast.height,
+      toast.measuredHeight,
       swiping,
       swipeMovement,
       swipeDirection,
@@ -192,8 +213,9 @@ function getDisplacement(
 
 export interface ToastRootState {
   /**
-   * The toast's transition status: `'starting'` as it arrives, `'ending'` once it
-   * is closing.
+   * The toast's transition status: `'starting'` as it arrives (auto-clears to
+   * `undefined` after one frame for enter animation), `'ending'` once it is
+   * closing.
    */
   transitionStatus: 'starting' | 'ending' | undefined;
   /**
@@ -227,6 +249,12 @@ export interface ToastRootState {
    * The toast's measured height.
    */
   height: number;
+  /**
+   * The last measured height before the toast closed, preserved for the
+   * consumer to use as the starting value for an exit animation.
+   * Falls back to `height` when no close has occurred yet.
+   */
+  measuredHeight: number;
   /**
    * Whether a swipe is currently in progress.
    */
