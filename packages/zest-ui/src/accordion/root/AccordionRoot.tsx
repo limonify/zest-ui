@@ -32,18 +32,33 @@ export function AccordionRoot<Value = any>(componentProps: AccordionRoot.Props<V
     ...elementProps
   } = componentProps;
 
+  const normalizeValue = React.useCallback((val: any) => {
+    if (val === undefined || val === null) return undefined;
+    if (Array.isArray(val)) return val;
+    return [val];
+  }, []);
+
+  const normalizedValueProp = React.useMemo(
+    () => normalizeValue(valueProp),
+    [valueProp, normalizeValue],
+  );
+  const normalizedDefaultValueProp = React.useMemo(
+    () => normalizeValue(defaultValueProp),
+    [defaultValueProp, normalizeValue],
+  );
+
   // Memoized to allow omitting both defaultValue and value, which would
   // otherwise trigger a warning in useControlled.
   const defaultValue = React.useMemo(() => {
     if (valueProp === undefined) {
-      return defaultValueProp ?? [];
+      return normalizedDefaultValueProp ?? [];
     }
 
     return undefined;
-  }, [valueProp, defaultValueProp]);
+  }, [valueProp, normalizedDefaultValueProp]);
 
   const [value, setValue] = useControlled<AccordionValue<Value>>({
-    controlled: valueProp,
+    controlled: normalizedValueProp,
     default: defaultValue,
     name: 'Accordion',
     state: 'value',
@@ -115,16 +130,18 @@ export interface AccordionRootProps<Value = any>
   extends Omit<ZestUIComponentProps<typeof View, AccordionRootState<Value>>, 'value'> {
   /**
    * The controlled value of the item(s) that should be expanded.
+   * Accepts a single value or an array of values.
    *
    * To render an uncontrolled accordion, use the `defaultValue` prop instead.
    */
-  value?: AccordionValue<Value> | undefined;
+  value?: Value | AccordionValue<Value> | undefined;
   /**
    * The uncontrolled value of the item(s) that should be initially expanded.
+   * Accepts a single value or an array of values.
    *
    * To render a controlled accordion, use the `value` prop instead.
    */
-  defaultValue?: AccordionValue<Value> | undefined;
+  defaultValue?: Value | AccordionValue<Value> | undefined;
   /**
    * Whether the component should ignore user interaction.
    * @default false

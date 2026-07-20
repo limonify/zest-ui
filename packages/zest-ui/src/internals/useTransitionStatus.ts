@@ -26,16 +26,18 @@ export function useTransitionStatus(
   );
   const [mounted, setMounted] = React.useState(open);
 
-  useIsoLayoutEffect(() => {
-    if (open && !mounted) {
-      setMounted(true);
-      setTransitionStatus('starting');
-    } else if (!open && mounted && transitionStatus !== 'ending' && !deferEndingState) {
-      setTransitionStatus('ending');
-    } else if (!open && !mounted && transitionStatus === 'ending') {
-      setTransitionStatus(undefined);
-    }
-  }, [open, mounted, transitionStatus, deferEndingState]);
+  if (open && !mounted) {
+    setMounted(true);
+    setTransitionStatus('starting');
+  }
+
+  if (!open && mounted && transitionStatus !== 'ending' && !deferEndingState) {
+    setTransitionStatus('ending');
+  }
+
+  if (!open && !mounted && transitionStatus === 'ending') {
+    setTransitionStatus(undefined);
+  }
 
   useIsoLayoutEffect(() => {
     if (!open && mounted && transitionStatus !== 'ending' && deferEndingState) {
@@ -63,7 +65,7 @@ export function useTransitionStatus(
     return () => {
       AnimationFrame.cancel(frame);
     };
-  }, [enableIdleState, open]);
+  }, [enableIdleState, open, transitionStatus]);
 
   useIsoLayoutEffect(() => {
     if (!open || !enableIdleState) {

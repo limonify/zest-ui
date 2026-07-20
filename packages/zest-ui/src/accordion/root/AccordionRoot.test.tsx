@@ -216,4 +216,19 @@ describe('Accordion', () => {
         .accessibilityElementsHidden,
     ).toBe(true);
   });
+
+  it('supports a single string defaultValue and value prop', async () => {
+    const onValueChange = jest.fn();
+    await render(<TestAccordion defaultValue="one" onValueChange={onValueChange} />);
+
+    expect(screen.getByTestId('panel-one')).toBeTruthy();
+    expect(screen.queryByTestId('panel-two')).toBeNull();
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('trigger-two'));
+
+    expect(onValueChange).toHaveBeenCalledWith(['two'], expect.anything());
+    expect(screen.queryByTestId('panel-one')).toBeNull();
+    expect(screen.getByTestId('panel-two')).toBeTruthy();
+  });
 });
