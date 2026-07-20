@@ -6,7 +6,11 @@ import { useCollapsibleRootContext } from '../root/CollapsibleRootContext';
 import type { CollapsibleRootState } from '../root/CollapsibleRoot';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestUIComponentProps } from '../../types';
-import { useCollapsiblePanel } from './useCollapsiblePanel';
+import { useCollapsiblePanel, type MeasurePadding } from './useCollapsiblePanel';
+import {
+  CollapsiblePanelContextContext,
+  type CollapsiblePanelContext,
+} from './CollapsiblePanelContext';
 
 /**
  * A panel with the collapsible contents.
@@ -16,11 +20,19 @@ import { useCollapsiblePanel } from './useCollapsiblePanel';
  * object as `height`/`width` — the React Native counterpart of the web version's
  * `--collapsible-panel-height` CSS variable. Drive an `Animated` value from
  * `state.height` and `state.transitionStatus` to animate the panel.
+ *
+ * ⚠️ **Padding footgun:** The measured `height`/`width` reflects the natural
+ * content size of the panel's **children**, not the panel element itself. If you
+ * apply `padding` on the Panel element via `style`, the clip height will not
+ * account for it and content at the bottom will be clipped. To pad the panel,
+ * put padding on a child View **inside** the Panel instead, or use a
+ * `measurePadding` prop. See `Accordion.Panel` for the same caveat.
  */
 export function CollapsiblePanel(componentProps: CollapsiblePanel.Props) {
   const {
     className,
     keepMounted = false,
+    measurePadding,
     render,
     style,
     ref,
@@ -32,6 +44,7 @@ export function CollapsiblePanel(componentProps: CollapsiblePanel.Props) {
 
   const { dimensions, props, shouldRender, wrappedChildren } = useCollapsiblePanel({
     keepMounted,
+    measurePadding,
     children,
   });
 
@@ -45,12 +58,27 @@ export function CollapsiblePanel(componentProps: CollapsiblePanel.Props) {
     [rootState, transitionStatus, dimensions.height, dimensions.width],
   );
 
-  return useRenderElement(View, componentProps, {
+  const panelContext: CollapsiblePanelContext = React.useMemo(
+    () => ({
+      height: dimensions.height,
+      width: dimensions.width,
+      transitionStatus,
+    }),
+    [dimensions.height, dimensions.width, transitionStatus],
+  );
+
+  const element = useRenderElement(View, componentProps, {
     state,
     ref,
     enabled: shouldRender,
     props: [props, elementProps, { children: wrappedChildren }],
   });
+
+  return (
+    <CollapsiblePanelContextContext.Provider value={panelContext}>
+      {element}
+    </CollapsiblePanelContextContext.Provider>
+  );
 }
 
 export interface CollapsiblePanelState extends CollapsibleRootState {
@@ -80,6 +108,16 @@ export interface CollapsiblePanelProps
    * @default false
    */
   keepMounted?: boolean | undefined;
+  /**
+   * Padding applied to the inner measurement wrapper so the reported
+   * `height`/`width` reflect the padded content size.
+   *
+   * Use this instead of `style.padding` on the panel element to avoid the
+   * padding footgun where the clip height does not account for padding.
+   * The padding is applied inside the clip, so the animation height
+   * naturally includes it.
+   */
+  measurePadding?: MeasurePadding | undefined;
 }
 
 export namespace CollapsiblePanel {

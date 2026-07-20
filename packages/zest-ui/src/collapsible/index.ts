@@ -4,3 +4,4 @@ export type * from './root/CollapsibleRoot';
 export type * from './trigger/CollapsibleTrigger';
 export type * from './panel/CollapsiblePanel';
 export { useCollapsibleRootContext } from './root/CollapsibleRootContext';
+export { useCollapsiblePanelState } from './panel/CollapsiblePanelContext';

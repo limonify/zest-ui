@@ -7,3 +7,4 @@ export type * from './trigger/AccordionTrigger';
 export type * from './panel/AccordionPanel';
 export { useAccordionRootContext } from './root/AccordionRootContext';
 export { useAccordionItemContext } from './item/AccordionItemContext';
+export { useCollapsiblePanelState as useAccordionPanelState } from '../collapsible/panel/CollapsiblePanelContext';

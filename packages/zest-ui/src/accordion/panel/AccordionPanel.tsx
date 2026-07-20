@@ -3,7 +3,11 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useCollapsibleRootContext } from '../../collapsible/root/CollapsibleRootContext';
-import { useCollapsiblePanel } from '../../collapsible/panel/useCollapsiblePanel';
+import { useCollapsiblePanel, type MeasurePadding } from '../../collapsible/panel/useCollapsiblePanel';
+import {
+  CollapsiblePanelContextContext,
+  type CollapsiblePanelContext,
+} from '../../collapsible/panel/CollapsiblePanelContext';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { AccordionItemState } from '../item/AccordionItem';
 import { useAccordionItemContext } from '../item/AccordionItemContext';
@@ -16,11 +20,19 @@ import type { ZestUIComponentProps } from '../../types';
  *
  * Like `Collapsible.Panel`, it publishes the measured content size on the state
  * object so the consumer can drive an `Animated` value from it.
+ *
+ * ⚠️ **Padding footgun:** The measured `height`/`width` reflects the natural
+ * content size of the panel's **children**, not the panel element itself. If you
+ * apply `padding` on the Panel element via `style`, the clip height will not
+ * account for it and content at the bottom will be clipped. To pad the panel,
+ * put padding on a child View **inside** the Panel instead, or use a
+ * `measurePadding` prop.
  */
 export function AccordionPanel(componentProps: AccordionPanel.Props) {
   const {
     className,
     keepMounted: keepMountedProp,
+    measurePadding,
     render,
     style,
     ref,
@@ -36,6 +48,7 @@ export function AccordionPanel(componentProps: AccordionPanel.Props) {
 
   const { dimensions, props, shouldRender, wrappedChildren } = useCollapsiblePanel({
     keepMounted,
+    measurePadding,
     children,
   });
 
@@ -49,7 +62,16 @@ export function AccordionPanel(componentProps: AccordionPanel.Props) {
     [itemState, transitionStatus, dimensions.height, dimensions.width],
   );
 
-  return useRenderElement(View, componentProps, {
+  const panelContext: CollapsiblePanelContext = React.useMemo(
+    () => ({
+      height: dimensions.height,
+      width: dimensions.width,
+      transitionStatus,
+    }),
+    [dimensions.height, dimensions.width, transitionStatus],
+  );
+
+  const element = useRenderElement(View, componentProps, {
     state,
     ref,
     enabled: shouldRender,
@@ -60,6 +82,12 @@ export function AccordionPanel(componentProps: AccordionPanel.Props) {
       { children: wrappedChildren },
     ],
   });
+
+  return (
+    <CollapsiblePanelContextContext.Provider value={panelContext}>
+      {element}
+    </CollapsiblePanelContextContext.Provider>
+  );
 }
 
 export interface AccordionPanelState extends AccordionItemState {
@@ -89,6 +117,16 @@ export interface AccordionPanelProps
    * Defaults to the `keepMounted` prop on `Accordion.Root`.
    */
   keepMounted?: boolean | undefined;
+  /**
+   * Padding applied to the inner measurement wrapper so the reported
+   * `height`/`width` reflect the padded content size.
+   *
+   * Use this instead of `style.padding` on the panel element to avoid the
+   * padding footgun where the clip height does not account for padding.
+   * The padding is applied inside the clip, so the animation height
+   * naturally includes it.
+   */
+  measurePadding?: MeasurePadding | undefined;
 }
 
 export namespace AccordionPanel {
