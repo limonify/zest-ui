@@ -15,17 +15,20 @@ describe('Switch.Root', () => {
     const switchEl = screen.getByTestId('switch');
     expect(switchEl.props.accessibilityRole).toBe('switch');
     expect(switchEl.props.accessibilityState).toMatchObject({ checked: false });
-    // Unlike the Checkbox indicator, the thumb is always mounted.
-    expect(screen.getByTestId('thumb')).toBeTruthy();
+    // The thumb follows the animation contract: unmounted when unchecked,
+    // mounted when checked (unless keepMounted is set).
+    expect(screen.queryByTestId('thumb')).toBeNull();
 
     const user = userEvent.setup();
     await user.press(switchEl);
 
     expect(onCheckedChange).toHaveBeenCalledWith(true, expect.objectContaining({ reason: 'none' }));
     expect(screen.getByTestId('switch').props.accessibilityState).toMatchObject({ checked: true });
+    expect(screen.getByTestId('thumb')).toBeTruthy();
 
     await user.press(switchEl);
     expect(screen.getByTestId('switch').props.accessibilityState).toMatchObject({ checked: false });
+    expect(screen.queryByTestId('thumb')).toBeNull();
   });
 
   it('respects the controlled checked prop', async () => {
