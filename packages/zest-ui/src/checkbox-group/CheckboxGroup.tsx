@@ -52,7 +52,10 @@ export function CheckboxGroup(componentProps: CheckboxGroup.Props) {
 
   const parent = useCheckboxGroupParent({ allValues, value, onValueChange: setValue });
 
-  const state: CheckboxGroupState = { disabled };
+  const state: CheckboxGroupState = React.useMemo(
+    () => ({ disabled }),
+    [disabled],
+  );
 
   const contextValue: CheckboxGroupContext = React.useMemo(
     () => ({

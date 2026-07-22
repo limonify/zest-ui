@@ -15,6 +15,7 @@
     "build": "turbo run build"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.1",
     "@eslint/js": "^9",
     "eslint": "^9",
     "eslint-plugin-react-hooks": "^5",

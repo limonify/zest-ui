@@ -6,6 +6,7 @@ import { useDialogPopupProps } from '../../dialog/popup/useDialogPopupProps';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import type { ZestUIComponentProps } from '../../types';
+import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { useDrawerRootContext, type DrawerSnapPoint, type DrawerSwipeDirection } from '../root/DrawerRootContext';
@@ -59,7 +60,7 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
     setActiveSnapPoint,
     snapToSequentialPoints,
   } = useDrawerSnapPoints();
-  const { store, open, props } = useDialogPopupProps();
+  const { store, open, transitionStatus, props } = useDialogPopupProps();
 
   const [swiping, setSwiping] = React.useState(false);
   const [swipeMovement, setSwipeMovement] = React.useState(0);
@@ -157,6 +158,7 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
 
   const state: DrawerPopupState = {
     open,
+    transitionStatus,
     swiping,
     swipeMovement,
     swipeDirection,
@@ -192,6 +194,11 @@ export interface DrawerPopupState {
    * Whether the drawer is currently open.
    */
   open: boolean;
+  /**
+   * The transition status of the drawer: `'starting'` as it opens (auto-clears
+   * to `undefined` after one frame), `'ending'` once it is closing.
+   */
+  transitionStatus: TransitionStatus;
   /**
    * Whether a swipe is currently in progress.
    */

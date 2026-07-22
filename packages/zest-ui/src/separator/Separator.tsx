@@ -1,4 +1,5 @@
 'use client';
+import * as React from 'react';
 import { View } from 'react-native';
 import type { ZestUIComponentProps, Orientation } from '../types';
 import { useRenderElement } from '../use-render/useRenderElement';
@@ -17,7 +18,10 @@ export function Separator(componentProps: Separator.Props) {
     ...elementProps
   } = componentProps;
 
-  const state: SeparatorState = { orientation };
+  const state: SeparatorState = React.useMemo(
+    () => ({ orientation }),
+    [orientation],
+  );
 
   const element = useRenderElement(View, componentProps, {
     state,

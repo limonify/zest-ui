@@ -69,7 +69,10 @@ export function ToggleGroup<Value extends string = string>(
     },
   );
 
-  const state: ToggleGroupState = { disabled, multiple, orientation };
+  const state: ToggleGroupState = React.useMemo(
+    () => ({ disabled, multiple, orientation }),
+    [disabled, multiple, orientation],
+  );
 
   const contextValue: ToggleGroupContext<Value> = React.useMemo(
     () => ({

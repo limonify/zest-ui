@@ -41,7 +41,10 @@ export function TabsTab(componentProps: TabsTab.Props) {
 
   const tabPanelId = getTabPanelIdByValue(value);
 
-  const state: TabsTabState = { disabled, active, orientation, tabActivationDirection, pressed };
+  const state: TabsTabState = React.useMemo(
+    () => ({ disabled, active, orientation, tabActivationDirection, pressed }),
+    [disabled, active, orientation, tabActivationDirection, pressed],
+  );
 
   return useRenderElement(Pressable, componentProps, {
     state,

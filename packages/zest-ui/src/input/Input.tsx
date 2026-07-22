@@ -1,4 +1,5 @@
 'use client';
+import * as React from 'react';
 import { TextInput } from 'react-native';
 import { useRenderElement } from '../use-render/useRenderElement';
 import { useFieldControl } from '../field/control/useFieldControl';
@@ -32,7 +33,10 @@ export function Input(componentProps: Input.Props) {
     requireField: false,
   });
 
-  const state: Input.State = { disabled: field?.disabled ?? false };
+  const state: Input.State = React.useMemo(
+    () => ({ disabled: field?.disabled ?? false }),
+    [field?.disabled],
+  );
 
   return useRenderElement(TextInput, componentProps, {
     state,

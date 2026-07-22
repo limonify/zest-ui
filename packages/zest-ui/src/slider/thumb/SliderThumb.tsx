@@ -28,7 +28,7 @@ export function SliderThumb(componentProps: SliderThumb.Props) {
       ? { position: 'absolute' as const, bottom: `${percent}%` as const }
       : { position: 'absolute' as const, left: `${percent}%` as const };
 
-  const thumbState: SliderThumbState = { ...state, index, value };
+  const thumbState: SliderThumbState = { ...state, index, value, percent };
 
   return useRenderElement(View, componentProps, {
     state: thumbState,
@@ -73,6 +73,10 @@ export interface SliderThumbState extends SliderRootState {
    * This thumb's value.
    */
   value: number;
+  /**
+   * This thumb's position as a percentage (0-100) of the track.
+   */
+  percent: number;
 }
 
 export interface SliderThumbProps extends ZestUIComponentProps<typeof View, SliderThumbState> {

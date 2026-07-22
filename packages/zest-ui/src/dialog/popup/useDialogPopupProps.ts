@@ -1,6 +1,7 @@
 'use client';
 import { useDialogRootContext } from '../root/DialogRootContext';
 import { useDialogPortalContext } from '../portal/DialogPortalContext';
+import { useDialogTransitionContext } from '../root/DialogTransitionContext';
 
 /**
  * The state and element props shared by every popup built on the dialog store —
@@ -9,6 +10,7 @@ import { useDialogPortalContext } from '../portal/DialogPortalContext';
 export function useDialogPopupProps() {
   useDialogPortalContext();
   const store = useDialogRootContext();
+  const transitionContext = useDialogTransitionContext();
 
   const open = store.useState('open');
   const titleElementId = store.useState('titleElementId');
@@ -18,6 +20,7 @@ export function useDialogPopupProps() {
   return {
     store,
     open,
+    transitionStatus: transitionContext?.transitionStatus,
     props: {
       role,
       accessibilityViewIsModal: true,

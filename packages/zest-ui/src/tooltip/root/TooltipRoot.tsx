@@ -1,10 +1,12 @@
 'use client';
-import type * as React from 'react';
+import * as React from 'react';
 import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { useTransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import { TooltipStore } from '../store/TooltipStore';
 import { TooltipRootContext } from './TooltipRootContext';
+import { TooltipTransitionContext } from './TooltipTransitionContext';
 
 /**
  * Groups all parts of the tooltip.
@@ -26,7 +28,21 @@ export function TooltipRoot(props: TooltipRoot.Props) {
   store.useControlledProp('openProp', open);
   store.useContextCallback('onOpenChange', onOpenChange);
 
-  return <TooltipRootContext.Provider value={store}>{children}</TooltipRootContext.Provider>;
+  const resolvedOpen = store.useState('open');
+  const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
+
+  const transitionContextValue = React.useMemo(
+    () => ({ transitionStatus }),
+    [transitionStatus],
+  );
+
+  return (
+    <TooltipRootContext.Provider value={store}>
+      <TooltipTransitionContext.Provider value={transitionContextValue}>
+        {children}
+      </TooltipTransitionContext.Provider>
+    </TooltipRootContext.Provider>
+  );
 }
 
 export interface TooltipRootState {}

@@ -53,7 +53,10 @@ export function RadioGroup<Value = any>(componentProps: RadioGroup.Props<Value>)
     },
   );
 
-  const state: RadioGroupState = { disabled, readOnly, required };
+  const state: RadioGroupState = React.useMemo(
+    () => ({ disabled, readOnly, required }),
+    [disabled, readOnly, required],
+  );
 
   const contextValue: RadioGroupContext<Value> = React.useMemo(
     () => ({

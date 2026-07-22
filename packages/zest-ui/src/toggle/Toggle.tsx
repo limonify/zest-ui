@@ -1,4 +1,5 @@
 'use client';
+import * as React from 'react';
 import { Pressable, type GestureResponderEvent } from 'react-native';
 import { useControlled } from '../hooks/useControlled';
 import { useId } from '../hooks/useId';
@@ -65,7 +66,10 @@ export function Toggle<Value extends string = string>(componentProps: Toggle.Pro
 
   const { getButtonProps } = useButton({ disabled });
 
-  const state: ToggleState = { disabled, pressed };
+  const state: ToggleState = React.useMemo(
+    () => ({ disabled, pressed }),
+    [disabled, pressed],
+  );
 
   return useRenderElement(Pressable, componentProps, {
     state,

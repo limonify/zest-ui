@@ -21,6 +21,176 @@
       "types": "./lib/index.d.ts",
       "react-native": "./src/index.ts",
       "default": "./lib/index.js"
+    },
+    "./accordion": {
+      "types": "./lib/accordion/index.d.ts",
+      "react-native": "./src/accordion/index.ts",
+      "default": "./lib/accordion/index.js"
+    },
+    "./alert-dialog": {
+      "types": "./lib/alert-dialog/index.d.ts",
+      "react-native": "./src/alert-dialog/index.ts",
+      "default": "./lib/alert-dialog/index.js"
+    },
+    "./autocomplete": {
+      "types": "./lib/autocomplete/index.d.ts",
+      "react-native": "./src/autocomplete/index.ts",
+      "default": "./lib/autocomplete/index.js"
+    },
+    "./avatar": {
+      "types": "./lib/avatar/index.d.ts",
+      "react-native": "./src/avatar/index.ts",
+      "default": "./lib/avatar/index.js"
+    },
+    "./button": {
+      "types": "./lib/button/index.d.ts",
+      "react-native": "./src/button/index.ts",
+      "default": "./lib/button/index.js"
+    },
+    "./checkbox": {
+      "types": "./lib/checkbox/index.d.ts",
+      "react-native": "./src/checkbox/index.ts",
+      "default": "./lib/checkbox/index.js"
+    },
+    "./checkbox-group": {
+      "types": "./lib/checkbox-group/index.d.ts",
+      "react-native": "./src/checkbox-group/index.ts",
+      "default": "./lib/checkbox-group/index.js"
+    },
+    "./collapsible": {
+      "types": "./lib/collapsible/index.d.ts",
+      "react-native": "./src/collapsible/index.ts",
+      "default": "./lib/collapsible/index.js"
+    },
+    "./combobox": {
+      "types": "./lib/combobox/index.d.ts",
+      "react-native": "./src/combobox/index.ts",
+      "default": "./lib/combobox/index.js"
+    },
+    "./context-menu": {
+      "types": "./lib/context-menu/index.d.ts",
+      "react-native": "./src/context-menu/index.ts",
+      "default": "./lib/context-menu/index.js"
+    },
+    "./dialog": {
+      "types": "./lib/dialog/index.d.ts",
+      "react-native": "./src/dialog/index.ts",
+      "default": "./lib/dialog/index.js"
+    },
+    "./drawer": {
+      "types": "./lib/drawer/index.d.ts",
+      "react-native": "./src/drawer/index.ts",
+      "default": "./lib/drawer/index.js"
+    },
+    "./field": {
+      "types": "./lib/field/index.d.ts",
+      "react-native": "./src/field/index.ts",
+      "default": "./lib/field/index.js"
+    },
+    "./fieldset": {
+      "types": "./lib/fieldset/index.d.ts",
+      "react-native": "./src/fieldset/index.ts",
+      "default": "./lib/fieldset/index.js"
+    },
+    "./input": {
+      "types": "./lib/input/index.d.ts",
+      "react-native": "./src/input/index.ts",
+      "default": "./lib/input/index.js"
+    },
+    "./menu": {
+      "types": "./lib/menu/index.d.ts",
+      "react-native": "./src/menu/index.ts",
+      "default": "./lib/menu/index.js"
+    },
+    "./meter": {
+      "types": "./lib/meter/index.d.ts",
+      "react-native": "./src/meter/index.ts",
+      "default": "./lib/meter/index.js"
+    },
+    "./number-field": {
+      "types": "./lib/number-field/index.d.ts",
+      "react-native": "./src/number-field/index.ts",
+      "default": "./lib/number-field/index.js"
+    },
+    "./otp-field": {
+      "types": "./lib/otp-field/index.d.ts",
+      "react-native": "./src/otp-field/index.ts",
+      "default": "./lib/otp-field/index.js"
+    },
+    "./popover": {
+      "types": "./lib/popover/index.d.ts",
+      "react-native": "./src/popover/index.ts",
+      "default": "./lib/popover/index.js"
+    },
+    "./progress": {
+      "types": "./lib/progress/index.d.ts",
+      "react-native": "./src/progress/index.ts",
+      "default": "./lib/progress/index.js"
+    },
+    "./radio": {
+      "types": "./lib/radio/index.d.ts",
+      "react-native": "./src/radio/index.ts",
+      "default": "./lib/radio/index.js"
+    },
+    "./radio-group": {
+      "types": "./lib/radio-group/index.d.ts",
+      "react-native": "./src/radio-group/index.ts",
+      "default": "./lib/radio-group/index.js"
+    },
+    "./select": {
+      "types": "./lib/select/index.d.ts",
+      "react-native": "./src/select/index.ts",
+      "default": "./lib/select/index.js"
+    },
+    "./separator": {
+      "types": "./lib/separator/index.d.ts",
+      "react-native": "./src/separator/index.ts",
+      "default": "./lib/separator/index.js"
+    },
+    "./slider": {
+      "types": "./lib/slider/index.d.ts",
+      "react-native": "./src/slider/index.ts",
+      "default": "./lib/slider/index.js"
+    },
+    "./switch": {
+      "types": "./lib/switch/index.d.ts",
+      "react-native": "./src/switch/index.ts",
+      "default": "./lib/switch/index.js"
+    },
+    "./tabs": {
+      "types": "./lib/tabs/index.d.ts",
+      "react-native": "./src/tabs/index.ts",
+      "default": "./lib/tabs/index.js"
+    },
+    "./toast": {
+      "types": "./lib/toast/index.d.ts",
+      "react-native": "./src/toast/index.ts",
+      "default": "./lib/toast/index.js"
+    },
+    "./toggle": {
+      "types": "./lib/toggle/index.d.ts",
+      "react-native": "./src/toggle/index.ts",
+      "default": "./lib/toggle/index.js"
+    },
+    "./toggle-group": {
+      "types": "./lib/toggle-group/index.d.ts",
+      "react-native": "./src/toggle-group/index.ts",
+      "default": "./lib/toggle-group/index.js"
+    },
+    "./tooltip": {
+      "types": "./lib/tooltip/index.d.ts",
+      "react-native": "./src/tooltip/index.ts",
+      "default": "./lib/tooltip/index.js"
+    },
+    "./hooks": {
+      "types": "./lib/hooks/index.d.ts",
+      "react-native": "./src/hooks/index.ts",
+      "default": "./lib/hooks/index.js"
+    },
+    "./store": {
+      "types": "./lib/store/index.d.ts",
+      "react-native": "./src/store/index.ts",
+      "default": "./lib/store/index.js"
     }
   },
   "files": [
@@ -34,6 +204,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "lint": "eslint src",
     "build": "tsc -p tsconfig.build.json",
     "clean": "rm -rf lib",
@@ -46,6 +217,7 @@
   },
   "devDependencies": {
     "@babel/runtime": "^8.0.0",
+    "@size-limit/preset-small-lib": "^12.1.0",
     "@testing-library/react-native": "^14.0.1",
     "@types/jest": "^29.5.14",
     "@types/react": "~19.2.2",
@@ -55,6 +227,7 @@
     "react": "19.2.3",
     "react-native": "0.86.0",
     "react-native-gesture-handler": "~3.1.0",
+    "size-limit": "^12.1.0",
     "typescript": "~6.0.3"
   },
   "dependencies": {
@@ -64,5 +237,12 @@
     "react-native-gesture-handler": {
       "optional": true
     }
-  }
+  },
+  "size-limit": [
+    {
+      "name": "full",
+      "path": "lib/index.js",
+      "limit": "500 KB"
+    }
+  ]
 }

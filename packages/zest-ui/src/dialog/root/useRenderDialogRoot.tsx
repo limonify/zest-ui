@@ -1,10 +1,12 @@
 'use client';
 import * as React from 'react';
 import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { useTransitionStatus } from '../../internals/useTransitionStatus';
 import { usePopupRootHandle } from '../../utils/popups/usePopupRootHandle';
 import { DialogStore } from '../store/DialogStore';
 import type { DialogRootProps } from './DialogRoot';
 import { DialogRootContext } from './DialogRootContext';
+import { DialogTransitionContext } from './DialogTransitionContext';
 
 export type DialogRootMode = 'dialog' | 'alert-dialog';
 
@@ -53,11 +55,21 @@ export function useRenderDialogRoot<Payload = unknown>(
 
   usePopupRootHandle({ store, handle, actionsRef });
 
+  const resolvedOpen = store.useState('open');
+  const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
+
   const payload = store.useState('payload') as Payload;
+
+  const transitionContextValue = React.useMemo(
+    () => ({ transitionStatus }),
+    [transitionStatus],
+  );
 
   return (
     <DialogRootContext.Provider value={store}>
-      {typeof children === 'function' ? children(payload) : children}
+      <DialogTransitionContext.Provider value={transitionContextValue}>
+        {typeof children === 'function' ? children(payload) : children}
+      </DialogTransitionContext.Provider>
     </DialogRootContext.Provider>
   );
 }

@@ -14,7 +14,10 @@ export function AvatarRoot(componentProps: AvatarRoot.Props) {
 
   const [imageLoadingStatus, setImageLoadingStatus] = React.useState<ImageLoadingStatus>('idle');
 
-  const state: AvatarRootState = { imageLoadingStatus };
+  const state: AvatarRootState = React.useMemo(
+    () => ({ imageLoadingStatus }),
+    [imageLoadingStatus],
+  );
 
   const contextValue: AvatarRootContext = React.useMemo(
     () => ({ imageLoadingStatus, setImageLoadingStatus }),

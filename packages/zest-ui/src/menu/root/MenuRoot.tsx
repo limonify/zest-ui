@@ -1,12 +1,14 @@
 'use client';
-import type * as React from 'react';
+import * as React from 'react';
 import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { useTransitionStatus } from '../../internals/useTransitionStatus';
 import { usePopupRootHandle } from '../../utils/popups/usePopupRootHandle';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import { MenuStore } from '../store/MenuStore';
 import type { MenuHandle } from '../store/MenuHandle';
 import { MenuRootContext } from './MenuRootContext';
+import { MenuTransitionContext } from './MenuTransitionContext';
 
 /**
  * Groups all parts of the menu.
@@ -49,11 +51,21 @@ export function MenuRoot<Payload = unknown>(props: MenuRoot.Props<Payload>) {
 
   usePopupRootHandle({ store, handle, actionsRef });
 
+  const resolvedOpen = store.useState('open');
+  const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
+
   const payload = store.useState('payload') as Payload;
+
+  const transitionContextValue = React.useMemo(
+    () => ({ transitionStatus }),
+    [transitionStatus],
+  );
 
   return (
     <MenuRootContext.Provider value={store}>
-      {typeof children === 'function' ? children(payload) : children}
+      <MenuTransitionContext.Provider value={transitionContextValue}>
+        {typeof children === 'function' ? children(payload) : children}
+      </MenuTransitionContext.Provider>
     </MenuRootContext.Provider>
   );
 }

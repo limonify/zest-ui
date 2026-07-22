@@ -19,7 +19,10 @@ export function Button(componentProps: Button.Props) {
 
   const { getButtonProps } = useButton({ disabled });
 
-  const state: ButtonState = { disabled, pressed };
+  const state: ButtonState = React.useMemo(
+    () => ({ disabled, pressed }),
+    [disabled, pressed],
+  );
 
   return useRenderElement(Pressable, componentProps, {
     state,

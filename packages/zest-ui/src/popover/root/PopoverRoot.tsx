@@ -1,12 +1,14 @@
 'use client';
-import type * as React from 'react';
+import * as React from 'react';
 import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { useTransitionStatus } from '../../internals/useTransitionStatus';
 import { usePopupRootHandle } from '../../utils/popups/usePopupRootHandle';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import { PopoverStore } from '../store/PopoverStore';
 import type { PopoverHandle } from '../store/PopoverHandle';
 import { PopoverRootContext } from './PopoverRootContext';
+import { PopoverTransitionContext } from './PopoverTransitionContext';
 
 /**
  * Groups all parts of the popover.
@@ -43,11 +45,21 @@ export function PopoverRoot<Payload = unknown>(props: PopoverRoot.Props<Payload>
 
   usePopupRootHandle({ store, handle, actionsRef });
 
+  const resolvedOpen = store.useState('open');
+  const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
+
   const payload = store.useState('payload') as Payload;
+
+  const transitionContextValue = React.useMemo(
+    () => ({ transitionStatus }),
+    [transitionStatus],
+  );
 
   return (
     <PopoverRootContext.Provider value={store}>
-      {typeof children === 'function' ? children(payload) : children}
+      <PopoverTransitionContext.Provider value={transitionContextValue}>
+        {typeof children === 'function' ? children(payload) : children}
+      </PopoverTransitionContext.Provider>
     </PopoverRootContext.Provider>
   );
 }

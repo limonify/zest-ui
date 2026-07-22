@@ -43,7 +43,10 @@ export function MenuItem(componentProps: MenuItem.Props) {
 
   const { getButtonProps } = useButton({ disabled });
 
-  const state: MenuItemState = { disabled, pressed, index };
+  const state: MenuItemState = React.useMemo(
+    () => ({ disabled, pressed, index }),
+    [disabled, pressed, index],
+  );
 
   return useRenderElement(Pressable, componentProps, {
     state,

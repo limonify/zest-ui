@@ -18,7 +18,15 @@ export function SelectList(componentProps: SelectList.Props) {
   return useRenderElement(ScrollView, componentProps, {
     state,
     ref,
-    props: [{ accessibilityRole: 'list' as const, role: 'listbox' as const }, elementProps],
+    props: [
+      {
+        accessibilityRole: 'list' as const,
+        role: 'listbox' as const,
+        keyboardShouldPersistTaps: 'handled' as const,
+        keyboardDismissMode: 'on-drag' as const,
+      },
+      elementProps,
+    ],
   });
 }
 

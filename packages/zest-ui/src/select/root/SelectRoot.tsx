@@ -1,10 +1,12 @@
 'use client';
-import type * as React from 'react';
+import * as React from 'react';
 import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { useTransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import { SelectStore, type SelectItems } from '../store/SelectStore';
 import { SelectRootContext } from './SelectRootContext';
+import { SelectTransitionContext } from './SelectTransitionContext';
 
 /**
  * Groups all parts of the select.
@@ -52,7 +54,21 @@ export function SelectRoot<Value = any>(props: SelectRoot.Props<Value>) {
   store.useContextCallback('onValueChange', onValueChange);
   store.useSyncedValues({ disabled, readOnly, required, items, multiple });
 
-  return <SelectRootContext.Provider value={store}>{children}</SelectRootContext.Provider>;
+  const resolvedOpen = store.useState('open');
+  const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
+
+  const transitionContextValue = React.useMemo(
+    () => ({ transitionStatus }),
+    [transitionStatus],
+  );
+
+  return (
+    <SelectRootContext.Provider value={store}>
+      <SelectTransitionContext.Provider value={transitionContextValue}>
+        {children}
+      </SelectTransitionContext.Provider>
+    </SelectRootContext.Provider>
+  );
 }
 
 export interface SelectRootState {}

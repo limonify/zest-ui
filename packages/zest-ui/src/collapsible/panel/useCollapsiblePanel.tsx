@@ -35,6 +35,7 @@ export function useCollapsiblePanel(parameters: UseCollapsiblePanelParameters) {
 
   const handleContentLayout = React.useCallback((event: LayoutChangeEvent) => {
     const { height, width } = event.nativeEvent.layout;
+    if (height <= 0) return;
     setDimensions((previous) =>
       previous.height === height && previous.width === width ? previous : { height, width },
     );

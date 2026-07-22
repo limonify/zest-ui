@@ -2,8 +2,10 @@
 import { View } from 'react-native';
 import { usePopoverRootContext } from '../root/PopoverRootContext';
 import { usePopoverPositionerContext } from '../positioner/PopoverPositionerContext';
+import { usePopoverTransitionContext } from '../root/PopoverTransitionContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -15,12 +17,13 @@ export function PopoverPopup(componentProps: PopoverPopup.Props) {
 
   const store = usePopoverRootContext();
   const { side, align } = usePopoverPositionerContext();
+  const { transitionStatus } = usePopoverTransitionContext() ?? { transitionStatus: undefined };
 
   const open = store.useState('open');
   const titleElementId = store.useState('titleElementId');
   const descriptionElementId = store.useState('descriptionElementId');
 
-  const state: PopoverPopupState = { open, side, align };
+  const state: PopoverPopupState = { open, transitionStatus, side, align };
 
   return useRenderElement(View, componentProps, {
     state,
@@ -45,6 +48,11 @@ export interface PopoverPopupState {
    * Whether the popover is currently open.
    */
   open: boolean;
+  /**
+   * The transition status of the popover: `'starting'` as it opens (auto-clears
+   * to `undefined` after one frame), `'ending'` once it is closing.
+   */
+  transitionStatus: TransitionStatus;
   /**
    * The side the popup was actually placed on, after collision handling.
    */
