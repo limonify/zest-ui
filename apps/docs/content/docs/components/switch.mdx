@@ -104,6 +104,22 @@ function Thumb({ props, state }) {
 
 See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
+## Context
+
+Access the switch state from child components with `useSwitchRootContext`:
+
+```tsx
+import { useSwitchRootContext } from '@limonify/zest-ui';
+
+function CustomThumb() {
+  const state = useSwitchRootContext();
+  // state.checked, state.disabled, state.transitionStatus
+  return <View style={state.checked ? styles.on : styles.off} />;
+}
+```
+
+The hook throws if used outside `<Switch.Root>`.
+
 ## Accessibility
 
 `accessibilityRole="switch"` with `accessibilityState.checked`. Field-aware inside a `Field.Root`.

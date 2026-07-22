@@ -1,8 +1,14 @@
-# Changelog
+## [0.3.0] - 2025-07-23
 
-All notable changes to this project will be documented in this file.
+### Features
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+- **Context hooks**: Exported `useCheckboxRootContext`, `useRadioRootContext`, `useSwitchRootContext`, and `useDialogRootContext` hooks. These hooks provide access to component state from child parts without requiring a `render` function. Now all compound components export their root context hooks for consistency.
+
+### Documentation
+
+- Added `## Context` sections to Checkbox, Radio, Switch, and Dialog component pages documenting the new hooks.
+
+---
 
 ## [0.2.0] - 2025-01-23
 

@@ -134,6 +134,22 @@ function Tick({ props, state }) {
 
 See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
+## Context
+
+Access the checkbox state from child components with `useCheckboxRootContext`:
+
+```tsx
+import { useCheckboxRootContext } from '@limonify/zest-ui';
+
+function CustomIndicator() {
+  const state = useCheckboxRootContext();
+  // state.checked, state.indeterminate, state.disabled, state.transitionStatus
+  return <View style={state.checked ? styles.active : styles.inactive} />;
+}
+```
+
+The hook throws if used outside `<Checkbox.Root>`.
+
 ## Accessibility
 
 `accessibilityState.checked` is `true`, `false`, or `'mixed'` when indeterminate. Inside a `Field.Root` the checkbox is labelled by `Field.Label` automatically.

@@ -109,6 +109,22 @@ function Dot({ props, state }) {
 
 See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
+## Context
+
+Access the radio state from child components with `useRadioRootContext`:
+
+```tsx
+import { useRadioRootContext } from '@limonify/zest-ui';
+
+function CustomDot() {
+  const state = useRadioRootContext();
+  // state.checked, state.disabled, state.value, state.transitionStatus
+  return <View style={state.checked ? styles.active : styles.inactive} />;
+}
+```
+
+The hook throws if used outside `<Radio.Root>`.
+
 ## Accessibility
 
 `Radio.Root` is `accessibilityRole="radio"` with `accessibilityState.checked`. `Radio.Indicator` supports `keepMounted` + `transitionStatus` for exit animations.

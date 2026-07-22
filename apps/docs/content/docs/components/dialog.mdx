@@ -154,6 +154,22 @@ import { Dialog } from '@limonify/zest-ui';
 
 See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
+## Context
+
+Access the dialog state from child components with `useDialogRootContext`:
+
+```tsx
+import { useDialogRootContext } from '@limonify/zest-ui';
+
+function CustomClose() {
+  const store = useDialogRootContext();
+  // store.open, store.setOpen, store.transitionStatus
+  return <Button onPress={() => store.setOpen(false)}>Close</Button>;
+}
+```
+
+The hook throws if used outside `<Dialog.Root>`.
+
 ## Accessibility
 
 The popup is `accessibilityViewIsModal` with `accessibilityLabelledBy` pointing at `Dialog.Title`
