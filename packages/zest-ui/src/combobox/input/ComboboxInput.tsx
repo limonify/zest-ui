@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { TextInput } from 'react-native';
+import { TextInput, type LayoutChangeEvent } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
@@ -22,7 +22,15 @@ export function ComboboxInput(componentProps: ComboboxInput.Props) {
     openOnFocus,
     setTriggerNode,
     update,
+    setInputRef,
+    setTriggerWidth,
   } = useComboboxRootContext();
+
+  const internalRef = React.useRef<TextInput>(null);
+
+  React.useEffect(() => {
+    setInputRef(internalRef);
+  }, [setInputRef]);
 
   const anchorRef = React.useCallback(
     (node: unknown) => {
@@ -30,7 +38,7 @@ export function ComboboxInput(componentProps: ComboboxInput.Props) {
     },
     [setTriggerNode],
   );
-  const mergedRef = useMergedRefs(ref, anchorRef);
+  const mergedRef = useMergedRefs(ref, anchorRef, internalRef);
 
   const state: ComboboxInputState = { open, disabled };
 
@@ -49,7 +57,9 @@ export function ComboboxInput(componentProps: ComboboxInput.Props) {
             setOpen(true);
           }
         },
-        onLayout() {
+        onLayout(event: LayoutChangeEvent) {
+          const { width } = event.nativeEvent.layout;
+          setTriggerWidth(width);
           update?.();
         },
         accessibilityRole: 'search' as const,

@@ -1,4 +1,5 @@
 'use client';
+import * as React from 'react';
 import { View } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
@@ -32,7 +33,7 @@ export function ComboboxPositioner(componentProps: ComboboxPositioner.Props) {
     ...elementProps
   } = componentProps;
 
-  const { open, triggerNode, setUpdate } = useComboboxRootContext();
+  const { open, triggerNode, setUpdate, triggerWidth } = useComboboxRootContext();
 
   const positioning = useAnchorPositioning({
     align,
@@ -57,7 +58,12 @@ export function ComboboxPositioner(componentProps: ComboboxPositioner.Props) {
 
   const mergedRef = useMergedRefs(ref, refs.setFloating);
 
-  const state: ComboboxPositionerState = { open, side: positioning.side, align: positioning.align };
+  const state: ComboboxPositionerState = { 
+    open, 
+    side: positioning.side, 
+    align: positioning.align,
+    triggerWidth,
+  };
 
   return useRenderElement(View, componentProps, {
     state,
@@ -70,6 +76,11 @@ export interface ComboboxPositionerState {
   open: boolean;
   side: Side;
   align: Align;
+  /**
+   * The trigger's measured width, available for consumers to apply to the popup.
+   * This is the React Native equivalent of the web's `--anchor-width` CSS variable.
+   */
+  triggerWidth: number | undefined;
 }
 
 export interface ComboboxPositionerProps

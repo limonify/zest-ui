@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import type { TextInput } from 'react-native';
 import type { ZestNativeEvent } from '../../utils/createChangeEventDetails';
 
 export interface ComboboxItem {
@@ -42,6 +43,16 @@ export interface ComboboxRootContext {
   setTriggerNode: (node: unknown) => void;
   update: (() => void) | undefined;
   setUpdate: (fn: (() => void) | undefined) => void;
+  /**
+   * Ref to the input element for programmatic blur.
+   */
+  inputRef: React.RefObject<TextInput | null> | undefined;
+  setInputRef: (ref: React.RefObject<TextInput | null>) => void;
+  /**
+   * The trigger's measured width, used to size the popup.
+   */
+  triggerWidth: number | undefined;
+  setTriggerWidth: (width: number) => void;
 }
 
 export const ComboboxRootContext = React.createContext<ComboboxRootContext | undefined>(undefined);

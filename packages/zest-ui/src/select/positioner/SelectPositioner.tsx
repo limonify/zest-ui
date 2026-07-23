@@ -39,6 +39,7 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
   const store = useSelectRootContext();
   const open = store.useState('open');
   const triggerNode = store.useState('triggerNode');
+  const triggerWidth = store.useState('triggerWidth');
 
   const positioning = useAnchorPositioning({
     align,
@@ -65,7 +66,12 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
 
   const mergedRef = useMergedRefs(ref, refs.setFloating);
 
-  const state: SelectPositionerState = { open, side: positioning.side, align: positioning.align };
+  const state: SelectPositionerState = { 
+    open, 
+    side: positioning.side, 
+    align: positioning.align,
+    triggerWidth,
+  };
 
   const contextValue: SelectPositionerContext = React.useMemo(
     () => ({ side: positioning.side, align: positioning.align, arrowRef, arrowStyles }),
@@ -97,6 +103,11 @@ export interface SelectPositionerState {
   open: boolean;
   side: Side;
   align: Align;
+  /**
+   * The trigger's measured width, available for consumers to apply to the popup.
+   * This is the React Native equivalent of the web's `--anchor-width` CSS variable.
+   */
+  triggerWidth: number | undefined;
 }
 
 export interface SelectPositionerProps

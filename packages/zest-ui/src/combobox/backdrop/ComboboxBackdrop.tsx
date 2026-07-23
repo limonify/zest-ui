@@ -11,7 +11,7 @@ import type { ZestUIComponentProps } from '../../types';
 export function ComboboxBackdrop(componentProps: ComboboxBackdrop.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const { open, setOpen } = useComboboxRootContext();
+  const { open, setOpen, inputRef } = useComboboxRootContext();
 
   const state: ComboboxBackdropState = { open };
 
@@ -23,6 +23,7 @@ export function ComboboxBackdrop(componentProps: ComboboxBackdrop.Props) {
         style: StyleSheet.absoluteFill,
         onPress(event: GestureResponderEvent) {
           setOpen(false, event);
+          inputRef?.current?.blur();
         },
       },
       elementProps,

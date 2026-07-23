@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import type { TextInput } from 'react-native';
 import { useControlled } from '../../hooks/useControlled';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
@@ -98,6 +99,8 @@ export function useComboboxRoot(parameters: UseComboboxRootParameters): Combobox
 
   const [triggerNode, setTriggerNode] = React.useState<unknown>(null);
   const [update, setUpdate] = React.useState<(() => void) | undefined>(undefined);
+  const [inputRef, setInputRef] = React.useState<React.RefObject<TextInput | null> | undefined>(undefined);
+  const [triggerWidth, setTriggerWidth] = React.useState<number | undefined>(undefined);
 
   const setOpen = useStableCallback((nextOpen: boolean, event?: ZestNativeEvent) => {
     if (nextOpen === open) {
@@ -171,6 +174,10 @@ export function useComboboxRoot(parameters: UseComboboxRootParameters): Combobox
       setTriggerNode,
       update,
       setUpdate,
+      inputRef,
+      setInputRef,
+      triggerWidth,
+      setTriggerWidth,
     }),
     [
       mode,
@@ -185,6 +192,8 @@ export function useComboboxRoot(parameters: UseComboboxRootParameters): Combobox
       openOnFocus,
       triggerNode,
       update,
+      inputRef,
+      triggerWidth,
     ],
   );
 }

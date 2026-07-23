@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { Pressable, type GestureResponderEvent } from 'react-native';
+import { Pressable, type GestureResponderEvent, type LayoutChangeEvent } from 'react-native';
 import { useSelectRootContext } from '../root/SelectRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
@@ -64,7 +64,9 @@ export function SelectTrigger(componentProps: SelectTrigger.Props) {
         onPressOut() {
           setPressed(false);
         },
-        onLayout() {
+        onLayout(event: LayoutChangeEvent) {
+          const { width } = event.nativeEvent.layout;
+          store.set('triggerWidth', width);
           store.state.update?.();
         },
         accessibilityRole: 'combobox' as const,

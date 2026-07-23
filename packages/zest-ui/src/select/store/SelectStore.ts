@@ -111,6 +111,10 @@ export type State = {
    */
   labelId: string | undefined;
   update: (() => void) | undefined;
+  /**
+   * The trigger's measured width, used to size the popup.
+   */
+  triggerWidth: number | undefined;
 };
 
 type Context = {
@@ -132,6 +136,7 @@ const selectors = {
   triggerNode: createSelector((state: State) => state.triggerNode),
   labelId: createSelector((state: State) => state.labelId),
   update: createSelector((state: State) => state.update),
+  triggerWidth: createSelector((state: State) => state.triggerWidth),
 };
 
 export class SelectStore extends ReactStore<Readonly<State>, Context, typeof selectors> {
@@ -151,6 +156,7 @@ export class SelectStore extends ReactStore<Readonly<State>, Context, typeof sel
         triggerNode: null,
         labelId: undefined,
         update: undefined,
+        triggerWidth: undefined,
         ...initialState,
       },
       { onValueChange: undefined, onOpenChange: undefined },

@@ -13,7 +13,7 @@ import type { ZestUIComponentProps } from '../../types';
 export function ComboboxItem(componentProps: ComboboxItem.Props) {
   const { render, className, style, item, ref, ...elementProps } = componentProps;
 
-  const { selectedValue, selectItem } = useComboboxRootContext();
+  const { selectedValue, selectItem, inputRef } = useComboboxRootContext();
   const { onLayout } = useCompositeListItem();
 
   const [pressed, setPressed] = React.useState(false);
@@ -29,6 +29,7 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
         onLayout,
         onPress(event: GestureResponderEvent) {
           selectItem(item, event);
+          inputRef?.current?.blur();
         },
         onPressIn: () => setPressed(true),
         onPressOut: () => setPressed(false),

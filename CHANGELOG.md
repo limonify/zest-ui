@@ -1,3 +1,22 @@
+## [0.3.2] - 2026-07-23
+
+### Bug Fixes
+
+- **Combobox/Autocomplete popup**: Fixed popup not closing when selecting an item or tapping backdrop. Previously, the input would regain focus after the Modal closed, triggering `openOnFocus` and reopening the popup. Now the input is programmatically blurred on item selection and backdrop press.
+
+### Features
+
+- **Combobox/Autocomplete/Select trigger width**: Added `triggerWidth` to positioner state. The trigger's `onLayout` measures its width and exposes it via state, allowing consumers to apply it to the popup (React Native equivalent of web's `--anchor-width` CSS variable). This maintains headless UI principles - the library provides the information, consumers decide how to use it.
+
+### Breaking Changes
+
+- `ComboboxRootContext` now includes `inputRef`, `setInputRef`, `triggerWidth`, and `setTriggerWidth` fields
+- `ComboboxPositionerState` now includes `triggerWidth` field
+- `SelectPositionerState` now includes `triggerWidth` field
+- `SelectStore.State` now includes `triggerWidth` field
+
+---
+
 ## [0.3.1] - 2025-07-23
 
 ### Bug Fixes
