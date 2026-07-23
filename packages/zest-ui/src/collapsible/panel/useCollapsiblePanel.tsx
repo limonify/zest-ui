@@ -58,13 +58,26 @@ export function useCollapsiblePanel(parameters: UseCollapsiblePanelParameters) {
   // be measured on an inner element that is never height-constrained.
   // When `measurePadding` is set, it is applied to the inner measurement
   // wrapper so the reported `height`/`width` reflect the padded content size.
+  const paddingStyle = React.useMemo(
+    () =>
+      measurePadding
+        ? {
+            paddingTop: measurePadding.top,
+            paddingRight: measurePadding.right,
+            paddingBottom: measurePadding.bottom,
+            paddingLeft: measurePadding.left,
+          }
+        : undefined,
+    [measurePadding],
+  );
+
   const wrappedChildren = React.useMemo(
     () => (
-      <View style={measurePadding} onLayout={handleContentLayout}>
+      <View style={paddingStyle} onLayout={handleContentLayout}>
         {children}
       </View>
     ),
-    [handleContentLayout, measurePadding, children],
+    [handleContentLayout, paddingStyle, children],
   );
 
   return {
