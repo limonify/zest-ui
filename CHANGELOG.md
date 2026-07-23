@@ -1,3 +1,11 @@
+## [0.3.1] - 2025-07-23
+
+### Bug Fixes
+
+- **measurePadding style**: Fixed `measurePadding` prop in Collapsible/Accordion panels. The `top`/`right`/`bottom`/`left` values are now correctly converted to `paddingTop`/`paddingRight`/`paddingBottom`/`paddingLeft` for React Native. Previously they were applied as positioning properties which had no effect.
+
+---
+
 ## [0.3.0] - 2025-07-23
 
 ### Features
