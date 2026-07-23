@@ -1,5 +1,4 @@
 'use client';
-import * as React from 'react';
 import { View } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
