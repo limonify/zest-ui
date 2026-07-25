@@ -1,7 +1,12 @@
 'use client';
 import * as React from 'react';
+import type { MeterRootState } from './MeterRoot';
 
 export interface MeterRootContext {
+  /**
+   * The state every part publishes to its style and render functions.
+   */
+  state: MeterRootState;
   /**
    * The current value.
    */

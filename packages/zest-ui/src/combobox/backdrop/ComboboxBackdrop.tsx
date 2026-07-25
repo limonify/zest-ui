@@ -2,6 +2,8 @@
 import { Pressable, StyleSheet, type GestureResponderEvent } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
+import { REASONS } from '../../utils/reasons';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -11,7 +13,8 @@ import type { ZestUIComponentProps } from '../../types';
 export function ComboboxBackdrop(componentProps: ComboboxBackdrop.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const { open, setOpen, inputRef } = useComboboxRootContext();
+  const store = useComboboxRootContext();
+  const open = store.useState('open');
 
   const state: ComboboxBackdropState = { open };
 
@@ -22,8 +25,12 @@ export function ComboboxBackdrop(componentProps: ComboboxBackdrop.Props) {
       {
         style: StyleSheet.absoluteFill,
         onPress(event: GestureResponderEvent) {
-          setOpen(false, event);
-          inputRef?.current?.blur();
+          if (store.select('disablePointerDismissal')) {
+            return;
+          }
+
+          store.setOpen(false, createChangeEventDetails(REASONS.outsidePress, event));
+          store.select('inputRef')?.current?.blur();
         },
       },
       elementProps,

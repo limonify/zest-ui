@@ -102,15 +102,24 @@ These fields reach your `style` and `render` functions on **Autocomplete.Input**
 
 <AutoType path="../../packages/zest-ui/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
 
+
+### Cancelling a change, and opening it from elsewhere
+
+An autocomplete shares the combobox's event contract: every callback receives an event details
+object whose `cancel()` vetoes the change, and `reason` says what caused it. It has a handle too —
+`Autocomplete.createHandle()` — for an input rendered outside the root, plus `actionsRef` for
+imperative `close()`/`unmount()`. See
+[Combobox](/docs/components/combobox) for the worked examples; every one of them applies here.
+
 ## Animation
 
-`Autocomplete.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade the list in and out:
+`Autocomplete.Popup` publishes `state.transitionStatus`. Keep the portal mounted with `<Portal keepMounted>` and fade the list in and out:
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Autocomplete } from '@limonify/zest-ui';
 
-<Autocomplete.Popup keepMounted render={(props) => (
+<Autocomplete.Popup render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
 )}>
   {/* ... */}

@@ -20,10 +20,19 @@ export function PopoverPopup(componentProps: PopoverPopup.Props) {
   const { transitionStatus } = usePopoverTransitionContext() ?? { transitionStatus: undefined };
 
   const open = store.useState('open');
+  const triggerWidth = store.useState('triggerWidth');
+  const triggerHeight = store.useState('triggerHeight');
   const titleElementId = store.useState('titleElementId');
   const descriptionElementId = store.useState('descriptionElementId');
 
-  const state: PopoverPopupState = { open, transitionStatus, side, align };
+  const state: PopoverPopupState = {
+    open,
+    transitionStatus,
+    side,
+    align,
+    triggerWidth,
+    triggerHeight,
+  };
 
   return useRenderElement(View, componentProps, {
     state,
@@ -61,6 +70,16 @@ export interface PopoverPopupState {
    * The alignment the popup was actually placed with.
    */
   align: Align;
+  /**
+   * The trigger's measured width, available for consumers to size the popup
+   * against its anchor. This is the React Native equivalent of the web's
+   * `--anchor-width` CSS variable.
+   */
+  triggerWidth: number | undefined;
+  /**
+   * The trigger's measured height.
+   */
+  triggerHeight: number | undefined;
 }
 
 export interface PopoverPopupProps extends ZestUIComponentProps<typeof View, PopoverPopupState> {}

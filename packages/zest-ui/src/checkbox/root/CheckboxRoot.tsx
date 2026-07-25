@@ -44,7 +44,9 @@ export function CheckboxRoot(componentProps: CheckboxRoot.Props) {
   const parentContext = groupContext?.parent;
   const isGroupedWithParent = parentContext != null && groupContext?.allValues != null;
 
-  const { fieldDisabled, fieldProps, validateField } = useFieldControlRegistration();
+  const { fieldDisabled, fieldProps, markChanged, markTouched } = useFieldControlRegistration({
+    initialValue: defaultChecked ?? checkedProp ?? false,
+  });
 
   const disabled = (groupContext?.disabled || disabledProp || fieldDisabled) ?? false;
 
@@ -133,7 +135,10 @@ export function CheckboxRoot(componentProps: CheckboxRoot.Props) {
           }
 
           setCheckedState(nextChecked);
-          validateField(nextChecked);
+          // A press is both the change and the end of the interaction: there is
+          // no blur on a checkbox to mark it touched later.
+          markChanged(nextChecked);
+          markTouched(nextChecked);
 
           if (value && groupValue && setGroupValue && !parent && !isGroupedWithParent) {
             const nextGroupValue = nextChecked

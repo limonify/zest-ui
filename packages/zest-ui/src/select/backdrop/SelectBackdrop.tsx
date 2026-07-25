@@ -25,6 +25,10 @@ export function SelectBackdrop(componentProps: SelectBackdrop.Props) {
       {
         style: StyleSheet.absoluteFill,
         onPress(event: GestureResponderEvent) {
+          if (store.select('disablePointerDismissal')) {
+            return;
+          }
+
           store.setOpen(false, createChangeEventDetails(REASONS.outsidePress, event));
         },
       },

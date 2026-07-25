@@ -5,6 +5,7 @@ import { useControlled } from '../../hooks/useControlled';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import { clamp } from '../../utils/clamp';
 import type { ZestUIComponentProps, Orientation } from '../../types';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
@@ -24,7 +25,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
   const {
     className,
     defaultValue,
-    disabled = false,
+    disabled: disabledProp = false,
     format,
     locale,
     max = 100,
@@ -40,6 +41,12 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
     ref,
     ...elementProps
   } = componentProps;
+
+  const { fieldDisabled, markChanged, markTouched } = useFieldControlRegistration({
+    initialValue: defaultValue ?? value,
+  });
+
+  const disabled = disabledProp || fieldDisabled;
 
   // A range slider is just a slider whose value is an array; remember which
   // shape the consumer used so callbacks hand back the same one.
@@ -123,6 +130,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
 
       valuesRef.current = nextValues;
       setValuesState(nextValues);
+      markChanged(fromArray(nextValues, isRange));
     },
   );
 
@@ -154,6 +162,8 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
 
   const commitValue = useStableCallback((eventDetails: SliderRoot.ChangeEventDetails) => {
     onValueCommitted?.(fromArray(valuesRef.current, isRange) as Value, eventDetails);
+    // Releasing the thumb is the end of the interaction — a slider's blur.
+    markTouched(fromArray(valuesRef.current, isRange));
   });
 
   const state: SliderRootState = React.useMemo(

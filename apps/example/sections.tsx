@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Animated, Pressable, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   Accordion,
   AlertDialog,
@@ -26,6 +26,7 @@ import {
   Radio,
   RadioGroup,
   Select,
+  Separator,
   Slider,
   Switch,
   Tabs,
@@ -33,6 +34,7 @@ import {
   Toggle,
   ToggleGroup,
   Tooltip,
+  useFilter,
 } from '@limonify/zest-ui';
 import { styles } from './styles';
 
@@ -557,6 +559,8 @@ export function MenuSection() {
           <Menu.Backdrop style={styles.menuBackdrop} />
           <Menu.Positioner side="bottom" align="start" sideOffset={4}>
             <Menu.Popup style={styles.floatingPopup}>
+              {/* Optional, and it follows the popup when collision handling flips it. */}
+              <Menu.Arrow style={styles.arrow} />
               <Menu.Group>
                 <Menu.GroupLabel style={styles.groupLabel}>Actions</Menu.GroupLabel>
                 {['Duplicate', 'Rename'].map((action) => (
@@ -1325,5 +1329,65 @@ export function ToastOverlay() {
         </Toast.Root>
       ))}
     </Toast.Viewport>
+  );
+}
+
+export function SeparatorSection() {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Separator</Text>
+      <Text style={styles.label}>
+        A divider that announces itself as one. It is what sits between every section on this
+        screen, and what `Menu.Separator` and `OTPField.Separator` re-export.
+      </Text>
+
+      <View style={styles.group}>
+        <Text style={styles.label}>Above</Text>
+        <Separator style={styles.separator} />
+        <Text style={styles.label}>Below</Text>
+      </View>
+
+      <View style={[styles.row, { height: 32 }]}>
+        <Text style={styles.label}>Left</Text>
+        <Separator
+          orientation="vertical"
+          style={{ width: StyleSheet.hairlineWidth, backgroundColor: '#ccc', alignSelf: 'stretch' }}
+        />
+        <Text style={styles.label}>Right</Text>
+      </View>
+    </View>
+  );
+}
+
+export function FilterSection() {
+  const FRUITS = ['Apple', 'Apricot', 'Banana', 'Cherry', 'Crème brûlée', 'Jalapeño Popper'];
+  const [query, setQuery] = React.useState('');
+  const { contains } = useFilter();
+
+  const matches = React.useMemo(
+    () => FRUITS.filter((item) => contains(item, query)),
+    [contains, query],
+  );
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>useFilter</Text>
+      <Text style={styles.label}>
+        Locale-aware matching: type "creme" or "peno" and the accented entries still match.
+      </Text>
+
+      <Input value={query} onValueChange={setQuery} style={styles.fieldControl} placeholder="Filter" />
+      <View style={styles.group}>
+        {matches.length === 0 ? (
+          <Text style={styles.label}>No matches</Text>
+        ) : (
+          matches.map((item) => (
+            <Text key={item} style={styles.label}>
+              {item}
+            </Text>
+          ))
+        )}
+      </View>
+    </View>
   );
 }

@@ -7,7 +7,7 @@ import { useButton } from '../../internals/use-button/useButton';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
 import type { CompositeItemLayout } from '../../internals/composite/list/CompositeListContext';
 import { useTabsRootContext } from '../root/TabsRootContext';
-import type { TabsRoot } from '../root/TabsRoot';
+import type { TabsRoot, TabsRootState } from '../root/TabsRoot';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
@@ -106,7 +106,7 @@ export interface TabsTabMetadata {
   layout?: CompositeItemLayout | undefined;
 }
 
-export interface TabsTabState {
+export interface TabsTabState extends TabsRootState {
   /**
    * Whether the component should ignore user interaction.
    */
@@ -115,14 +115,6 @@ export interface TabsTabState {
    * Whether the component is active.
    */
   active: boolean;
-  /**
-   * The component orientation.
-   */
-  orientation: TabsRoot.Orientation;
-  /**
-   * The direction used for tab activation.
-   */
-  tabActivationDirection: TabsTab.ActivationDirection;
   /**
    * Whether the tab is currently pressed.
    */

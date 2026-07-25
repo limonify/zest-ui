@@ -62,7 +62,10 @@ export function ProgressRoot(componentProps: ProgressRoot.Props) {
       : formatNumber(percentageValue / 100, locale, { style: 'percent' });
   }
 
-  const state: ProgressRootState = React.useMemo(() => ({ status }), [status]);
+  const state: ProgressRootState = React.useMemo(
+    () => ({ status, value: clampedValue, min, max, percent: percentageValue, formattedValue }),
+    [status, clampedValue, min, max, percentageValue, formattedValue],
+  );
 
   const contextValue: ProgressRootContext = React.useMemo(
     () => ({ formattedValue, percentageValue, setLabelId, state, value }),
@@ -102,6 +105,27 @@ export interface ProgressRootState {
    * The current status.
    */
   status: ProgressStatus;
+  /**
+   * The current value, clamped into `[min, max]`, or `null` while indeterminate.
+   */
+  value: number | null;
+  /**
+   * The minimum value.
+   */
+  min: number;
+  /**
+   * The maximum value.
+   */
+  max: number;
+  /**
+   * How far the value sits through the range, `0`–`100`, or `null` while
+   * indeterminate. This is what an indicator's width comes from.
+   */
+  percent: number | null;
+  /**
+   * The value as text, through `format`/`locale`. Empty while indeterminate.
+   */
+  formattedValue: string;
 }
 
 export interface ProgressRootProps extends ZestUIComponentProps<typeof View, ProgressRootState> {

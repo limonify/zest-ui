@@ -17,6 +17,7 @@ import {
   DialogSection,
   DrawerSection,
   FieldSection,
+  FilterSection,
   HandleSection,
   MenuSection,
   MeterSection,
@@ -27,6 +28,7 @@ import {
   ProgressSection,
   RadioSection,
   SelectSection,
+  SeparatorSection,
   SliderSection,
   SwitchSection,
   TabsSection,
@@ -112,6 +114,10 @@ export default function App() {
           <OTPFieldSection />
           <Separator style={styles.separator} />
           <ToastSection />
+          <Separator style={styles.separator} />
+          <SeparatorSection />
+          <Separator style={styles.separator} />
+          <FilterSection />
         </ScrollView>
         <StatusBar style="auto" />
         {/* Screen-anchored overlay: sits above everything, lets touches through. */}

@@ -22,8 +22,16 @@ export function SelectPopup(componentProps: SelectPopup.Props) {
 
   const open = store.useState('open');
   const triggerWidth = store.useState('triggerWidth');
+  const triggerHeight = store.useState('triggerHeight');
 
-  const state: SelectPopupState = { open, transitionStatus, side, align, triggerWidth };
+  const state: SelectPopupState = {
+    open,
+    transitionStatus,
+    side,
+    align,
+    triggerWidth,
+    triggerHeight,
+  };
 
   const element = useRenderElement(View, componentProps, {
     state,
@@ -64,6 +72,10 @@ export interface SelectPopupState {
    * The trigger's measured width, available for consumers to apply to the popup.
    */
   triggerWidth: number | undefined;
+  /**
+   * The trigger's measured height.
+   */
+  triggerHeight: number | undefined;
 }
 
 export interface SelectPopupProps extends ZestUIComponentProps<typeof View, SelectPopupState> {}

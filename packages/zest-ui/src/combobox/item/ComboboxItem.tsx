@@ -1,9 +1,12 @@
 'use client';
 import * as React from 'react';
 import { Pressable, type GestureResponderEvent } from 'react-native';
-import { useComboboxRootContext, type ComboboxItem as ComboboxItemData } from '../root/ComboboxRootContext';
+import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
+import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
+import { REASONS } from '../../utils/reasons';
+import type { ComboboxItem as ComboboxItemData } from '../store/ComboboxStore';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -13,13 +16,18 @@ import type { ZestUIComponentProps } from '../../types';
 export function ComboboxItem(componentProps: ComboboxItem.Props) {
   const { render, className, style, item, ref, ...elementProps } = componentProps;
 
-  const { selectedValue, selectItem, inputRef } = useComboboxRootContext();
-  const { onLayout } = useCompositeListItem();
+  const store = useComboboxRootContext();
+  const selectedValue = store.useState('value');
+
+  const { index, onLayout } = useCompositeListItem();
 
   const [pressed, setPressed] = React.useState(false);
   const selected = selectedValue === item.value;
 
-  const state: ComboboxItemState = { selected, pressed };
+  const state: ComboboxItemState = React.useMemo(
+    () => ({ selected, pressed, index }),
+    [selected, pressed, index],
+  );
 
   return useRenderElement(Pressable, componentProps, {
     state,
@@ -28,8 +36,8 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
       {
         onLayout,
         onPress(event: GestureResponderEvent) {
-          selectItem(item, event);
-          inputRef?.current?.blur();
+          store.selectItem(item, createChangeEventDetails(REASONS.itemPress, event));
+          store.select('inputRef')?.current?.blur();
         },
         onPressIn: () => setPressed(true),
         onPressOut: () => setPressed(false),
@@ -44,8 +52,18 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
 }
 
 export interface ComboboxItemState {
+  /**
+   * Whether this item is the selected one.
+   */
   selected: boolean;
+  /**
+   * Whether the item is currently pressed.
+   */
   pressed: boolean;
+  /**
+   * The item's index in the list, in visual order.
+   */
+  index: number;
 }
 
 export interface ComboboxItemProps extends ZestUIComponentProps<typeof Pressable, ComboboxItemState> {

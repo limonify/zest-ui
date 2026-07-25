@@ -93,15 +93,27 @@ These fields reach your `style` and `render` functions on **Tooltip parts** (`st
 
 <AutoType path="../../packages/zest-ui/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootState" />
 
+
+### Sizing the popup to its trigger
+
+The positioner and the popup both publish `triggerWidth` and `triggerHeight` — the trigger's
+measured size, and the React Native counterpart of the web's `--anchor-width` CSS variable:
+
+```tsx
+<Tooltip.Popup style={(state) => [styles.popup, { minWidth: state.triggerWidth }]} />
+```
+
+Both are `undefined` until the trigger has been laid out once.
+
 ## Animation
 
-`Tooltip.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out:
+`Tooltip.Popup` publishes `state.transitionStatus`. Keep the portal mounted with `<Portal keepMounted>` and fade it in and out:
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Tooltip } from '@limonify/zest-ui';
 
-<Tooltip.Popup keepMounted render={(props) => (
+<Tooltip.Popup render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(100)} exiting={FadeOut.duration(100)} />
 )}>
   {/* ... */}

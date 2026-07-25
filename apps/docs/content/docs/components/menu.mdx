@@ -15,10 +15,21 @@ description: A list of actions opened from a trigger, with submenus and checkabl
     Menu.Backdrop
     Menu.Positioner
       Menu.Popup
+        Menu.Arrow
         Menu.Group / Menu.GroupLabel
         Menu.Item
-        Menu.CheckboxItem / Menu.RadioGroup
+        Menu.LinkItem
+        Menu.CheckboxItem > Menu.CheckboxItemIndicator
+        Menu.RadioGroup
+          Menu.RadioItem > Menu.RadioItemIndicator
+        Menu.Separator
         Menu.SubmenuRoot > Menu.SubmenuTrigger`} />
+
+`Menu.Arrow` is optional and points at the trigger; it reads `side`/`align` from the
+positioner, so it follows the popup when collision handling flips it.
+`Menu.LinkItem` is an item that opens a link rather than running an action, and it closes the
+menu with the `link-press` reason. `Menu.Separator` is the shared
+[`Separator`](/docs/components/separator), re-exported for convenience.
 
 ## Usage
 
@@ -101,15 +112,27 @@ These fields reach your `style` and `render` functions on **Menu.Popup** (`style
 
 <AutoType path="../../packages/zest-ui/src/menu/popup/MenuPopup.tsx" name="MenuPopupState" />
 
+
+### Sizing the popup to its trigger
+
+The positioner and the popup both publish `triggerWidth` and `triggerHeight` — the trigger's
+measured size, and the React Native counterpart of the web's `--anchor-width` CSS variable:
+
+```tsx
+<Menu.Popup style={(state) => [styles.popup, { minWidth: state.triggerWidth }]} />
+```
+
+Both are `undefined` until the trigger has been laid out once.
+
 ## Animation
 
-`Menu.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out. Each submenu level is its own Modal, so add `keepMounted` on every level you animate:
+`Menu.Popup` publishes `state.transitionStatus`. Keep the portal mounted with `<Portal keepMounted>` and fade it in and out. Each submenu level is its own Modal, so add `keepMounted` on every level you animate:
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Menu } from '@limonify/zest-ui';
 
-<Menu.Popup keepMounted render={(props) => (
+<Menu.Popup render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
 )}>
   {/* ... */}

@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { Pressable, type GestureResponderEvent } from 'react-native';
+import { Pressable, type GestureResponderEvent, type LayoutChangeEvent } from 'react-native';
 import { useTooltipRootContext } from '../root/TooltipRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
@@ -61,7 +61,10 @@ export function TooltipTrigger(componentProps: TooltipTrigger.Props) {
         onPressOut() {
           setPressed(false);
         },
-        onLayout() {
+        onLayout(event: LayoutChangeEvent) {
+          const { width, height } = event.nativeEvent.layout;
+          store.set('triggerWidth', width);
+          store.set('triggerHeight', height);
           store.state.update?.();
         },
         accessibilityState: { expanded: open, disabled: disabled || undefined },

@@ -193,3 +193,52 @@ describe('Progress', () => {
     });
   });
 });
+
+describe('Progress state', () => {
+  it('publishes the value, range and percent alongside the status', async () => {
+    const seen: Array<Progress.Track.State> = [];
+
+    await render(
+      <Progress.Root value={25}>
+        <Progress.Track
+          testID="track"
+          style={(state) => {
+            seen.push(state);
+            return undefined;
+          }}
+        />
+      </Progress.Root>,
+    );
+
+    expect(seen.at(-1)).toMatchObject({
+      status: 'progressing',
+      value: 25,
+      min: 0,
+      max: 100,
+      percent: 25,
+    });
+  });
+
+  it('reports a null value and percent while indeterminate', async () => {
+    const seen: Array<Progress.Track.State> = [];
+
+    await render(
+      <Progress.Root value={null}>
+        <Progress.Track
+          testID="track"
+          style={(state) => {
+            seen.push(state);
+            return undefined;
+          }}
+        />
+      </Progress.Root>,
+    );
+
+    expect(seen.at(-1)).toMatchObject({
+      status: 'indeterminate',
+      value: null,
+      percent: null,
+      formattedValue: '',
+    });
+  });
+});

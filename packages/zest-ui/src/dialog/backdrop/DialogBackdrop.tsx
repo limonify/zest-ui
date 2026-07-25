@@ -16,8 +16,10 @@ export function DialogBackdrop(componentProps: DialogBackdrop.Props) {
 
   const store = useDialogRootContext();
   const open = store.useState('open');
+  const nested = store.useState('nested');
+  const nestedDialogOpen = store.useState('nestedDialogOpen');
 
-  const state: DialogBackdropState = { open };
+  const state: DialogBackdropState = { open, nested, nestedDialogOpen };
 
   return useRenderElement(View, componentProps, {
     state,
@@ -39,6 +41,15 @@ export interface DialogBackdropState {
    * Whether the dialog is currently open.
    */
   open: boolean;
+  /**
+   * Whether this dialog is rendered inside another dialog's tree.
+   */
+  nested: boolean;
+  /**
+   * Whether a dialog nested inside this one is open — a backdrop usually wants
+   * to darken further while it is.
+   */
+  nestedDialogOpen: boolean;
 }
 
 export interface DialogBackdropProps

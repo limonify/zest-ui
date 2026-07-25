@@ -1,8 +1,10 @@
 'use client';
 import * as React from 'react';
 import { View } from 'react-native';
-import { useComboboxRootContext, type ComboboxItem } from '../root/ComboboxRootContext';
+import { useComboboxRootContext } from '../root/ComboboxRootContext';
+import { useComboboxItemsContext } from '../root/ComboboxItemsContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import type { ComboboxItem } from '../store/ComboboxStore';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -16,7 +18,10 @@ import type { ZestUIComponentProps } from '../../types';
 export function ComboboxList(componentProps: ComboboxList.Props) {
   const { render, className, style, children, ref, ...elementProps } = componentProps;
 
-  const { filteredItems, open } = useComboboxRootContext();
+  const store = useComboboxRootContext();
+  const { filteredItems } = useComboboxItemsContext();
+
+  const open = store.useState('open');
 
   const state: ComboboxListState = { open, empty: filteredItems.length === 0 };
 

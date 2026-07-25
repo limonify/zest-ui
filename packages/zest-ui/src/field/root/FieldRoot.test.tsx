@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { act, fireEvent, render, screen, userEvent } from '@testing-library/react-native';
-import { Checkbox, Field, Fieldset, Input, Switch } from '../../index';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Checkbox, Field, Fieldset, Input, OTPField, RadioGroup, Radio, Select, Slider, Switch } from '../../index';
 
 const hidden = { includeHiddenElements: true } as const;
 
@@ -219,5 +220,170 @@ describe('Input', () => {
 
     const labelId = screen.getByTestId('label').props.nativeID;
     expect(screen.getByTestId('input').props.accessibilityLabelledBy).toBe(labelId);
+  });
+});
+
+describe('Field bookkeeping for non-text controls', () => {
+  /** Renders the field's own state as text so a test can read it. */
+  function Bookkeeping() {
+    return (
+      <Field.Validity>
+        {(validity) => (
+          <Field.Description testID="state">
+            {`dirty:${validity.field.dirty} touched:${validity.field.touched} filled:${validity.field.filled}`}
+          </Field.Description>
+        )}
+      </Field.Validity>
+    );
+  }
+
+  function fieldState() {
+    return screen.getByTestId('state').props.children;
+  }
+
+  it('a Checkbox makes the field dirty, filled and touched', async () => {
+    await render(
+      <Field.Root>
+        <Checkbox.Root testID="checkbox" />
+        <Bookkeeping />
+      </Field.Root>,
+    );
+
+    expect(fieldState()).toBe('dirty:false touched:false filled:false');
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('checkbox'));
+
+    expect(fieldState()).toBe('dirty:true touched:true filled:true');
+  });
+
+  it('unchecking again leaves the field touched but no longer dirty', async () => {
+    await render(
+      <Field.Root>
+        <Checkbox.Root testID="checkbox" />
+        <Bookkeeping />
+      </Field.Root>,
+    );
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('checkbox'));
+    await user.press(screen.getByTestId('checkbox'));
+
+    expect(fieldState()).toBe('dirty:false touched:true filled:false');
+  });
+
+  it('a Switch reports the same way', async () => {
+    await render(
+      <Field.Root>
+        <Switch.Root testID="switch" />
+        <Bookkeeping />
+      </Field.Root>,
+    );
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('switch'));
+
+    expect(fieldState()).toBe('dirty:true touched:true filled:true');
+  });
+
+  it('a RadioGroup reports its selection', async () => {
+    await render(
+      <Field.Root>
+        <RadioGroup testID="group">
+          <Radio.Root testID="radio-a" value="a" />
+          <Radio.Root testID="radio-b" value="b" />
+        </RadioGroup>
+        <Bookkeeping />
+      </Field.Root>,
+    );
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('radio-b'));
+
+    expect(fieldState()).toBe('dirty:true touched:true filled:true');
+  });
+
+  it('a Select reports its selection, and closing counts as leaving it', async () => {
+    await render(
+      <Field.Root>
+        <Select.Root defaultOpen>
+          <Select.Trigger testID="trigger" />
+          <Select.Portal>
+            <Select.Positioner>
+              <Select.Popup>
+                <Select.Item testID="item-a" value="a" />
+              </Select.Popup>
+            </Select.Positioner>
+          </Select.Portal>
+        </Select.Root>
+        <Bookkeeping />
+      </Field.Root>,
+    );
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-a'));
+
+    expect(fieldState()).toBe('dirty:true touched:true filled:true');
+  });
+
+  it('an OTPField reports a completed code', async () => {
+    await render(
+      <Field.Root>
+        <OTPField.Root length={2}>
+          <OTPField.Input testID="slot-0" />
+          <OTPField.Input testID="slot-1" />
+        </OTPField.Root>
+        <Bookkeeping />
+      </Field.Root>,
+    );
+
+    await changeText('slot-0', '1');
+    expect(fieldState()).toBe('dirty:true touched:false filled:true');
+
+    await changeText('slot-1', '2');
+    expect(fieldState()).toBe('dirty:true touched:true filled:true');
+  });
+
+  it('labels a Slider thumb with Field.Label', async () => {
+    // Slider.Control uses a gesture, which needs the root view even in a test.
+    await render(
+      <GestureHandlerRootView>
+        <Field.Root>
+          <Field.Label testID="label">Volume</Field.Label>
+          <Slider.Root>
+            <Slider.Control>
+              <Slider.Thumb testID="thumb" />
+            </Slider.Control>
+          </Slider.Root>
+        </Field.Root>
+      </GestureHandlerRootView>,
+    );
+
+    const labelId = screen.getByTestId('label').props.nativeID;
+    expect(screen.getByTestId('thumb').props.accessibilityLabelledBy).toBe(labelId);
+  });
+
+  it('a disabled Field disables a Slider, Select and OTPField inside it', async () => {
+    await render(
+      <GestureHandlerRootView>
+        <Field.Root disabled>
+          <Slider.Root>
+            <Slider.Control>
+              <Slider.Thumb testID="thumb" />
+            </Slider.Control>
+          </Slider.Root>
+          <Select.Root>
+            <Select.Trigger testID="trigger" />
+          </Select.Root>
+          <OTPField.Root length={1}>
+            <OTPField.Input testID="slot-0" />
+          </OTPField.Root>
+        </Field.Root>
+      </GestureHandlerRootView>,
+    );
+
+    expect(screen.getByTestId('thumb').props.accessibilityState).toMatchObject({ disabled: true });
+    expect(screen.getByTestId('trigger').props.accessibilityState).toMatchObject({ disabled: true });
+    expect(screen.getByTestId('slot-0').props.accessibilityState).toMatchObject({ disabled: true });
   });
 });

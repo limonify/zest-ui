@@ -36,7 +36,9 @@ export function AvatarFallback(componentProps: AvatarFallback.Props) {
   return useRenderElement(View, componentProps, {
     state,
     ref,
-    props: elementProps,
+    // A fallback stands in for the image, so it announces as one too — the
+    // initials or icon inside it are what a screen reader reads out.
+    props: [{ accessibilityRole: 'image' as const }, elementProps],
     enabled: imageLoadingStatus !== 'loaded' && (delay === 0 || delayPassed),
   });
 }

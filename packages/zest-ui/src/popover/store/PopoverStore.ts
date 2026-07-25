@@ -23,6 +23,15 @@ export type State = {
    */
   triggerNode: unknown;
   /**
+   * The trigger's measured width, the React Native counterpart of the web's
+   * `--anchor-width` CSS variable.
+   */
+  triggerWidth: number | undefined;
+  /**
+   * The trigger's measured height.
+   */
+  triggerHeight: number | undefined;
+  /**
    * Set by the Positioner so the Trigger can request a reposition when it is
    * laid out. React Native has no `autoUpdate`.
    */
@@ -57,6 +66,8 @@ const selectors = {
   descriptionElementId: createSelector((state: State) => state.descriptionElementId),
   disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
   triggerNode: createSelector((state: State) => state.triggerNode),
+  triggerWidth: createSelector((state: State) => state.triggerWidth),
+  triggerHeight: createSelector((state: State) => state.triggerHeight),
   update: createSelector((state: State) => state.update),
   payload: createSelector((state: State) => state.payload),
   triggerId: createSelector((state: State) => state.triggerIdProp ?? state.triggerId),
@@ -75,6 +86,8 @@ export class PopoverStore extends ReactStore<Readonly<State>, Context, typeof se
         descriptionElementId: undefined,
         disablePointerDismissal: false,
         triggerNode: null,
+        triggerWidth: undefined,
+        triggerHeight: undefined,
         update: undefined,
         payload: undefined,
         triggerId: null,

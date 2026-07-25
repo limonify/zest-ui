@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Text } from 'react-native';
-import { render, screen, userEvent } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { Select } from '../index';
 
 const FRUITS = ['apple', 'banana', 'cherry'];
@@ -404,5 +404,124 @@ describe('Select multiple', () => {
     await user.press(screen.getByTestId('item-banana'));
 
     expect(screen.queryByTestId('popup')).toBeNull();
+  });
+});
+
+describe('Select handles and dismissal', () => {
+  it('opens and closes through a handle from a detached trigger', async () => {
+    const handle = Select.createHandle();
+
+    await render(
+      <>
+        <Select.Trigger testID="detached" nativeID="fruit-trigger" handle={handle} />
+        <Select.Root handle={handle}>
+          <Select.Portal>
+            <Select.Positioner>
+              <Select.Popup testID="popup" />
+            </Select.Positioner>
+          </Select.Portal>
+        </Select.Root>
+      </>,
+    );
+
+    expect(screen.queryByTestId('popup')).toBeNull();
+
+    await act(async () => {
+      handle.open('fruit-trigger');
+    });
+    expect(screen.getByTestId('popup')).toBeTruthy();
+
+    await act(async () => {
+      handle.close();
+    });
+    expect(screen.queryByTestId('popup')).toBeNull();
+  });
+
+  it("hands a detached trigger's payload to the root children", async () => {
+    const handle = Select.createHandle<string>();
+
+    await render(
+      <>
+        <Select.Trigger testID="detached" nativeID="fruit-trigger" handle={handle} payload="citrus" />
+        <Select.Root handle={handle}>
+          {(payload) => (
+            <Select.Portal>
+              <Select.Positioner>
+                <Select.Popup testID="popup">
+                  <Text testID="payload">{payload}</Text>
+                </Select.Popup>
+              </Select.Positioner>
+            </Select.Portal>
+          )}
+        </Select.Root>
+      </>,
+    );
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('detached'));
+
+    expect(screen.getByTestId('payload')).toHaveTextContent('citrus');
+  });
+
+  it('closes through actionsRef, and unmount() does not fire onOpenChange', async () => {
+    const actionsRef = React.createRef<Select.Root.Actions>();
+    const onOpenChange = jest.fn();
+
+    await render(<TestSelect defaultOpen actionsRef={actionsRef} onOpenChange={onOpenChange} />);
+
+    await act(async () => {
+      actionsRef.current!.close();
+    });
+    expect(onOpenChange).toHaveBeenLastCalledWith(
+      false,
+      expect.objectContaining({ reason: 'imperative-action' }),
+    );
+
+    onOpenChange.mockClear();
+    await render(<TestSelect defaultOpen actionsRef={actionsRef} onOpenChange={onOpenChange} />);
+
+    await act(async () => {
+      actionsRef.current!.unmount();
+    });
+    expect(screen.queryByTestId('popup')).toBeNull();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it('stays open on an outside press when dismissal is disabled', async () => {
+    await render(<TestSelect defaultOpen disablePointerDismissal />);
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('backdrop'));
+
+    expect(screen.getByTestId('popup')).toBeTruthy();
+  });
+
+  it('publishes the trigger size on the popup so it can match its anchor', async () => {
+    const seen: Array<number | undefined> = [];
+
+    await render(
+      <Select.Root defaultOpen>
+        <Select.Trigger testID="trigger" />
+        <Select.Portal>
+          <Select.Positioner>
+            <Select.Popup
+              testID="popup"
+              style={(state) => {
+                seen.push(state.triggerWidth);
+                return undefined;
+              }}
+            />
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>,
+    );
+
+    await act(async () => {
+      fireEvent(screen.getByTestId('trigger'), 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width: 240, height: 44 } },
+      });
+    });
+
+    expect(seen.at(-1)).toBe(240);
   });
 });

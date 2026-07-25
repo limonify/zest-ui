@@ -29,7 +29,9 @@ export function RadioGroup<Value = any>(componentProps: RadioGroup.Props<Value>)
     ...elementProps
   } = componentProps;
 
-  const { fieldDisabled, fieldProps, validateField } = useFieldControlRegistration();
+  const { fieldDisabled, fieldProps, markChanged, markTouched } = useFieldControlRegistration({
+    initialValue: defaultValue ?? valueProp,
+  });
 
   const disabled = disabledProp || fieldDisabled;
 
@@ -49,7 +51,8 @@ export function RadioGroup<Value = any>(componentProps: RadioGroup.Props<Value>)
       }
 
       setCheckedValueUnwrapped(value);
-      validateField(value);
+      markChanged(value);
+      markTouched(value);
     },
   );
 

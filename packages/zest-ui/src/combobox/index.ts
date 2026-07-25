@@ -14,3 +14,5 @@ export {
   useComboboxRootContext,
   type ComboboxItem as ComboboxItemData,
 } from './root/ComboboxRootContext';
+export { ComboboxHandle } from './store/ComboboxHandle';
+export type { ComboboxItems } from './store/ComboboxStore';

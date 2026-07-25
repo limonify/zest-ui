@@ -16,10 +16,14 @@ export function useDialogPopupProps() {
   const titleElementId = store.useState('titleElementId');
   const descriptionElementId = store.useState('descriptionElementId');
   const role = store.useState('role');
+  const nested = store.useState('nested');
+  const nestedDialogOpen = store.useState('nestedDialogOpen');
 
   return {
     store,
     open,
+    nested,
+    nestedDialogOpen,
     transitionStatus: transitionContext?.transitionStatus,
     props: {
       role,

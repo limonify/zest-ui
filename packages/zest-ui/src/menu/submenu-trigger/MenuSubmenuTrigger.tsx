@@ -62,6 +62,9 @@ export function MenuSubmenuTrigger(componentProps: MenuSubmenuTrigger.Props) {
       {
         onLayout(event: LayoutChangeEvent) {
           onLayout(event);
+          const { width, height } = event.nativeEvent.layout;
+          store.set('triggerWidth', width);
+          store.set('triggerHeight', height);
           store.state.update?.();
         },
         accessibilityRole: 'menuitem' as const,

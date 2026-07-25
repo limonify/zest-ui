@@ -60,7 +60,7 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
     setActiveSnapPoint,
     snapToSequentialPoints,
   } = useDrawerSnapPoints();
-  const { store, open, transitionStatus, props } = useDialogPopupProps();
+  const { store, open, transitionStatus, nested, nestedDialogOpen, props } = useDialogPopupProps();
 
   const [swiping, setSwiping] = React.useState(false);
   const [swipeMovement, setSwipeMovement] = React.useState(0);
@@ -159,6 +159,8 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
   const state: DrawerPopupState = {
     open,
     transitionStatus,
+    nested,
+    nestedDialogOpen,
     swiping,
     swipeMovement,
     swipeDirection,
@@ -199,6 +201,15 @@ export interface DrawerPopupState {
    * to `undefined` after one frame), `'ending'` once it is closing.
    */
   transitionStatus: TransitionStatus;
+  /**
+   * Whether this drawer is rendered inside another dialog's tree.
+   */
+  nested: boolean;
+  /**
+   * Whether a dialog nested inside this one is open — the cue to scale or dim
+   * this popup, which the web version drives with a CSS variable.
+   */
+  nestedDialogOpen: boolean;
   /**
    * Whether a swipe is currently in progress.
    */

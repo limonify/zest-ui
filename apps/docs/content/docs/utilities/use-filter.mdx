@@ -1,0 +1,76 @@
+---
+title: useFilter
+description: Locale-aware string matching for filtering a list.
+---
+
+`useFilter` returns three matchers built on `Intl.Collator`. It is what
+[`Combobox`](/docs/components/combobox) and [`Autocomplete`](/docs/components/autocomplete) filter
+with by default; use it directly when you filter the items yourself.
+
+## Why not `toLowerCase().includes()`
+
+A lowercase comparison only folds case. A collator folds the things a person typing on a phone
+actually leaves out — accents, diacritics, and script-level differences:
+
+```tsx
+import { useFilter } from '@limonify/zest-ui';
+
+const { contains } = useFilter();
+
+contains('Résumé', 'resume'); // true
+contains('Jalapeño Popper', 'PENO'); // true
+contains('Banana bread', 'cake'); // false
+```
+
+## Usage
+
+```tsx
+import { useFilter } from '@limonify/zest-ui';
+
+function CommandList({ items }: { items: string[] }) {
+  const [query, setQuery] = React.useState('');
+  const { contains } = useFilter();
+
+  const matches = React.useMemo(
+    () => items.filter((item) => contains(item, query)),
+    [items, query, contains],
+  );
+
+  return <List data={matches} />;
+}
+```
+
+The returned object is stable while the options are, so it is safe as a `useMemo` dependency.
+
+## Sensitivity
+
+Every `Intl.CollatorOptions` field is accepted, plus `locale`. The default is
+`sensitivity: 'base'`, which ignores both case and accents. Tighten it when case matters:
+
+```tsx
+const { contains } = useFilter({ sensitivity: 'case' });
+
+contains('Résumé', 'Resume'); // true  — accents still fold
+contains('Résumé', 'resume'); // false — case now counts
+```
+
+## API
+
+<AutoType path="../../packages/zest-ui/src/filter/useFilter.ts" name="UseFilterParameters" />
+
+<AutoType path="../../packages/zest-ui/src/filter/useFilter.ts" name="UseFilterReturnValue" />
+
+An empty query matches everything, so an untouched search field filters nothing out.
+
+## One limitation
+
+All three matchers compare a **fixed-width** window of the string, so a query only ever matches a
+run of the same length. A character that folds to a different number of characters is therefore not
+matched across that boundary:
+
+```tsx
+contains('STRASSE', 'straße'); // false — 6 characters cannot match 7
+```
+
+Scanning every width instead would make each keystroke quadratic in the length of the list, which
+is the wrong trade for a filter that runs on every character typed.

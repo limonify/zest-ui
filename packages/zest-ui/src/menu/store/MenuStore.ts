@@ -11,6 +11,15 @@ export type State = {
    * The anchor's native node, carried across the portal boundary.
    */
   triggerNode: unknown;
+  /**
+   * The trigger's measured width, the React Native counterpart of the web's
+   * `--anchor-width` CSS variable.
+   */
+  triggerWidth: number | undefined;
+  /**
+   * The trigger's measured height.
+   */
+  triggerHeight: number | undefined;
   update: (() => void) | undefined;
   /**
    * The payload of the trigger the popup was opened by, handed to the root's
@@ -40,6 +49,8 @@ const selectors = {
   open: createSelector((state: State) => state.openProp ?? state.open),
   disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
   triggerNode: createSelector((state: State) => state.triggerNode),
+  triggerWidth: createSelector((state: State) => state.triggerWidth),
+  triggerHeight: createSelector((state: State) => state.triggerHeight),
   update: createSelector((state: State) => state.update),
   payload: createSelector((state: State) => state.payload),
   triggerId: createSelector((state: State) => state.triggerIdProp ?? state.triggerId),
@@ -53,6 +64,8 @@ export class MenuStore extends ReactStore<Readonly<State>, Context, typeof selec
         openProp: undefined,
         disablePointerDismissal: false,
         triggerNode: null,
+        triggerWidth: undefined,
+        triggerHeight: undefined,
         update: undefined,
         payload: undefined,
         triggerId: null,

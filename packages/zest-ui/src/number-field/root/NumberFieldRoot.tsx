@@ -52,7 +52,9 @@ export function NumberFieldRoot(componentProps: NumberFieldRoot.Props) {
     ...elementProps
   } = componentProps;
 
-  const { fieldDisabled, validateField } = useFieldControlRegistration();
+  const { fieldDisabled, markChanged } = useFieldControlRegistration({
+    initialValue: defaultValue ?? valueProp ?? null,
+  });
 
   const disabled = disabledProp || fieldDisabled;
 
@@ -135,7 +137,7 @@ export function NumberFieldRoot(componentProps: NumberFieldRoot.Props) {
 
         valueRef.current = validatedValue;
         setValueState(validatedValue);
-        validateField(validatedValue);
+        markChanged(validatedValue);
       }
 
       lastChangedValueRef.current = validatedValue;

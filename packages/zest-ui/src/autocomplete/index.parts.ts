@@ -1,4 +1,5 @@
 export { AutocompleteRoot as Root } from './root/AutocompleteRoot';
+export { createAutocompleteHandle as createHandle } from './handle';
 
 // An autocomplete reuses every combobox part but its Root.
 export { ComboboxInput as Input } from '../combobox/input/ComboboxInput';

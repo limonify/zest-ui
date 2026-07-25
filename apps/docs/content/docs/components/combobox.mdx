@@ -103,16 +103,51 @@ import { Combobox } from '@limonify/zest-ui';
 
 ## API
 
-`Combobox.Root` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
+`Combobox.Root` — every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `items` | `(string \| { value, label })[]` | — | The items to filter and choose from. |
-| `value` / `defaultValue` | `unknown` | — | The selected value. |
-| `onValueChange` | `(value) => void` | — | Called when the selection changes. |
-| `inputValue` / `defaultInputValue` | `string` | — | The input text. |
-| `openOnFocus` | `boolean` | `true` | Open the list when the input is focused. |
-| `filter` | `(item, query) => boolean` | label match | Custom filter predicate. |
+<AutoType path="../../packages/zest-ui/src/combobox/root/ComboboxRoot.tsx" name="ComboboxRootProps" />
+
+Filtering defaults to a locale-aware label match — "resume" finds "Résumé". Pass `filter` to change
+it, and build your own predicate with [`useFilter`](/docs/utilities/use-filter).
+
+### Cancelling a change
+
+Every callback receives an event details object alongside the new value. Calling `cancel()` on it
+vetoes the change — and because one object is shared across a single interaction, cancelling in
+`onValueChange` also stops the list from closing:
+
+```tsx
+<Combobox.Root
+  onOpenChange={(open, eventDetails) => {
+    if (!open && eventDetails.reason === 'outside-press') {
+      eventDetails.cancel();
+    }
+  }}
+/>
+```
+
+The reasons a combobox reports are `input-press`, `input-change`, `trigger-focus`, `item-press`,
+`outside-press`, `escape-key`, `imperative-action` and `none`.
+
+### Opening it from elsewhere
+
+`Combobox.createHandle()` connects a root to an input rendered outside it, and lets you open and
+close the list imperatively:
+
+```tsx
+const handle = Combobox.createHandle();
+
+<Combobox.Input nativeID="fruit" handle={handle} />
+// …anywhere else in the tree
+<Combobox.Root handle={handle}>{/* … */}</Combobox.Root>
+
+handle.open('fruit');
+handle.close();
+```
+
+`actionsRef` is the other half of that: `actionsRef.current.close()` closes with the
+`imperative-action` reason, and `unmount()` closes *without* firing `onOpenChange` — which is what
+you call once your own closing animation has finished.
 
 ## State
 
@@ -120,15 +155,27 @@ These fields reach your `style` and `render` functions on **Combobox.Input** (`s
 
 <AutoType path="../../packages/zest-ui/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
 
+
+### Sizing the popup to its trigger
+
+The positioner and the popup both publish `triggerWidth` and `triggerHeight` — the trigger's
+measured size, and the React Native counterpart of the web's `--anchor-width` CSS variable:
+
+```tsx
+<Combobox.Popup style={(state) => [styles.popup, { minWidth: state.triggerWidth }]} />
+```
+
+Both are `undefined` until the trigger has been laid out once.
+
 ## Animation
 
-`Combobox.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade the list in and out:
+`Combobox.Popup` publishes `state.transitionStatus`. Keep the portal mounted with `<Portal keepMounted>` and fade the list in and out:
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Combobox } from '@limonify/zest-ui';
 
-<Combobox.Popup keepMounted render={(props) => (
+<Combobox.Popup render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
 )}>
   {/* ... */}

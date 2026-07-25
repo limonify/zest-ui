@@ -1,5 +1,6 @@
 import { createSelector } from '../../store/createSelector';
 import { ReactStore } from '../../store/ReactStore';
+import { PopupTriggerMap } from '../../utils/popups/PopupTriggerMap';
 import type { SelectRoot } from '../root/SelectRoot';
 
 /**
@@ -101,6 +102,7 @@ export type State = {
   disabled: boolean;
   readOnly: boolean;
   required: boolean;
+  disablePointerDismissal: boolean;
   /**
    * The anchor's native node, carried across the portal boundary.
    */
@@ -115,11 +117,33 @@ export type State = {
    * The trigger's measured width, used to size the popup.
    */
   triggerWidth: number | undefined;
+  /**
+   * The trigger's measured height.
+   */
+  triggerHeight: number | undefined;
+  /**
+   * The payload of the trigger the select was opened by, handed to the root's
+   * children when they are a function.
+   */
+  payload: unknown;
+  /**
+   * The id of the trigger the select is associated with, or `null` for none.
+   */
+  triggerId: string | null;
+  /**
+   * The controlled `triggerId` prop, when provided.
+   */
+  triggerIdProp: string | null | undefined;
 };
 
 type Context = {
   onValueChange: ((value: any, eventDetails: SelectRoot.ChangeEventDetails) => void) | undefined;
   onOpenChange: ((open: boolean, eventDetails: SelectRoot.ChangeEventDetails) => void) | undefined;
+  /**
+   * Every trigger bound to this select, by id. A handle resolves `open(id)`
+   * through this, which is what lets a trigger rendered outside the root open it.
+   */
+  triggerNodes: PopupTriggerMap;
 };
 
 const selectors = {
@@ -137,6 +161,10 @@ const selectors = {
   labelId: createSelector((state: State) => state.labelId),
   update: createSelector((state: State) => state.update),
   triggerWidth: createSelector((state: State) => state.triggerWidth),
+  triggerHeight: createSelector((state: State) => state.triggerHeight),
+  disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
+  payload: createSelector((state: State) => state.payload),
+  triggerId: createSelector((state: State) => state.triggerIdProp ?? state.triggerId),
 };
 
 export class SelectStore extends ReactStore<Readonly<State>, Context, typeof selectors> {
@@ -153,13 +181,22 @@ export class SelectStore extends ReactStore<Readonly<State>, Context, typeof sel
         disabled: false,
         readOnly: false,
         required: false,
+        disablePointerDismissal: false,
         triggerNode: null,
         labelId: undefined,
         update: undefined,
         triggerWidth: undefined,
+        triggerHeight: undefined,
+        payload: undefined,
+        triggerId: null,
+        triggerIdProp: undefined,
         ...initialState,
       },
-      { onValueChange: undefined, onOpenChange: undefined },
+      {
+        onValueChange: undefined,
+        onOpenChange: undefined,
+        triggerNodes: new PopupTriggerMap(),
+      },
       selectors,
     );
   }

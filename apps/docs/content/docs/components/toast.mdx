@@ -11,11 +11,17 @@ description: Transient messages queued above the app, without blocking it.
 
 <Anatomy code={`Toast.Provider
   Toast.Viewport
-    Toast.Root
-      Toast.Title
-      Toast.Description
-      Toast.Action
-      Toast.Close`} />
+    Toast.Positioner
+      Toast.Root
+        Toast.Arrow
+        Toast.Title
+        Toast.Description
+        Toast.Action
+        Toast.Close`} />
+
+`Toast.Positioner` and `Toast.Arrow` are for a toast anchored to something on screen — the
+positioner corrects for the viewport's own origin (a toast is not inside a Modal), and the arrow
+reads `side`/`align` from it. A stacked list of toasts needs neither.
 
 ## Usage
 

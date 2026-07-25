@@ -75,6 +75,13 @@ import { Meter } from '@limonify/zest-ui';
 
 <AutoType path="../../packages/zest-ui/src/meter/root/MeterRoot.tsx" name="MeterRootProps" />
 
+## State
+
+These fields reach your `style` and `render` functions on **every Meter part**
+(`style={(state) => ...}`) — `percent` is what an indicator's width comes from.
+
+<AutoType path="../../packages/zest-ui/src/meter/root/MeterRoot.tsx" name="MeterRootState" />
+
 ## Accessibility
 
 `role="meter"` (with a `progressbar` accessibilityRole fallback) and `accessibilityValue`. The value normalizes to a percentage of `min`/`max` for the indicator width.

@@ -1,8 +1,10 @@
 'use client';
-import * as React from 'react';
-import type { ZestNativeEvent } from '../../utils/createChangeEventDetails';
-import { ComboboxRootContext, type ComboboxItem } from './ComboboxRootContext';
-import { useComboboxRoot, type ComboboxItems } from './useComboboxRoot';
+import type * as React from 'react';
+import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
+import type { REASONS } from '../../utils/reasons';
+import type { ComboboxHandle } from '../store/ComboboxHandle';
+import type { ComboboxItem, ComboboxItems } from '../store/ComboboxStore';
+import { useRenderComboboxRoot } from './useRenderComboboxRoot';
 
 /**
  * Groups all parts of the combobox: a text input that filters a list of items,
@@ -12,50 +14,28 @@ import { useComboboxRoot, type ComboboxItems } from './useComboboxRoot';
  * **Adapted from upstream.** Base UI's Combobox is a large component built on a
  * shared collection/filter core with chips, groups, rows and virtualization.
  * This is a focused React Native port: an input, a filtered list, and single
- * selection. Filtering is a case-insensitive label match by default; pass
- * `filter` to change it.
+ * selection. Filtering is a locale-aware label match by default (see
+ * `useFilter`); pass `filter` to change it.
  */
-export function ComboboxRoot(props: ComboboxRoot.Props) {
-  const {
-    items,
-    value,
-    defaultValue,
-    onValueChange,
-    inputValue,
-    defaultInputValue,
-    onInputValueChange,
-    open,
-    defaultOpen,
-    onOpenChange,
-    openOnFocus,
-    filter,
-    disabled = false,
-    children,
-  } = props;
-
-  const contextValue = useComboboxRoot({
-    mode: 'combobox',
-    items,
-    value,
-    defaultValue,
-    onValueChange,
-    inputValue,
-    defaultInputValue,
-    onInputValueChange,
-    open,
-    defaultOpen,
-    onOpenChange,
-    openOnFocus,
-    filter,
-    disabled,
-  });
-
-  return <ComboboxRootContext.Provider value={contextValue}>{children}</ComboboxRootContext.Provider>;
+export function ComboboxRoot<Payload = unknown>(props: ComboboxRoot.Props<Payload>) {
+  return useRenderComboboxRoot(props, 'combobox');
 }
 
 export interface ComboboxRootState {}
 
-export interface ComboboxRootProps {
+export interface ComboboxRootActions {
+  /**
+   * Unmounts the list without firing `onOpenChange`. Call it after an
+   * externally controlled closing animation finishes.
+   */
+  unmount: () => void;
+  /**
+   * Closes the list, reporting the `imperative-action` reason.
+   */
+  close: () => void;
+}
+
+export interface ComboboxRootProps<Payload = unknown> {
   /**
    * The items to filter and choose from. Strings, or `{ value, label }` records
    * for non-string values.
@@ -63,16 +43,20 @@ export interface ComboboxRootProps {
   items?: ComboboxItems | undefined;
   /**
    * The selected value.
+   *
+   * To render an uncontrolled combobox, use the `defaultValue` prop instead.
    */
   value?: unknown;
   /**
-   * The initially selected value when uncontrolled.
+   * The initially selected value.
+   *
+   * To render a controlled combobox, use the `value` prop instead.
    */
   defaultValue?: unknown;
   /**
-   * Called when the selection changes.
+   * Event handler called when the selection changes.
    */
-  onValueChange?: ((value: unknown) => void) | undefined;
+  onValueChange?: ((value: any, eventDetails: ComboboxRoot.ChangeEventDetails) => void) | undefined;
   /**
    * The controlled input text.
    */
@@ -82,39 +66,93 @@ export interface ComboboxRootProps {
    */
   defaultInputValue?: string | undefined;
   /**
-   * Called as the input text changes.
+   * Event handler called as the input text changes.
    */
-  onInputValueChange?: ((value: string) => void) | undefined;
+  onInputValueChange?:
+    | ((value: string, eventDetails: ComboboxRoot.ChangeEventDetails) => void)
+    | undefined;
   /**
-   * Whether the list is open.
+   * Whether the list is currently open.
    */
   open?: boolean | undefined;
   /**
-   * Whether the list is initially open when uncontrolled.
+   * Whether the list is initially open.
+   *
+   * To render a controlled combobox, use the `open` prop instead.
+   * @default false
    */
   defaultOpen?: boolean | undefined;
   /**
-   * Called when the list opens or closes.
+   * Event handler called when the list is opened or closed.
    */
-  onOpenChange?: ((open: boolean, event?: ZestNativeEvent) => void) | undefined;
+  onOpenChange?:
+    | ((open: boolean, eventDetails: ComboboxRoot.ChangeEventDetails) => void)
+    | undefined;
   /**
    * Whether focusing the input opens the list.
    * @default true
    */
   openOnFocus?: boolean | undefined;
   /**
-   * A custom filter predicate. Defaults to a case-insensitive label match.
+   * A custom filter predicate. Defaults to a locale-aware label match, so
+   * "resume" finds "Résumé" — see `useFilter` to build your own.
    */
   filter?: ((item: ComboboxItem, query: string) => boolean) | undefined;
   /**
-   * Whether the combobox is disabled.
+   * Whether the component should ignore user interaction.
    * @default false
    */
   disabled?: boolean | undefined;
-  children?: React.ReactNode;
+  /**
+   * Whether to prevent the list from closing on presses outside the popup.
+   * @default false
+   */
+  disablePointerDismissal?: boolean | undefined;
+  /**
+   * A ref to imperative actions.
+   */
+  actionsRef?: React.RefObject<ComboboxRoot.Actions | null> | undefined;
+  /**
+   * A handle associating this combobox with an input rendered outside it, and
+   * letting it be opened and closed imperatively. Create one with
+   * `Combobox.createHandle()`.
+   */
+  handle?: ComboboxHandle | undefined;
+  /**
+   * The id of the input the list is anchored to. Useful together with the `open`
+   * prop, to control which input a controlled list belongs to.
+   */
+  triggerId?: string | null | undefined;
+  /**
+   * The id of the input the list is initially anchored to. Useful together with
+   * `defaultOpen`.
+   */
+  defaultTriggerId?: string | null | undefined;
+  /**
+   * The content of the combobox.
+   *
+   * Pass a function to receive the payload the list was opened with, via a
+   * detached input's `payload` prop.
+   */
+  children?: React.ReactNode | ((payload: Payload) => React.ReactNode);
 }
+
+export type ComboboxRootChangeEventReason =
+  | typeof REASONS.inputPress
+  | typeof REASONS.inputChange
+  | typeof REASONS.triggerFocus
+  | typeof REASONS.itemPress
+  | typeof REASONS.outsidePress
+  | typeof REASONS.escapeKey
+  | typeof REASONS.imperativeAction
+  | typeof REASONS.none;
+
+export type ComboboxRootChangeEventDetails = ZestChangeEventDetails<ComboboxRootChangeEventReason>;
 
 export namespace ComboboxRoot {
   export type State = ComboboxRootState;
-  export type Props = ComboboxRootProps;
+  export type Props<Payload = unknown> = ComboboxRootProps<Payload>;
+  export type Actions = ComboboxRootActions;
+  export type ChangeEventReason = ComboboxRootChangeEventReason;
+  export type ChangeEventDetails = ComboboxRootChangeEventDetails;
 }

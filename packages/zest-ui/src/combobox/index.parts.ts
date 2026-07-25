@@ -1,4 +1,5 @@
 export { ComboboxRoot as Root } from './root/ComboboxRoot';
+export { createComboboxHandle as createHandle, ComboboxHandle as Handle } from './store/ComboboxHandle';
 export { ComboboxInput as Input } from './input/ComboboxInput';
 export { ComboboxPortal as Portal } from './portal/ComboboxPortal';
 export { ComboboxBackdrop as Backdrop } from './backdrop/ComboboxBackdrop';

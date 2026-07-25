@@ -96,15 +96,30 @@ These fields reach your `style` and `render` functions on **ContextMenu.Position
 
 <AutoType path="../../packages/zest-ui/src/context-menu/positioner/ContextMenuPositioner.tsx" name="ContextMenuPositionerState" />
 
+
+### Staying on screen
+
+The popup is placed at the point the long press landed. When it would run off the screen it flips
+to the other side of that point and is kept `collisionPadding` (5 by default) inside the edges;
+`state.side` and `state.align` on the positioner report where it actually ended up, so an arrow or
+a transform origin can follow it.
+
+```tsx
+<ContextMenu.Positioner
+  collisionPadding={12}
+  style={(state) => [state.side === 'top' && styles.originBottom]}
+/>
+```
+
 ## Animation
 
-`ContextMenu.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out:
+`ContextMenu.Popup` publishes `state.transitionStatus`. Keep the portal mounted with `<Portal keepMounted>` and fade it in and out:
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { ContextMenu } from '@limonify/zest-ui';
 
-<ContextMenu.Popup keepMounted render={(props) => (
+<ContextMenu.Popup render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
 )}>
   {/* ... */}

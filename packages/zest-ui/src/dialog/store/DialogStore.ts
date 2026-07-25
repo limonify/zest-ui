@@ -35,6 +35,15 @@ export type State = {
    * The controlled `triggerId` prop, when provided.
    */
   triggerIdProp: string | null | undefined;
+  /**
+   * Whether this dialog is itself rendered inside another dialog's tree.
+   */
+  nested: boolean;
+  /**
+   * How many dialogs nested inside this one are currently open. A count rather
+   * than a flag because siblings can overlap while one animates out.
+   */
+  nestedOpenCount: number;
 };
 
 type Context<Reason extends string> = {
@@ -56,6 +65,8 @@ const selectors = {
   descriptionElementId: createSelector((state: State) => state.descriptionElementId),
   disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
   role: createSelector((state: State) => state.role),
+  nested: createSelector((state: State) => state.nested),
+  nestedDialogOpen: createSelector((state: State) => state.nestedOpenCount > 0),
 };
 
 /**
@@ -67,8 +78,7 @@ const selectors = {
  * `DialogRootContext` erases it to `any` (the same trick the group components
  * use) so the parts stay non-generic.
  *
- * TODO(later): nested dialog counting, openMethod interaction typing,
- * transitions (`mounted`/`transitionStatus`), handles/payloads.
+ * TODO(later): openMethod interaction typing.
  */
 export class DialogStore<Reason extends string = DialogRootChangeEventReason> extends ReactStore<
   Readonly<State>,
@@ -87,6 +97,8 @@ export class DialogStore<Reason extends string = DialogRootChangeEventReason> ex
         payload: undefined,
         triggerId: null,
         triggerIdProp: undefined,
+        nested: false,
+        nestedOpenCount: 0,
         ...initialState,
       },
       { onOpenChange: undefined, triggerNodes: new PopupTriggerMap() },
@@ -106,5 +118,15 @@ export class DialogStore<Reason extends string = DialogRootChangeEventReason> ex
     }
 
     this.set('open', nextOpen);
+  };
+
+  /**
+   * Records that a dialog nested inside this one opened or closed.
+   *
+   * Increments rather than assigns, so two descendants closing out of order
+   * cannot leave the count stuck above zero.
+   */
+  public setNestedOpen = (open: boolean) => {
+    this.set('nestedOpenCount', Math.max(0, this.state.nestedOpenCount + (open ? 1 : -1)));
   };
 }

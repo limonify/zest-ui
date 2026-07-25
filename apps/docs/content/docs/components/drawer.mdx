@@ -17,7 +17,11 @@ description: A dialog that also opens and dismisses by swiping, with snap points
     Drawer.Viewport
       Drawer.Popup
         Drawer.Title
+        Drawer.Description
         Drawer.Close`} />
+
+`Drawer.Title` and `Drawer.Description` are the dialog's own parts, re-exported: the title names
+the drawer for assistive technology and the description is announced with it.
 
 ## Usage
 
@@ -108,10 +112,10 @@ These fields reach your `style` and `render` functions on **Drawer.Popup** (`sty
 import Animated, { SlideInDown, SlideOutDown, FadeIn, FadeOut } from 'react-native-reanimated';
 import { Drawer } from '@limonify/zest-ui';
 
-<Drawer.Backdrop keepMounted render={(props) => (
+<Drawer.Backdrop render={(props) => (
   <Animated.View {...props} entering={FadeIn} exiting={FadeOut} />
 )} />
-<Drawer.Popup keepMounted render={(props) => (
+<Drawer.Popup render={(props) => (
   <Animated.View {...props} entering={SlideInDown} exiting={SlideOutDown} />
 )}>
   {/* ... */}

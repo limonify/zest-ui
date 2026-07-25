@@ -245,6 +245,9 @@ These Base UI pieces stay web/desktop-only:
 | `Toolbar` | Desktop toolbar / roving tabindex |
 | `CSPProvider` | Content Security Policy is web-only |
 
+Base UI's `useFilter` **is** ported — `Combobox` and `Autocomplete` filter through it, and it is
+exported for filtering your own lists. See [the docs](https://zestui.limonify.com/docs/utilities/use-filter).
+
 ## Monorepo
 
 This repository is a bun + turborepo workspace:

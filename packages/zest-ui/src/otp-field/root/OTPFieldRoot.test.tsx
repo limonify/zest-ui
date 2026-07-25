@@ -369,3 +369,41 @@ describe('OTPField', () => {
     });
   });
 });
+
+describe('OTPField accessibility', () => {
+  it('groups the slots so they are announced as one field', async () => {
+    await render(
+      <OTPField.Root testID="root" length={4}>
+        {Array.from({ length: 4 }, (_, index) => (
+          <OTPField.Input key={index} testID={`slot-${index}`} />
+        ))}
+      </OTPField.Root>,
+    );
+
+    expect(screen.getByTestId('root').props.role).toBe('group');
+  });
+
+  it('names each slot by its position', async () => {
+    await render(
+      <OTPField.Root length={4}>
+        {Array.from({ length: 4 }, (_, index) => (
+          <OTPField.Input key={index} testID={`slot-${index}`} />
+        ))}
+      </OTPField.Root>,
+    );
+
+    expect(screen.getByTestId('slot-0').props.accessibilityLabel).toBe('Digit 1 of 4');
+    expect(screen.getByTestId('slot-3').props.accessibilityLabel).toBe('Digit 4 of 4');
+  });
+
+  it('lets a consumer label override the positional default', async () => {
+    await render(
+      <OTPField.Root length={2}>
+        <OTPField.Input testID="slot-0" accessibilityLabel="First digit" />
+        <OTPField.Input testID="slot-1" />
+      </OTPField.Root>,
+    );
+
+    expect(screen.getByTestId('slot-0').props.accessibilityLabel).toBe('First digit');
+  });
+});

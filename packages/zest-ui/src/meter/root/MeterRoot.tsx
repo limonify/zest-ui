@@ -45,11 +45,14 @@ export function MeterRoot(componentProps: MeterRoot.Props) {
     ? formatNumber(value, locale, format)
     : formatNumber(percentageValue / 100, locale, { style: 'percent' });
 
-  const state: MeterRootState = React.useMemo(() => ({}), []);
+  const state: MeterRootState = React.useMemo(
+    () => ({ value: clampedValue, min, max, percent: percentageValue, formattedValue }),
+    [clampedValue, min, max, percentageValue, formattedValue],
+  );
 
   const contextValue: MeterRootContext = React.useMemo(
-    () => ({ formattedValue, percentageValue, setLabelId, value }),
-    [formattedValue, percentageValue, value],
+    () => ({ formattedValue, percentageValue, setLabelId, state, value }),
+    [formattedValue, percentageValue, state, value],
   );
 
   const element = useRenderElement(View, componentProps, {
@@ -83,7 +86,29 @@ function valueToPercent(value: number, min: number, max: number) {
   return ((value - min) * 100) / (max - min);
 }
 
-export interface MeterRootState {}
+export interface MeterRootState {
+  /**
+   * The current value, clamped into `[min, max]`.
+   */
+  value: number;
+  /**
+   * The minimum value.
+   */
+  min: number;
+  /**
+   * The maximum value.
+   */
+  max: number;
+  /**
+   * How far the value sits through the range, `0`–`100`. This is what an
+   * indicator's width comes from.
+   */
+  percent: number;
+  /**
+   * The value as text, through `format`/`locale`.
+   */
+  formattedValue: string;
+}
 
 export interface MeterRootProps extends ZestUIComponentProps<typeof View, MeterRootState> {
   /**

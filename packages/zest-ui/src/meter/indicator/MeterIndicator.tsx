@@ -2,6 +2,7 @@
 import { View } from 'react-native';
 import { useMeterRootContext } from '../root/MeterRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import type { MeterRootState } from '../root/MeterRoot';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -11,9 +12,7 @@ import type { ZestUIComponentProps } from '../../types';
 export function MeterIndicator(componentProps: MeterIndicator.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const { percentageValue } = useMeterRootContext();
-
-  const state: MeterIndicatorState = {};
+  const { percentageValue, state } = useMeterRootContext();
 
   return useRenderElement(View, componentProps, {
     state,
@@ -22,7 +21,7 @@ export function MeterIndicator(componentProps: MeterIndicator.Props) {
   });
 }
 
-export interface MeterIndicatorState {}
+export interface MeterIndicatorState extends MeterRootState {}
 
 export interface MeterIndicatorProps
   extends ZestUIComponentProps<typeof View, MeterIndicatorState> {}

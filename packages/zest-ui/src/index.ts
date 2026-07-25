@@ -31,6 +31,7 @@ export * from './tooltip';
 export * from './toggle';
 export * from './toggle-group';
 
+export * from './filter';
 export * from './store';
 export * from './hooks';
 export * from './types';

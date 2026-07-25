@@ -52,6 +52,11 @@ export function AvatarImage(componentProps: AvatarImage.Props) {
     ref,
     props: [
       {
+        // An avatar image is content, not decoration: without a role assistive
+        // tech has nothing to announce it as. Pass `accessibilityLabel` (or
+        // `alt`) for the person it depicts; leave it off and RN treats the
+        // image as unlabelled, which is the right default for a decorative one.
+        accessibilityRole: 'image' as const,
         onLoadStart() {
           publishStatus('loading');
         },

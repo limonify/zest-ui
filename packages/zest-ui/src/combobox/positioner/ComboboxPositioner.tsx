@@ -1,6 +1,9 @@
 'use client';
+import * as React from 'react';
 import { View } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
+import { useComboboxPortalContext } from '../portal/ComboboxPortalContext';
+import { ComboboxPositionerContext } from './ComboboxPositionerContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
@@ -32,7 +35,13 @@ export function ComboboxPositioner(componentProps: ComboboxPositioner.Props) {
     ...elementProps
   } = componentProps;
 
-  const { open, triggerNode, setUpdate, triggerWidth } = useComboboxRootContext();
+  useComboboxPortalContext();
+  const store = useComboboxRootContext();
+
+  const open = store.useState('open');
+  const triggerNode = store.useState('triggerNode');
+  const triggerWidth = store.useState('triggerWidth');
+  const triggerHeight = store.useState('triggerHeight');
 
   const positioning = useAnchorPositioning({
     align,
@@ -51,24 +60,46 @@ export function ComboboxPositioner(componentProps: ComboboxPositioner.Props) {
   }, [refs, triggerNode]);
 
   useIsoLayoutEffect(() => {
-    setUpdate(update);
-    return () => setUpdate(undefined);
-  }, [setUpdate, update]);
+    store.set('update', update);
+    return () => {
+      store.set('update', undefined);
+    };
+  }, [store, update]);
 
   const mergedRef = useMergedRefs(ref, refs.setFloating);
 
-  const state: ComboboxPositionerState = { 
-    open, 
-    side: positioning.side, 
+  const state: ComboboxPositionerState = {
+    open,
+    side: positioning.side,
     align: positioning.align,
     triggerWidth,
+    triggerHeight,
   };
 
-  return useRenderElement(View, componentProps, {
+  const contextValue: ComboboxPositionerContext = React.useMemo(
+    () => ({ side: positioning.side, align: positioning.align }),
+    [positioning.side, positioning.align],
+  );
+
+  const element = useRenderElement(View, componentProps, {
     state,
     ref: mergedRef,
-    props: [{ style: positionerStyles, onLayout: () => update() }, elementProps],
+    props: [
+      {
+        style: positionerStyles,
+        onLayout() {
+          update();
+        },
+      },
+      elementProps,
+    ],
   });
+
+  return (
+    <ComboboxPositionerContext.Provider value={contextValue}>
+      {element}
+    </ComboboxPositionerContext.Provider>
+  );
 }
 
 export interface ComboboxPositionerState {
@@ -76,10 +107,14 @@ export interface ComboboxPositionerState {
   side: Side;
   align: Align;
   /**
-   * The trigger's measured width, available for consumers to apply to the popup.
+   * The input's measured width, available for consumers to apply to the popup.
    * This is the React Native equivalent of the web's `--anchor-width` CSS variable.
    */
   triggerWidth: number | undefined;
+  /**
+   * The input's measured height.
+   */
+  triggerHeight: number | undefined;
 }
 
 export interface ComboboxPositionerProps

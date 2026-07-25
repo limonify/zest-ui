@@ -21,8 +21,17 @@ export function MenuPopup(componentProps: MenuPopup.Props) {
   const { transitionStatus } = useMenuTransitionContext() ?? { transitionStatus: undefined };
 
   const open = store.useState('open');
+  const triggerWidth = store.useState('triggerWidth');
+  const triggerHeight = store.useState('triggerHeight');
 
-  const state: MenuPopupState = { open, transitionStatus, side, align };
+  const state: MenuPopupState = {
+    open,
+    transitionStatus,
+    side,
+    align,
+    triggerWidth,
+    triggerHeight,
+  };
 
   const element = useRenderElement(View, componentProps, {
     state,
@@ -60,6 +69,16 @@ export interface MenuPopupState {
    * The alignment the popup was actually placed with.
    */
   align: Align;
+  /**
+   * The trigger's measured width, available for consumers to size the popup
+   * against its anchor. This is the React Native equivalent of the web's
+   * `--anchor-width` CSS variable.
+   */
+  triggerWidth: number | undefined;
+  /**
+   * The trigger's measured height.
+   */
+  triggerHeight: number | undefined;
 }
 
 export interface MenuPopupProps extends ZestUIComponentProps<typeof View, MenuPopupState> {}

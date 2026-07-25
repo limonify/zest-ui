@@ -215,3 +215,31 @@ describe('Avatar', () => {
     });
   });
 });
+
+describe('Avatar accessibility', () => {
+  it('announces the image and the fallback as images', async () => {
+    await render(
+      <Avatar.Root testID="root">
+        <Avatar.Image testID="image" source={{ uri: 'https://example.com/a.png' }} />
+        <Avatar.Fallback testID="fallback" />
+      </Avatar.Root>,
+    );
+
+    expect(screen.getByTestId('image').props.accessibilityRole).toBe('image');
+    expect(screen.getByTestId('fallback').props.accessibilityRole).toBe('image');
+  });
+
+  it('lets the consumer name the image', async () => {
+    await render(
+      <Avatar.Root>
+        <Avatar.Image
+          testID="image"
+          accessibilityLabel="Ada Lovelace"
+          source={{ uri: 'https://example.com/a.png' }}
+        />
+      </Avatar.Root>,
+    );
+
+    expect(screen.getByTestId('image').props.accessibilityLabel).toBe('Ada Lovelace');
+  });
+});

@@ -3,6 +3,7 @@ import type * as React from 'react';
 import { Text } from 'react-native';
 import { useMeterRootContext } from '../root/MeterRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import type { MeterRootState } from '../root/MeterRoot';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -15,9 +16,7 @@ import type { ZestUIComponentProps } from '../../types';
 export function MeterValue(componentProps: MeterValue.Props) {
   const { render, className, style, children, ref, ...elementProps } = componentProps;
 
-  const { value, formattedValue } = useMeterRootContext();
-
-  const state: MeterValueState = {};
+  const { value, formattedValue, state } = useMeterRootContext();
 
   return useRenderElement(Text, componentProps, {
     state,
@@ -35,7 +34,7 @@ export function MeterValue(componentProps: MeterValue.Props) {
   });
 }
 
-export interface MeterValueState {}
+export interface MeterValueState extends MeterRootState {}
 
 export interface MeterValueProps
   extends Omit<ZestUIComponentProps<typeof Text, MeterValueState>, 'children'> {

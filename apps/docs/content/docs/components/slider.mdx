@@ -113,6 +113,15 @@ function Thumb({ props, state }) {
 
 To make the thumb *follow* the finger with spring physics instead, feed `state.values` into a shared value — see **Gesture-following values** in the [Reanimated guide](/docs/guides/animation-reanimated).
 
+
+## Inside a Field
+
+Wrapped in a [`Field.Root`](/docs/components/field), the slider inherits its `disabled` and
+`Slider.Thumb` is labelled by `Field.Label` — the thumb rather than the root, because that is the
+element assistive technology announces and adjusts. `Slider.Label` is still the fallback for a
+slider that stands on its own. Dragging marks the field dirty; releasing the thumb marks it
+touched, which is when `validationMode="onBlur"` runs.
+
 ## Accessibility
 
 Pass an array `value` for a range slider. Each `Slider.Thumb` is `accessibilityRole="adjustable"` and labelled by `Slider.Label`. Requires `react-native-gesture-handler`.

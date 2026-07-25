@@ -12,9 +12,9 @@ import { useDialogPopupProps } from './useDialogPopupProps';
 export function DialogPopup(componentProps: DialogPopup.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const { open, transitionStatus, props } = useDialogPopupProps();
+  const { open, transitionStatus, nested, nestedDialogOpen, props } = useDialogPopupProps();
 
-  const state: DialogPopupState = { open, transitionStatus };
+  const state: DialogPopupState = { open, transitionStatus, nested, nestedDialogOpen };
 
   return useRenderElement(View, componentProps, {
     state,
@@ -33,6 +33,15 @@ export interface DialogPopupState {
    * to `undefined` after one frame), `'ending'` once it is closing.
    */
   transitionStatus: TransitionStatus;
+  /**
+   * Whether this dialog is rendered inside another dialog's tree.
+   */
+  nested: boolean;
+  /**
+   * Whether a dialog nested inside this one is open — the cue to scale or dim
+   * this popup, which the web version drives with a CSS variable.
+   */
+  nestedDialogOpen: boolean;
 }
 
 export interface DialogPopupProps extends ZestUIComponentProps<typeof View, DialogPopupState> {}

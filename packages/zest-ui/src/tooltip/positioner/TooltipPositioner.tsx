@@ -38,6 +38,8 @@ export function TooltipPositioner(componentProps: TooltipPositioner.Props) {
   useTooltipPortalContext();
   const store = useTooltipRootContext();
   const open = store.useState('open');
+  const triggerWidth = store.useState('triggerWidth');
+  const triggerHeight = store.useState('triggerHeight');
   const triggerNode = store.useState('triggerNode');
 
   const positioning = useAnchorPositioning({
@@ -69,6 +71,8 @@ export function TooltipPositioner(componentProps: TooltipPositioner.Props) {
     open,
     side: positioning.side,
     align: positioning.align,
+    triggerWidth,
+    triggerHeight,
   };
 
   const contextValue: TooltipPositionerContext = React.useMemo(
@@ -101,6 +105,16 @@ export interface TooltipPositionerState {
   open: boolean;
   side: Side;
   align: Align;
+  /**
+   * The trigger's measured width, available for consumers to size the popup
+   * against its anchor. This is the React Native equivalent of the web's
+   * `--anchor-width` CSS variable.
+   */
+  triggerWidth: number | undefined;
+  /**
+   * The trigger's measured height.
+   */
+  triggerHeight: number | undefined;
 }
 
 export interface TooltipPositionerProps

@@ -1,22 +1,58 @@
 'use client';
+import * as React from 'react';
 import { useFieldRootContext } from '../../field/root/FieldRootContext';
 import { useStableCallback } from '../../hooks/useStableCallback';
 
+/** Whether a value counts as "the user has put something in this control". */
+function defaultIsFilled(value: unknown): boolean {
+  if (value == null || value === false || value === '') {
+    return false;
+  }
+
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+
+  return true;
+}
+
+export interface UseFieldControlRegistrationParameters {
+  /**
+   * The control's value at mount. `dirty` is whether the current value still
+   * equals this one.
+   */
+  initialValue?: unknown;
+  /**
+   * Whether a value counts as filled. Defaults to "not null, empty, or false".
+   */
+  isFilled?: ((value: unknown) => boolean) | undefined;
+}
+
 /**
- * Wires a non-text form control (Checkbox, Switch, RadioGroup, NumberField) into
- * a surrounding `Field.Root`, when there is one.
+ * Wires a non-text form control (Checkbox, Switch, RadioGroup, NumberField,
+ * Slider, Select, OTPField) into a surrounding `Field.Root`, when there is one.
  *
  * A field-aware control:
  * - is labelled by `Field.Label` and described by `Field.Description`/`Error`
  *   (through `accessibilityLabelledBy`/`accessibilityDescribedBy`);
  * - inherits the field's (and its fieldset's) `disabled`;
- * - runs the field's `validate` when its value changes.
+ * - runs the field's `validate` when its value changes;
+ * - reports `dirty`/`filled`/`touched`/`focused` back to the field, which is
+ *   what `Field.Validity` and `Field.Error` branch on.
  *
  * Outside a `Field.Root` everything is `undefined`/no-op, so a standalone
  * control is unaffected.
  */
-export function useFieldControlRegistration() {
+export function useFieldControlRegistration(
+  parameters: UseFieldControlRegistrationParameters = {},
+) {
+  const { initialValue, isFilled = defaultIsFilled } = parameters;
+
   const field = useFieldRootContext(false);
+
+  // Only the value the control mounted with decides `dirty`; a later prop change
+  // from the consumer is a new baseline they set themselves, not user input.
+  const initialValueRef = React.useRef(initialValue);
 
   const validate = useStableCallback((value: unknown) => {
     if (!field) {
@@ -24,6 +60,44 @@ export function useFieldControlRegistration() {
     }
     const errors = field.runValidation(value);
     field.setValidityData({ valid: errors.length === 0, errors });
+  });
+
+  /**
+   * Records a user-driven value change: the field becomes dirty (unless the
+   * value is back to where it started), filled tracks the new value, and
+   * `onChange` validation runs.
+   */
+  const markChanged = useStableCallback((value: unknown) => {
+    if (!field) {
+      return;
+    }
+
+    field.setDirty(!Object.is(value, initialValueRef.current));
+    field.setFilled(isFilled(value));
+
+    if (field.validationMode === 'onChange') {
+      validate(value);
+    }
+  });
+
+  /**
+   * Records that the user is done with the control — the counterpart of a blur
+   * on a text input, which is when `onBlur` validation runs.
+   */
+  const markTouched = useStableCallback((value: unknown) => {
+    if (!field) {
+      return;
+    }
+
+    field.setTouched(true);
+
+    if (field.validationMode === 'onBlur') {
+      validate(value);
+    }
+  });
+
+  const markFocused = useStableCallback((focused: boolean) => {
+    field?.setFocused(focused);
   });
 
   const describedBy =
@@ -36,18 +110,24 @@ export function useFieldControlRegistration() {
     fieldDisabled: field?.disabled ?? false,
     /**
      * Accessibility props associating the control with the field's label and
-     * messages. Spread into the control's props before `elementProps`.
+     * messages, and reporting its validity. Spread into the control's props
+     * before `elementProps`.
      */
     fieldProps: {
       accessibilityLabelledBy: field?.labelId,
       accessibilityDescribedBy: describedBy,
       'aria-labelledby': field?.labelId,
       'aria-describedby': describedBy,
+      'aria-invalid': field?.validityData.valid === false || undefined,
     },
     /**
-     * Runs the field's validation for a new control value. No-op without a field.
+     * Runs the field's validation for a new control value, regardless of
+     * `validationMode`. No-op without a field.
      */
     validateField: validate,
+    markChanged,
+    markTouched,
+    markFocused,
     /**
      * Whether a surrounding field is present at all.
      */

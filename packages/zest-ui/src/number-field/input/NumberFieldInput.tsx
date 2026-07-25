@@ -43,7 +43,7 @@ export function NumberFieldInput(componentProps: NumberFieldInput.Props) {
 
   const { disabled, readOnly, value, inputValue } = state;
 
-  const { fieldProps } = useFieldControlRegistration();
+  const { fieldProps, markTouched, markFocused } = useFieldControlRegistration();
 
   const handleChangeText = useStableCallback((text: string) => {
     if (disabled || readOnly) {
@@ -147,7 +147,16 @@ export function NumberFieldInput(componentProps: NumberFieldInput.Props) {
         nativeID: id,
         value: inputValue,
         onChangeText: handleChangeText,
-        onBlur: handleBlur,
+        onFocus() {
+          markFocused(true);
+        },
+        onBlur(event: NativeSyntheticEvent<TextInputFocusEventData>) {
+          markFocused(false);
+          // Leaving the input is what ends the interaction, the same way it does
+          // for a text control — so this is where `onBlur` validation runs.
+          markTouched(valueRef.current);
+          handleBlur(event);
+        },
         editable: !disabled && !readOnly,
         // `numeric` rather than `decimal-pad`: a locale's format may include a
         // decimal separator, a minus sign or a currency symbol, and the numeric

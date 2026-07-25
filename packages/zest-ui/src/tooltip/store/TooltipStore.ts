@@ -9,6 +9,15 @@ export type State = {
    * The anchor's native node, carried across the portal boundary.
    */
   triggerNode: unknown;
+  /**
+   * The trigger's measured width, the React Native counterpart of the web's
+   * `--anchor-width` CSS variable.
+   */
+  triggerWidth: number | undefined;
+  /**
+   * The trigger's measured height.
+   */
+  triggerHeight: number | undefined;
   update: (() => void) | undefined;
 };
 
@@ -19,13 +28,23 @@ type Context = {
 const selectors = {
   open: createSelector((state: State) => state.openProp ?? state.open),
   triggerNode: createSelector((state: State) => state.triggerNode),
+  triggerWidth: createSelector((state: State) => state.triggerWidth),
+  triggerHeight: createSelector((state: State) => state.triggerHeight),
   update: createSelector((state: State) => state.update),
 };
 
 export class TooltipStore extends ReactStore<Readonly<State>, Context, typeof selectors> {
   constructor(initialState?: Partial<State>) {
     super(
-      { open: false, openProp: undefined, triggerNode: null, update: undefined, ...initialState },
+      {
+        open: false,
+        openProp: undefined,
+        triggerNode: null,
+        triggerWidth: undefined,
+        triggerHeight: undefined,
+        update: undefined,
+        ...initialState,
+      },
       { onOpenChange: undefined },
       selectors,
     );

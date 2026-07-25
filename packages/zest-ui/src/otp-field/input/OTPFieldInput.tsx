@@ -163,6 +163,10 @@ export function OTPFieldInput(componentProps: OTPFieldInput.Props) {
         autoComplete: (index === 0 ? autoComplete : 'off') as 'one-time-code' | 'off',
         textContentType: index === 0 ? ('oneTimeCode' as const) : ('none' as const),
         enterKeyHint: index === length - 1 ? ('done' as const) : ('next' as const),
+        // Every slot is an identical one-character box, so position is the only
+        // thing that tells them apart out loud. A consumer-supplied
+        // `accessibilityLabel` in `elementProps` still wins.
+        accessibilityLabel: `Digit ${index + 1} of ${length}`,
         accessibilityState: { disabled: disabled || undefined },
       },
       elementProps,

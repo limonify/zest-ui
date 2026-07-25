@@ -571,10 +571,12 @@ This document originally planned two components that don't exist in Base UI. Nei
 ### Full Component Count Summary
 
 ```
-Base UI (38 components)
+Base UI (38 components + the `useFilter` hook)
   ├── Ported (same name):  32  (Button, Dialog, Select, Field, Combobox, ContextMenu...)
   ├── Excluded:             6  (PreviewCard, Menubar, NavigationMenu, ScrollArea, Toolbar, Form)
   └── Added (mobile-only):  0  (BottomSheet folded into Drawer's snap points)
+
+Utilities: `useFilter` ported (v0.4.0) — Combobox/Autocomplete filter through it.
 
 @limonify/zest-ui total:      32 components
 ```

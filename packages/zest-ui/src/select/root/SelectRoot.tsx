@@ -1,9 +1,13 @@
 'use client';
 import * as React from 'react';
 import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { useStableCallback } from '../../hooks/useStableCallback';
 import { useTransitionStatus } from '../../internals/useTransitionStatus';
+import { usePopupRootHandle } from '../../utils/popups/usePopupRootHandle';
+import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
+import type { SelectHandle } from '../store/SelectHandle';
 import { SelectStore, type SelectItems } from '../store/SelectStore';
 import { SelectRootContext } from './SelectRootContext';
 import { SelectTransitionContext } from './SelectTransitionContext';
@@ -15,12 +19,18 @@ import { SelectTransitionContext } from './SelectTransitionContext';
  * Unlike the web version there is no hidden `<select>`: React Native has no form
  * submission, so `name`/`form` are omitted. Multi-select is not ported yet.
  */
-export function SelectRoot<Value = any>(props: SelectRoot.Props<Value>) {
+export function SelectRoot<Value = any, Payload = unknown>(
+  props: SelectRoot.Props<Value, Payload>,
+) {
   const {
+    actionsRef,
     children,
     defaultOpen = false,
+    defaultTriggerId = null,
     defaultValue,
-    disabled = false,
+    disablePointerDismissal = false,
+    disabled: disabledProp = false,
+    handle,
     items,
     multiple = false,
     onOpenChange,
@@ -28,8 +38,15 @@ export function SelectRoot<Value = any>(props: SelectRoot.Props<Value>) {
     open,
     readOnly = false,
     required = false,
+    triggerId,
     value,
   } = props;
+
+  const { fieldDisabled, markChanged, markTouched } = useFieldControlRegistration({
+    initialValue: defaultValue ?? value ?? (multiple ? [] : undefined),
+  });
+
+  const disabled = disabledProp || fieldDisabled;
 
   const store = useRefWithInit(
     () =>
@@ -45,17 +62,59 @@ export function SelectRoot<Value = any>(props: SelectRoot.Props<Value>) {
         disabled,
         readOnly,
         required,
+        disablePointerDismissal,
+        triggerId: defaultTriggerId,
+        triggerIdProp: triggerId,
       }),
   ).current;
 
+  // Wrapping the consumer's callbacks is what lets a select report itself to a
+  // surrounding `Field.Root`: choosing a value makes the field dirty, and
+  // closing the popup is the select's equivalent of a blur.
+  const handleValueChange = useStableCallback(
+    (nextValue: Value, eventDetails: SelectRoot.ChangeEventDetails) => {
+      onValueChange?.(nextValue, eventDetails);
+
+      if (eventDetails.isCanceled) {
+        return;
+      }
+
+      markChanged(nextValue);
+    },
+  );
+
+  const handleOpenChange = useStableCallback(
+    (nextOpen: boolean, eventDetails: SelectRoot.ChangeEventDetails) => {
+      onOpenChange?.(nextOpen, eventDetails);
+
+      if (eventDetails.isCanceled || nextOpen) {
+        return;
+      }
+
+      markTouched(store.select('value'));
+    },
+  );
+
   store.useControlledProp('openProp', open);
   store.useControlledProp('valueProp', value);
-  store.useContextCallback('onOpenChange', onOpenChange);
-  store.useContextCallback('onValueChange', onValueChange);
-  store.useSyncedValues({ disabled, readOnly, required, items, multiple });
+  store.useControlledProp('triggerIdProp', triggerId);
+  store.useContextCallback('onOpenChange', handleOpenChange);
+  store.useContextCallback('onValueChange', handleValueChange);
+  store.useSyncedValues({
+    disabled,
+    readOnly,
+    required,
+    items,
+    multiple,
+    disablePointerDismissal,
+  });
+
+  usePopupRootHandle({ store, handle, actionsRef });
 
   const resolvedOpen = store.useState('open');
   const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
+
+  const payload = store.useState('payload') as Payload;
 
   const transitionContextValue = React.useMemo(
     () => ({ transitionStatus }),
@@ -65,7 +124,7 @@ export function SelectRoot<Value = any>(props: SelectRoot.Props<Value>) {
   return (
     <SelectRootContext.Provider value={store}>
       <SelectTransitionContext.Provider value={transitionContextValue}>
-        {children}
+        {typeof children === 'function' ? children(payload) : children}
       </SelectTransitionContext.Provider>
     </SelectRootContext.Provider>
   );
@@ -73,7 +132,19 @@ export function SelectRoot<Value = any>(props: SelectRoot.Props<Value>) {
 
 export interface SelectRootState {}
 
-export interface SelectRootProps<Value = any> {
+export interface SelectRootActions {
+  /**
+   * Unmounts the popup without firing `onOpenChange`. Call it after an
+   * externally controlled closing animation finishes.
+   */
+  unmount: () => void;
+  /**
+   * Closes the popup, reporting the `imperative-action` reason.
+   */
+  close: () => void;
+}
+
+export interface SelectRootProps<Value = any, Payload = unknown> {
   /**
    * The value of the currently selected item.
    *
@@ -146,9 +217,37 @@ export interface SelectRootProps<Value = any> {
    */
   items?: SelectItems | undefined;
   /**
-   * The content of the select.
+   * Whether to prevent the popup from closing on presses outside it.
+   * @default false
    */
-  children?: React.ReactNode;
+  disablePointerDismissal?: boolean | undefined;
+  /**
+   * A ref to imperative actions.
+   */
+  actionsRef?: React.RefObject<SelectRoot.Actions | null> | undefined;
+  /**
+   * A handle associating this select with triggers rendered outside it, and
+   * letting it be opened and closed imperatively. Create one with
+   * `Select.createHandle()`.
+   */
+  handle?: SelectHandle<Payload> | undefined;
+  /**
+   * The id of the trigger the popup is anchored to. Useful together with the
+   * `open` prop, to control which trigger a controlled select belongs to.
+   */
+  triggerId?: string | null | undefined;
+  /**
+   * The id of the trigger the popup is initially anchored to. Useful together
+   * with `defaultOpen`.
+   */
+  defaultTriggerId?: string | null | undefined;
+  /**
+   * The content of the select.
+   *
+   * Pass a function to receive the payload the select was opened with, via a
+   * trigger's `payload` prop.
+   */
+  children?: React.ReactNode | ((payload: Payload) => React.ReactNode);
 }
 
 export type SelectRootChangeEventReason =
@@ -163,7 +262,8 @@ export type SelectRootChangeEventDetails = ZestChangeEventDetails<SelectRootChan
 
 export namespace SelectRoot {
   export type State = SelectRootState;
-  export type Props<TValue = any> = SelectRootProps<TValue>;
+  export type Props<TValue = any, TPayload = unknown> = SelectRootProps<TValue, TPayload>;
+  export type Actions = SelectRootActions;
   export type ChangeEventReason = SelectRootChangeEventReason;
   export type ChangeEventDetails = SelectRootChangeEventDetails;
 }

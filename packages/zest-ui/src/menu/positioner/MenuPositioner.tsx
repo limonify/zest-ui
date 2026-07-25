@@ -38,6 +38,8 @@ export function MenuPositioner(componentProps: MenuPositioner.Props) {
   useMenuPortalContext();
   const store = useMenuRootContext();
   const open = store.useState('open');
+  const triggerWidth = store.useState('triggerWidth');
+  const triggerHeight = store.useState('triggerHeight');
   const triggerNode = store.useState('triggerNode');
 
   const positioning = useAnchorPositioning({
@@ -65,7 +67,13 @@ export function MenuPositioner(componentProps: MenuPositioner.Props) {
 
   const mergedRef = useMergedRefs(ref, refs.setFloating);
 
-  const state: MenuPositionerState = { open, side: positioning.side, align: positioning.align };
+  const state: MenuPositionerState = {
+    open,
+    side: positioning.side,
+    align: positioning.align,
+    triggerWidth,
+    triggerHeight,
+  };
 
   const contextValue: MenuPositionerContext = React.useMemo(
     () => ({ side: positioning.side, align: positioning.align, arrowRef, arrowStyles }),
@@ -95,6 +103,16 @@ export interface MenuPositionerState {
   open: boolean;
   side: Side;
   align: Align;
+  /**
+   * The trigger's measured width, available for consumers to size the popup
+   * against its anchor. This is the React Native equivalent of the web's
+   * `--anchor-width` CSS variable.
+   */
+  triggerWidth: number | undefined;
+  /**
+   * The trigger's measured height.
+   */
+  triggerHeight: number | undefined;
 }
 
 export interface MenuPositionerProps

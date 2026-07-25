@@ -40,6 +40,7 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
   const open = store.useState('open');
   const triggerNode = store.useState('triggerNode');
   const triggerWidth = store.useState('triggerWidth');
+  const triggerHeight = store.useState('triggerHeight');
 
   const positioning = useAnchorPositioning({
     align,
@@ -66,11 +67,12 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
 
   const mergedRef = useMergedRefs(ref, refs.setFloating);
 
-  const state: SelectPositionerState = { 
-    open, 
-    side: positioning.side, 
+  const state: SelectPositionerState = {
+    open,
+    side: positioning.side,
     align: positioning.align,
     triggerWidth,
+    triggerHeight,
   };
 
   const contextValue: SelectPositionerContext = React.useMemo(
@@ -108,6 +110,10 @@ export interface SelectPositionerState {
    * This is the React Native equivalent of the web's `--anchor-width` CSS variable.
    */
   triggerWidth: number | undefined;
+  /**
+   * The trigger's measured height.
+   */
+  triggerHeight: number | undefined;
 }
 
 export interface SelectPositionerProps

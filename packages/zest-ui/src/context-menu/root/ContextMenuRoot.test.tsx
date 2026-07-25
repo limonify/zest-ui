@@ -85,3 +85,72 @@ describe('ContextMenu', () => {
     );
   });
 });
+
+describe('ContextMenu placement', () => {
+  // jest-expo reports a 750x1334 window, so these coordinates are relative to that.
+  async function layoutPositioner(width: number, height: number) {
+    await act(async () => {
+      fireEvent(screen.getByTestId('positioner', hidden), 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width, height } },
+      });
+    });
+  }
+
+  function positionerStyle() {
+    return screen.getByTestId('positioner', hidden).props.style;
+  }
+
+  it('hangs below and right of the press point when there is room', async () => {
+    await render(<TestContextMenu />);
+    await longPress('trigger', 100, 200);
+    await layoutPositioner(200, 300);
+
+    expect(positionerStyle()).toMatchObject({ left: 100, top: 200 });
+  });
+
+  it('flips to the other side of the press point rather than running off screen', async () => {
+    await render(<TestContextMenu />);
+    // Near the bottom-right corner: a 200x300 popup would overflow both edges.
+    await longPress('trigger', 700, 1300);
+    await layoutPositioner(200, 300);
+
+    const style = positionerStyle();
+    expect(style).toMatchObject({ left: 500, top: 1000 });
+  });
+
+  it('reports the placement it actually used on state', async () => {
+    const seen: Array<{ side: string; align: string }> = [];
+
+    await render(
+      <ContextMenu.Root>
+        <ContextMenu.Trigger testID="trigger">
+          <Text>Long press me</Text>
+        </ContextMenu.Trigger>
+        <ContextMenu.Portal>
+          <ContextMenu.Positioner
+            testID="positioner"
+            style={(state) => {
+              seen.push({ side: state.side, align: state.align });
+              return undefined;
+            }}
+          >
+            <ContextMenu.Popup testID="popup" />
+          </ContextMenu.Positioner>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>,
+    );
+
+    await longPress('trigger', 700, 1300);
+    await layoutPositioner(200, 300);
+
+    expect(seen.at(-1)).toEqual({ side: 'top', align: 'end' });
+  });
+
+  it('keeps a popup larger than the screen inside the collision padding', async () => {
+    await render(<TestContextMenu />);
+    await longPress('trigger', 700, 1300);
+    await layoutPositioner(2000, 4000);
+
+    expect(positionerStyle()).toMatchObject({ left: 5, top: 5 });
+  });
+});

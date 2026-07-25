@@ -2,6 +2,7 @@
 import { View } from 'react-native';
 import { useSliderRootContext } from '../root/SliderRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import { formatNumber } from '../../utils/formatNumber';
 import type { SliderRootState } from '../root/SliderRoot';
 import type { ZestUIComponentProps } from '../../types';
@@ -20,6 +21,10 @@ export function SliderThumb(componentProps: SliderThumb.Props) {
   const { disabled, format, labelId, locale, max, min, orientation, state, values } =
     useSliderRootContext();
 
+  // The thumb is what assistive tech announces and adjusts, so a surrounding
+  // field's label and messages attach here rather than to the root.
+  const { fieldProps } = useFieldControlRegistration();
+
   const value = values[index] ?? min;
   const percent = max === min ? 0 : ((value - min) / (max - min)) * 100;
 
@@ -37,7 +42,6 @@ export function SliderThumb(componentProps: SliderThumb.Props) {
       {
         style: positionStyle,
         accessibilityRole: 'adjustable' as const,
-        accessibilityLabelledBy: labelId,
         accessibilityState: { disabled: disabled || undefined },
         accessibilityValue: {
           min,
@@ -46,6 +50,11 @@ export function SliderThumb(componentProps: SliderThumb.Props) {
           text: formatValue(value, format, locale),
         },
         'aria-orientation': orientation,
+        ...fieldProps,
+        // A surrounding `Field.Label` names the control; `Slider.Label` is the
+        // fallback for a slider that stands on its own.
+        accessibilityLabelledBy: fieldProps.accessibilityLabelledBy ?? labelId,
+        'aria-labelledby': fieldProps['aria-labelledby'] ?? labelId,
       },
       elementProps,
     ],

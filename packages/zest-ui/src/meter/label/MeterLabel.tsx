@@ -4,6 +4,7 @@ import { useMeterRootContext } from '../root/MeterRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
+import type { MeterRootState } from '../root/MeterRoot';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -13,7 +14,7 @@ import type { ZestUIComponentProps } from '../../types';
 export function MeterLabel(componentProps: MeterLabel.Props) {
   const { render, className, style, nativeID: idProp, ref, ...elementProps } = componentProps;
 
-  const { setLabelId } = useMeterRootContext();
+  const { setLabelId, state } = useMeterRootContext();
 
   const id = useId(idProp ?? undefined);
 
@@ -22,8 +23,6 @@ export function MeterLabel(componentProps: MeterLabel.Props) {
     return () => setLabelId(undefined);
   }, [id, setLabelId]);
 
-  const state: MeterLabelState = {};
-
   return useRenderElement(Text, componentProps, {
     state,
     ref,
@@ -31,7 +30,7 @@ export function MeterLabel(componentProps: MeterLabel.Props) {
   });
 }
 
-export interface MeterLabelState {}
+export interface MeterLabelState extends MeterRootState {}
 
 export interface MeterLabelProps extends ZestUIComponentProps<typeof Text, MeterLabelState> {}
 

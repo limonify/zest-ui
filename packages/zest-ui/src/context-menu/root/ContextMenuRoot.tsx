@@ -43,4 +43,12 @@ export interface ContextMenuRootProps
 export namespace ContextMenuRoot {
   export type State = ContextMenuRootState;
   export type Props = ContextMenuRootProps;
+  /**
+   * A context menu is a menu, so it reuses the menu's action and event
+   * contracts — a consumer should not have to reach for `Menu.Root`'s types to
+   * type a `ContextMenu.Root` handler.
+   */
+  export type Actions = MenuRoot.Actions;
+  export type ChangeEventReason = MenuRoot.ChangeEventReason;
+  export type ChangeEventDetails = MenuRoot.ChangeEventDetails;
 }

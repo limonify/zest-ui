@@ -2,6 +2,9 @@
 import * as React from 'react';
 import { Modal, type NativeSyntheticEvent } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
+import { ComboboxPortalContext } from './ComboboxPortalContext';
+import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
+import { REASONS } from '../../utils/reasons';
 
 /**
  * Moves the popup to the top of the app, as an RN `Modal` like the rest of the
@@ -10,7 +13,8 @@ import { useComboboxRootContext } from '../root/ComboboxRootContext';
 export function ComboboxPortal(props: ComboboxPortal.Props) {
   const { children, keepMounted = false } = props;
 
-  const { open, setOpen } = useComboboxRootContext();
+  const store = useComboboxRootContext();
+  const open = store.useState('open');
 
   const shouldRender = open || keepMounted;
   if (!shouldRender) {
@@ -18,18 +22,20 @@ export function ComboboxPortal(props: ComboboxPortal.Props) {
   }
 
   return (
-    <Modal
-      transparent
-      visible={open}
-      animationType="fade"
-      statusBarTranslucent
-      navigationBarTranslucent
-      onRequestClose={(event: NativeSyntheticEvent<unknown>) => {
-        setOpen(false, event);
-      }}
-    >
-      {children}
-    </Modal>
+    <ComboboxPortalContext.Provider value={keepMounted}>
+      <Modal
+        transparent
+        visible={open}
+        animationType="fade"
+        statusBarTranslucent
+        navigationBarTranslucent
+        onRequestClose={(event: NativeSyntheticEvent<unknown>) => {
+          store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
+        }}
+      >
+        {children}
+      </Modal>
+    </ComboboxPortalContext.Provider>
   );
 }
 

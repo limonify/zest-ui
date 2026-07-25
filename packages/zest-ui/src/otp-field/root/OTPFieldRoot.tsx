@@ -5,6 +5,7 @@ import { useControlled } from '../../hooks/useControlled';
 import { useId } from '../../hooks/useId';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import { CompositeList } from '../../internals/composite/list/CompositeList';
 import type { ZestUIComponentProps } from '../../types';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
@@ -31,7 +32,7 @@ export function OTPFieldRoot(componentProps: OTPFieldRoot.Props) {
     autoComplete = 'one-time-code',
     className,
     defaultValue,
-    disabled = false,
+    disabled: disabledProp = false,
     id: idProp,
     length,
     mask = false,
@@ -47,6 +48,12 @@ export function OTPFieldRoot(componentProps: OTPFieldRoot.Props) {
     ref,
     ...elementProps
   } = componentProps;
+
+  const { fieldDisabled, fieldProps, markChanged, markTouched } = useFieldControlRegistration({
+    initialValue: normalizeOTPValue(defaultValue ?? valueProp, length, validationType, normalizeValue),
+  });
+
+  const disabled = disabledProp || fieldDisabled;
 
   const id = useId(idProp);
 
@@ -103,8 +110,11 @@ export function OTPFieldRoot(componentProps: OTPFieldRoot.Props) {
       }
 
       setValueState(normalized);
+      markChanged(normalized);
 
       if (normalized.length === length) {
+        // A complete code ends the interaction; there is no blur to wait for.
+        markTouched(normalized);
         onValueComplete?.(normalized, createChangeEventDetails(eventDetails.reason));
       }
 
@@ -169,7 +179,17 @@ export function OTPFieldRoot(componentProps: OTPFieldRoot.Props) {
   const element = useRenderElement(View, componentProps, {
     state,
     ref,
-    props: elementProps,
+    props: [
+      {
+        // The slots are separate inputs but one field: without a group role a
+        // screen reader announces N unrelated text boxes. Pass
+        // `accessibilityLabel` to name the code being entered.
+        role: 'group' as const,
+        accessibilityState: { disabled: disabled || undefined },
+        ...fieldProps,
+      },
+      elementProps,
+    ],
   });
 
   return (

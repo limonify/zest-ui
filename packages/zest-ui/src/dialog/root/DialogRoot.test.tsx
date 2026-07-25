@@ -159,3 +159,90 @@ describe('Dialog', () => {
     });
   });
 });
+
+describe('nested dialogs', () => {
+  function NestedDialogs(props: { childOpen?: boolean }) {
+    return (
+      <Dialog.Root defaultOpen>
+        <Dialog.Portal>
+          <Dialog.Backdrop
+            testID="outer-backdrop"
+            style={(state) => {
+              backdropStates.push({ nested: state.nested, nestedDialogOpen: state.nestedDialogOpen });
+              return undefined;
+            }}
+          />
+          <Dialog.Viewport>
+            <Dialog.Popup
+              testID="outer-popup"
+              style={(state) => {
+                outerStates.push({
+                  nested: state.nested,
+                  nestedDialogOpen: state.nestedDialogOpen,
+                });
+                return undefined;
+              }}
+            >
+              <Dialog.Root open={props.childOpen ?? false}>
+                <Dialog.Portal>
+                  <Dialog.Viewport>
+                    <Dialog.Popup
+                      testID="inner-popup"
+                      style={(state) => {
+                        innerStates.push({
+                          nested: state.nested,
+                          nestedDialogOpen: state.nestedDialogOpen,
+                        });
+                        return undefined;
+                      }}
+                    />
+                  </Dialog.Viewport>
+                </Dialog.Portal>
+              </Dialog.Root>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
+  }
+
+  let outerStates: Array<{ nested: boolean; nestedDialogOpen: boolean }> = [];
+  let innerStates: Array<{ nested: boolean; nestedDialogOpen: boolean }> = [];
+  let backdropStates: Array<{ nested: boolean; nestedDialogOpen: boolean }> = [];
+
+  beforeEach(() => {
+    outerStates = [];
+    innerStates = [];
+    backdropStates = [];
+  });
+
+  it('marks the inner dialog as nested and the outer one as not', async () => {
+    await render(<NestedDialogs childOpen />);
+
+    expect(outerStates.at(-1)!.nested).toBe(false);
+    expect(innerStates.at(-1)!.nested).toBe(true);
+  });
+
+  it('tells the outer popup and backdrop that a nested dialog is open', async () => {
+    const view = await render(<NestedDialogs childOpen={false} />);
+
+    expect(outerStates.at(-1)!.nestedDialogOpen).toBe(false);
+    expect(backdropStates.at(-1)!.nestedDialogOpen).toBe(false);
+
+    await view.rerender(<NestedDialogs childOpen />);
+
+    expect(outerStates.at(-1)!.nestedDialogOpen).toBe(true);
+    expect(backdropStates.at(-1)!.nestedDialogOpen).toBe(true);
+    // The inner dialog has nothing nested inside it.
+    expect(innerStates.at(-1)!.nestedDialogOpen).toBe(false);
+  });
+
+  it('clears the count again when the nested dialog closes', async () => {
+    const view = await render(<NestedDialogs childOpen />);
+    expect(outerStates.at(-1)!.nestedDialogOpen).toBe(true);
+
+    await view.rerender(<NestedDialogs childOpen={false} />);
+
+    expect(outerStates.at(-1)!.nestedDialogOpen).toBe(false);
+  });
+});

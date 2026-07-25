@@ -13,7 +13,8 @@ import type { ZestUIComponentProps } from '../../types';
 export function ComboboxValue(componentProps: ComboboxValue.Props) {
   const { render, className, style, children, ref, ...elementProps } = componentProps;
 
-  const { inputValue } = useComboboxRootContext();
+  const store = useComboboxRootContext();
+  const inputValue = store.useState('inputValue');
 
   const state: ComboboxValueState = { value: inputValue };
 

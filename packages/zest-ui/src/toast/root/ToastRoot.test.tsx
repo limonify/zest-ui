@@ -530,8 +530,16 @@ describe('Toast', () => {
         id = manager.add({ title: 'Saved' });
       });
 
-      // The auto-clear effect ran during the act block (sync rAF), so
-      // transitionStatus has already been cleared to undefined.
+      // Give the auto-clear frame somewhere to land. It usually runs inside the
+      // `act` above, but a preceding fake-timer test can leave the environment's
+      // `requestAnimationFrame` running a tick late — the point of this test is
+      // that the status clears on the next frame, not which frame that is.
+      await act(async () => {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 0);
+        });
+      });
+
       expect(testStore!.select('toast', id)?.transitionStatus).toBeUndefined();
     });
 

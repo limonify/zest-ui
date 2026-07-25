@@ -2,6 +2,7 @@
 import { View } from 'react-native';
 import { useMeterRootContext } from '../root/MeterRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import type { MeterRootState } from '../root/MeterRoot';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -11,9 +12,7 @@ import type { ZestUIComponentProps } from '../../types';
 export function MeterTrack(componentProps: MeterTrack.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  useMeterRootContext();
-
-  const state: MeterTrackState = {};
+  const { state } = useMeterRootContext();
 
   return useRenderElement(View, componentProps, {
     state,
@@ -22,7 +21,7 @@ export function MeterTrack(componentProps: MeterTrack.Props) {
   });
 }
 
-export interface MeterTrackState {}
+export interface MeterTrackState extends MeterRootState {}
 
 export interface MeterTrackProps extends ZestUIComponentProps<typeof View, MeterTrackState> {}
 

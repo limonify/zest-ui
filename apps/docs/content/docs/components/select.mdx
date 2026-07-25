@@ -125,15 +125,52 @@ These fields reach your `style` and `render` functions on **Select.Trigger** (`s
 
 <AutoType path="../../packages/zest-ui/src/select/trigger/SelectTrigger.tsx" name="SelectTriggerState" />
 
+### Opening it from elsewhere
+
+`Select.createHandle()` connects a root to triggers rendered outside it, and lets you open and
+close the popup imperatively:
+
+```tsx
+const handle = Select.createHandle<string>();
+
+<Select.Trigger nativeID="font" handle={handle} payload="from-toolbar" />
+// …anywhere else in the tree
+<Select.Root handle={handle}>
+  {(payload) => <Select.Portal>{/* … */}</Select.Portal>}
+</Select.Root>
+
+handle.open('font');
+```
+
+The popup anchors to whichever trigger the id resolves to, so an imperative open lands in the right
+place. A trigger's `payload` reaches the root's children when they are a function.
+
+`actionsRef` gives the same control from inside: `close()` closes with the `imperative-action`
+reason, and `unmount()` closes without firing `onOpenChange` — for when your own closing animation
+has just finished. Set `disablePointerDismissal` to keep the popup open when a press lands outside
+it.
+
+
+### Sizing the popup to its trigger
+
+The positioner and the popup both publish `triggerWidth` and `triggerHeight` — the trigger's
+measured size, and the React Native counterpart of the web's `--anchor-width` CSS variable:
+
+```tsx
+<Select.Popup style={(state) => [styles.popup, { minWidth: state.triggerWidth }]} />
+```
+
+Both are `undefined` until the trigger has been laid out once.
+
 ## Animation
 
-`Select.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted` and fade it in and out:
+`Select.Popup` publishes `state.transitionStatus`. Keep the portal mounted with `<Portal keepMounted>` and fade it in and out:
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Select } from '@limonify/zest-ui';
 
-<Select.Popup keepMounted render={(props) => (
+<Select.Popup render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
 )}>
   {/* ... */}

@@ -1,4 +1,5 @@
 export { SelectRoot as Root } from './root/SelectRoot';
+export { createSelectHandle as createHandle, SelectHandle as Handle } from './store/SelectHandle';
 export { SelectLabel as Label } from './label/SelectLabel';
 export { SelectTrigger as Trigger } from './trigger/SelectTrigger';
 export { SelectValue as Value } from './value/SelectValue';

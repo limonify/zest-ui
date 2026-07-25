@@ -1,5 +1,5 @@
 export { DrawerRoot as Root } from './root/DrawerRoot';
-export { createDrawerHandle as createHandle } from './handle';
+export { createDrawerHandle as createHandle, type DrawerHandle as Handle } from './handle';
 export { DrawerPopup as Popup } from './popup/DrawerPopup';
 export { DrawerSwipeArea as SwipeArea } from './swipe-area/DrawerSwipeArea';
 

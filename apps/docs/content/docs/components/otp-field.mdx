@@ -81,3 +81,11 @@ These fields reach your `style` and `render` functions on **OTPField.Input** (a 
 ## Accessibility
 
 Set `validationType` to restrict input (numeric/alphabetic). `mask` replaces the visible character while keeping the real value.
+
+The root renders with `role="group"`, so the slots announce as one field rather than as N unrelated
+text boxes — pass `accessibilityLabel` on it to name the code being entered. Each slot defaults to
+`"Digit 1 of 6"`-style labelling, since every box otherwise looks and reads identically; pass your
+own `accessibilityLabel` on a slot to override it.
+
+Inside a [`Field.Root`](/docs/components/field) the field's label and messages attach to the group,
+and entering a complete code marks the field dirty, filled and touched.

@@ -35,7 +35,9 @@ export function SwitchRoot(componentProps: SwitchRoot.Props) {
     ...elementProps
   } = componentProps;
 
-  const { fieldDisabled, fieldProps, validateField } = useFieldControlRegistration();
+  const { fieldDisabled, fieldProps, markChanged, markTouched } = useFieldControlRegistration({
+    initialValue: defaultChecked ?? checkedProp ?? false,
+  });
 
   const disabled = disabledProp || fieldDisabled;
 
@@ -78,7 +80,8 @@ export function SwitchRoot(componentProps: SwitchRoot.Props) {
           }
 
           setCheckedState(nextChecked);
-          validateField(nextChecked);
+          markChanged(nextChecked);
+          markTouched(nextChecked);
         },
         accessibilityRole: 'switch' as const,
         accessibilityState: {

@@ -101,15 +101,27 @@ These fields reach your `style` and `render` functions on **Popover.Positioner /
 
 <AutoType path="../../packages/zest-ui/src/popover/positioner/PopoverPositioner.tsx" name="PopoverPositionerState" />
 
+
+### Sizing the popup to its trigger
+
+The positioner and the popup both publish `triggerWidth` and `triggerHeight` — the trigger's
+measured size, and the React Native counterpart of the web's `--anchor-width` CSS variable:
+
+```tsx
+<Popover.Popup style={(state) => [styles.popup, { minWidth: state.triggerWidth }]} />
+```
+
+Both are `undefined` until the trigger has been laid out once.
+
 ## Animation
 
-`Popover.Popup` publishes `state.transitionStatus`. Keep it mounted with `keepMounted`; a quick fade (or zoom) reads well for an anchored popup:
+`Popover.Popup` publishes `state.transitionStatus`. Keep the portal mounted with `<Portal keepMounted>`; a quick fade (or zoom) reads well for an anchored popup:
 
 ```tsx
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Popover } from '@limonify/zest-ui';
 
-<Popover.Popup keepMounted render={(props) => (
+<Popover.Popup render={(props) => (
   <Animated.View {...props} entering={FadeIn.duration(120)} exiting={FadeOut.duration(120)} />
 )}>
   {/* ... */}

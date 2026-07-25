@@ -1,6 +1,7 @@
 'use client';
 import { View } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
+import { useComboboxItemsContext } from '../root/ComboboxItemsContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ZestUIComponentProps } from '../../types';
 
@@ -11,7 +12,10 @@ import type { ZestUIComponentProps } from '../../types';
 export function ComboboxEmpty(componentProps: ComboboxEmpty.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const { filteredItems, open } = useComboboxRootContext();
+  const store = useComboboxRootContext();
+  const { filteredItems } = useComboboxItemsContext();
+
+  const open = store.useState('open');
 
   const state: ComboboxEmptyState = { open };
 

@@ -60,3 +60,47 @@ describe('Meter', () => {
     error.mockRestore();
   });
 });
+
+describe('Meter state', () => {
+  it('publishes the value, range and percent to every part', async () => {
+    const seen: Array<Meter.Track.State> = [];
+    const collect = (state: Meter.Track.State) => {
+      seen.push(state);
+      return undefined;
+    };
+
+    await render(
+      <Meter.Root value={30} min={20} max={40}>
+        <Meter.Track testID="track" style={collect}>
+          <Meter.Indicator testID="indicator" />
+        </Meter.Track>
+      </Meter.Root>,
+    );
+
+    expect(seen.at(-1)).toMatchObject({
+      value: 30,
+      min: 20,
+      max: 40,
+      percent: 50,
+    });
+    expect(seen.at(-1)!.formattedValue).toBe('50%');
+  });
+
+  it('clamps the value it publishes into the range', async () => {
+    const seen: Array<Meter.Track.State> = [];
+
+    await render(
+      <Meter.Root value={999} max={100}>
+        <Meter.Track
+          testID="track"
+          style={(state) => {
+            seen.push(state);
+            return undefined;
+          }}
+        />
+      </Meter.Root>,
+    );
+
+    expect(seen.at(-1)).toMatchObject({ value: 100, percent: 100 });
+  });
+});

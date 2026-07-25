@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { Pressable, type GestureResponderEvent } from 'react-native';
+import { Pressable, type GestureResponderEvent, type LayoutChangeEvent } from 'react-native';
 import { PopoverRootContext } from '../root/PopoverRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
@@ -99,7 +99,10 @@ export function PopoverTrigger<Payload = unknown>(componentProps: PopoverTrigger
         onPressOut() {
           setPressed(false);
         },
-        onLayout() {
+        onLayout(event: LayoutChangeEvent) {
+          const { width, height } = event.nativeEvent.layout;
+          store.set('triggerWidth', width);
+          store.set('triggerHeight', height);
           // Nothing tracks the anchor globally in React Native, so a moved or
           // resized trigger has to ask the positioner to recompute.
           store.state.update?.();
