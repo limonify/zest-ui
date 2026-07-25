@@ -32,6 +32,13 @@ export function baseOptions(): BaseLayoutProps {
         </span>
       ),
     },
+    links: [
+      {
+        text: 'llms.txt',
+        url: '/llms.txt',
+        external: true,
+      },
+    ],
     githubUrl: 'https://github.com/limonify/zest',
   };
 }
