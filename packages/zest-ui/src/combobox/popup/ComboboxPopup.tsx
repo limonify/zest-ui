@@ -12,9 +12,9 @@ import type { ZestUIComponentProps } from '../../types';
 export function ComboboxPopup(componentProps: ComboboxPopup.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const { open } = useComboboxRootContext();
+  const { open, triggerWidth } = useComboboxRootContext();
 
-  const state: ComboboxPopupState = { open };
+  const state: ComboboxPopupState = { open, triggerWidth };
 
   const element = useRenderElement(View, componentProps, {
     state,
@@ -34,6 +34,10 @@ export function ComboboxPopup(componentProps: ComboboxPopup.Props) {
 
 export interface ComboboxPopupState {
   open: boolean;
+  /**
+   * The trigger's measured width, available for consumers to apply to the popup.
+   */
+  triggerWidth: number | undefined;
 }
 
 export interface ComboboxPopupProps extends ZestUIComponentProps<typeof View, ComboboxPopupState> {}

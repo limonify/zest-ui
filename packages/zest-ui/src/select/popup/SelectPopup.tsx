@@ -21,8 +21,9 @@ export function SelectPopup(componentProps: SelectPopup.Props) {
   const { transitionStatus } = useSelectTransitionContext() ?? { transitionStatus: undefined };
 
   const open = store.useState('open');
+  const triggerWidth = store.useState('triggerWidth');
 
-  const state: SelectPopupState = { open, transitionStatus, side, align };
+  const state: SelectPopupState = { open, transitionStatus, side, align, triggerWidth };
 
   const element = useRenderElement(View, componentProps, {
     state,
@@ -59,6 +60,10 @@ export interface SelectPopupState {
    * The alignment the popup was actually placed with.
    */
   align: Align;
+  /**
+   * The trigger's measured width, available for consumers to apply to the popup.
+   */
+  triggerWidth: number | undefined;
 }
 
 export interface SelectPopupProps extends ZestUIComponentProps<typeof View, SelectPopupState> {}
