@@ -1,10 +1,12 @@
 name: CI
 
+# Pull requests only — no `push` trigger, so day-to-day commits on a branch don't
+# each spend a run. Release workflows run the same checks before publishing.
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
+  # Manual re-run from the Actions tab, without opening a PR.
+  workflow_dispatch:
 
 # Cancel superseded runs on the same ref.
 concurrency:
