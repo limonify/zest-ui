@@ -63,6 +63,36 @@ const ref = useRef<View>(null);
 <Popover.Popup ref={ref} />
 ```
 
+## `modalProps` — on every `Portal`
+
+Each popup family's `Portal` (`Dialog`, `Drawer`, `AlertDialog`, `Menu`, `ContextMenu`, `Popover`,
+`Tooltip`, `Select`, `Combobox`, `Autocomplete`) renders a React Native
+[`Modal`](https://reactnative.dev/docs/modal). `modalProps` is forwarded to it, so nothing about the
+Modal is out of reach:
+
+```tsx
+<Dialog.Portal modalProps={{ animationType: 'none' }}>
+```
+
+The defaults are `transparent`, `animationType="fade"`, `statusBarTranslucent` and
+`navigationBarTranslucent`. Two of them are load-bearing:
+
+- **`transparent`** is what lets the backdrop show the app underneath.
+- **`statusBarTranslucent`** makes the Modal's origin the top of the screen — the coordinate space
+  anchored popups are positioned in. Changing it breaks positioning on Android.
+
+Two props stay owned by zest:
+
+- **`visible`** follows the popup's open state and cannot be overridden.
+- **`onRequestClose`** is *chained*, not replaced: yours runs first, then zest closes the popup with
+  the `escape-key` reason. This is the Android hardware back button, and Escape on web.
+
+<Callout type="info">
+  Pass `animationType: 'none'` when you drive the enter animation yourself — otherwise your animation
+  plays on top of the Modal's own native cross-fade. See
+  [Animating with Reanimated](/docs/guides/animation-reanimated).
+</Callout>
+
 ## Accessibility props
 
 Every part sets the native `accessibilityRole` / `accessibilityState` / `accessibilityLabelledBy`

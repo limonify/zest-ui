@@ -34,7 +34,7 @@
 
 **Milestone 12 (shipped):** API symmetry across the popup families, `Field` integration for the form controls, the `useFilter` utility, and an accessibility pass. Each popup family's `Portal` also gained a `modalProps` passthrough, so the RN `Modal`'s own `animationType="fade"` — previously the one part of the render output a consumer could not reach — can be replaced or switched off.
 
-**Current totals:** 32 components, 775 Jest tests in 55 suites (jest-expo + @testing-library/react-native), 90%+ statement coverage, Expo example app in `apps/example` exercising every one, and a Fumadocs site in `apps/docs` with a page per component plus the hooks, render-engine and store utilities.
+**Current totals:** 32 components, 889 Jest tests in 62 suites (jest-expo + @testing-library/react-native), 93% statement / 86% branch coverage, Expo example app in `apps/example` exercising every one, and a Fumadocs site in `apps/docs` with a page per component plus the hooks, render-engine and store utilities.
 
 Notes that supersede older sections of this document:
 

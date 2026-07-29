@@ -1,3 +1,41 @@
+## [0.5.0] - 2026-07-29
+
+The last part of the rendered output a consumer could not reach — the portal's `Modal` — plus two bug fixes and the test coverage the handle family never had. **No breaking changes.**
+
+### Features
+
+- **`modalProps` on every `Portal`**: each popup family's `Portal` (`Dialog`, `AlertDialog`, `Drawer`, `Menu`, `ContextMenu`, `Popover`, `Tooltip`, `Select`, `Combobox`, `Autocomplete`) forwards `modalProps` to the React Native `Modal` it renders. The Modal's `animationType="fade"` was previously unreachable, so a consumer-driven enter animation was stuck riding on top of a native cross-fade; pass `animationType: 'none'` to take it over entirely. `onShow`, `supportedOrientations` and the rest of the Modal API are reachable the same way.
+
+  ```tsx
+  <Dialog.Portal keepMounted modalProps={{ animationType: 'none' }}>
+  ```
+
+  Two props stay owned by zest: `visible` follows the popup's open state, and `onRequestClose` is *chained* rather than replaced — yours runs first, then zest closes with the `escape-key` reason. The `transparent` and `statusBarTranslucent` defaults are load-bearing (the backdrop, and the coordinate space anchored popups are positioned in), so override them deliberately.
+
+- **`ZestPortalModalProps`** is exported for typing a `modalProps` object you build elsewhere.
+
+- **New subpath exports**: `@limonify/zest-ui/filter`, `/merge-props`, `/use-render` and `/types`. All four were already exported from the root but had no entry in the export map, so importing them by subpath failed.
+
+### Bug Fixes
+
+- **`useRender` types**: `UseRenderParameters` did not declare `className` or `style`, even though the implementation reads both. The documented way to build your own zest-style part did not typecheck. Both are now declared.
+- **`ToggleGroup` and `CheckboxGroup` parent**: guard the `indexOf` result before `splice`. `splice(-1, 1)` removes the *last* item, so a value that was not in the list would silently drop an unrelated one.
+
+### Documentation
+
+- **New utility pages**: [Hooks](https://zestui.limonify.com/docs/utilities/hooks), [useRender & mergeProps](https://zestui.limonify.com/docs/utilities/use-render) and [Store](https://zestui.limonify.com/docs/utilities/store). The 14 hooks, the render engine and the store layer were public exports with no documentation.
+- **`modalProps`** is documented in Common props, and the Reanimated guide gained a section on turning the Modal's own fade off before animating a popup yourself.
+- **Fixed the Reanimated collapsible recipe**, which dropped `props.style` — and with it the panel's own clip. Added a section on why panel content comes out invisible: a height that resolves to `0` before the content is measured, `props` not spread onto the animated view, or a missing `keepMounted`.
+- Corrected the `animationType` claim in `ARCHITECTURE.md` and `CLAUDE.md` (they said `"none"`; the code says `"fade"`), dropped the finished build plan and the embedded copy of `CLAUDE.md` from `ARCHITECTURE.md`, and fixed every release date in this file against its git tag.
+
+### Internal
+
+- **Tests: 717 → 889** in 62 suites; statement coverage 90.32% → 93.77%, branch 82.34% → 85.91%. The handle family had tests for `Dialog` only — the other seven families are now covered, along with the `BasePopupHandle` attach/detach stack (overlapping roots, quiet handoff, restoring an earlier root, resolving a trigger registered before a root attached). Also covered: the 48 context hooks' throwing branch, `ComboboxValue`, `MenuArrow`, `useRender`, `warn`, `error`, `PopupTriggerMap`, `createSelector`, the four hooks the library exports but never uses itself, and `Accordion.Panel`'s content lifecycle.
+- **CI** now lints and typechecks `apps/docs` and `apps/example`, which `turbo run lint` never visited; turbo declares the docs app's build outputs, which were missing, so a cache hit no longer restores an empty site.
+- `size-limit` tightened from 500 KB to 75 KB against an actual 60 KB, plus a subpath gate; the half-adopted changesets setup was removed in favour of the tag-driven release workflow; the two READMEs are kept in sync by a CI check.
+
+---
+
 ## [0.4.0] - 2026-07-26
 
 API symmetry across the popup families, the missing half of the Field integration, and `useFilter`.
@@ -85,7 +123,7 @@ API symmetry across the popup families, the missing half of the Field integratio
 
 ---
 
-## [0.3.1] - 2025-07-23
+## [0.3.1] - 2026-07-23
 
 ### Bug Fixes
 
@@ -93,7 +131,7 @@ API symmetry across the popup families, the missing half of the Field integratio
 
 ---
 
-## [0.3.0] - 2025-07-23
+## [0.3.0] - 2026-07-23
 
 ### Features
 
@@ -105,7 +143,7 @@ API symmetry across the popup families, the missing half of the Field integratio
 
 ---
 
-## [0.2.0] - 2025-01-23
+## [0.2.0] - 2026-07-23
 
 ### Features
 
@@ -140,7 +178,7 @@ API symmetry across the popup families, the missing half of the Field integratio
 
 ---
 
-## [0.1.5] - 2024-12-XX
+## [0.1.5] - 2026-07-20
 
 ### Bug Fixes
 
@@ -148,7 +186,7 @@ API symmetry across the popup families, the missing half of the Field integratio
 
 ---
 
-## [0.1.4] - 2024-12-XX
+## [0.1.4] - 2026-07-20
 
 ### Features
 
@@ -157,7 +195,7 @@ API symmetry across the popup families, the missing half of the Field integratio
 
 ---
 
-## [0.1.3] - 2024-12-XX
+## [0.1.3] - 2026-07-20
 
 ### Bug Fixes
 
@@ -166,7 +204,7 @@ API symmetry across the popup families, the missing half of the Field integratio
 
 ---
 
-## [0.1.2] - 2024-12-XX
+## [0.1.2] - 2026-07-19
 
 ### Features
 
@@ -174,7 +212,7 @@ API symmetry across the popup families, the missing half of the Field integratio
 
 ---
 
-## [0.1.1] - 2024-12-XX
+## [0.1.1] - 2026-07-18
 
 ### Infrastructure
 
@@ -184,7 +222,7 @@ API symmetry across the popup families, the missing half of the Field integratio
 
 ---
 
-## [0.1.0] - 2024-12-XX
+## [0.1.0] - 2026-07-18
 
 ### Initial Release
 

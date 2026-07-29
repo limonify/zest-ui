@@ -42,6 +42,20 @@ import { Dialog } from '@limonify/zest-ui';
 is handled by `keepMounted`. Because React Native can't report when an exit animation finished,
 `keepMounted` is what keeps the element around long enough for `exiting` to play.
 
+### Turn the Modal's own fade off first
+
+Every popup family's `Portal` is a React Native `Modal`, and it defaults to
+`animationType="fade"` — a *native* cross-fade that runs underneath whatever you animate. Leave it on
+and your 150 ms `FadeIn` plays on top of it. Take it over through
+[`modalProps`](/docs/common-props#modalprops--on-every-portal):
+
+```tsx
+<Dialog.Portal keepMounted modalProps={{ animationType: 'none' }}>
+```
+
+Keep the default when you are *not* animating the popup yourself: the Modal's fade also covers the
+exit, which a consumer-driven animation cannot, because the Modal unmounts on close.
+
 ## Less boilerplate: `useAnimatedValue`
 
 Every state-driven animation repeats the same three steps — a shared value, a `useEffect` that
