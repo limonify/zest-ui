@@ -19,8 +19,11 @@
       "dependsOn": ["docs#build"]
     },
     "test": {
-      "dependsOn": ["^test"],
-      "outputs": ["coverage/**"]
+      // No `outputs`: `bun test` runs plain `jest`, which writes nothing.
+      // Coverage comes from the package's own `test:coverage` script, which is
+      // not a turbo task — declaring `coverage/**` here only produces a
+      // "no output files found" warning on every run.
+      "dependsOn": ["^test"]
     },
     "lint": {}
   }
