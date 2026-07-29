@@ -1,0 +1,148 @@
+---
+title: Hooks
+description: The DOM-free React hooks zest is built on, exported for your own components.
+---
+
+Every hook zest uses internally is exported. They are small, dependency-free, and written for React
+Native — no `document`, no `window` DOM APIs. Import them from the root or from the `hooks` subpath:
+
+```tsx
+import { useControlled, useStableCallback } from '@limonify/zest-ui';
+// or
+import { useControlled } from '@limonify/zest-ui/hooks';
+```
+
+## State
+
+### `useControlled`
+
+The controlled/uncontrolled pattern every zest component uses. Returns the current value and a
+setter; when `controlled` is not `undefined` the setter only reports, it does not store.
+
+```tsx
+const [value, setValue] = useControlled({
+  controlled: props.value,
+  default: props.defaultValue,
+  name: 'MyComponent',
+  state: 'value',
+});
+```
+
+It warns in development when a component switches between controlled and uncontrolled between
+renders, which is almost always a bug in the consumer.
+
+### `usePreviousValue`
+
+Returns the value from the previous render, or `null` on the first one. Useful for reacting to a
+transition rather than to a state.
+
+```tsx
+const previousOpen = usePreviousValue(open);
+const justOpened = open && previousOpen === false;
+```
+
+### `useForcedRerendering`
+
+Returns a stable function that rerenders the component when called. Reach for it only when state
+genuinely lives outside React (a mutable ref, an external store without a subscription).
+
+```tsx
+const rerender = useForcedRerendering();
+```
+
+## Identity and refs
+
+### `useId`
+
+`React.useId` with an optional override, so a component can accept an `id` prop and fall back to a
+generated one. The result is safe to pass to `nativeID` and `accessibilityLabelledBy`.
+
+```tsx
+const id = useId(props.id);
+```
+
+### `useMergedRefs`
+
+Combines several refs into one — the standard problem when a component both forwards a `ref` and
+needs its own.
+
+```tsx
+const ref = useMergedRefs(props.ref, localRef);
+```
+
+### `useRefWithInit`
+
+`useRef` with a lazy initializer, so an expensive object is constructed once instead of on every
+render. This is how every zest store is created.
+
+```tsx
+const store = useRefWithInit(() => new MyStore(initialState)).current;
+```
+
+### `useValueAsRef`
+
+Turns a value into a ref so an effect can read the newest version of it **without** listing it as a
+dependency — that is, without re-running when it changes.
+
+```tsx
+const latest = useValueAsRef(onChange);
+
+React.useEffect(() => {
+  const timer = setTimeout(() => latest.current(), 1000);
+  return () => clearTimeout(timer);
+}, []); // does not need `onChange`
+```
+
+`current` updates in a layout effect, so it holds the value from the last **committed** render.
+
+### `useStableCallback`
+
+Returns a function whose identity never changes but which always calls the latest closure. Pass it
+anywhere a changing callback would cause a downstream effect to re-run.
+
+```tsx
+const handleChange = useStableCallback((next: string) => {
+  onValueChange?.(next, value);
+});
+```
+
+## Effects and scheduling
+
+### `useIsoLayoutEffect`
+
+`useLayoutEffect` that degrades to `useEffect` where there is no host to lay out, so server
+rendering (react-native-web, Expo Router's static export) does not warn.
+
+### `useOnMount`
+
+Runs a callback once, after mount. `useOnFirstRender` is the render-phase counterpart: it runs
+**during** the first render, before the tree is committed.
+
+```tsx
+useOnMount(() => {
+  analytics.track('sheet_opened');
+});
+```
+
+### `useTimeout`, `useInterval`, `useAnimationFrame`
+
+Cancel-on-unmount wrappers around the three schedulers. Each returns an object with `start` and
+`clear`, so a pending callback can never fire into an unmounted component.
+
+```tsx
+const timeout = useTimeout();
+
+timeout.start(300, () => {
+  setOpen(false);
+});
+```
+
+`useAnimationFrame` also exposes the process-global `AnimationFrame` scheduler that zest's transition
+machinery uses; in tests, reset it between cases so a frame scheduled by one test cannot fire during
+another.
+
+<Callout type="warn">
+  These hooks are the library's own building blocks, exported because they are useful when you write
+  components in zest's style. They follow the library's semver, but they are a smaller and less
+  documented surface than the components — prefer a component or `useRender` when one fits.
+</Callout>

@@ -85,10 +85,15 @@ import { Collapsible } from '@limonify/zest-ui';
 function Panel({ props, state }) {
   const p = useAnimatedValue(state.open ? 1 : 0);
   const style = useAnimatedStyle(() => ({
+    // `undefined` — never `0` — until the content has been measured, so the
+    // panel falls back to its natural height instead of collapsing shut.
     height: state.height != null ? p.value * state.height : undefined,
     opacity: p.value,
   }));
-  return <Animated.View {...props} style={[{ overflow: 'hidden' }, style]} />;
+  // Keep `props.style` in the array: it carries the panel's own `overflow:
+  // 'hidden'`, and dropping it is what turns a height animation into a panel
+  // whose content spills out of the clip.
+  return <Animated.View {...props} style={[props.style, style]} />;
 }
 
 <Collapsible.Panel keepMounted render={(props, state) => <Panel props={props} state={state} />}>
@@ -101,6 +106,24 @@ function Panel({ props, state }) {
   when you can — measuring a clipped element is fragile on the New Architecture. The measured height
   is there when you need precise control.
 </Callout>
+
+### When the panel content is invisible
+
+Almost always one of three things, all on the consumer's side of the contract:
+
+1. **The height resolved to `0` before the content was measured.** `state.height` is `undefined`
+   until the panel's inner wrapper reports an `onLayout`. Writing `height: state.height ?? 0` (or
+   passing `undefined` into `withTiming`, which yields `NaN`) clips the panel shut on the first
+   frame, and a clipped panel can fail to produce a new measurement on the New Architecture — so it
+   never reopens. Fall back to `undefined`, not `0`.
+2. **`props` was not spread onto the animated view.** The panel delivers its children *through*
+   `props.children`; a wrapper that renders `<Animated.View style={style} />` without `{...props}`
+   renders an empty box. Spread `props` first, then compose styles on top.
+3. **`keepMounted` is missing but an exit animation is expected.** Without it the panel unmounts the
+   instant it closes, so the exit never plays and the content appears to vanish rather than animate.
+
+If you only need a fade or a slide, animate `opacity`/`transform` instead and let the panel size
+itself — that path does not depend on measurement at all, and it is what `apps/example` uses.
 
 ## Timing vs spring
 

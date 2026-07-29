@@ -2,6 +2,7 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
+import next from '@next/eslint-plugin-next';
 
 export default tseslint.config(
   {
@@ -13,6 +14,10 @@ export default tseslint.config(
       '**/dist/**',
       '**/build/**',
       '**/coverage/**',
+      // Next.js build output and fumadocs' generated source map for apps/docs.
+      '**/.next/**',
+      '**/.source/**',
+      '**/out/**',
       'reference/**',
     ],
   },
@@ -35,6 +40,31 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // eslint-plugin-react-hooks v7 turns on the React Compiler's static
+      // analysis. Its classic rules (`rules-of-hooks`, `exhaustive-deps`) stay
+      // on; the compiler rules below are off because they flag the utility layer
+      // that is a verbatim port of upstream Base UI, where each pattern is
+      // deliberate and correct:
+      //   refs             — `useRefWithInit`/`useControlled`/`useOnFirstRender`
+      //                      read a ref during render *by design*: that is what a
+      //                      lazy ref initializer is. Also flags handing a ref to
+      //                      floating-ui's `arrow({ element })`, which reads it
+      //                      at layout time, not during render.
+      //   set-state-in-effect — `Avatar.Fallback` and `ContextMenu.Positioner`
+      //                      commit a value from an effect on purpose; both are
+      //                      commented at the call site.
+      //   immutability     — `useStableCallback`/`useValueAsRef` assign to the
+      //                      ref they just created, which is the whole mechanism.
+      //   globals          — `warn`/`error` keep a module-level Set so a message
+      //                      is only ever printed once per process.
+      //   use-memo         — `useFilter` memoizes on `JSON.stringify(options)`,
+      //                      a deliberate deep compare over an options object.
+      // Revisit if the library is ever compiled with the React Compiler.
+      'react-hooks/refs': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/immutability': 'off',
+      'react-hooks/globals': 'off',
+      'react-hooks/use-memo': 'off',
       // The port deliberately widens some popup-trigger types to `unknown`/`any`
       // where the DOM node was the only concrete part upstream (see CLAUDE.md).
       '@typescript-eslint/no-explicit-any': 'off',
@@ -62,10 +92,33 @@ export default tseslint.config(
     },
   },
   {
+    // Build/tooling config files are CommonJS running in Node, not app code.
+    files: ['**/*.config.js', '**/*.config.cjs'],
+    languageOptions: {
+      globals: { require: 'readonly', module: 'writable', __dirname: 'readonly' },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  {
     // Tests reach into internals and mock freely.
     files: ['**/*.test.{ts,tsx}', '**/jest.setup.ts'],
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  {
+    // The docs site is Next.js, not React Native — it gets Next's own rules
+    // (and without the plugin registered, its `eslint-disable` directives are
+    // themselves lint errors).
+    files: ['apps/docs/**/*.{ts,tsx,js,jsx,mjs}'],
+    plugins: {
+      '@next/next': next,
+    },
+    rules: {
+      ...next.configs.recommended.rules,
+      ...next.configs['core-web-vitals'].rules,
     },
   },
 );

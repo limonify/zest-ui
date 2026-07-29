@@ -11,6 +11,7 @@ import { useTooltipRootContext } from '../root/TooltipRootContext';
 import { TooltipPortalContext } from './TooltipPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import type { ZestPortalModalProps } from '../../types';
 
 /**
  * A portal element that moves the tooltip to the top of the app.
@@ -23,7 +24,7 @@ import { REASONS } from '../../utils/reasons';
  * so a press anywhere outside the popup closes it.
  */
 export function TooltipPortal(props: TooltipPortal.Props) {
-  const { children, keepMounted = false } = props;
+  const { children, keepMounted = false, modalProps } = props;
 
   const store = useTooltipRootContext();
   const open = store.useState('open');
@@ -37,11 +38,13 @@ export function TooltipPortal(props: TooltipPortal.Props) {
     <TooltipPortalContext.Provider value={keepMounted}>
       <Modal
         transparent
-        visible={open}
         animationType="fade"
         statusBarTranslucent
         navigationBarTranslucent
+        {...modalProps}
+        visible={open}
         onRequestClose={(event: NativeSyntheticEvent<unknown>) => {
+          modalProps?.onRequestClose?.(event);
           store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
         }}
       >
@@ -68,6 +71,13 @@ export interface TooltipPortalProps {
    * @default false
    */
   keepMounted?: boolean | undefined;
+  /**
+   * Props forwarded to the underlying React Native `Modal`. Lets you replace
+   * the default `animationType="fade"`, or reach the rest of the Modal API.
+   * `visible` stays owned by the tooltip's open state, and `onRequestClose` is
+   * chained rather than replaced.
+   */
+  modalProps?: ZestPortalModalProps | undefined;
 }
 
 export namespace TooltipPortal {

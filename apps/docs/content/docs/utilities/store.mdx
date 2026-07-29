@@ -1,0 +1,121 @@
+---
+title: Store
+description: The subscription store behind every stateful zest component.
+---
+
+Compound components (Dialog, Select, Menu, Combobox, …) keep their state in a small external store
+rather than in React state, so a part deep in the tree can subscribe to one field without rerendering
+when an unrelated field changes. The store layer is exported for components you build the same way.
+
+```tsx
+import { ReactStore, createSelector } from '@limonify/zest-ui';
+// or
+import { ReactStore, createSelector } from '@limonify/zest-ui/store';
+```
+
+## Defining a store
+
+```tsx
+type State = {
+  open: boolean;
+  // The mirror of a controlled `open` prop. `undefined` means uncontrolled.
+  openProp: boolean | undefined;
+  activeIndex: number;
+};
+
+const selectors = {
+  // The controlled prop wins when present; this is the value everything reads.
+  open: createSelector((state: State) => state.openProp ?? state.open),
+  activeIndex: createSelector((state: State) => state.activeIndex),
+};
+
+class SheetStore extends ReactStore<State, Context, typeof selectors> {
+  constructor(initialState: State) {
+    super(initialState, {}, selectors);
+  }
+
+  setOpen(nextOpen: boolean, eventDetails: ZestChangeEventDetails) {
+    if (nextOpen === this.select('open')) {
+      return;
+    }
+
+    this.context.onOpenChange?.(nextOpen, eventDetails);
+
+    if (eventDetails.isCanceled) {
+      return;
+    }
+
+    // Only the uncontrolled key is written: a controlled consumer owns `openProp`.
+    this.set('open', nextOpen);
+  }
+}
+```
+
+## Wiring it to a component
+
+```tsx
+function SheetRoot(props: SheetRoot.Props) {
+  const store = useRefWithInit(
+    () => new SheetStore({ open: props.defaultOpen ?? false, openProp: props.open, activeIndex: 0 }),
+  ).current;
+
+  store.useControlledProp('openProp', props.open);
+  store.useContextCallback('onOpenChange', props.onOpenChange);
+  store.useSyncedValues({ disabled: props.disabled });
+
+  return <SheetRootContext.Provider value={store}>{props.children}</SheetRootContext.Provider>;
+}
+```
+
+| Method | What it does |
+| --- | --- |
+| `useState(key)` | Subscribes the calling component to one key, via `useSyncExternalStore`. |
+| `select(key)` | Reads a value once, outside React. |
+| `set(key, value)` | Writes one key and notifies its subscribers. |
+| `apply(partial)` | Writes several keys in one notification. |
+| `useControlledProp(key, value)` | Keeps a mirror key in sync with a controlled prop. |
+| `useContextCallback(key, fn)` | Stores a consumer callback without making it a render dependency. |
+| `useSyncedValues(partial)` | Pushes plain props into the store each render. |
+| `subscribe(key, fn)` | Subscribes outside React. |
+
+## `createSelector`
+
+Derives a value from the state, combining up to six functions. The last one is the combiner:
+
+```tsx
+const isItemActive = createSelector(
+  (state: State) => state.activeIndex,
+  (activeIndex: number, index: number) => activeIndex === index,
+);
+
+const active = store.useState('isItemActive', index);
+```
+
+<Callout type="warn">
+  The combiner cannot have optional or default parameters — memoization relies on `Function.length`,
+  which does not count them. TypeScript rejects it with a message saying so.
+</Callout>
+
+## Change event details
+
+State changes carry a reason, so a consumer can tell *why* something closed and veto it:
+
+```tsx
+import { REASONS, createChangeEventDetails } from '@limonify/zest-ui';
+
+store.setOpen(false, createChangeEventDetails(REASONS.outsidePress, event));
+```
+
+```tsx
+<Dialog.Root
+  onOpenChange={(open, details) => {
+    if (!open && details.reason === 'outside-press' && hasUnsavedChanges) {
+      details.cancel(); // the dialog stays open
+    }
+  }}
+/>
+```
+
+`REASONS` holds every slug the library emits — `trigger-press`, `outside-press`, `escape-key`,
+`close-press`, `item-press`, `imperative-action`, `none`, and the component-specific ones. Each
+component's page lists the reasons it can emit.

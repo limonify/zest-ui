@@ -6,6 +6,7 @@ import { useMenuSubmenuRootContext } from '../submenu-root/MenuSubmenuRootContex
 import { MenuPortalContext } from './MenuPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import type { ZestPortalModalProps } from '../../types';
 
 /**
  * A portal element that moves the popup to the top of the app.
@@ -15,7 +16,7 @@ import { REASONS } from '../../utils/reasons';
  * A submenu's Modal nests inside its parent's, which RN supports.
  */
 export function MenuPortal(props: MenuPortal.Props) {
-  const { children, keepMounted = false } = props;
+  const { children, keepMounted = false, modalProps } = props;
 
   const store = useMenuRootContext();
   const submenuRootContext = useMenuSubmenuRootContext();
@@ -30,11 +31,14 @@ export function MenuPortal(props: MenuPortal.Props) {
     <MenuPortalContext.Provider value={keepMounted}>
       <Modal
         transparent
-        visible={open}
         animationType="fade"
         statusBarTranslucent
         navigationBarTranslucent
+        {...modalProps}
+        visible={open}
         onRequestClose={(event: NativeSyntheticEvent<unknown>) => {
+          modalProps?.onRequestClose?.(event);
+
           const eventDetails = createChangeEventDetails(REASONS.escapeKey, event);
           store.setOpen(false, eventDetails);
 
@@ -61,6 +65,13 @@ export interface MenuPortalProps {
    * @default false
    */
   keepMounted?: boolean | undefined;
+  /**
+   * Props forwarded to the underlying React Native `Modal`. Lets you replace
+   * the default `animationType="fade"`, or reach the rest of the Modal API.
+   * `visible` stays owned by the menu's open state, and `onRequestClose` is
+   * chained rather than replaced.
+   */
+  modalProps?: ZestPortalModalProps | undefined;
 }
 
 export namespace MenuPortal {

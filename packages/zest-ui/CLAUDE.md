@@ -176,7 +176,7 @@ Only `Slider.Control` and `Drawer.Popup` use it, which is why it is an **optiona
 | Upstream (web) | Zest (RN) |
 |---|---|
 | tag name (`'div'`, `'button'`) | default component (`View`, `Pressable`, `Text`) |
-| Portal to `document.body` | RN `Modal` (transparent, `animationType="none"`, `statusBarTranslucent`) — for **every** popup family (see below) |
+| Portal to `document.body` | RN `Modal` (transparent, `animationType="fade"`, `statusBarTranslucent`), overridable via the Portal's `modalProps` — for **every** popup family (see below) |
 | outside click / dismiss | full-screen `Viewport` Pressable; popup claims responder via `onStartShouldSetResponder: () => true` |
 | Escape key | `Modal.onRequestClose` → `REASONS.escapeKey` |
 | `aria-labelledby` + ids | `useId` + `nativeID` + `accessibilityLabelledBy` (+ keep the `aria-*` prop for RN-web) |
@@ -224,7 +224,7 @@ Add a demo section to `apps/example/App.tsx` for every new component (plain Styl
 
 - **Lint is ESLint 9 flat config** at the repo root (`eslint.config.mjs`): `@eslint/js` + `typescript-eslint` recommended + `eslint-plugin-react-hooks`. Rules the port deliberately turns off, each with a reason in the config: `no-explicit-any`, `no-namespace`, `no-empty-object-type`, `no-unsafe-function-type`, `no-this-alias` (the last two are the store layer's verbatim-port shape). `no-unused-vars` uses `ignoreRestSiblings: true` so the universal `{ render, className, style, ...rest }` strip is not flagged. Run `bun run lint` (turbo → `eslint src` in the package).
 - **The package ships both source and a compiled fallback.** `package.json`'s `react-native` condition (and `source` field) point Metro straight at `src/index.ts` — Metro transforms it with the app's own Babel, exactly as when the package shipped source only. Everyone else (Node, Jest, webpack, react-native-web) gets `lib/`, a CommonJS + `.d.ts` build emitted by `tsc -p tsconfig.build.json` (classic `node` resolution, so the source's extensionless imports resolve). `bun run build` produces it; `prepack` rebuilds it before every publish; `lib/` is git-ignored. The `files` array whitelists `src` + `lib` and negates `src/**/*.test.*` so tests never ship.
-- **CI** is `.github/workflows/ci.yml`: Bun install (frozen lockfile), then typecheck · lint · test · build · `npm pack --dry-run` on push/PR to `main`.
+- **CI** is `.github/workflows/ci.yml`: Bun install (frozen lockfile), then README sync check · typecheck · lint · test · coverage · build · `size-limit` · `npm pack --dry-run`. It runs on pull requests to `main` and on manual dispatch — **not** on every push, so a branch commit does not spend a run. `turbo run lint`/`typecheck` cover all three workspaces (the library, `apps/docs`, `apps/example`); the docs app gets `@next/eslint-plugin-next` on top.
 - **Never run on a real device in this environment.** The whole library has only ever been validated by Jest (native modules mocked) and `expo export` (Metro bundle builds, 1001 modules). Positioning, gestures, nested `Modal`, snap points, and `measureInWindow` have never been seen rendering on a simulator. That remains the single biggest untested risk — say so honestly, never claim a device run that did not happen.
 
 ## Gotchas already solved — don't re-fight these

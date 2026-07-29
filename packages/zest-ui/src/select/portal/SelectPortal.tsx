@@ -5,6 +5,7 @@ import { useSelectRootContext } from '../root/SelectRootContext';
 import { SelectPortalContext } from './SelectPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import type { ZestPortalModalProps } from '../../types';
 
 /**
  * A portal element that moves the popup to the top of the app.
@@ -12,7 +13,7 @@ import { REASONS } from '../../utils/reasons';
  * React Native's `Modal`, like the rest of the popup family.
  */
 export function SelectPortal(props: SelectPortal.Props) {
-  const { children, keepMounted = false } = props;
+  const { children, keepMounted = false, modalProps } = props;
 
   const store = useSelectRootContext();
   const open = store.useState('open');
@@ -26,11 +27,13 @@ export function SelectPortal(props: SelectPortal.Props) {
     <SelectPortalContext.Provider value={keepMounted}>
       <Modal
         transparent
-        visible={open}
         animationType="fade"
         statusBarTranslucent
         navigationBarTranslucent
+        {...modalProps}
+        visible={open}
         onRequestClose={(event: NativeSyntheticEvent<unknown>) => {
+          modalProps?.onRequestClose?.(event);
           store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
         }}
       >
@@ -47,6 +50,13 @@ export interface SelectPortalProps {
    * @default false
    */
   keepMounted?: boolean | undefined;
+  /**
+   * Props forwarded to the underlying React Native `Modal`. Lets you replace
+   * the default `animationType="fade"`, or reach the rest of the Modal API.
+   * `visible` stays owned by the select's open state, and `onRequestClose` is
+   * chained rather than replaced.
+   */
+  modalProps?: ZestPortalModalProps | undefined;
 }
 
 export namespace SelectPortal {

@@ -90,7 +90,12 @@ export function useCheckboxGroupParent(
         if (nextChecked) {
           newValue.push(childValue);
         } else {
-          newValue.splice(newValue.indexOf(childValue), 1);
+          // Guard the index: `splice(-1, 1)` drops the *last* item, so an
+          // unchecked-but-absent child would silently remove an unrelated one.
+          const index = newValue.indexOf(childValue);
+          if (index !== -1) {
+            newValue.splice(index, 1);
+          }
         }
 
         onValueChange(newValue, eventDetails);

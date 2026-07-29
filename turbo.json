@@ -3,13 +3,24 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["lib/**"]
+      // `lib/**` is the library's tsc output; `.next`/`out` are the docs site's.
+      // A task whose real outputs are undeclared caches as if it produced
+      // nothing, so a cache hit would restore an empty build.
+      "outputs": ["lib/**", ".next/**", "!.next/cache/**", "out/**"]
     },
     "typecheck": {
       "dependsOn": ["^build"]
     },
+    // The docs tsconfig includes `.next/types/**`, which Next only generates
+    // during a build — typechecking before it exists fails on a missing
+    // `./routes.js`. So this one waits for its own build, not just its
+    // dependencies'.
+    "docs#typecheck": {
+      "dependsOn": ["docs#build"]
+    },
     "test": {
-      "dependsOn": ["^test"]
+      "dependsOn": ["^test"],
+      "outputs": ["coverage/**"]
     },
     "lint": {}
   }

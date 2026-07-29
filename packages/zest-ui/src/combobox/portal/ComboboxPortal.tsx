@@ -5,13 +5,14 @@ import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { ComboboxPortalContext } from './ComboboxPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import type { ZestPortalModalProps } from '../../types';
 
 /**
  * Moves the popup to the top of the app, as an RN `Modal` like the rest of the
  * popup family.
  */
 export function ComboboxPortal(props: ComboboxPortal.Props) {
-  const { children, keepMounted = false } = props;
+  const { children, keepMounted = false, modalProps } = props;
 
   const store = useComboboxRootContext();
   const open = store.useState('open');
@@ -25,11 +26,13 @@ export function ComboboxPortal(props: ComboboxPortal.Props) {
     <ComboboxPortalContext.Provider value={keepMounted}>
       <Modal
         transparent
-        visible={open}
         animationType="fade"
         statusBarTranslucent
         navigationBarTranslucent
+        {...modalProps}
+        visible={open}
         onRequestClose={(event: NativeSyntheticEvent<unknown>) => {
+          modalProps?.onRequestClose?.(event);
           store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
         }}
       >
@@ -46,6 +49,13 @@ export interface ComboboxPortalProps {
    * @default false
    */
   keepMounted?: boolean | undefined;
+  /**
+   * Props forwarded to the underlying React Native `Modal`. Lets you replace
+   * the default `animationType="fade"`, or reach the rest of the Modal API.
+   * `visible` stays owned by the combobox's open state, and `onRequestClose` is
+   * chained rather than replaced.
+   */
+  modalProps?: ZestPortalModalProps | undefined;
 }
 
 export namespace ComboboxPortal {

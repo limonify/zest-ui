@@ -5,6 +5,7 @@ import { usePopoverRootContext } from '../root/PopoverRootContext';
 import { PopoverPortalContext } from './PopoverPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import type { ZestPortalModalProps } from '../../types';
 
 /**
  * A portal element that moves the popup to the top of the app.
@@ -18,7 +19,7 @@ import { REASONS } from '../../utils/reasons';
  * resolves the anchor into.
  */
 export function PopoverPortal(props: PopoverPortal.Props) {
-  const { children, keepMounted = false } = props;
+  const { children, keepMounted = false, modalProps } = props;
 
   const store = usePopoverRootContext();
   const open = store.useState('open');
@@ -32,11 +33,13 @@ export function PopoverPortal(props: PopoverPortal.Props) {
     <PopoverPortalContext.Provider value={keepMounted}>
       <Modal
         transparent
-        visible={open}
         animationType="fade"
         statusBarTranslucent
         navigationBarTranslucent
+        {...modalProps}
+        visible={open}
         onRequestClose={(event: NativeSyntheticEvent<unknown>) => {
+          modalProps?.onRequestClose?.(event);
           store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
         }}
       >
@@ -53,6 +56,13 @@ export interface PopoverPortalProps {
    * @default false
    */
   keepMounted?: boolean | undefined;
+  /**
+   * Props forwarded to the underlying React Native `Modal`. Lets you replace
+   * the default `animationType="fade"`, or reach the rest of the Modal API.
+   * `visible` stays owned by the popover's open state, and `onRequestClose` is
+   * chained rather than replaced.
+   */
+  modalProps?: ZestPortalModalProps | undefined;
 }
 
 export namespace PopoverPortal {

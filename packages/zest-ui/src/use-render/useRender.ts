@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { View } from 'react-native';
-import type { ComponentRenderFn, NativeProps, RenderProp } from '../types';
+import type { ComponentRenderFn, NativeProps, RenderProp, ZestStyle } from '../types';
 import {
   useRenderElement,
   type UseRenderElementParameters,
@@ -39,6 +39,19 @@ export interface UseRenderParameters<
    * @default View
    */
   defaultComponent?: React.ElementType | undefined;
+  /**
+   * A class name, or a function of the component's state returning one.
+   *
+   * `useRender` forwards its own parameters to the render engine as the
+   * component props, so this is read exactly as it is on a built-in part —
+   * declaring it here is what lets a consumer pass their `className` through.
+   */
+  className?: string | ((state: State) => string | undefined) | undefined;
+  /**
+   * A React Native style, or a function of the component's state returning one.
+   * Composed *after* the styles in `props`, so the consumer's style wins.
+   */
+  style?: ZestStyle<State>;
 }
 
 export type UseRenderReturnValue<Enabled extends boolean | undefined> = Enabled extends false

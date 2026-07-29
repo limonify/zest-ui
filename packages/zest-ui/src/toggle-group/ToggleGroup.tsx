@@ -53,7 +53,12 @@ export function ToggleGroup<Value extends string = string>(
         if (nextPressed) {
           newGroupValue.push(newValue);
         } else {
-          newGroupValue.splice(groupValue.indexOf(newValue), 1);
+          // Guard the index: `splice(-1, 1)` drops the *last* item, so an
+          // unpressed-but-absent toggle would silently remove an unrelated one.
+          const index = groupValue.indexOf(newValue);
+          if (index !== -1) {
+            newGroupValue.splice(index, 1);
+          }
         }
       } else {
         newGroupValue = nextPressed ? [newValue] : [];

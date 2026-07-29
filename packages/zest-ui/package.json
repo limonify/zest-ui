@@ -191,6 +191,26 @@
       "types": "./lib/store/index.d.ts",
       "react-native": "./src/store/index.ts",
       "default": "./lib/store/index.js"
+    },
+    "./filter": {
+      "types": "./lib/filter/index.d.ts",
+      "react-native": "./src/filter/index.ts",
+      "default": "./lib/filter/index.js"
+    },
+    "./merge-props": {
+      "types": "./lib/merge-props/index.d.ts",
+      "react-native": "./src/merge-props/index.ts",
+      "default": "./lib/merge-props/index.js"
+    },
+    "./use-render": {
+      "types": "./lib/use-render/index.d.ts",
+      "react-native": "./src/use-render/index.ts",
+      "default": "./lib/use-render/index.js"
+    },
+    "./types": {
+      "types": "./lib/types/index.d.ts",
+      "react-native": "./src/types/index.ts",
+      "default": "./lib/types/index.js"
     }
   },
   "files": [
@@ -242,7 +262,12 @@
     {
       "name": "full",
       "path": "lib/index.js",
-      "limit": "500 KB"
+      "limit": "75 KB"
+    },
+    {
+      "name": "dialog only",
+      "path": "lib/dialog/index.js",
+      "limit": "20 KB"
     }
   ]
 }

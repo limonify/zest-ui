@@ -1,10 +1,29 @@
 import type * as React from 'react';
-import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from 'react-native';
+import type { ImageStyle, ModalProps, StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 /**
  * Any React Native style value accepted by Zest components.
  */
 export type ZestStyleValue = StyleProp<ViewStyle | TextStyle | ImageStyle>;
+
+/**
+ * Props forwarded to the React Native `Modal` that every popup family's
+ * `Portal` renders.
+ *
+ * `visible` and `children` are omitted because the Portal owns them: visibility
+ * follows the popup's open state, and the children are the popup's own parts.
+ * Everything else is yours, including `animationType` — pass `'none'` to switch
+ * the Modal's native cross-fade off and drive the whole enter/exit yourself.
+ *
+ * `onRequestClose` is *chained*, not replaced: yours runs first, then Zest's own
+ * handler closes the popup with the `escape-key` reason.
+ *
+ * Two of the defaults are load-bearing for anchored popups — `transparent`
+ * (so the backdrop shows the app underneath) and `statusBarTranslucent` (which
+ * makes the Modal's origin the top of the screen, the coordinate space
+ * `useAnchorPositioning` measures anchors in). Override them only deliberately.
+ */
+export type ZestPortalModalProps = Omit<ModalProps, 'visible' | 'children'>;
 
 /**
  * Style accepted by Zest components. React Native style prop, or a function of

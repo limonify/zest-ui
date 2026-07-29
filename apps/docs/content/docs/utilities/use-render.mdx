@@ -1,0 +1,99 @@
+---
+title: useRender & mergeProps
+description: Build your own components with zest's render engine and prop-merging semantics.
+---
+
+Every zest part is built on the same two primitives, and both are exported. Use them when you want a
+component of your own to accept `render` / `className` / `style` the way zest's do.
+
+## `useRender`
+
+Renders an element, applying the `render` prop if one was given and resolving `className`/`style`
+functions against your component's state.
+
+```tsx
+import { useRender } from '@limonify/zest-ui';
+import { View } from 'react-native';
+
+function Badge(props: Badge.Props) {
+  const { tone = 'neutral', render, className, style, ref, ...elementProps } = props;
+
+  const state = { tone };
+
+  return useRender({
+    defaultComponent: View,
+    render,
+    className,
+    style,
+    state,
+    ref,
+    props: [{ accessibilityRole: 'text' as const }, elementProps],
+  });
+}
+```
+
+A consumer can then do everything they can do with a built-in part:
+
+```tsx
+<Badge tone="danger" style={(state) => (state.tone === 'danger' ? styles.danger : styles.neutral)} />
+<Badge render={(props) => <Animated.View {...props} />} />
+```
+
+### Parameters
+
+| Name | Description |
+| --- | --- |
+| `defaultComponent` | The component to render when no `render` prop is given. Defaults to `View`. |
+| `render` | The consumer's `render` prop — an element or `(props, state) => element`. |
+| `state` | Passed as the second argument to `render`, and to `className`/`style` functions. |
+| `props` | Internal props, or an array merged left-to-right (rightmost wins). |
+| `ref` | A ref, or an array of refs, merged with the one on a `render` element. |
+| `enabled` | `false` renders nothing and returns `null`. |
+
+<Callout type="warn">
+  `render` is called as a plain function, not mounted as a component. Passing a component directly
+  (`render={MyThing}`) breaks the Rules of Hooks; zest warns in development when it detects a render
+  function whose name looks like a component. Write `render={(props) => <MyThing {...props} />}` or
+  `render={<MyThing />}` instead.
+</Callout>
+
+## `mergeProps`
+
+Merges prop objects with the semantics every zest part relies on. It is `Object.assign` order —
+**rightmost wins** — with three exceptions:
+
+- **`style`** composes into a React Native array `[left, right]`, so the rightmost style wins when RN
+  flattens it. It never object-spreads, because a style may be a registered `StyleSheet` id or a
+  nested array.
+- **`className`** concatenates.
+- **Event handlers** chain and run **right-to-left**: the rightmost (usually the consumer's) runs
+  first.
+
+```tsx
+import { mergeProps } from '@limonify/zest-ui';
+
+const props = mergeProps(
+  { onPress: internalPress, style: styles.base },
+  { onPress: consumerPress, style: styles.override },
+);
+```
+
+Because the consumer's handler runs first, it can stop the component's own behaviour:
+
+```tsx
+<Menu.Item
+  onPress={(event) => {
+    if (!canSelect) {
+      event.preventZestUIHandler(); // the menu will not close
+    }
+  }}
+/>
+```
+
+`mergePropsN` takes an array instead of positional arguments — that is what `useRender`'s `props`
+array uses internally.
+
+<Callout type="info">
+  `ref` is **not** merged by `mergeProps`. Use `useMergedRefs` (see [Hooks](/docs/utilities/hooks))
+  when you need to combine refs, or let `useRender` do it for you.
+</Callout>

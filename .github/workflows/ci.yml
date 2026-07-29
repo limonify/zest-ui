@@ -28,6 +28,11 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Check the two READMEs are in sync
+        # The repo landing page and the npm README must stay identical.
+        # `bun run readme:sync` regenerates the package copy from the root one.
+        run: bun run readme:check
+
       - name: Typecheck
         run: bun run typecheck
 

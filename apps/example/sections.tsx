@@ -106,7 +106,10 @@ export function CheckboxSection() {
  */
 export function AnimatedPanel(props: { style?: unknown; children?: React.ReactNode }) {
   const { style, children, ...rest } = props;
-  const opacity = React.useRef(new Animated.Value(0)).current;
+  // A lazy `useState` initializer rather than `useRef(...).current`: the value is
+  // read during render (it goes into `style`), which `react-hooks/refs` forbids
+  // for refs. Both create the Animated.Value exactly once.
+  const [opacity] = React.useState(() => new Animated.Value(0));
 
   React.useEffect(() => {
     Animated.timing(opacity, { toValue: 1, duration: 150, useNativeDriver: true }).start();
@@ -130,8 +133,8 @@ export function TabsIndicatorBar(props: {
   style?: unknown;
 }) {
   const { left, width, style, ...rest } = props;
-  const animatedLeft = React.useRef(new Animated.Value(left)).current;
-  const animatedWidth = React.useRef(new Animated.Value(width)).current;
+  const [animatedLeft] = React.useState(() => new Animated.Value(left));
+  const [animatedWidth] = React.useState(() => new Animated.Value(width));
 
   React.useEffect(() => {
     Animated.parallel([
@@ -1359,13 +1362,17 @@ export function SeparatorSection() {
   );
 }
 
+// Module scope, not inside the component: a fresh array each render would make
+// the `matches` memo recompute every time. Named apart from the `FRUITS` used by
+// the Select sections, which it used to shadow.
+const FILTER_FRUITS = ['Apple', 'Apricot', 'Banana', 'Cherry', 'Crème brûlée', 'Jalapeño Popper'];
+
 export function FilterSection() {
-  const FRUITS = ['Apple', 'Apricot', 'Banana', 'Cherry', 'Crème brûlée', 'Jalapeño Popper'];
   const [query, setQuery] = React.useState('');
   const { contains } = useFilter();
 
   const matches = React.useMemo(
-    () => FRUITS.filter((item) => contains(item, query)),
+    () => FILTER_FRUITS.filter((item) => contains(item, query)),
     [contains, query],
   );
 
