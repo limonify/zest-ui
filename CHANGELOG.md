@@ -1,3 +1,30 @@
+## [0.5.1] - 2026-07-31
+
+One bug fix. **No breaking changes**, no API surface added.
+
+### Bug Fixes
+
+- **`NumberField` crashed on blur in React Native.** Hermes does not implement `Intl.NumberFormat.prototype.formatToParts`. `Intl.NumberFormat` is there and `format()` works, but that one method is `undefined`, so blurring a `NumberField` threw:
+
+  ```
+  TypeError: undefined is not a function
+    at getFormatParts (number-field/utils/parse.ts:76)
+    at parseNumber (number-field/utils/parse.ts:141)
+    at NumberFieldInput onBlur
+  ```
+
+  `parse.ts` called it in three places to derive the locale's grouping and decimal separators and the currency or unit label. It now goes through `utils/formatToParts.ts`, which uses the engine's own implementation wherever there is one and otherwise derives the parts from `format()` alone.
+
+  The fallback reproduces what `parse.ts` actually reads and **does not claim to be a complete `formatToParts`** — no `exponentSeparator`, no compact-notation suffixes, and no attempt at the `literal` placement of a real implementation. The separators are probed with a plain formatter rather than the caller's: a caller asking for `maximumFractionDigits: 0` or `useGrouping: false` would otherwise suppress the very symbol being looked for.
+
+  Nothing changes on a platform that has the method, which is every browser and Node.
+
+### Internal
+
+- **Tests: 889 → 912** in 63 suites. Both new groups run with the method **deleted from the prototype** — the fallback on its own across `en-US`, `de-DE`, `tr-TR`, `fr-FR`, `en-IN` and `ar-EG`, and the entire existing `parseNumber` suite re-run without it. That second run is the one that matters: a test that simply called `formatToParts` would exercise the native path and prove nothing about the fallback, which is precisely how a method missing on the only platform this library ships to passed 889 tests and reached a device.
+
+---
+
 ## [0.5.0] - 2026-07-29
 
 The last part of the rendered output a consumer could not reach — the portal's `Modal` — plus two bug fixes and the test coverage the handle family never had. **No breaking changes.**
@@ -10,7 +37,7 @@ The last part of the rendered output a consumer could not reach — the portal's
   <Dialog.Portal keepMounted modalProps={{ animationType: 'none' }}>
   ```
 
-  Two props stay owned by zest: `visible` follows the popup's open state, and `onRequestClose` is *chained* rather than replaced — yours runs first, then zest closes with the `escape-key` reason. The `transparent` and `statusBarTranslucent` defaults are load-bearing (the backdrop, and the coordinate space anchored popups are positioned in), so override them deliberately.
+  Two props stay owned by zest: `visible` follows the popup's open state, and `onRequestClose` is _chained_ rather than replaced — yours runs first, then zest closes with the `escape-key` reason. The `transparent` and `statusBarTranslucent` defaults are load-bearing (the backdrop, and the coordinate space anchored popups are positioned in), so override them deliberately.
 
 - **`ZestPortalModalProps`** is exported for typing a `modalProps` object you build elsewhere.
 
@@ -19,7 +46,7 @@ The last part of the rendered output a consumer could not reach — the portal's
 ### Bug Fixes
 
 - **`useRender` types**: `UseRenderParameters` did not declare `className` or `style`, even though the implementation reads both. The documented way to build your own zest-style part did not typecheck. Both are now declared.
-- **`ToggleGroup` and `CheckboxGroup` parent**: guard the `indexOf` result before `splice`. `splice(-1, 1)` removes the *last* item, so a value that was not in the list would silently drop an unrelated one.
+- **`ToggleGroup` and `CheckboxGroup` parent**: guard the `indexOf` result before `splice`. `splice(-1, 1)` removes the _last_ item, so a value that was not in the list would silently drop an unrelated one.
 
 ### Documentation
 
