@@ -318,6 +318,71 @@ describe('NumberField parse', () => {
     });
   });
 
+  /**
+   * The whole parse path on an engine with no `formatToParts` — which is Hermes,
+   * and therefore every React Native app.
+   *
+   * A NumberField blurring on a device died here with "undefined is not a
+   * function" while this very suite passed, because Node has the method. So the
+   * suite has to be able to run without it, and this is that run.
+   */
+  describe('without Intl.NumberFormat.prototype.formatToParts', () => {
+    const real = Intl.NumberFormat.prototype.formatToParts;
+
+    beforeAll(() => {
+      // @ts-expect-error — removing it is the point.
+      delete Intl.NumberFormat.prototype.formatToParts;
+    });
+    afterAll(() => {
+      Intl.NumberFormat.prototype.formatToParts = real;
+    });
+
+    it('has actually removed it, so the rest of this block means something', () => {
+      expect(new Intl.NumberFormat('en-US').formatToParts).toBeUndefined();
+    });
+
+    it('reads the locale details', () => {
+      const details = getNumberLocaleDetails('en-US');
+      expect(details.decimal).toBe('.');
+      expect(details.group).toBe(',');
+    });
+
+    it('reads a locale whose separators are the other way round', () => {
+      const details = getNumberLocaleDetails('de-DE');
+      expect(details.decimal).toBe(',');
+      expect(details.group).toBe('.');
+    });
+
+    it('parses a grouped decimal', () => {
+      expect(parseNumber('1,234.56', 'en-US')).toBe(1234.56);
+      expect(parseNumber('1.234,56', 'de-DE')).toBe(1234.56);
+    });
+
+    it('parses a percentage', () => {
+      expect(parseNumber('12%')).toBe(0.12);
+    });
+
+    it('parses a currency amount', () => {
+      expect(parseNumber('€1.234,56', 'de-DE', { style: 'currency', currency: 'EUR' })).toBe(
+        1234.56,
+      );
+    });
+
+    it('parses a value with a unit label', () => {
+      expect(
+        parseNumber('60 km/h', 'en-US', { style: 'unit', unit: 'kilometer-per-hour' }),
+      ).toBe(60);
+    });
+
+    it('parses Arabic-Indic numerals', () => {
+      expect(parseNumber('١٢٣٤')).toBe(1234);
+    });
+
+    it('parses a negative number', () => {
+      expect(parseNumber('-1,234.5', 'en-US')).toBe(-1234.5);
+    });
+  });
+
   describe('isNumeralChar', () => {
     it('accepts a digit from every supported numeral system', () => {
       // ASCII, Arabic-Indic, Persian, fullwidth, and Han (including both zero forms).

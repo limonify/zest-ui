@@ -1,4 +1,5 @@
 import { getFormatter } from '../../utils/formatNumber';
+import { formatToParts } from '../../utils/formatToParts';
 
 // Han numerals in digit order, with both zero forms first ('零' at 0, '〇' at 1), so a
 // character's digit value is `max(indexOf - 1, 0)`.
@@ -73,7 +74,7 @@ const SAMPLE_FORMAT_NUMBER = 11111.1;
  * non-numeric symbol a given locale/format renders.
  */
 export function getFormatParts(locale?: Intl.LocalesArgument, options?: Intl.NumberFormatOptions) {
-  return getFormatter(locale, options).formatToParts(SAMPLE_FORMAT_NUMBER);
+  return formatToParts(getFormatter(locale, options), SAMPLE_FORMAT_NUMBER);
 }
 
 export function getNumberLocaleDetails(
@@ -90,9 +91,7 @@ export function getNumberLocaleDetails(
   // The formatting options may omit the decimal separator (e.g. integer formats), so resolve it
   // from the plain locale formatter. This overrides any options-derived decimal too, which is
   // safe because the separator is locale-determined and identical across format styles.
-  getFormatter(locale)
-    .formatToParts(0.1)
-    .forEach((part) => {
+  formatToParts(getFormatter(locale), 0.1).forEach((part) => {
       if (part.type === 'decimal') {
         result[part.type] = part.value;
       }
@@ -144,8 +143,7 @@ export function parseNumber(
   );
 
   // Build robust unit regex from all unit parts (such as "km/h")
-  const unitParts = getFormatter(computedLocale, options)
-    .formatToParts(1)
+  const unitParts = formatToParts(getFormatter(computedLocale, options), 1)
     .filter((p) => p.type === 'unit')
     .map((p) => escapeRegExp(p.value));
   const unitRegex = unitParts.length ? new RegExp(unitParts.join('|'), 'g') : null;
