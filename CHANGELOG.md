@@ -1,3 +1,23 @@
+## [0.5.2] - 2026-08-04
+
+No API changes — this release is infrastructure only.
+
+### Features
+
+- **Published to GitHub Packages, alongside npm.** The release workflow now mirrors `@limonify/zest-ui` to `npm.pkg.github.com` under the `limonify` org immediately after the npm publish, so the same version number is available from both registries for org-internal mirrors or air-gapped installs. GitHub Packages does not support npm provenance, so `--provenance` stays on the npm step only. A consumer installing from GitHub Packages must point the `@limonify` scope at that registry and authenticate via an `.npmrc`:
+
+  ```bash
+  # .npmrc — @limonify:registry=https://npm.pkg.github.com
+  @limonify:registry=https://npm.pkg.github.com
+  //npm.pkg.github.com/:_authToken=${GITHUB_PACKAGES_TOKEN}
+  ```
+
+### Internal
+
+- **Tooling versions aligned.** CI and the release workflow pin bun `1.3.14`, matching the `packageManager` field. The root `typescript` dev dependency was reverted from `~7.0.2` to `~6.0.3`: typescript-eslint@8.66 (the latest published) hard-errors on TypeScript 7.0, so `turbo run lint` failed on every workspace until the revert. Kept from the upgrade pass: turbo `^2.10.8` and `@next/eslint-plugin-next` `^16.3.0`.
+
+---
+
 ## [0.5.1] - 2026-07-31
 
 One bug fix. **No breaking changes**, no API surface added.
