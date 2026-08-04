@@ -5,6 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A backdrop for the menu, and the surface that dismisses it.
@@ -14,8 +15,8 @@ export function MenuBackdrop(componentProps: MenuBackdrop.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
   const store = useMenuRootContext();
-  const open = store.useState('open');
-  const disablePointerDismissal = store.useState('disablePointerDismissal');
+  const open = useStoreState(store, 'open');
+  const disablePointerDismissal = useStoreState(store, 'disablePointerDismissal');
 
   const state: MenuBackdropState = { open };
 

@@ -7,6 +7,7 @@ import { MenuPortalContext } from './MenuPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ZestPortalModalProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A portal element that moves the popup to the top of the app.
@@ -20,7 +21,7 @@ export function MenuPortal(props: MenuPortal.Props) {
 
   const store = useMenuRootContext();
   const submenuRootContext = useMenuSubmenuRootContext();
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const shouldRender = open || keepMounted;
   if (!shouldRender) {

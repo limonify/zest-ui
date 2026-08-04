@@ -56,7 +56,10 @@ export function MenuCheckboxItem(componentProps: MenuCheckboxItem.Props) {
 
   const { getButtonProps } = useButton({ disabled });
 
-  const state: MenuCheckboxItemState = { checked, disabled, pressed, index };
+  const state: MenuCheckboxItemState = React.useMemo(
+    () => ({ checked, disabled, pressed, index }),
+    [checked, disabled, pressed, index],
+  );
 
   const element = useRenderElement(Pressable, componentProps, {
     state,

@@ -7,6 +7,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A container for the tooltip contents.
@@ -19,9 +20,9 @@ export function TooltipPopup(componentProps: TooltipPopup.Props) {
   const { side, align } = useTooltipPositionerContext();
   const { transitionStatus } = useTooltipTransitionContext() ?? { transitionStatus: undefined };
 
-  const open = store.useState('open');
-  const triggerWidth = store.useState('triggerWidth');
-  const triggerHeight = store.useState('triggerHeight');
+  const open = useStoreState(store, 'open');
+  const triggerWidth = useStoreState(store, 'triggerWidth');
+  const triggerHeight = useStoreState(store, 'triggerHeight');
 
   const state: TooltipPopupState = {
     open,

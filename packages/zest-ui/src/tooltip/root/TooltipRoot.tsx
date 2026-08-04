@@ -7,6 +7,7 @@ import type { REASONS } from '../../utils/reasons';
 import { TooltipStore } from '../store/TooltipStore';
 import { TooltipRootContext } from './TooltipRootContext';
 import { TooltipTransitionContext } from './TooltipTransitionContext';
+import { useContextCallback, useControlledProp, useStoreState } from '../../store/ReactStore';
 
 /**
  * Groups all parts of the tooltip.
@@ -25,10 +26,10 @@ export function TooltipRoot(props: TooltipRoot.Props) {
     () => new TooltipStore({ open: defaultOpen, openProp: open }),
   ).current;
 
-  store.useControlledProp('openProp', open);
-  store.useContextCallback('onOpenChange', onOpenChange);
+  useControlledProp(store, 'openProp', open);
+  useContextCallback(store, 'onOpenChange', onOpenChange);
 
-  const resolvedOpen = store.useState('open');
+  const resolvedOpen = useStoreState(store, 'open');
   const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
 
   const transitionContextValue = React.useMemo(

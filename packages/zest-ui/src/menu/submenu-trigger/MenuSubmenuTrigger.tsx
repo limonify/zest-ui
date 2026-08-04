@@ -10,6 +10,7 @@ import { useMergedRefs } from '../../hooks/useMergedRefs';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A menu item that opens a submenu.
@@ -35,7 +36,7 @@ export function MenuSubmenuTrigger(componentProps: MenuSubmenuTrigger.Props) {
 
   // Inside a SubmenuRoot this is the submenu's own store, not the parent's.
   const store = useMenuRootContext();
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   // The list this item belongs to is the parent's popup, since that is where it
   // renders.

@@ -2,6 +2,7 @@
 import { useDialogRootContext } from '../root/DialogRootContext';
 import { useDialogPortalContext } from '../portal/DialogPortalContext';
 import { useDialogTransitionContext } from '../root/DialogTransitionContext';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * The state and element props shared by every popup built on the dialog store —
@@ -12,12 +13,12 @@ export function useDialogPopupProps() {
   const store = useDialogRootContext();
   const transitionContext = useDialogTransitionContext();
 
-  const open = store.useState('open');
-  const titleElementId = store.useState('titleElementId');
-  const descriptionElementId = store.useState('descriptionElementId');
-  const role = store.useState('role');
-  const nested = store.useState('nested');
-  const nestedDialogOpen = store.useState('nestedDialogOpen');
+  const open = useStoreState(store, 'open');
+  const titleElementId = useStoreState(store, 'titleElementId');
+  const descriptionElementId = useStoreState(store, 'descriptionElementId');
+  const role = useStoreState(store, 'role');
+  const nested = useStoreState(store, 'nested');
+  const nestedDialogOpen = useStoreState(store, 'nestedDialogOpen');
 
   return {
     store,

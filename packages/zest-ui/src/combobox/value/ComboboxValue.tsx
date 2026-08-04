@@ -4,6 +4,7 @@ import { Text } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * Displays the current input text (the selected label in combobox mode).
@@ -14,7 +15,7 @@ export function ComboboxValue(componentProps: ComboboxValue.Props) {
   const { render, className, style, children, ref, ...elementProps } = componentProps;
 
   const store = useComboboxRootContext();
-  const inputValue = store.useState('inputValue');
+  const inputValue = useStoreState(store, 'inputValue');
 
   const state: ComboboxValueState = { value: inputValue };
 

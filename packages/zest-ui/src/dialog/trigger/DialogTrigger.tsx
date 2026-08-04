@@ -13,6 +13,7 @@ import type { DialogStore } from '../store/DialogStore';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A button that opens the dialog.
@@ -48,7 +49,7 @@ export function DialogTrigger<Payload = unknown>(componentProps: DialogTrigger.P
   }
 
   const id = useId(idProp ?? undefined);
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const [pressed, setPressed] = React.useState(false);
 

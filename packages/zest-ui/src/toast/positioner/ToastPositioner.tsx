@@ -13,6 +13,7 @@ import {
 } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
 import { ToastPositionerContext } from './ToastPositionerContext';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * Positions a toast against an anchor, for a toast that belongs to something on
@@ -44,7 +45,7 @@ export function ToastPositioner(componentProps: ToastPositioner.Props) {
   } = componentProps;
 
   const store = useToastProviderContext();
-  const viewportOrigin = store.useState('viewportOrigin');
+  const viewportOrigin = useStoreState(store, 'viewportOrigin');
 
   const positioning = useAnchorPositioning({
     align,

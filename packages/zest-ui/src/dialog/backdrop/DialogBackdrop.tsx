@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { useDialogRootContext } from '../root/DialogRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A visual overlay behind the popup.
@@ -15,9 +16,9 @@ export function DialogBackdrop(componentProps: DialogBackdrop.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
   const store = useDialogRootContext();
-  const open = store.useState('open');
-  const nested = store.useState('nested');
-  const nestedDialogOpen = store.useState('nestedDialogOpen');
+  const open = useStoreState(store, 'open');
+  const nested = useStoreState(store, 'nested');
+  const nestedDialogOpen = useStoreState(store, 'nestedDialogOpen');
 
   const state: DialogBackdropState = { open, nested, nestedDialogOpen };
 

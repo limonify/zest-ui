@@ -7,6 +7,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * Displays an element positioned against the menu anchor.
@@ -18,7 +19,7 @@ export function MenuArrow(componentProps: MenuArrow.Props) {
   const store = useMenuRootContext();
   const { side, align, arrowRef, arrowStyles } = useMenuPositionerContext();
 
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const mergedRef = useMergedRefs(ref, arrowRef as React.Ref<unknown>);
 

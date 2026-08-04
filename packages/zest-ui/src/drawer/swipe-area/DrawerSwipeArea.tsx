@@ -9,6 +9,7 @@ import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { useDrawerRootContext, type DrawerSwipeDirection } from '../root/DrawerRootContext';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * How far a swipe must travel, in pixels, before it opens the drawer. Matches
@@ -53,7 +54,7 @@ export function DrawerSwipeArea(componentProps: DrawerSwipeArea.Props) {
   const store = useDialogRootContext();
   const { swipeDirection: dismissDirection } = useDrawerRootContext();
 
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const [swiping, setSwiping] = React.useState(false);
 

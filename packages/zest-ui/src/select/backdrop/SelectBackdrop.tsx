@@ -5,6 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A backdrop for the select popup, and the surface that dismisses it.
@@ -14,7 +15,7 @@ export function SelectBackdrop(componentProps: SelectBackdrop.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
   const store = useSelectRootContext();
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const state: SelectBackdropState = { open };
 

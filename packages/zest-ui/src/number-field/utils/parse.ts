@@ -143,9 +143,12 @@ export function parseNumber(
   );
 
   // Build robust unit regex from all unit parts (such as "km/h")
-  const unitParts = formatToParts(getFormatter(computedLocale, options), 1)
-    .filter((p) => p.type === 'unit')
-    .map((p) => escapeRegExp(p.value));
+  const unitParts: string[] = [];
+  for (const part of formatToParts(getFormatter(computedLocale, options), 1)) {
+    if (part.type === 'unit') {
+      unitParts.push(escapeRegExp(part.value));
+    }
+  }
   const unitRegex = unitParts.length ? new RegExp(unitParts.join('|'), 'g') : null;
 
   let groupRegex: RegExp | null = null;

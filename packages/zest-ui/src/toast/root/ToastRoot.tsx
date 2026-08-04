@@ -10,6 +10,7 @@ import { AnimationFrame } from '../../hooks/useAnimationFrame';
 import type { ZestUIComponentProps } from '../../types';
 import type { ToastObject } from '../useToastManager';
 import { ToastRootContext } from './ToastRootContext';
+import { useStoreState } from '../../store/ReactStore';
 
 /** Matches `Drawer.Popup`: a swipe dismisses once it has travelled this far. */
 const DEFAULT_SWIPE_THRESHOLD = 40;
@@ -57,10 +58,10 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
   const [swiping, setSwiping] = React.useState(false);
   const [swipeMovement, setSwipeMovement] = React.useState(0);
 
-  const index = store.useState('toastIndex', toast.id);
-  const offsetY = store.useState('toastOffsetY', toast.id);
-  const visibleIndex = store.useState('toastVisibleIndex', toast.id);
-  const expanded = store.useState('expanded');
+  const index = useStoreState(store, 'toastIndex', toast.id);
+  const offsetY = useStoreState(store, 'toastOffsetY', toast.id);
+  const visibleIndex = useStoreState(store, 'toastVisibleIndex', toast.id);
+  const expanded = useStoreState(store, 'expanded');
 
   // Without an animation there is nothing to wait for, so a closed toast leaves
   // the list at once.

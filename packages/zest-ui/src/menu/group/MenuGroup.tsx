@@ -3,6 +3,7 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
+import { EMPTY_OBJECT } from '../../utils/empty';
 import type { ZestUIComponentProps } from '../../types';
 import { MenuGroupContext } from './MenuGroupContext';
 
@@ -17,7 +18,7 @@ export function MenuGroup(componentProps: MenuGroup.Props) {
 
   const contextValue: MenuGroupContext = React.useMemo(() => ({ labelId }), [labelId]);
 
-  const state: MenuGroupState = {};
+  const state: MenuGroupState = EMPTY_OBJECT;
 
   const element = useRenderElement(View, componentProps, {
     state,

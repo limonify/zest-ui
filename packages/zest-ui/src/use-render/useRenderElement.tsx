@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { useMergedRefs, useMergedRefsN } from '../hooks/useMergedRefs';
+import { useMergedRefsN } from '../hooks/useMergedRefs';
 import { getReactElementRef } from '../utils/getReactElementRef';
 import { warn } from '../utils/warn';
-import { EMPTY_OBJECT } from '../utils/empty';
+import { EMPTY_ARRAY, EMPTY_OBJECT } from '../utils/empty';
 import { resolveClassName } from '../utils/resolveClassName';
 import { resolveStyle } from '../utils/resolveStyle';
 import { mergeProps, mergePropsN, mergeClassNames, mergeStyles } from '../merge-props';
@@ -65,19 +65,21 @@ function useRenderElementProps<
   // since EMPTY_OBJECT is frozen and mutations would fail in strict mode.
   const outProps: NativeProps = enabled && props ? resolveRenderFunctionProps(props) : {};
 
-  // SAFETY: The `useMergedRefs` functions use a single hook to store the same value,
-  // switching between them at runtime is safe. If this assertion fails, React will
-  // throw at runtime anyway.
-  /* eslint-disable react-hooks/rules-of-hooks */
-  if (!enabled) {
-    // Called only to keep the hook order stable when disabled; the merged ref is unused.
-    void useMergedRefs(null, null);
-  } else if (Array.isArray(ref)) {
-    outProps.ref = useMergedRefsN([outProps.ref, getReactElementRef(renderProp), ...ref]);
-  } else {
-    outProps.ref = useMergedRefs(outProps.ref, getReactElementRef(renderProp), ref);
+  // Only the ref list branches; `useMergedRefsN` itself is called once, unconditionally, so the
+  // Hook order is identical on every render whether the element is enabled or not and whether one
+  // ref or an array of them was passed. When disabled the merge runs over an empty list and the
+  // resulting `null` callback is discarded.
+  const refsToMerge: Array<React.Ref<any> | undefined> = !enabled
+    ? (EMPTY_ARRAY as Array<React.Ref<any> | undefined>)
+    : Array.isArray(ref)
+      ? [outProps.ref, getReactElementRef(renderProp), ...ref]
+      : [outProps.ref, getReactElementRef(renderProp), ref];
+
+  const mergedRef = useMergedRefsN(refsToMerge);
+
+  if (enabled) {
+    outProps.ref = mergedRef;
   }
-  /* eslint-enable react-hooks/rules-of-hooks */
 
   if (!enabled) {
     return EMPTY_OBJECT;

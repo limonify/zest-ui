@@ -9,6 +9,7 @@ import type { DialogRootProps } from './DialogRoot';
 import { DialogNestingContext, useDialogNestingContext } from './DialogNestingContext';
 import { DialogRootContext } from './DialogRootContext';
 import { DialogTransitionContext } from './DialogTransitionContext';
+import { useContextCallback, useControlledProp, useStoreState, useSyncedValues } from '../../store/ReactStore';
 
 export type DialogRootMode = 'dialog' | 'alert-dialog';
 
@@ -54,14 +55,14 @@ export function useRenderDialogRoot<Payload = unknown>(
       }),
   ).current;
 
-  store.useControlledProp('openProp', open);
-  store.useControlledProp('triggerIdProp', triggerId);
-  store.useContextCallback('onOpenChange', onOpenChange);
-  store.useSyncedValues({ disablePointerDismissal, role, nested });
+  useControlledProp(store, 'openProp', open);
+  useControlledProp(store, 'triggerIdProp', triggerId);
+  useContextCallback(store, 'onOpenChange', onOpenChange);
+  useSyncedValues(store, { disablePointerDismissal, role, nested });
 
   usePopupRootHandle({ store, handle, actionsRef });
 
-  const resolvedOpen = store.useState('open');
+  const resolvedOpen = useStoreState(store, 'open');
   const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
 
   // Tell the dialog above this one whether it now has an open descendant. The
@@ -86,7 +87,7 @@ export function useRenderDialogRoot<Payload = unknown>(
     parent?.onNestedOpenChange(open);
   });
 
-  const payload = store.useState('payload') as Payload;
+  const payload = useStoreState(store, 'payload') as Payload;
 
   const transitionContextValue = React.useMemo(
     () => ({ transitionStatus }),

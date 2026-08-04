@@ -2,6 +2,7 @@
 import { Text } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMenuGroupContext } from '../group/MenuGroupContext';
+import { EMPTY_OBJECT } from '../../utils/empty';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -13,7 +14,7 @@ export function MenuGroupLabel(componentProps: MenuGroupLabel.Props) {
 
   const { labelId } = useMenuGroupContext();
 
-  const state: MenuGroupLabelState = {};
+  const state: MenuGroupLabelState = EMPTY_OBJECT;
 
   return useRenderElement(Text, componentProps, {
     state,

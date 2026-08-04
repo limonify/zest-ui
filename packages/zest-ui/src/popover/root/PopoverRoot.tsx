@@ -9,6 +9,7 @@ import { PopoverStore } from '../store/PopoverStore';
 import type { PopoverHandle } from '../store/PopoverHandle';
 import { PopoverRootContext } from './PopoverRootContext';
 import { PopoverTransitionContext } from './PopoverTransitionContext';
+import { useContextCallback, useControlledProp, useStoreState, useSyncedValues } from '../../store/ReactStore';
 
 /**
  * Groups all parts of the popover.
@@ -38,17 +39,17 @@ export function PopoverRoot<Payload = unknown>(props: PopoverRoot.Props<Payload>
       }),
   ).current;
 
-  store.useControlledProp('openProp', open);
-  store.useControlledProp('triggerIdProp', triggerId);
-  store.useContextCallback('onOpenChange', onOpenChange);
-  store.useSyncedValues({ disablePointerDismissal });
+  useControlledProp(store, 'openProp', open);
+  useControlledProp(store, 'triggerIdProp', triggerId);
+  useContextCallback(store, 'onOpenChange', onOpenChange);
+  useSyncedValues(store, { disablePointerDismissal });
 
   usePopupRootHandle({ store, handle, actionsRef });
 
-  const resolvedOpen = store.useState('open');
+  const resolvedOpen = useStoreState(store, 'open');
   const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
 
-  const payload = store.useState('payload') as Payload;
+  const payload = useStoreState(store, 'payload') as Payload;
 
   const transitionContextValue = React.useMemo(
     () => ({ transitionStatus }),

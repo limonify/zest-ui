@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { useSelectRootContext } from '../root/SelectRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A decorative icon inside the trigger, hidden from assistive technology.
@@ -12,7 +13,7 @@ export function SelectIcon(componentProps: SelectIcon.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
   const store = useSelectRootContext();
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const state: SelectIconState = { open };
 

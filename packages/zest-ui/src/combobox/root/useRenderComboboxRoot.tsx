@@ -16,6 +16,7 @@ import type { ComboboxRoot } from './ComboboxRoot';
 import { ComboboxItemsContext } from './ComboboxItemsContext';
 import { ComboboxRootContext } from './ComboboxRootContext';
 import { ComboboxTransitionContext } from './ComboboxTransitionContext';
+import { useContextCallback, useControlledProp, useStoreState, useSyncedValues } from '../../store/ReactStore';
 
 export type ComboboxMode = 'combobox' | 'autocomplete';
 
@@ -88,18 +89,6 @@ export function useRenderComboboxRoot<Payload = unknown>(
     [filter, contains],
   );
 
-  // The initial input text is only read on the first render; compute it once so
-  // it stays stable, or a later selection changing the controlled `value` (and
-  // with it the derived label) would look like a controlled/uncontrolled switch.
-  const initialInputRef = React.useRef<string | undefined>(undefined);
-  if (initialInputRef.current === undefined) {
-    initialInputRef.current =
-      defaultInputValue ??
-      (mode === 'combobox'
-        ? (normalizedItems.find((item) => item.value === (value ?? defaultValue))?.label ?? '')
-        : '');
-  }
-
   const store = useRefWithInit(
     () =>
       new ComboboxStore({
@@ -107,7 +96,15 @@ export function useRenderComboboxRoot<Payload = unknown>(
         openProp: open,
         value: defaultValue ?? null,
         valueProp: value,
-        inputValue: initialInputRef.current!,
+        // The initial input text is only ever read here, and this closure only runs on the
+        // first render — so deriving it inline keeps it stable. Recomputing it later would
+        // make a selection that changes the controlled `value` (and with it the derived
+        // label) look like a controlled/uncontrolled switch.
+        inputValue:
+          defaultInputValue ??
+          (mode === 'combobox'
+            ? (normalizedItems.find((item) => item.value === (value ?? defaultValue))?.label ?? '')
+            : ''),
         inputValueProp: inputValue,
         items: normalizedItems,
         mode,
@@ -119,14 +116,14 @@ export function useRenderComboboxRoot<Payload = unknown>(
       }),
   ).current;
 
-  store.useControlledProp('openProp', open);
-  store.useControlledProp('valueProp', value);
-  store.useControlledProp('inputValueProp', inputValue);
-  store.useControlledProp('triggerIdProp', triggerId);
-  store.useContextCallback('onOpenChange', onOpenChange);
-  store.useContextCallback('onValueChange', onValueChange);
-  store.useContextCallback('onInputValueChange', onInputValueChange);
-  store.useSyncedValues({
+  useControlledProp(store, 'openProp', open);
+  useControlledProp(store, 'valueProp', value);
+  useControlledProp(store, 'inputValueProp', inputValue);
+  useControlledProp(store, 'triggerIdProp', triggerId);
+  useContextCallback(store, 'onOpenChange', onOpenChange);
+  useContextCallback(store, 'onValueChange', onValueChange);
+  useContextCallback(store, 'onInputValueChange', onInputValueChange);
+  useSyncedValues(store, {
     mode,
     disabled,
     disablePointerDismissal,
@@ -136,9 +133,9 @@ export function useRenderComboboxRoot<Payload = unknown>(
 
   usePopupRootHandle({ store, handle, actionsRef });
 
-  const resolvedOpen = store.useState('open');
-  const selectedValue = store.useState('value');
-  const currentInputValue = store.useState('inputValue');
+  const resolvedOpen = useStoreState(store, 'open');
+  const selectedValue = useStoreState(store, 'value');
+  const currentInputValue = useStoreState(store, 'inputValue');
 
   // The label of the currently selected value (combobox mode only).
   const selectedLabel =
@@ -175,7 +172,7 @@ export function useRenderComboboxRoot<Payload = unknown>(
   const itemsContextValue = React.useMemo(() => ({ filteredItems }), [filteredItems]);
   const transitionContextValue = React.useMemo(() => ({ transitionStatus }), [transitionStatus]);
 
-  const payload = store.useState('payload') as Payload;
+  const payload = useStoreState(store, 'payload') as Payload;
 
   return (
     <ComboboxRootContext.Provider value={store}>

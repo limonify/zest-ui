@@ -14,6 +14,7 @@ import {
 } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
 import { MenuPositionerContext } from './MenuPositionerContext';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * Positions the menu against the trigger.
@@ -37,10 +38,10 @@ export function MenuPositioner(componentProps: MenuPositioner.Props) {
 
   useMenuPortalContext();
   const store = useMenuRootContext();
-  const open = store.useState('open');
-  const triggerWidth = store.useState('triggerWidth');
-  const triggerHeight = store.useState('triggerHeight');
-  const triggerNode = store.useState('triggerNode');
+  const open = useStoreState(store, 'open');
+  const triggerWidth = useStoreState(store, 'triggerWidth');
+  const triggerHeight = useStoreState(store, 'triggerHeight');
+  const triggerNode = useStoreState(store, 'triggerNode');
 
   const positioning = useAnchorPositioning({
     align,

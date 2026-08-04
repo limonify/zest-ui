@@ -8,6 +8,7 @@ import { CompositeList } from '../../internals/composite/list/CompositeList';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A container for the menu items.
@@ -20,9 +21,9 @@ export function MenuPopup(componentProps: MenuPopup.Props) {
   const { side, align } = useMenuPositionerContext();
   const { transitionStatus } = useMenuTransitionContext() ?? { transitionStatus: undefined };
 
-  const open = store.useState('open');
-  const triggerWidth = store.useState('triggerWidth');
-  const triggerHeight = store.useState('triggerHeight');
+  const open = useStoreState(store, 'open');
+  const triggerWidth = useStoreState(store, 'triggerWidth');
+  const triggerHeight = useStoreState(store, 'triggerHeight');
 
   const state: MenuPopupState = {
     open,

@@ -14,6 +14,7 @@ import type { SelectStore } from '../store/SelectStore';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A button that opens the select popup, and the element it is positioned against.
@@ -54,11 +55,11 @@ export function SelectTrigger<Payload = unknown>(componentProps: SelectTrigger.P
   // and messages attach here rather than to the root.
   const { fieldProps } = useFieldControlRegistration();
 
-  const open = store.useState('open');
-  const rootDisabled = store.useState('disabled');
-  const readOnly = store.useState('readOnly');
-  const required = store.useState('required');
-  const labelId = store.useState('labelId');
+  const open = useStoreState(store, 'open');
+  const rootDisabled = useStoreState(store, 'disabled');
+  const readOnly = useStoreState(store, 'readOnly');
+  const required = useStoreState(store, 'required');
+  const labelId = useStoreState(store, 'labelId');
 
   const disabled = rootDisabled || disabledProp;
 

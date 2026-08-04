@@ -1,5 +1,3 @@
-import { useStore } from './useStore';
-
 type Listener<T> = (state: T) => void;
 
 /**
@@ -10,7 +8,7 @@ export class Store<State> {
   /**
    * The current state of the store.
    * This property is updated immediately when the state changes as a result of calling {@link setState}, {@link update}, or {@link set}.
-   * To subscribe to state changes, use the {@link useState} method. The value returned by {@link useState} is updated after the component renders (similarly to React's useState).
+   * To subscribe to state changes, use the `useStoreState` hook. The value it returns is updated after the component renders (similarly to React's useState).
    * The values can be used directly (to avoid subscribing to the store) in effects or event handlers.
    *
    * Do not modify properties in state directly. Instead, use the provided methods to ensure proper state management and listener notification.
@@ -106,18 +104,6 @@ export class Store<State> {
     this.setState(newState);
   }
 
-  use<F extends (...args: any) => any>(selector: F, ...args: SelectorArgs<F>): ReturnType<F>;
-
-  use(selector: any, a1?: unknown, a2?: unknown, a3?: unknown) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useStore(this, selector, a1, a2, a3);
-  }
 }
 
 export type ReadonlyStore<State> = Pick<Store<State>, 'getSnapshot' | 'subscribe' | 'state'>;
-
-type SelectorArgs<Selector> = Selector extends (...params: infer Params) => any
-  ? Tail<Params>
-  : never;
-
-type Tail<T extends readonly any[]> = T extends readonly [any, ...infer Rest] ? Rest : [];

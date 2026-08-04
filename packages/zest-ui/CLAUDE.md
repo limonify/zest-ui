@@ -90,11 +90,30 @@ const selectors = {
 Root component wiring:
 
 ```tsx
+import {
+  useControlledProp,
+  useContextCallback,
+  useSyncedValues,
+  useStoreState,
+} from '../../store/ReactStore';
+
 const store = useRefWithInit(() => new DialogStore({ open: defaultOpen, openProp: open, ... })).current;
-store.useControlledProp('openProp', open);
-store.useContextCallback('onOpenChange', onOpenChange);
-store.useSyncedValues({ disablePointerDismissal });
+useControlledProp(store, 'openProp', open);
+useContextCallback(store, 'onOpenChange', onOpenChange);
+useSyncedValues(store, { disablePointerDismissal });
+
+// ...and in every part that reads state:
+const open = useStoreState(store, 'open');
 ```
+
+**The store's React glue is free functions taking the store first — not methods.** This is a
+deliberate divergence from Base UI, which hangs them off the class (`store.useState(...)`).
+A class body is not a render scope to any Rules-of-Hooks linter, so as methods every one of
+them reads as a hook called outside a component (13 errors, and an `eslint-disable` at the top
+of `ReactStore.ts` papering over them). As module-scope functions they are ordinary custom
+hooks. `select()` and `observe()` are *not* hooks and stay on the class. Note `useStoreState`
+is the renamed `store.useState` — it cannot be called `useState` because nearly every file
+also imports React's. Import from `store/ReactStore`, never the `store` barrel (bundle size).
 
 State changes fire through `createChangeEventDetails(REASONS.xxx, event)`; add the component's `ChangeEventReason` union next to its Root, reusing `REASONS` slugs (`trigger-press`, `outside-press`, `escape-key`, `close-press`, `imperative-action`, `none`). New reasons go into `src/utils/reason-parts.ts` / `reasons.ts`.
 

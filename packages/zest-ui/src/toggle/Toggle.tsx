@@ -44,18 +44,22 @@ export function Toggle<Value extends string = string>(componentProps: Toggle.Pro
 
   const disabled = (disabledProp || groupContext?.disabled) ?? false;
 
-  if (process.env.NODE_ENV !== 'production') {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useIsoLayoutEffect(() => {
-      if (groupContext && valueProp === undefined && groupContext.isValueInitialized) {
-        error(
-          'A `<Toggle>` component rendered in a `<ToggleGroup>` has no explicit `value` prop.',
-          'This will cause issues between the Toggle Group and Toggle values.',
-          'Provide the `<Toggle>` with a `value` prop matching the `<ToggleGroup>` values prop type.',
-        );
-      }
-    }, [groupContext, valueProp, groupContext?.isValueInitialized]);
-  }
+  // The warning is development-only, but its hook is called unconditionally so that the Hook
+  // order stays identical on every render. The `process.env.NODE_ENV` guard lives inside the
+  // effect body instead of around the hook call.
+  useIsoLayoutEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      return;
+    }
+
+    if (groupContext && valueProp === undefined && groupContext.isValueInitialized) {
+      error(
+        'A `<Toggle>` component rendered in a `<ToggleGroup>` has no explicit `value` prop.',
+        'This will cause issues between the Toggle Group and Toggle values.',
+        'Provide the `<Toggle>` with a `value` prop matching the `<ToggleGroup>` values prop type.',
+      );
+    }
+  }, [groupContext, valueProp, groupContext?.isValueInitialized]);
 
   const [pressed, setPressedState] = useControlled({
     controlled: groupContext ? value !== undefined && groupValue.indexOf(value) > -1 : pressedProp,

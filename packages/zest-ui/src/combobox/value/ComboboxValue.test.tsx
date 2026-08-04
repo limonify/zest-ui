@@ -57,7 +57,11 @@ describe('Combobox.Value', () => {
     await render(
       <Combobox.Root defaultInputValue="apple">
         <Combobox.Value
-          render={(props, state) => <Text {...props} testID="custom" children={`> ${state.value}`} />}
+          render={(props, state) => (
+            <Text {...props} testID="custom">
+              {`> ${state.value}`}
+            </Text>
+          )}
         />
       </Combobox.Root>,
     );

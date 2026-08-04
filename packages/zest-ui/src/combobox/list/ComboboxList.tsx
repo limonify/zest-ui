@@ -6,6 +6,7 @@ import { useComboboxItemsContext } from '../root/ComboboxItemsContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ComboboxItem } from '../store/ComboboxStore';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * Renders the filtered items through a render function.
@@ -21,7 +22,7 @@ export function ComboboxList(componentProps: ComboboxList.Props) {
   const store = useComboboxRootContext();
   const { filteredItems } = useComboboxItemsContext();
 
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const state: ComboboxListState = { open, empty: filteredItems.length === 0 };
 

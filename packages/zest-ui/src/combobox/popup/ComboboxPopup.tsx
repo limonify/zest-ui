@@ -8,6 +8,7 @@ import { CompositeList } from '../../internals/composite/list/CompositeList';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A container for the filtered list.
@@ -20,9 +21,9 @@ export function ComboboxPopup(componentProps: ComboboxPopup.Props) {
   const { side, align } = useComboboxPositionerContext();
   const { transitionStatus } = useComboboxTransitionContext() ?? { transitionStatus: undefined };
 
-  const open = store.useState('open');
-  const triggerWidth = store.useState('triggerWidth');
-  const triggerHeight = store.useState('triggerHeight');
+  const open = useStoreState(store, 'open');
+  const triggerWidth = useStoreState(store, 'triggerWidth');
+  const triggerHeight = useStoreState(store, 'triggerHeight');
 
   const state: ComboboxPopupState = {
     open,

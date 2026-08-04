@@ -1,7 +1,13 @@
 import * as React from 'react';
 import { Text } from 'react-native';
 import { act, render, screen } from '@testing-library/react-native';
-import { ReactStore } from './ReactStore';
+import {
+  ReactStore,
+  useContextCallback,
+  useControlledProp,
+  useStoreState,
+  useSyncedValueWithCleanup,
+} from './ReactStore';
 import { createSelector } from './createSelector';
 import { useRefWithInit } from '../hooks/useRefWithInit';
 
@@ -42,7 +48,7 @@ describe('ReactStore', () => {
 
     function Test({ controlled }: { controlled: number | undefined }) {
       store = useStableStore<TestState>({ value: 0, label: '' });
-      store.useControlledProp('value', controlled);
+      useControlledProp(store, 'value', controlled);
       return null;
     }
 
@@ -59,7 +65,7 @@ describe('ReactStore', () => {
 
     function Value() {
       renders += 1;
-      const value = store.useState('value');
+      const value = useStoreState(store, 'value');
       return <Text>{`value:${value}`}</Text>;
     }
 
@@ -93,7 +99,7 @@ describe('ReactStore', () => {
     const store = new ReactStore<State>({ id: undefined });
 
     function Test({ id }: { id: string }) {
-      store.useSyncedValueWithCleanup('id', id);
+      useSyncedValueWithCleanup(store, 'id', id);
       return null;
     }
 
@@ -112,7 +118,7 @@ describe('ReactStore', () => {
       store = useRefWithInit(
         () => new ReactStore<TestState, Context>({ value: 0, label: '' }, { onChange: undefined }),
       ).current;
-      store.useContextCallback('onChange', onChange);
+      useContextCallback(store, 'onChange', onChange);
       return null;
     }
 

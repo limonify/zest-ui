@@ -12,6 +12,7 @@ import { TooltipPortalContext } from './TooltipPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ZestPortalModalProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A portal element that moves the tooltip to the top of the app.
@@ -27,7 +28,7 @@ export function TooltipPortal(props: TooltipPortal.Props) {
   const { children, keepMounted = false, modalProps } = props;
 
   const store = useTooltipRootContext();
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const shouldRender = open || keepMounted;
   if (!shouldRender) {

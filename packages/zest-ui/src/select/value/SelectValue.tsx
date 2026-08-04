@@ -4,6 +4,7 @@ import { useSelectRootContext } from '../root/SelectRootContext';
 import { resolveSelectLabel } from '../store/SelectStore';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * The label of the currently selected item.
@@ -22,10 +23,10 @@ export function SelectValue(componentProps: SelectValue.Props) {
   const { render, className, style, children, ref, ...elementProps } = componentProps;
 
   const store = useSelectRootContext();
-  const value = store.useState('value');
-  const labelsByValue = store.useState('labelsByValue');
-  const items = store.useState('items');
-  const multiple = store.useState('multiple');
+  const value = useStoreState(store, 'value');
+  const labelsByValue = useStoreState(store, 'labelsByValue');
+  const items = useStoreState(store, 'items');
+  const multiple = useStoreState(store, 'multiple');
 
   const labels =
     multiple && Array.isArray(value)

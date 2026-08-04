@@ -7,6 +7,7 @@ import { useMergedRefs } from '../../hooks/useMergedRefs';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * The element the tooltip describes, and the element it is positioned against.
@@ -24,7 +25,7 @@ export function TooltipTrigger(componentProps: TooltipTrigger.Props) {
   } = componentProps;
 
   const store = useTooltipRootContext();
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const [pressed, setPressed] = React.useState(false);
 

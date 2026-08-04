@@ -53,7 +53,10 @@ export function MenuRadioItem<Value = any>(componentProps: MenuRadioItem.Props<V
 
   const { getButtonProps } = useButton({ disabled });
 
-  const state: MenuRadioItemState = { checked, disabled, pressed, index };
+  const state: MenuRadioItemState = React.useMemo(
+    () => ({ checked, disabled, pressed, index }),
+    [checked, disabled, pressed, index],
+  );
 
   const element = useRenderElement(Pressable, componentProps, {
     state,

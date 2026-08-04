@@ -1,6 +1,7 @@
 'use client';
 import { ScrollView } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { EMPTY_OBJECT } from '../../utils/empty';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -13,7 +14,7 @@ import type { ZestUIComponentProps } from '../../types';
 export function SelectList(componentProps: SelectList.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const state: SelectListState = {};
+  const state: SelectListState = EMPTY_OBJECT;
 
   return useRenderElement(ScrollView, componentProps, {
     state,

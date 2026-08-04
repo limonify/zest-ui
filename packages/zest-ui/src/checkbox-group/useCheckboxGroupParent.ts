@@ -38,16 +38,19 @@ export function useCheckboxGroupParent(
       checked,
       onCheckedChange(_, eventDetails) {
         const uncontrolledState = uncontrolledStateRef.current;
+        // Both filters below ask "is this value checked?" once per child, so the
+        // membership test is built once instead of rescanning the array each time.
+        const checkedValues = new Set(uncontrolledState);
 
         // None except the disabled ones that are checked, which can't be changed.
         const none = allValues.filter(
-          (v) => disabledStatesRef.current.get(v) && uncontrolledState.includes(v),
+          (v) => disabledStatesRef.current.get(v) && checkedValues.has(v),
         );
         // "All" that are valid:
         // - any that aren't disabled
         // - disabled ones that are checked
         const all = allValues.filter(
-          (v) => !disabledStatesRef.current.get(v) || uncontrolledState.includes(v),
+          (v) => !disabledStatesRef.current.get(v) || checkedValues.has(v),
         );
 
         const allOnOrOff = uncontrolledState.length === all.length || uncontrolledState.length === 0;

@@ -4,6 +4,7 @@ import { useSelectRootContext } from '../root/SelectRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
+import { EMPTY_OBJECT } from '../../utils/empty';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -22,7 +23,7 @@ export function SelectLabel(componentProps: SelectLabel.Props) {
     return () => store.set('labelId', undefined);
   }, [id, store]);
 
-  const state: SelectLabelState = {};
+  const state: SelectLabelState = EMPTY_OBJECT;
 
   return useRenderElement(Text, componentProps, {
     state,

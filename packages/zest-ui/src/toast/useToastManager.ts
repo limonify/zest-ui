@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import { useToastProviderContext } from './provider/ToastProviderContext';
+import { useStoreState } from '../store/ReactStore';
 
 /**
  * Returns the array of toasts and methods to manage them.
@@ -8,7 +9,7 @@ import { useToastProviderContext } from './provider/ToastProviderContext';
 export function useToastManager<Data extends object = any>(): UseToastManagerReturnValue<Data> {
   const store = useToastProviderContext();
 
-  const toasts = store.useState('toasts');
+  const toasts = useStoreState(store, 'toasts');
 
   return React.useMemo(
     () => ({

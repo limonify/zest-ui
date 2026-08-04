@@ -6,6 +6,7 @@ import { PopoverPortalContext } from './PopoverPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ZestPortalModalProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A portal element that moves the popup to the top of the app.
@@ -22,7 +23,7 @@ export function PopoverPortal(props: PopoverPortal.Props) {
   const { children, keepMounted = false, modalProps } = props;
 
   const store = usePopoverRootContext();
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const shouldRender = open || keepMounted;
   if (!shouldRender) {

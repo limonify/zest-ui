@@ -4,6 +4,7 @@ import { usePopoverRootContext } from '../root/PopoverRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
 import type { ZestUIComponentProps } from '../../types';
+import { useSyncedValueWithCleanup } from '../../store/ReactStore';
 
 /**
  * A heading that labels the popover.
@@ -16,7 +17,7 @@ export function PopoverTitle(componentProps: PopoverTitle.Props) {
 
   const id = useId(idProp ?? undefined);
 
-  store.useSyncedValueWithCleanup('titleElementId', id);
+  useSyncedValueWithCleanup(store, 'titleElementId', id);
 
   return useRenderElement(Text, componentProps, {
     ref,

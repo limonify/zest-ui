@@ -13,6 +13,7 @@ import type { PopoverStore } from '../store/PopoverStore';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A button that opens the popover, and the element it is positioned against.
@@ -45,7 +46,7 @@ export function PopoverTrigger<Payload = unknown>(componentProps: PopoverTrigger
   }
 
   const id = useId(idProp ?? undefined);
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const [pressed, setPressed] = React.useState(false);
 

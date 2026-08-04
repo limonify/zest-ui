@@ -11,6 +11,7 @@ import type { SelectHandle } from '../store/SelectHandle';
 import { SelectStore, type SelectItems } from '../store/SelectStore';
 import { SelectRootContext } from './SelectRootContext';
 import { SelectTransitionContext } from './SelectTransitionContext';
+import { useContextCallback, useControlledProp, useStoreState, useSyncedValues } from '../../store/ReactStore';
 
 /**
  * Groups all parts of the select.
@@ -95,12 +96,12 @@ export function SelectRoot<Value = any, Payload = unknown>(
     },
   );
 
-  store.useControlledProp('openProp', open);
-  store.useControlledProp('valueProp', value);
-  store.useControlledProp('triggerIdProp', triggerId);
-  store.useContextCallback('onOpenChange', handleOpenChange);
-  store.useContextCallback('onValueChange', handleValueChange);
-  store.useSyncedValues({
+  useControlledProp(store, 'openProp', open);
+  useControlledProp(store, 'valueProp', value);
+  useControlledProp(store, 'triggerIdProp', triggerId);
+  useContextCallback(store, 'onOpenChange', handleOpenChange);
+  useContextCallback(store, 'onValueChange', handleValueChange);
+  useSyncedValues(store, {
     disabled,
     readOnly,
     required,
@@ -111,10 +112,10 @@ export function SelectRoot<Value = any, Payload = unknown>(
 
   usePopupRootHandle({ store, handle, actionsRef });
 
-  const resolvedOpen = store.useState('open');
+  const resolvedOpen = useStoreState(store, 'open');
   const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
 
-  const payload = store.useState('payload') as Payload;
+  const payload = useStoreState(store, 'payload') as Payload;
 
   const transitionContextValue = React.useMemo(
     () => ({ transitionStatus }),

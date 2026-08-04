@@ -2,6 +2,7 @@
 import { Text } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useSelectGroupContext } from '../group/SelectGroupContext';
+import { EMPTY_OBJECT } from '../../utils/empty';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -13,7 +14,7 @@ export function SelectGroupLabel(componentProps: SelectGroupLabel.Props) {
 
   const { labelId } = useSelectGroupContext();
 
-  const state: SelectGroupLabelState = {};
+  const state: SelectGroupLabelState = EMPTY_OBJECT;
 
   return useRenderElement(Text, componentProps, {
     state,

@@ -6,6 +6,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A positioning container for the dialog popup.
@@ -19,7 +20,7 @@ export function DialogViewport(componentProps: DialogViewport.Props) {
   const keepMounted = useDialogPortalContext();
   const store = useDialogRootContext();
 
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const state: DialogViewportState = { open };
 

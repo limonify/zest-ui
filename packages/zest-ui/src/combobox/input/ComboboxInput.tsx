@@ -12,6 +12,7 @@ import { REASONS } from '../../utils/reasons';
 import type { ComboboxHandle } from '../store/ComboboxHandle';
 import type { ComboboxStore } from '../store/ComboboxStore';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * The text input that filters the list, and the element the popup is anchored to.
@@ -47,11 +48,11 @@ export function ComboboxInput<Payload = unknown>(componentProps: ComboboxInput.P
 
   const id = useId(idProp ?? undefined);
 
-  const open = store.useState('open');
-  const disabled = store.useState('disabled');
-  const inputValue = store.useState('inputValue');
-  const openOnFocus = store.useState('openOnFocus');
-  const update = store.useState('update');
+  const open = useStoreState(store, 'open');
+  const disabled = useStoreState(store, 'disabled');
+  const inputValue = useStoreState(store, 'inputValue');
+  const openOnFocus = useStoreState(store, 'openOnFocus');
+  const update = useStoreState(store, 'update');
 
   const internalRef = React.useRef<TextInput>(null);
 

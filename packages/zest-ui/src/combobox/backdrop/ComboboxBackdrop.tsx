@@ -5,6 +5,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A full-screen surface that dismisses the list on an outside press.
@@ -14,7 +15,7 @@ export function ComboboxBackdrop(componentProps: ComboboxBackdrop.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
   const store = useComboboxRootContext();
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const state: ComboboxBackdropState = { open };
 

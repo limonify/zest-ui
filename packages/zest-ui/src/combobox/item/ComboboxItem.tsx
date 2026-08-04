@@ -8,6 +8,7 @@ import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ComboboxItem as ComboboxItemData } from '../store/ComboboxStore';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A selectable item in the list.
@@ -17,7 +18,7 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
   const { render, className, style, item, ref, ...elementProps } = componentProps;
 
   const store = useComboboxRootContext();
-  const selectedValue = store.useState('value');
+  const selectedValue = useStoreState(store, 'value');
 
   const { index, onLayout } = useCompositeListItem();
 

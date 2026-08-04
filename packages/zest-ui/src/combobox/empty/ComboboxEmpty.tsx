@@ -4,6 +4,7 @@ import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { useComboboxItemsContext } from '../root/ComboboxItemsContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * Shown when no items match the current query.
@@ -15,7 +16,7 @@ export function ComboboxEmpty(componentProps: ComboboxEmpty.Props) {
   const store = useComboboxRootContext();
   const { filteredItems } = useComboboxItemsContext();
 
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const state: ComboboxEmptyState = { open };
 

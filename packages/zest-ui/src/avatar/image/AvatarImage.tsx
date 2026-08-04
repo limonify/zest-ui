@@ -20,6 +20,24 @@ import type { ZestUIComponentProps } from '../../types';
  * doing through `imageLoadingStatus` on the state object. Hiding it until it has
  * loaded is therefore the consumer's call (and `transitionStatus` is published
  * for fading it in — see the animation contract).
+ *
+ * **Uses React Native's `Image`, which does not cache across mounts.** Remote
+ * avatars therefore refetch whenever this part remounts. zest cannot fix that
+ * for you: `expo-image` is a native module whose entry point runs
+ * `initObserveIntegrationIfNeeded()` **at import time**, and `src/index.ts`
+ * re-exports this file — so importing it here would drag expo-image into every
+ * consumer's bundle, including one that only ever renders a `Button`, and crash
+ * any app without expo-modules-core. Swap the element instead — the `render`
+ * prop replaces it wholesale, and every prop below is forwarded untouched:
+ *
+ * ```tsx
+ * import { Image as ExpoImage } from 'expo-image';
+ *
+ * <Avatar.Image source={{ uri }} render={<ExpoImage cachePolicy="memory-disk" />} />
+ * ```
+ *
+ * `expo-image` spells `resizeMode` as `contentFit`; the rest of the props used
+ * here (`source`, `onLoadStart`, `onLoad`, `onError`) carry over as-is.
  */
 export function AvatarImage(componentProps: AvatarImage.Props) {
   const { className, render, style, onLoadingStatusChange, ref, ...elementProps } = componentProps;

@@ -14,6 +14,7 @@ import {
 } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
 import { SelectPositionerContext } from './SelectPositionerContext';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * Positions the select popup against the trigger.
@@ -37,10 +38,10 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
 
   useSelectPortalContext();
   const store = useSelectRootContext();
-  const open = store.useState('open');
-  const triggerNode = store.useState('triggerNode');
-  const triggerWidth = store.useState('triggerWidth');
-  const triggerHeight = store.useState('triggerHeight');
+  const open = useStoreState(store, 'open');
+  const triggerNode = useStoreState(store, 'triggerNode');
+  const triggerWidth = useStoreState(store, 'triggerWidth');
+  const triggerHeight = useStoreState(store, 'triggerHeight');
 
   const positioning = useAnchorPositioning({
     align,

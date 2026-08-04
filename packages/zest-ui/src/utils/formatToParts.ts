@@ -15,6 +15,8 @@
 // suffixes, or the `literal` placement of a real implementation. Where the engine
 // has the real method, that is what runs.
 
+import { getFormatter } from './formatNumber';
+
 /**
  * Digits in every numbering system `Intl.NumberFormat` emits here — ASCII,
  * Arabic-Indic, Persian, fullwidth and Han. Kept in step with `parse.ts`'s own
@@ -74,7 +76,9 @@ function separatorsOf(formatter: Intl.NumberFormat): { group?: string; decimal?:
     return cached;
   }
 
-  const text = new Intl.NumberFormat(locale, {
+  // Reuses the shared module-scope formatter cache rather than constructing a
+  // throwaway one: building an `Intl.NumberFormat` loads the locale data tables.
+  const text = getFormatter(locale, {
     numberingSystem,
     useGrouping: true,
     minimumFractionDigits: 1,
@@ -84,9 +88,13 @@ function separatorsOf(formatter: Intl.NumberFormat): { group?: string; decimal?:
   const runs = toRuns(text);
   // Only separators BETWEEN two digit runs count; a leading currency symbol or a
   // trailing unit is not one.
-  const between = runs
-    .filter((run, index) => !run.digits && runs[index - 1]?.digits && runs[index + 1]?.digits)
-    .map((run) => run.value);
+  const between: string[] = [];
+  for (let index = 0; index < runs.length; index += 1) {
+    const run = runs[index];
+    if (!run.digits && runs[index - 1]?.digits && runs[index + 1]?.digits) {
+      between.push(run.value);
+    }
+  }
 
   // Grouping first, decimal last. A locale that declines to group five digits
   // yields one separator, and it is the decimal.

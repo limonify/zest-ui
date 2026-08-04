@@ -104,7 +104,7 @@ export function CheckboxSection() {
  * `transitionStatus` on the panel state for consumers who want to drive a height
  * animation themselves — see the Collapsible docs.
  */
-export function AnimatedPanel(props: { style?: unknown; children?: React.ReactNode }) {
+function AnimatedPanel(props: { style?: unknown; children?: React.ReactNode }) {
   const { style, children, ...rest } = props;
   // A lazy `useState` initializer rather than `useRef(...).current`: the value is
   // read during render (it goes into `style`), which `react-hooks/refs` forbids
@@ -127,7 +127,7 @@ export function AnimatedPanel(props: { style?: unknown; children?: React.ReactNo
  * tab's measured position and size on its state — the counterpart of the web
  * version's `--active-tab-*` CSS variables — and the consumer animates it.
  */
-export function TabsIndicatorBar(props: {
+function TabsIndicatorBar(props: {
   left: number;
   width: number;
   style?: unknown;
@@ -249,7 +249,7 @@ export function AccordionSection() {
   );
 }
 
-export const COLORS = ['red', 'green', 'blue'];
+const COLORS = ['red', 'green', 'blue'];
 
 export function CheckboxGroupSection() {
   const [value, setValue] = React.useState<string[]>(['red']);
@@ -651,7 +651,7 @@ export function MenuSection() {
   );
 }
 
-export const FRUITS = [
+const FRUITS = [
   { value: 'apple', label: 'Apple' },
   { value: 'banana', label: 'Banana' },
   { value: 'cherry', label: 'Cherry' },
@@ -697,7 +697,7 @@ export function ContextMenuSection() {
   );
 }
 
-export const COUNTRIES = [
+const COUNTRIES = [
   'Argentina', 'Australia', 'Austria', 'Belgium', 'Brazil', 'Canada', 'Chile', 'Denmark',
   'Egypt', 'Finland', 'France', 'Germany', 'Greece', 'Iceland', 'India', 'Ireland', 'Italy',
   'Japan', 'Mexico', 'Netherlands', 'Norway', 'Portugal', 'Spain', 'Sweden', 'Turkey',
@@ -928,7 +928,7 @@ export function MultiSelectSection() {
  * A handle is what lets a trigger live outside its root — there is no context
  * reaching across — and lets anything else open the dialog imperatively.
  */
-export const confirmDialog = createDialogHandle<{ file: string }>();
+const confirmDialog = createDialogHandle<{ file: string }>();
 
 export function HandleSection() {
   return (
@@ -1268,7 +1268,7 @@ export function ToastSection() {
   );
 }
 
-export function ToastButtons() {
+function ToastButtons() {
   const { add, promise } = Toast.useToastManager();
 
   return (

@@ -4,6 +4,7 @@ import { useDialogRootContext } from '../root/DialogRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
 import type { ZestUIComponentProps } from '../../types';
+import { useSyncedValueWithCleanup } from '../../store/ReactStore';
 
 /**
  * A paragraph with additional information about the dialog.
@@ -16,7 +17,7 @@ export function DialogDescription(componentProps: DialogDescription.Props) {
 
   const id = useId(idProp ?? undefined);
 
-  store.useSyncedValueWithCleanup('descriptionElementId', id);
+  useSyncedValueWithCleanup(store, 'descriptionElementId', id);
 
   return useRenderElement(Text, componentProps, {
     ref,

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import Image from 'next/image';
 
 /**
  * A slot for a component demo. On React Native there is no live web preview
@@ -10,8 +11,16 @@ export function Demo({ src, alt, children }: { src?: string; alt?: string; child
   return (
     <div className="not-prose my-6 overflow-hidden rounded-xl border border-fd-border bg-fd-muted">
       {src ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt={alt ?? ''} className="mx-auto block w-full max-w-sm" />
+        // `width`/`height` are the intrinsic-size hint Next needs; the real GIF keeps its own
+        // aspect ratio because `h-auto` overrides the emitted height. The site is a static
+        // export with `images.unoptimized`, so this is a plain `<img>` plus lazy loading.
+        <Image
+          src={src}
+          alt={alt ?? ''}
+          width={384}
+          height={384}
+          className="mx-auto block h-auto w-full max-w-sm"
+        />
       ) : (
         <div className="flex min-h-52 flex-col items-center justify-center gap-2 p-8 text-center">
           <div

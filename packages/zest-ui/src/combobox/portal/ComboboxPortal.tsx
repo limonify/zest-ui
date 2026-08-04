@@ -6,6 +6,7 @@ import { ComboboxPortalContext } from './ComboboxPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ZestPortalModalProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * Moves the popup to the top of the app, as an RN `Modal` like the rest of the
@@ -15,7 +16,7 @@ export function ComboboxPortal(props: ComboboxPortal.Props) {
   const { children, keepMounted = false, modalProps } = props;
 
   const store = useComboboxRootContext();
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const shouldRender = open || keepMounted;
   if (!shouldRender) {

@@ -7,6 +7,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * A container for the popover contents.
@@ -19,11 +20,11 @@ export function PopoverPopup(componentProps: PopoverPopup.Props) {
   const { side, align } = usePopoverPositionerContext();
   const { transitionStatus } = usePopoverTransitionContext() ?? { transitionStatus: undefined };
 
-  const open = store.useState('open');
-  const triggerWidth = store.useState('triggerWidth');
-  const triggerHeight = store.useState('triggerHeight');
-  const titleElementId = store.useState('titleElementId');
-  const descriptionElementId = store.useState('descriptionElementId');
+  const open = useStoreState(store, 'open');
+  const triggerWidth = useStoreState(store, 'triggerWidth');
+  const triggerHeight = useStoreState(store, 'triggerHeight');
+  const titleElementId = useStoreState(store, 'titleElementId');
+  const descriptionElementId = useStoreState(store, 'descriptionElementId');
 
   const state: PopoverPopupState = {
     open,

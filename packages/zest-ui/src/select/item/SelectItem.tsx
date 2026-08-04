@@ -10,6 +10,7 @@ import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { isSelectValueSelected, toggleSelectValue } from '../store/SelectStore';
 import { SelectItemContext } from './SelectItemContext';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * An individual option in the select.
@@ -27,9 +28,9 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
   } = componentProps;
 
   const store = useSelectRootContext();
-  const selectedValue = store.useState('value');
-  const readOnly = store.useState('readOnly');
-  const multiple = store.useState('multiple');
+  const selectedValue = useStoreState(store, 'value');
+  const readOnly = useStoreState(store, 'readOnly');
+  const multiple = useStoreState(store, 'multiple');
 
   const { index, onLayout } = useCompositeListItem();
 

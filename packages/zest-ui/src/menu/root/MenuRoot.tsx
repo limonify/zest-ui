@@ -9,6 +9,7 @@ import { MenuStore } from '../store/MenuStore';
 import type { MenuHandle } from '../store/MenuHandle';
 import { MenuRootContext } from './MenuRootContext';
 import { MenuTransitionContext } from './MenuTransitionContext';
+import { useContextCallback, useControlledProp, useStoreState, useSyncedValues } from '../../store/ReactStore';
 
 /**
  * Groups all parts of the menu.
@@ -44,17 +45,17 @@ export function MenuRoot<Payload = unknown>(props: MenuRoot.Props<Payload>) {
       }),
   ).current;
 
-  store.useControlledProp('openProp', open);
-  store.useControlledProp('triggerIdProp', triggerId);
-  store.useContextCallback('onOpenChange', onOpenChange);
-  store.useSyncedValues({ disablePointerDismissal });
+  useControlledProp(store, 'openProp', open);
+  useControlledProp(store, 'triggerIdProp', triggerId);
+  useContextCallback(store, 'onOpenChange', onOpenChange);
+  useSyncedValues(store, { disablePointerDismissal });
 
   usePopupRootHandle({ store, handle, actionsRef });
 
-  const resolvedOpen = store.useState('open');
+  const resolvedOpen = useStoreState(store, 'open');
   const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
 
-  const payload = store.useState('payload') as Payload;
+  const payload = useStoreState(store, 'payload') as Payload;
 
   const transitionContextValue = React.useMemo(
     () => ({ transitionStatus }),

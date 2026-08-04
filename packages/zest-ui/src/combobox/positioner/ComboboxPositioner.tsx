@@ -14,6 +14,7 @@ import {
   type UseAnchorPositioningSharedParameters,
 } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * Positions the list against the input.
@@ -38,10 +39,10 @@ export function ComboboxPositioner(componentProps: ComboboxPositioner.Props) {
   useComboboxPortalContext();
   const store = useComboboxRootContext();
 
-  const open = store.useState('open');
-  const triggerNode = store.useState('triggerNode');
-  const triggerWidth = store.useState('triggerWidth');
-  const triggerHeight = store.useState('triggerHeight');
+  const open = useStoreState(store, 'open');
+  const triggerNode = useStoreState(store, 'triggerNode');
+  const triggerWidth = useStoreState(store, 'triggerWidth');
+  const triggerHeight = useStoreState(store, 'triggerHeight');
 
   const positioning = useAnchorPositioning({
     align,

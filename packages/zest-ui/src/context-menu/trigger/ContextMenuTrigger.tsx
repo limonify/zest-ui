@@ -6,6 +6,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { useStoreState } from '../../store/ReactStore';
 
 /**
  * The area that opens the context menu when long-pressed.
@@ -20,7 +21,7 @@ export function ContextMenuTrigger(componentProps: ContextMenuTrigger.Props) {
   const store = useMenuRootContext();
   const { setAnchor } = useContextMenuRootContext();
 
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
 
   const state: ContextMenuTriggerState = { open };
 

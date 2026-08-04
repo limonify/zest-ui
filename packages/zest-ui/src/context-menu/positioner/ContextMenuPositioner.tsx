@@ -8,6 +8,7 @@ import { useContextMenuRootContext } from '../root/ContextMenuRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { Align, Side } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
+import { useStoreState } from '../../store/ReactStore';
 
 const NO_ARROW = { current: null };
 
@@ -36,7 +37,7 @@ export function ContextMenuPositioner(componentProps: ContextMenuPositioner.Prop
   const store = useMenuRootContext();
   const { anchor } = useContextMenuRootContext();
 
-  const open = store.useState('open');
+  const open = useStoreState(store, 'open');
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
   // The popup's own size, which only exists after it has been laid out. Until
