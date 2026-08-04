@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write # commit the version bump back to main
   id-token: write # npm provenance
+  packages: write # push @limonify/zest-ui to GitHub Packages
 
 concurrency:
   group: release-${{ github.ref }}
