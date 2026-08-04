@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   publish:
-    name: Publish @limonify/zest-ui to npm
+    name: Publish @limonify/zest-ui to npm + GitHub Packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,6 +23,39 @@ jobs:
           # Needed so the version-bump commit can push to main after a tag release.
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Guard against re-publishing an existing version
+        # Both registries reject a publish whose version already exists. Fail
+        # early (before the version-bump commit) when the release tag is not
+        # strictly newer than the latest version published on npm.
+        run: |
+          set -euo pipefail
+
+          if [ "${GITHUB_EVENT_NAME}" = "release" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            # Manual dispatch has no tag — use the version in the manifest.
+            VERSION="$(node -p "require('./packages/zest-ui/package.json').version")"
+          fi
+
+          LATEST="$(npm view @limonify/zest-ui version 2>/dev/null || true)"
+          if [ -z "${LATEST}" ]; then
+            echo "No published version on npm yet — will publish ${VERSION}"
+            exit 0
+          fi
+
+          if [ "${VERSION}" = "${LATEST}" ]; then
+            echo "::error::Release ${VERSION} is already published on npm (latest: ${LATEST}); refusing to publish."
+            exit 1
+          fi
+
+          LOWER="$(printf '%s\n%s\n' "${VERSION}" "${LATEST}" | sort -V | head -n1)"
+          if [ "${LOWER}" = "${VERSION}" ]; then
+            echo "::error::Release ${VERSION} is older than the latest published version (${LATEST}); refusing to publish."
+            exit 1
+          fi
+
+          echo "Publishing ${VERSION} (latest published: ${LATEST})"
 
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
