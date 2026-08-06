@@ -15,6 +15,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/docs/node_modules ./apps/docs/node_modules
 COPY package.json bun.lock ./
+COPY CHANGELOG.md ./
 COPY packages/zest-ui ./packages/zest-ui
 COPY apps/docs ./apps/docs
 WORKDIR /app/apps/docs
