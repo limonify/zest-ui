@@ -5,6 +5,7 @@ import {
   defaultItemEquality,
   type ItemEqualityComparer,
 } from '../../internals/itemEquality';
+import { isValueSelected } from '../../utils/selection';
 import { PopupTriggerMap } from '../../utils/popups/PopupTriggerMap';
 import type { SelectRoot } from '../root/SelectRoot';
 
@@ -143,6 +144,21 @@ const selectors = {
   items: createSelector((state: State) => state.items),
   multiple: createSelector((state: State) => state.multiple),
   isItemEqualToValue: createSelector((state: State) => state.isItemEqualToValue),
+  /**
+   * Whether one item's value is selected.
+   *
+   * Items subscribe to this boolean rather than to the whole selection, so
+   * choosing one row in a long list re-renders only the rows whose answer
+   * actually changed — not every row. `useSyncExternalStore` bails out on an
+   * unchanged value, which is what makes that work.
+   */
+  isSelected: createSelector(
+    (state: State) => (state.valueProp !== undefined ? state.valueProp : state.value),
+    (state: State) => state.multiple,
+    (state: State) => state.isItemEqualToValue,
+    (value: unknown, multiple: boolean, comparer: ItemEqualityComparer, itemValue: unknown) =>
+      isValueSelected(value, itemValue, multiple, comparer),
+  ),
   disabled: createSelector((state: State) => state.disabled),
   readOnly: createSelector((state: State) => state.readOnly),
   required: createSelector((state: State) => state.required),

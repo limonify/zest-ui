@@ -8,7 +8,7 @@ import { useCompositeListItem } from '../../internals/composite/list/useComposit
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
-import { isValueSelected, toggleSelectedValue } from '../../utils/selection';
+import { toggleSelectedValue } from '../../utils/selection';
 import { SelectItemContext } from './SelectItemContext';
 import { useStoreState } from '../../store/ReactStore';
 
@@ -28,10 +28,11 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
   } = componentProps;
 
   const store = useSelectRootContext();
-  const selectedValue = useStoreState(store, 'value');
   const readOnly = useStoreState(store, 'readOnly');
-  const multiple = useStoreState(store, 'multiple');
-  const isItemEqualToValue = useStoreState(store, 'isItemEqualToValue');
+
+  // Subscribing to the boolean, not to the whole selection: choosing one row in
+  // a long list then re-renders only the rows whose answer changed.
+  const selected = useStoreState(store, 'isSelected', value);
 
   const { index, onLayout } = useCompositeListItem();
 
@@ -39,7 +40,6 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
 
   const { getButtonProps } = useButton({ disabled });
 
-  const selected = isValueSelected(selectedValue, value, multiple, isItemEqualToValue);
 
   const state: SelectItemState = React.useMemo(
     () => ({ disabled, pressed, selected, index }),
@@ -67,8 +67,15 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
           // also stops the popup from closing.
           const eventDetails = createChangeEventDetails(REASONS.itemPress, event);
 
+          // Read at press time rather than subscribing: an item does not need to
+          // re-render when a *different* row's selection changes.
           store.setValue(
-            toggleSelectedValue(selectedValue, value, multiple, isItemEqualToValue),
+            toggleSelectedValue(
+              store.select('value'),
+              value,
+              store.select('multiple'),
+              store.select('isItemEqualToValue'),
+            ),
             eventDetails,
           );
 
@@ -78,7 +85,7 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
 
           // Picking one of many is rarely the end of the interaction, so a
           // multiple select stays open until it is dismissed.
-          if (!multiple) {
+          if (!store.select('multiple')) {
             store.setOpen(false, eventDetails);
           }
         },

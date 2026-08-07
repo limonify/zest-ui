@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import type { ComboboxEntry, ComboboxItem } from '../store/ComboboxStore';
+import type { ComboboxEntry } from '../store/ComboboxStore';
 
 export interface ComboboxItemsContext {
   /**
@@ -12,11 +12,6 @@ export interface ComboboxItemsContext {
    * How many selectable items survived filtering, with groups flattened away.
    */
   filteredItemCount: number;
-  /**
-   * The selected value(s), resolved to items. Empty when nothing is selected,
-   * and at most one entry unless the combobox is `multiple`.
-   */
-  selectedItems: ComboboxItem[];
 }
 
 /**

@@ -6,7 +6,6 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
-import { isValueSelected } from '../../utils/selection';
 import type { ComboboxItem as ComboboxItemData } from '../store/ComboboxStore';
 import { ComboboxItemContext } from './ComboboxItemContext';
 import type { ZestUIComponentProps } from '../../types';
@@ -28,17 +27,17 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
   } = componentProps;
 
   const store = useComboboxRootContext();
-  const selectedValue = useStoreState(store, 'value');
-  const multiple = useStoreState(store, 'multiple');
   const rootDisabled = useStoreState(store, 'disabled');
 
+  // Subscribing to the boolean, not to the whole selection: choosing one row in
+  // a long list then re-renders only the rows whose answer changed.
+  const selected = useStoreState(store, 'isSelected', item.value);
+
   const disabled = disabledProp || rootDisabled;
-  const isItemEqualToValue = useStoreState(store, 'isItemEqualToValue');
 
   const { index, onLayout } = useCompositeListItem();
 
   const [pressed, setPressed] = React.useState(false);
-  const selected = isValueSelected(selectedValue, item.value, multiple, isItemEqualToValue);
 
   const state: ComboboxItemState = React.useMemo(
     () => ({ disabled, selected, pressed, index }),

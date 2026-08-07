@@ -25,6 +25,7 @@ import {
 } from '../store/ComboboxStore';
 import type { ComboboxRoot } from './ComboboxRoot';
 import { ComboboxItemsContext } from './ComboboxItemsContext';
+import { ComboboxSelectionContext } from './ComboboxSelectionContext';
 import { ComboboxRootContext } from './ComboboxRootContext';
 import { ComboboxTransitionContext } from './ComboboxTransitionContext';
 import { useContextCallback, useControlledProp, useStoreState, useSyncedValues } from '../../store/ReactStore';
@@ -302,9 +303,13 @@ export function useRenderComboboxRoot<Payload = unknown>(
   const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
 
   const itemsContextValue = React.useMemo(
-    () => ({ filteredItems, filteredItemCount, selectedItems }),
-    [filteredItems, filteredItemCount, selectedItems],
+    () => ({ filteredItems, filteredItemCount }),
+    [filteredItems, filteredItemCount],
   );
+
+  // Kept apart from the filtered items: they change for different reasons, and
+  // sharing one context would re-render the whole list on every selection.
+  const selectionContextValue = React.useMemo(() => ({ selectedItems }), [selectedItems]);
   const transitionContextValue = React.useMemo(() => ({ transitionStatus }), [transitionStatus]);
 
   const payload = useStoreState(store, 'payload') as Payload;
@@ -312,9 +317,11 @@ export function useRenderComboboxRoot<Payload = unknown>(
   return (
     <ComboboxRootContext.Provider value={store}>
       <ComboboxItemsContext.Provider value={itemsContextValue}>
+        <ComboboxSelectionContext.Provider value={selectionContextValue}>
         <ComboboxTransitionContext.Provider value={transitionContextValue}>
           {typeof children === 'function' ? children(payload) : children}
         </ComboboxTransitionContext.Provider>
+        </ComboboxSelectionContext.Provider>
       </ComboboxItemsContext.Provider>
     </ComboboxRootContext.Provider>
   );

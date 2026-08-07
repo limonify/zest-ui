@@ -1,6 +1,6 @@
 'use client';
 import { View } from 'react-native';
-import { useComboboxItemsContext } from '../root/ComboboxItemsContext';
+import { useComboboxSelectionContext } from '../root/ComboboxSelectionContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { CompositeList } from '../../internals/composite/list/CompositeList';
 import type { ZestUIComponentProps } from '../../types';
@@ -27,7 +27,7 @@ import type { ZestUIComponentProps } from '../../types';
 export function ComboboxChips(componentProps: ComboboxChips.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const { selectedItems } = useComboboxItemsContext();
+  const { selectedItems } = useComboboxSelectionContext();
 
   const empty = selectedItems.length === 0;
 

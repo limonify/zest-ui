@@ -4,17 +4,15 @@ import { act, render, screen } from '@testing-library/react-native';
 import { Select } from '../index';
 
 /**
- * `isItemEqualToValue` is synced into the store, and every item subscribes to it.
- * A comparer written inline is a new function on every render, so the store is
- * written whenever the consumer's component renders and the items render a
- * second time with it — once as its JSX children, once for the store.
+ * `isItemEqualToValue` is synced into the store, so a comparer written inline is
+ * a new function on every render and the store is written every time the
+ * consumer's component renders.
  *
- * Memoizing the comparer removes that second pass. zest cannot do it for you:
- * stabilizing the identity internally would mean either calling
- * `useStableCallback` (which throws when called during render, and comparing is
- * render work) or writing a ref during render (which React may replay or
- * discard). So the guidance is the consumer's, and these pin down what each
- * choice actually costs.
+ * That used to cost every item a second render. It no longer does: items
+ * subscribe to the *boolean* `isSelected(itemValue)`, and a comparer whose
+ * identity changed but whose answer did not leaves that boolean alone, so
+ * `useSyncExternalStore` bails out. Memoizing the comparer is still tidier, but
+ * it is no longer load-bearing — and these pin that down so it stays true.
  */
 function renderCounter() {
   const renders = jest.fn();
@@ -60,7 +58,7 @@ async function rendersPerParentRender(node: React.ReactElement, renders: jest.Mo
 const byId = (a: any, b: any) => a.id === b.id;
 
 describe('isItemEqualToValue identity', () => {
-  it('costs an extra item render when written inline', async () => {
+  it('costs no extra item render when written inline', async () => {
     const { renders, style } = renderCounter();
 
     function App() {
@@ -76,10 +74,12 @@ describe('isItemEqualToValue identity', () => {
       );
     }
 
-    expect(await rendersPerParentRender(<App />, renders)).toBe(2);
+    // One render, for the parent's own — the store write the new identity causes
+    // does not reach the item, because the boolean it selects is unchanged.
+    expect(await rendersPerParentRender(<App />, renders)).toBe(1);
   });
 
-  it('costs one when it is stable', async () => {
+  it('costs the same when it is stable', async () => {
     const { renders, style } = renderCounter();
 
     function App() {

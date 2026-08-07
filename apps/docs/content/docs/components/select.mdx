@@ -155,18 +155,8 @@ It applies everywhere the selection is compared: which item is marked selected, 
 `Select.Value` resolves, and what a `multiple` press toggles. `null` and `undefined` never reach
 your comparer, so it does not have to guard against an empty selection.
 
-`isItemEqualToValue` is synced into the store that every item subscribes to, so a comparer written
-inline is a new function on each render and the items render a second time with it. Hoist it, or
-wrap it in `useCallback`, and that second pass goes away:
-
-```tsx
-const isItemEqualToValue = React.useCallback((item, value) => item.id === value.id, []);
-```
-
-zest cannot stabilize it for you: the comparer is called *during render*, which rules out
-`useStableCallback`, and freezing it behind a ref would mean writing that ref during render — which
-React may replay or discard. It also has to stay reactive, so swapping the comparer's behaviour
-actually takes effect.
+Writing it inline costs nothing: items subscribe to whether *they* are selected, not to the
+comparer, so one whose identity changed but whose answer did not re-renders nothing.
 
 ## State
 

@@ -9,7 +9,7 @@ import {
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { PopupTriggerMap } from '../../utils/popups/PopupTriggerMap';
 import { REASONS } from '../../utils/reasons';
-import { toggleSelectedValue } from '../../utils/selection';
+import { isValueSelected, toggleSelectedValue } from '../../utils/selection';
 import type { ComboboxRoot } from '../root/ComboboxRoot';
 
 /**
@@ -234,6 +234,21 @@ const selectors = {
   mode: createSelector((state: State) => state.mode),
   multiple: createSelector((state: State) => state.multiple),
   isItemEqualToValue: createSelector((state: State) => state.isItemEqualToValue),
+  /**
+   * Whether one item's value is selected.
+   *
+   * Items subscribe to this boolean rather than to the whole selection, so
+   * choosing one row in a long list re-renders only the rows whose answer
+   * actually changed — not every row. `useSyncExternalStore` bails out on an
+   * unchanged value, which is what makes that work.
+   */
+  isSelected: createSelector(
+    (state: State) => (state.valueProp !== undefined ? state.valueProp : state.value),
+    (state: State) => state.multiple,
+    (state: State) => state.isItemEqualToValue,
+    (value: unknown, multiple: boolean, comparer: ItemEqualityComparer, itemValue: unknown) =>
+      isValueSelected(value, itemValue, multiple, comparer),
+  ),
   disabled: createSelector((state: State) => state.disabled),
   disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
   openOnFocus: createSelector((state: State) => state.openOnFocus),

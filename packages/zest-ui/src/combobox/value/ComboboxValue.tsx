@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Text } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
-import { useComboboxItemsContext } from '../root/ComboboxItemsContext';
+import { useComboboxSelectionContext } from '../root/ComboboxSelectionContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import type { ComboboxItem } from '../store/ComboboxStore';
 import type { ZestUIComponentProps } from '../../types';
@@ -30,7 +30,7 @@ export function ComboboxValue(componentProps: ComboboxValue.Props) {
   const { render, className, style, children, placeholder, ref, ...elementProps } = componentProps;
 
   const store = useComboboxRootContext();
-  const { selectedItems } = useComboboxItemsContext();
+  const { selectedItems } = useComboboxSelectionContext();
   const inputValue = useStoreState(store, 'inputValue');
 
   const rendersSelection = typeof children === 'function';

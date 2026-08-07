@@ -189,6 +189,15 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 
 ### Fixed
 
+- **Choosing one row no longer re-renders the whole list.** Every item subscribed to the entire
+  selection, so picking one of fifty re-rendered all fifty — and the selected items shared a context
+  with the filtered ones, so a selection also produced a new context value and re-rendered
+  `Combobox.List` with every row under it. Items now subscribe to the boolean
+  `isSelected(itemValue)`, which `useSyncExternalStore` bails out of for every row whose answer did
+  not change, and the selection has a context of its own. Measured on a fifty-item list: fifty item
+  renders per selection before, one after. It also removed the cost of writing
+  `isItemEqualToValue` inline, which no longer reaches the items at all.
+
 - **`Combobox.Status` now announces on iOS too.** It was built on
   `accessibilityLiveRegion`, which React Native only implements on Android, so on iOS the part did
   nothing at all. iOS now gets the same text through `AccessibilityInfo.announceForAccessibility`,
@@ -259,7 +268,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   `isValueSelected`/`toggleSelectedValue` and now take a comparer, shared with `Combobox`. Neither
   was exported from the package.
 - React Doctor: 98/100. The one remaining warning is the documented `expo-image` rejection.
-- 1079 tests, up from 912.
+- 1085 tests, up from 912.
 
 ---
 

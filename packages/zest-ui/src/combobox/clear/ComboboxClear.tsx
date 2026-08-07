@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { Pressable, type GestureResponderEvent } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
-import { useComboboxItemsContext } from '../root/ComboboxItemsContext';
+import { useComboboxSelectionContext } from '../root/ComboboxSelectionContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
@@ -32,7 +32,7 @@ export function ComboboxClear(componentProps: ComboboxClear.Props) {
   } = componentProps;
 
   const store = useComboboxRootContext();
-  const { selectedItems } = useComboboxItemsContext();
+  const { selectedItems } = useComboboxSelectionContext();
 
   const comboboxDisabled = useStoreState(store, 'disabled');
   const mode = useStoreState(store, 'mode');
