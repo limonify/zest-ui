@@ -125,10 +125,32 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   `delay`, `closeDelay`, `hoverable` and `trackCursorAxis` remain deliberately absent: they exist to
   read hover intent, and a touch screen has no hover.
 
+- **`Combobox` and `Autocomplete` now take part in `Field` and `Form`.** `Select` reported itself to
+  a surrounding `Field.Root`; these two did not touch it at all, so a combobox inside a field was
+  unlabelled, ignored the field's `disabled`, never ran its `validate`, and could not be submitted.
+  Now the input is named by `Field.Label` and described by `Field.Description`/`Error`, closing the
+  list counts as the blur that `validationMode="onBlur"` fires on, and a form focuses the input when
+  submission stops there. An autocomplete's value is the typed text, so that is what its field
+  validates.
+- **`Field.Error` publishes `errors` on its state**, so a `validate` returning several messages can
+  render them all. `children` still defaults to the first.
+- **`Combobox.Empty` takes `keepMounted`**, and publishes `empty` — the exit-animation lever every
+  other conditionally rendered part already had.
+
 - **`Menu.Root` takes `disabled`**, which also disables its triggers.
 
 - **`ContextMenu.Arrow`**, re-exported from `Menu` — `ContextMenu.Positioner` already provides the
   context it reads.
+
+### Fixed
+
+- **A non-text control could not be submitted, even when valid.** `Select`, `NumberField` and
+  `Slider` call `useFieldControlRegistration` twice — once at the root, where the value is, and once
+  at the element, for the accessibility props alone. Both registered with the field, so a form
+  validated the control a second time against a value that call never had (`undefined`), and a
+  perfectly valid `Select` could never pass submission. Only the call that owns the value registers
+  now, behind an explicit `ownsValue`. This shipped in this release and never reached a published
+  version.
 
 ### Changed
 
@@ -164,7 +186,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   `isValueSelected`/`toggleSelectedValue` and now take a comparer, shared with `Combobox`. Neither
   was exported from the package.
 - React Doctor: 98/100. The one remaining warning is the documented `expo-image` rejection.
-- 1021 tests, up from 912.
+- 1039 tests, up from 912.
 
 ---
 

@@ -51,6 +51,7 @@ export function OTPFieldRoot(componentProps: OTPFieldRoot.Props) {
 
   const { fieldDisabled, fieldProps, markChanged, markTouched } = useFieldControlRegistration({
     initialValue: normalizeOTPValue(defaultValue ?? valueProp, length, validationType, normalizeValue),
+    ownsValue: true,
   });
 
   const disabled = disabledProp || fieldDisabled;

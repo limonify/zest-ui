@@ -54,6 +54,7 @@ export function NumberFieldRoot(componentProps: NumberFieldRoot.Props) {
 
   const { fieldDisabled, markChanged } = useFieldControlRegistration({
     initialValue: defaultValue ?? valueProp ?? null,
+    ownsValue: true,
   });
 
   const disabled = disabledProp || fieldDisabled;

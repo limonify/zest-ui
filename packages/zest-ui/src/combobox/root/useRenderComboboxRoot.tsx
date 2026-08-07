@@ -5,6 +5,8 @@ import { useRefWithInit } from '../../hooks/useRefWithInit';
 import { useTransitionStatus } from '../../internals/useTransitionStatus';
 import { usePopupRootHandle } from '../../utils/popups/usePopupRootHandle';
 import { useFilter } from '../../filter/useFilter';
+import { useStableCallback } from '../../hooks/useStableCallback';
+import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import {
   compareItemEquality,
   defaultItemEquality,
@@ -78,7 +80,7 @@ export function useRenderComboboxRoot<Payload = unknown>(
     defaultTriggerId = null,
     defaultValue,
     disablePointerDismissal = false,
-    disabled = false,
+    disabled: disabledProp = false,
     filter,
     handle,
     inputValue,
@@ -98,6 +100,31 @@ export function useRenderComboboxRoot<Payload = unknown>(
   // list of selectable items, which is what every selection lookup runs against.
   const entries = React.useMemo(() => normalizeComboboxItems(items), [items]);
   const normalizedItems = React.useMemo(() => flattenComboboxEntries(entries), [entries]);
+
+  // A combobox reports itself to a surrounding `Field.Root` exactly as `Select`
+  // does. An autocomplete has no separate selection, so the text it holds *is*
+  // its value as far as the field is concerned.
+  const ownsText = mode === 'autocomplete';
+
+  // The field needs a way to focus the input when a form stops on this control,
+  // but the input's ref lives in the store, which is created below. A stable
+  // shim reads it through a ref the effect fills in.
+  const storeRef = React.useRef<ComboboxStore | null>(null);
+  const fieldFocusRef = useRefWithInit(() => ({
+    focus() {
+      storeRef.current?.select('inputRef')?.current?.focus();
+    },
+  }));
+
+  const { fieldDisabled, markChanged, markTouched } = useFieldControlRegistration({
+    initialValue: ownsText
+      ? (defaultInputValue ?? inputValue ?? '')
+      : (defaultValue ?? value ?? null),
+    ownsValue: true,
+    focusRef: fieldFocusRef,
+  });
+
+  const disabled = disabledProp || fieldDisabled;
 
   const { contains } = useFilter();
   const filterItem = React.useMemo(
@@ -139,13 +166,56 @@ export function useRenderComboboxRoot<Payload = unknown>(
       }),
   ).current;
 
+  // Wrapping the consumer's callbacks is what lets a combobox report itself to a
+  // surrounding `Field.Root`: choosing a value makes the field dirty, and
+  // closing the list is the combobox's equivalent of a blur.
+  const handleValueChange = useStableCallback(
+    (nextValue: unknown, eventDetails: ComboboxRoot.ChangeEventDetails) => {
+      onValueChange?.(nextValue, eventDetails);
+
+      if (eventDetails.isCanceled || ownsText) {
+        return;
+      }
+
+      markChanged(nextValue);
+    },
+  );
+
+  const handleInputValueChange = useStableCallback(
+    (nextValue: string, eventDetails: ComboboxRoot.ChangeEventDetails) => {
+      onInputValueChange?.(nextValue, eventDetails);
+
+      if (eventDetails.isCanceled || !ownsText) {
+        return;
+      }
+
+      markChanged(nextValue);
+    },
+  );
+
+  const handleOpenChange = useStableCallback(
+    (nextOpen: boolean, eventDetails: ComboboxRoot.ChangeEventDetails) => {
+      onOpenChange?.(nextOpen, eventDetails);
+
+      if (eventDetails.isCanceled || nextOpen) {
+        return;
+      }
+
+      markTouched(ownsText ? store.select('inputValue') : store.select('value'));
+    },
+  );
+
+  useIsoLayoutEffect(() => {
+    storeRef.current = store;
+  }, [store]);
+
   useControlledProp(store, 'openProp', open);
   useControlledProp(store, 'valueProp', value);
   useControlledProp(store, 'inputValueProp', inputValue);
   useControlledProp(store, 'triggerIdProp', triggerId);
-  useContextCallback(store, 'onOpenChange', onOpenChange);
-  useContextCallback(store, 'onValueChange', onValueChange);
-  useContextCallback(store, 'onInputValueChange', onInputValueChange);
+  useContextCallback(store, 'onOpenChange', handleOpenChange);
+  useContextCallback(store, 'onValueChange', handleValueChange);
+  useContextCallback(store, 'onInputValueChange', handleInputValueChange);
   useSyncedValues(store, {
     mode,
     multiple,

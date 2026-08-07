@@ -33,6 +33,19 @@ export interface UseFieldControlRegistrationParameters {
    * are `Pressable`s with nothing to focus, and leave it out.
    */
   focusRef?: React.RefObject<{ focus?: () => void } | null> | undefined;
+  /**
+   * Whether this is the call that owns the control's value, and so the one a
+   * surrounding `Form` should revalidate and focus on submit.
+   *
+   * A component often calls this hook twice: once where the value lives (the
+   * root) and once where the element is, only for the accessibility props (the
+   * trigger, the thumb, the input). Only the first may register — otherwise the
+   * form validates the control twice, the second time against a value that call
+   * does not have.
+   *
+   * @default false
+   */
+  ownsValue?: boolean | undefined;
 }
 
 /**
@@ -53,7 +66,7 @@ export interface UseFieldControlRegistrationParameters {
 export function useFieldControlRegistration(
   parameters: UseFieldControlRegistrationParameters = {},
 ) {
-  const { initialValue, isFilled = defaultIsFilled, focusRef } = parameters;
+  const { initialValue, isFilled = defaultIsFilled, focusRef, ownsValue = false } = parameters;
 
   const field = useFieldRootContext(false);
 
@@ -116,7 +129,7 @@ export function useFieldControlRegistration(
   const latestValueRef = React.useRef(initialValue);
 
   useIsoLayoutEffect(() => {
-    if (!field) {
+    if (!field || !ownsValue) {
       return undefined;
     }
 
@@ -128,7 +141,7 @@ export function useFieldControlRegistration(
       },
       focus: () => focusRef?.current?.focus?.(),
     });
-  }, [field, focusRef]);
+  }, [field, focusRef, ownsValue]);
 
   const describedBy =
     field && field.messageIds.length > 0 ? field.messageIds.join(' ') : undefined;

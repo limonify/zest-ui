@@ -387,3 +387,26 @@ describe('Field bookkeeping for non-text controls', () => {
     expect(screen.getByTestId('slot-0').props.accessibilityState).toMatchObject({ disabled: true });
   });
 });
+
+describe('Field.Error state', () => {
+  it('carries every validation message, not just the first', async () => {
+    const styleFn = jest.fn(() => undefined);
+
+    await render(
+      <Field.Root validate={() => ['Too short', 'Needs a digit']} validationMode="onChange">
+        <Field.Control testID="control" />
+        <Field.Error testID="error" style={styleFn} />
+      </Field.Root>,
+    );
+
+    await act(async () => {
+      fireEvent.changeText(screen.getByTestId('control'), 'x');
+    });
+
+    // `children` still defaults to the first message.
+    expect(screen.getByTestId('error')).toHaveTextContent('Too short');
+    expect(styleFn).toHaveBeenLastCalledWith(
+      expect.objectContaining({ errors: ['Too short', 'Needs a digit'] }),
+    );
+  });
+});

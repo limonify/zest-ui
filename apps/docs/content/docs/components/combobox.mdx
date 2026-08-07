@@ -337,6 +337,27 @@ import { Combobox } from '@limonify/zest-ui';
 
 See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
+## Inside a Field
+
+A combobox reports itself to a surrounding [`Field.Root`](/docs/components/field) the same way a
+`Select` does: the input is named by `Field.Label` and described by `Field.Description`/`Error`, it
+inherits the field's `disabled`, and choosing a value runs the field's `validate`. Closing the list
+is a combobox's blur, which is when `validationMode="onBlur"` fires.
+
+```tsx
+<Field.Root name="country" validate={(value) => (value ? null : 'Pick a country')}>
+  <Field.Label>Country</Field.Label>
+  <Combobox.Root items={COUNTRIES} value={value} onValueChange={setValue}>
+    <Combobox.Input />
+    {/* … */}
+  </Combobox.Root>
+  <Field.Error />
+</Field.Root>
+```
+
+That is also what lets it take part in a [`Form`](/docs/components/form): submitting validates the
+combobox along with everything else, and focuses its input when it is the first field that failed.
+
 ## Accessibility
 
 The input is `accessibilityRole="search"` with `aria-expanded` and `aria-autocomplete="list"`; each

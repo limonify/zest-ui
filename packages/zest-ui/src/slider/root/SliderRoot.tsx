@@ -53,6 +53,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
 
   const { fieldDisabled, markChanged, markTouched } = useFieldControlRegistration({
     initialValue: defaultValue ?? value,
+    ownsValue: true,
   });
 
   const disabled = disabledProp || fieldDisabled;

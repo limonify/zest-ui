@@ -72,6 +72,32 @@ describe('Combobox', () => {
     expect(screen.queryByTestId('item-Apple')).toBeNull();
   });
 
+  it('keeps the empty state mounted with keepMounted, publishing `empty`', async () => {
+    const styleFn = jest.fn(() => undefined);
+
+    await render(
+      <Combobox.Root items={FRUITS} defaultOpen>
+        <Combobox.Input testID="input" />
+        <Combobox.Portal>
+          <Combobox.Positioner>
+            <Combobox.Popup>
+              <Combobox.Empty testID="empty" keepMounted style={styleFn}>
+                <Text>No fruit</Text>
+              </Combobox.Empty>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Portal>
+      </Combobox.Root>,
+    );
+
+    // Mounted even though everything still matches, so it can be animated out.
+    expect(screen.getByTestId('empty', hidden)).toBeTruthy();
+    expect(styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ empty: false }));
+
+    await type('input', 'zzz');
+    expect(styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ empty: true }));
+  });
+
   it('selects an item, fills the input, and closes', async () => {
     const onValueChange = jest.fn();
     await render(<TestCombobox defaultOpen onValueChange={onValueChange} />);

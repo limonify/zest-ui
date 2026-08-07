@@ -37,6 +37,7 @@ export function SwitchRoot(componentProps: SwitchRoot.Props) {
 
   const { fieldDisabled, fieldProps, markChanged, markTouched } = useFieldControlRegistration({
     initialValue: defaultChecked ?? checkedProp ?? false,
+    ownsValue: true,
   });
 
   const disabled = disabledProp || fieldDisabled;

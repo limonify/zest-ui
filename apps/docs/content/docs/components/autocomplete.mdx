@@ -154,6 +154,23 @@ import { Autocomplete } from '@limonify/zest-ui';
 
 See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contract.
 
+## Inside a Field
+
+An autocomplete reports itself to a surrounding [`Field.Root`](/docs/components/field), with one
+difference from a combobox: its value *is* the typed text, so that is what the field validates and
+what a [`Form`](/docs/components/form) submits.
+
+```tsx
+<Field.Root name="tag" validate={(text) => (text ? null : 'Add a tag')}>
+  <Field.Label>Tag</Field.Label>
+  <Autocomplete.Root items={TAGS} inputValue={tag} onInputValueChange={setTag}>
+    <Autocomplete.Input />
+    {/* … */}
+  </Autocomplete.Root>
+  <Field.Error />
+</Field.Root>
+```
+
 ## Accessibility
 
 See [Combobox](/docs/components/combobox) for the single-select variant — they share every part below the root.

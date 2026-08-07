@@ -7,6 +7,7 @@ import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
 import { usePopupHandleStore } from '../../utils/popups/usePopupHandleStore';
+import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ComboboxHandle } from '../store/ComboboxHandle';
@@ -47,6 +48,10 @@ export function ComboboxInput<Payload = unknown>(componentProps: ComboboxInput.P
   }
 
   const id = useId(idProp ?? undefined);
+
+  // The root owns the value and registers it with the field; this call only
+  // collects the accessibility props and reports focus, so it does not register.
+  const { fieldProps, markFocused } = useFieldControlRegistration();
 
   const open = useStoreState(store, 'open');
   const disabled = useStoreState(store, 'disabled');
@@ -112,6 +117,8 @@ export function ComboboxInput<Payload = unknown>(componentProps: ComboboxInput.P
           }
         },
         onFocus() {
+          markFocused(true);
+
           if (payload !== undefined) {
             store.set('payload', payload);
           }
@@ -129,10 +136,14 @@ export function ComboboxInput<Payload = unknown>(componentProps: ComboboxInput.P
           store.set('triggerHeight', height);
           update?.();
         },
+        onBlur() {
+          markFocused(false);
+        },
         accessibilityRole: 'search' as const,
         accessibilityState: { expanded: open, disabled: disabled || undefined },
         'aria-expanded': open,
         'aria-autocomplete': 'list' as const,
+        ...fieldProps,
       },
       elementProps,
     ],

@@ -31,6 +31,7 @@ export function RadioGroup<Value = any>(componentProps: RadioGroup.Props<Value>)
 
   const { fieldDisabled, fieldProps, markChanged, markTouched } = useFieldControlRegistration({
     initialValue: defaultValue ?? valueProp,
+    ownsValue: true,
   });
 
   const disabled = disabledProp || fieldDisabled;

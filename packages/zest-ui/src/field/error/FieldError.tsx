@@ -1,5 +1,5 @@
 'use client';
-import type * as React from 'react';
+import * as React from 'react';
 import { Text } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
@@ -27,11 +27,11 @@ export function FieldError(componentProps: FieldError.Props) {
     ...elementProps
   } = componentProps;
 
-  const { validityData, setMessageIds, state } = useFieldRootContext();
+  const { validityData, setMessageIds, state: fieldState } = useFieldRootContext();
 
   const id = useId(idProp ?? undefined);
 
-  const rendered = match === true ? true : !state.disabled && validityData.valid === false;
+  const rendered = match === true ? true : !fieldState.disabled && validityData.valid === false;
 
   useIsoLayoutEffect(() => {
     if (!rendered || !id) {
@@ -41,7 +41,13 @@ export function FieldError(componentProps: FieldError.Props) {
     return () => setMessageIds((previous) => previous.filter((item) => item !== id));
   }, [rendered, id, setMessageIds]);
 
-  // Default to the first validation message when no children are given.
+  // Every message is on the state, so a `validate` that returns several can be
+  // rendered in full; `children` defaults to the first, which is the common case.
+  const state: FieldErrorState = React.useMemo(
+    () => ({ ...fieldState, errors: validityData.errors }),
+    [fieldState, validityData.errors],
+  );
+
   const content = children ?? validityData.errors[0];
 
   return useRenderElement(Text, componentProps, {
@@ -52,7 +58,13 @@ export function FieldError(componentProps: FieldError.Props) {
   });
 }
 
-export interface FieldErrorState extends FieldRoot.State {}
+export interface FieldErrorState extends FieldRoot.State {
+  /**
+   * Every message the field's `validate` returned, in order. Empty when the
+   * field is valid. `children` defaults to the first of them.
+   */
+  errors: string[];
+}
 
 export interface FieldErrorProps
   extends Omit<ZestUIComponentProps<typeof Text, FieldErrorState>, 'children'> {

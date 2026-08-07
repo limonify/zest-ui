@@ -46,6 +46,7 @@ export function CheckboxRoot(componentProps: CheckboxRoot.Props) {
 
   const { fieldDisabled, fieldProps, markChanged, markTouched } = useFieldControlRegistration({
     initialValue: defaultChecked ?? checkedProp ?? false,
+    ownsValue: true,
   });
 
   const disabled = (groupContext?.disabled || disabledProp || fieldDisabled) ?? false;

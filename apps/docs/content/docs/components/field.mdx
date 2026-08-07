@@ -112,6 +112,26 @@ pointing at the same label. `Field.Item` opens a nested labelling scope: the `Fi
 
 An item can be `disabled` on its own; a disabled `Field.Root` disables all of them.
 
+### Which controls a field wires up
+
+`Field.Control` and `Input` are the text inputs. Beyond those, `Checkbox`, `Switch`, `RadioGroup`,
+`Slider`, `NumberField`, `OTPField`, `Select`, `Combobox` and `Autocomplete` all report themselves
+to a surrounding field: they inherit its `disabled`, are named by `Field.Label`, run its `validate`,
+and take part in a [`Form`](/docs/components/form).
+
+`Field.Error` publishes every message on its state, so a `validate` that returns several can render
+them all — `children` defaults to the first:
+
+```tsx
+<Field.Error render={(props, state) => (
+  <View {...props}>
+    {state.errors.map((message) => <Text key={message}>{message}</Text>)}
+  </View>
+)} />
+```
+
+Pass `match` to keep it rendered regardless of validity — that is this part's `keepMounted`.
+
 ## State
 
 These fields reach your `style` and `render` functions on **every Field part** (`style={(state) => ...}`).

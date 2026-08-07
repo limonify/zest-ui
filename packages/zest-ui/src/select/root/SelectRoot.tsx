@@ -47,6 +47,7 @@ export function SelectRoot<Value = any, Payload = unknown>(
 
   const { fieldDisabled, markChanged, markTouched } = useFieldControlRegistration({
     initialValue: defaultValue ?? value ?? (multiple ? [] : undefined),
+    ownsValue: true,
   });
 
   const disabled = disabledProp || fieldDisabled;
