@@ -17,11 +17,22 @@ import { useStoreState } from '../../store/ReactStore';
  * Renders a `<Pressable>`.
  */
 export function ComboboxItem(componentProps: ComboboxItem.Props) {
-  const { render, className, style, item, ref, ...elementProps } = componentProps;
+  const {
+    render,
+    className,
+    style,
+    disabled: disabledProp = false,
+    item,
+    ref,
+    ...elementProps
+  } = componentProps;
 
   const store = useComboboxRootContext();
   const selectedValue = useStoreState(store, 'value');
   const multiple = useStoreState(store, 'multiple');
+  const rootDisabled = useStoreState(store, 'disabled');
+
+  const disabled = disabledProp || rootDisabled;
   const isItemEqualToValue = useStoreState(store, 'isItemEqualToValue');
 
   const { index, onLayout } = useCompositeListItem();
@@ -30,8 +41,8 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
   const selected = isValueSelected(selectedValue, item.value, multiple, isItemEqualToValue);
 
   const state: ComboboxItemState = React.useMemo(
-    () => ({ selected, pressed, index }),
-    [selected, pressed, index],
+    () => ({ disabled, selected, pressed, index }),
+    [disabled, selected, pressed, index],
   );
 
   const contextValue: ComboboxItemContext = React.useMemo(() => ({ state }), [state]);
@@ -43,6 +54,10 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
       {
         onLayout,
         onPress(event: GestureResponderEvent) {
+          if (disabled) {
+            return;
+          }
+
           store.selectItem(item, createChangeEventDetails(REASONS.itemPress, event));
 
           // Dismissing the keyboard is right when the selection ends the
@@ -56,7 +71,7 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
         onPressOut: () => setPressed(false),
         accessibilityRole: 'menuitem' as const,
         role: 'option' as const,
-        accessibilityState: { selected },
+        accessibilityState: { selected, disabled: disabled || undefined },
         'aria-selected': selected,
       },
       elementProps,
@@ -67,6 +82,11 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
 }
 
 export interface ComboboxItemState {
+  /**
+   * Whether the item should ignore user interaction. A disabled root disables
+   * every item in it.
+   */
+  disabled: boolean;
   /**
    * Whether this item is the selected one.
    */
@@ -86,6 +106,11 @@ export interface ComboboxItemProps extends ZestUIComponentProps<typeof Pressable
    * The item this row represents, as handed to you by `Combobox.List`.
    */
   item: ComboboxItemData;
+  /**
+   * Whether the item should ignore user interaction.
+   * @default false
+   */
+  disabled?: boolean | undefined;
 }
 
 export namespace ComboboxItem {

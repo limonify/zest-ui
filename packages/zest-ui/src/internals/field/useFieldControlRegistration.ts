@@ -100,7 +100,7 @@ export function useFieldControlRegistration(
     field.setFilled(isFilled(value));
 
     if (field.validationMode === 'onChange') {
-      validate(value);
+      field.validateOnChange(value);
     }
   });
 
@@ -116,7 +116,8 @@ export function useFieldControlRegistration(
     field.setTouched(true);
 
     if (field.validationMode === 'onBlur') {
-      validate(value);
+      // A blur outranks anything the debounce still has pending.
+      field.validateNow(value);
     }
   });
 
@@ -135,9 +136,7 @@ export function useFieldControlRegistration(
 
     return field.registerControl({
       validate: () => {
-        const errors = field.runValidation(latestValueRef.current);
-        field.setValidityData({ valid: errors.length === 0, errors });
-        return errors;
+        return field.validateNow(latestValueRef.current);
       },
       focus: () => focusRef?.current?.focus?.(),
     });

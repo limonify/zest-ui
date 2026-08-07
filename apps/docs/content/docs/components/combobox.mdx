@@ -126,6 +126,19 @@ import { Combobox } from '@limonify/zest-ui';
 Filtering defaults to a locale-aware label match — "resume" finds "Résumé". Pass `filter` to change
 it, and build your own predicate with [`useFilter`](/docs/utilities/use-filter).
 
+### Placeholders and disabled items
+
+`Combobox.Value` takes a `placeholder` shown while the input is empty, and reports
+`state.placeholder` so it can be styled differently. `Combobox.Item` takes `disabled` — a disabled
+item ignores presses and reports itself to assistive technology; a disabled `Combobox.Root` disables
+all of them.
+
+```tsx
+<Combobox.Value placeholder="No country yet" />
+
+<Combobox.Item item={item} disabled={item.value === 'antarctica'} />
+```
+
 ### Object values
 
 Values are compared with `Object.is`, so an object value only ever matches itself. If `items` is

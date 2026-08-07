@@ -86,6 +86,19 @@ import { Field } from '@limonify/zest-ui';
 
 <AutoType path="../../packages/zest-ui/src/field/root/FieldRoot.tsx" name="FieldRootProps" />
 
+### Slowing validation down
+
+With `validationMode="onChange"`, `validate` runs on every keystroke — fine for a cheap check,
+wasteful for anything else, and it makes the error flicker while the user is still typing.
+`validationDebounceTime` waits instead:
+
+```tsx
+<Field.Root validationMode="onChange" validationDebounceTime={300} validate={checkUsername}>
+```
+
+A blur, or a form submitting, validates immediately and cancels whatever is pending — so nothing
+can submit against a stale verdict.
+
 ### Labelling each item of a group
 
 A `Field.Root` labels one control, so a checkbox or radio group inside it would have every item

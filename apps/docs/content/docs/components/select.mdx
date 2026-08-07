@@ -124,6 +124,19 @@ import { Select } from '@limonify/zest-ui';
 
 <AutoType path="../../packages/zest-ui/src/select/root/SelectRoot.tsx" name="SelectRootProps" />
 
+### Before anything is selected
+
+`Select.Value` takes a `placeholder`, shown while no label is known — which is not only "nothing is
+selected": without `items`, the selected label is unknown until the popup has been opened once.
+`state.placeholder` says which of the two is on screen, so it can be styled differently.
+
+```tsx
+<Select.Value
+  placeholder="Pick a fruit"
+  style={(state) => [styles.value, state.placeholder && styles.muted]}
+/>
+```
+
 ### Object values
 
 Values are compared with `Object.is`, so an object value only ever matches itself. If `items` is

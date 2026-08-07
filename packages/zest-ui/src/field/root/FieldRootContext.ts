@@ -61,6 +61,15 @@ export interface FieldRootContext {
    */
   runValidation: (value: unknown) => string[];
   /**
+   * Validates a user-driven change, honouring `validationDebounceTime`.
+   */
+  validateOnChange: (value: unknown) => void;
+  /**
+   * Validates immediately, cancelling anything the debounce still has pending,
+   * and returns the messages. This is what a blur and a form submitting use.
+   */
+  validateNow: (value: unknown) => string[];
+  /**
    * Registers the field's control, so a surrounding `Form` can revalidate it on
    * submit and focus it when it fails. Returns the cleanup.
    */

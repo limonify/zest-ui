@@ -27,7 +27,7 @@ import { useStoreState } from '../../store/ReactStore';
  * `style`, `className` and `render` do nothing in that form.
  */
 export function ComboboxValue(componentProps: ComboboxValue.Props) {
-  const { render, className, style, children, ref, ...elementProps } = componentProps;
+  const { render, className, style, children, placeholder, ref, ...elementProps } = componentProps;
 
   const store = useComboboxRootContext();
   const { selectedItems } = useComboboxItemsContext();
@@ -35,12 +35,23 @@ export function ComboboxValue(componentProps: ComboboxValue.Props) {
 
   const rendersSelection = typeof children === 'function';
 
-  const state: ComboboxValueState = { value: inputValue, items: selectedItems };
+  const showsPlaceholder = !rendersSelection && children == null && inputValue === '';
+
+  const state: ComboboxValueState = {
+    value: inputValue,
+    items: selectedItems,
+    placeholder: showsPlaceholder,
+  };
 
   const element = useRenderElement(Text, componentProps, {
     state,
     ref,
-    props: [{ children: rendersSelection ? undefined : (children ?? inputValue) }, elementProps],
+    props: [
+      {
+        children: rendersSelection ? undefined : (children ?? (showsPlaceholder ? placeholder : inputValue)),
+      },
+      elementProps,
+    ],
     enabled: !rendersSelection,
   });
 
@@ -61,6 +72,10 @@ export interface ComboboxValueState {
    * and at most one entry unless the combobox is `multiple`.
    */
   items: ComboboxItem[];
+  /**
+   * Whether the placeholder is what is being shown, because there is no text.
+   */
+  placeholder: boolean;
 }
 
 export interface ComboboxValueProps
@@ -70,6 +85,11 @@ export interface ComboboxValueProps
    * this part's own element entirely.
    */
   children?: React.ReactNode | ((items: ComboboxItem[]) => React.ReactNode);
+  /**
+   * Shown while the input is empty. `children` takes precedence, and a function
+   * `children` replaces this part entirely.
+   */
+  placeholder?: React.ReactNode;
 }
 
 export namespace ComboboxValue {

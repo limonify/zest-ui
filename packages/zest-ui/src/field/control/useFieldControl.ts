@@ -66,17 +66,10 @@ export function useFieldControl(parameters: UseFieldControlParameters) {
     field?.setFilled(value.length > 0);
   }, [field, value]);
 
-  const validateNow = useStableCallback((nextValue: string) => {
-    if (!field) {
-      return;
-    }
-    const errors = field.runValidation(nextValue);
-    field.setValidityData({ valid: errors.length === 0, errors });
-  });
-
-  // The form's copy of the value is what `validate()` runs against on submit,
-  // and the change handler is not the only way it moves (a controlled consumer
-  // can set it), so track render rather than the handler.
+  // What `validate()` runs against on submit, and what a blur validates. Both
+  // the handler and the render write it: a change and the blur it causes can
+  // land in one batch, before React has re-rendered, and a controlled consumer
+  // can move the value without the handler running at all.
   const valueRef = React.useRef(value);
   useIsoLayoutEffect(() => {
     valueRef.current = value;
@@ -89,9 +82,7 @@ export function useFieldControl(parameters: UseFieldControlParameters) {
 
     return field.registerControl({
       validate: () => {
-        const errors = field.runValidation(valueRef.current);
-        field.setValidityData({ valid: errors.length === 0, errors });
-        return errors;
+        return field.validateNow(valueRef.current);
       },
       focus: () => inputRef?.current?.focus(),
     });
@@ -102,6 +93,7 @@ export function useFieldControl(parameters: UseFieldControlParameters) {
       return;
     }
 
+    valueRef.current = text;
     setValueState(text);
     onValueChange?.(text);
 
@@ -110,7 +102,7 @@ export function useFieldControl(parameters: UseFieldControlParameters) {
     field?.setDirty(text !== initialValueRef.current);
 
     if (field?.validationMode === 'onChange') {
-      validateNow(text);
+      field.validateOnChange(text);
     }
   });
 
@@ -123,7 +115,10 @@ export function useFieldControl(parameters: UseFieldControlParameters) {
     field?.setTouched(true);
 
     if (field?.validationMode === 'onBlur') {
-      validateNow(value);
+      // A blur outranks anything the debounce still has pending. Read the value
+      // from the ref, not the render closure: a change and the blur it causes
+      // can land in one batch, before React has re-rendered.
+      field.validateNow(valueRef.current);
     }
   });
 

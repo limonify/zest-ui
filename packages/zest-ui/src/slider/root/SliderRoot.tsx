@@ -35,6 +35,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
     defaultValue,
     disabled: disabledProp = false,
     format,
+    getAccessibilityValueText,
     locale,
     max = 100,
     min = 0,
@@ -233,6 +234,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
       disabled,
       dragging,
       format,
+      getAccessibilityValueText,
       getClosestThumbIndex,
       getValueFromPosition,
       labelId,
@@ -254,6 +256,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
       disabled,
       dragging,
       format,
+      getAccessibilityValueText,
       getClosestThumbIndex,
       getValueFromPosition,
       labelId,
@@ -364,6 +367,26 @@ export interface SliderRootProps<Value extends number | readonly number[] = numb
    * @default 1
    */
   step?: number | undefined;
+  /**
+   * Returns a human-readable text alternative for a thumb's value, announced by
+   * assistive technology.
+   *
+   * Renamed from upstream's `getAriaValueText`: on React Native this feeds
+   * `accessibilityValue.text`, not `aria-valuetext`. The third argument is the
+   * thumb's index, so the two ends of a range can read differently.
+   *
+   * @example
+   * ```tsx
+   * <Slider.Root
+   *   getAccessibilityValueText={(text, value, index) =>
+   *     `${index === 0 ? 'Minimum' : 'Maximum'} ${text}`
+   *   }
+   * />
+   * ```
+   */
+  getAccessibilityValueText?:
+    | ((formattedValue: string, value: number, index: number) => string)
+    | undefined;
   /**
    * The minimum number of steps to keep between the thumbs of a range slider.
    * @default 0

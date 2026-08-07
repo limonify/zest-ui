@@ -83,6 +83,24 @@ import { Slider } from '@limonify/zest-ui';
 
 <AutoType path="../../packages/zest-ui/src/slider/root/SliderRoot.tsx" name="SliderRootProps" />
 
+### What a screen reader reads out
+
+Each thumb announces its value through `accessibilityValue.text`, formatted by `format`/`locale`.
+`getAccessibilityValueText` replaces it — the third argument is the thumb's index, so the two ends
+of a range can read differently:
+
+```tsx
+<Slider.Root
+  value={[20, 80]}
+  getAccessibilityValueText={(text, value, index) =>
+    `${index === 0 ? 'Minimum' : 'Maximum'} ${text}`
+  }
+/>
+```
+
+This is upstream's `getAriaValueText`, renamed: React Native has `accessibilityValue.text`, not
+`aria-valuetext`. `Progress` and `Meter` carry the same prop.
+
 ### Range thumbs colliding
 
 A range slider's thumbs have to do *something* when one is dragged into another, and

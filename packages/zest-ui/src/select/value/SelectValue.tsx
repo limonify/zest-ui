@@ -20,7 +20,7 @@ import { useStoreState } from '../../store/ReactStore';
  * right separator, so format from `labels` when it matters.
  */
 export function SelectValue(componentProps: SelectValue.Props) {
-  const { render, className, style, children, ref, ...elementProps } = componentProps;
+  const { render, className, style, children, placeholder, ref, ...elementProps } = componentProps;
 
   const store = useSelectRootContext();
   const value = useStoreState(store, 'value');
@@ -40,9 +40,10 @@ export function SelectValue(componentProps: SelectValue.Props) {
 
   const label = labels.length > 0 ? labels.join(', ') : undefined;
 
-  const state: SelectValueState = { value, label, labels };
+  const state: SelectValueState = { value, label, labels, placeholder: label === undefined };
 
-  const resolvedChildren = typeof children === 'function' ? children(state) : (children ?? label);
+  const resolvedChildren =
+    typeof children === 'function' ? children(state) : (children ?? label ?? placeholder);
 
   return useRenderElement(Text, componentProps, {
     state,
@@ -66,11 +67,21 @@ export interface SelectValueState {
    * no label is known yet.
    */
   labels: string[];
+  /**
+   * Whether the placeholder is what is being shown, because no label is known.
+   */
+  placeholder: boolean;
 }
 
 export interface SelectValueProps
   extends Omit<ZestUIComponentProps<typeof Text, SelectValueState>, 'children'> {
   children?: React.ReactNode | ((state: SelectValueState) => React.ReactNode);
+  /**
+   * Shown while nothing is selected — or while the selected label is not known
+   * yet, which is the case before the popup has been opened once unless
+   * `Select.Root` was given `items`. `children` takes precedence.
+   */
+  placeholder?: React.ReactNode;
 }
 
 export namespace SelectValue {

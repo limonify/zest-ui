@@ -7,6 +7,7 @@ import { useControlled } from '../../hooks/useControlled';
 import { useFieldsetRootContext } from '../../fieldset/root/FieldsetRootContext';
 import type { ZestUIComponentProps } from '../../types';
 import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { useTimeout } from '../../hooks/useTimeout';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useFormContext } from '../../form/FormContext';
 import {
@@ -32,6 +33,7 @@ export function FieldRoot(componentProps: FieldRoot.Props) {
     className,
     style,
     validate: validateProp,
+    validationDebounceTime = 0,
     validationMode = 'onBlur',
     name,
     disabled: disabledProp = false,
@@ -136,6 +138,33 @@ export function FieldRoot(componentProps: FieldRoot.Props) {
 
   // An error from outside outranks the local verdict: the field cannot know the
   // server disagreed with it.
+  // `onChange` validation runs on every keystroke, which is wasteful for an
+  // expensive `validate` and makes the error flicker while the user is still
+  // typing. The timer lives here so every control in the field shares it.
+  const debounce = useTimeout();
+
+  const commitValidation = useStableCallback((value: unknown) => {
+    const errors = runValidation(value);
+    setValidityData({ valid: errors.length === 0, errors });
+    return errors;
+  });
+
+  const validateOnChange = useStableCallback((value: unknown) => {
+    if (validationDebounceTime > 0) {
+      debounce.start(validationDebounceTime, () => commitValidation(value));
+      return;
+    }
+
+    debounce.clear();
+    commitValidation(value);
+  });
+
+  const validateNow = useStableCallback((value: unknown) => {
+    // A blur, or a form submitting, outranks anything still pending.
+    debounce.clear();
+    return commitValidation(value);
+  });
+
   const valid = invalid === true || externalErrors ? false : validityData.valid;
   const errors = externalErrors ?? validityData.errors;
 
@@ -157,6 +186,8 @@ export function FieldRoot(componentProps: FieldRoot.Props) {
       validityData: { valid, errors },
       setValidityData,
       runValidation,
+      validateOnChange,
+      validateNow,
       registerControl,
       clearExternalError,
       validationMode,
@@ -181,6 +212,8 @@ export function FieldRoot(componentProps: FieldRoot.Props) {
       valid,
       errors,
       runValidation,
+      validateOnChange,
+      validateNow,
       registerControl,
       clearExternalError,
       validationMode,
@@ -242,6 +275,16 @@ export interface FieldRootProps extends ZestUIComponentProps<typeof View, FieldR
    * @default 'onBlur'
    */
   validationMode?: 'onBlur' | 'onChange' | undefined;
+  /**
+   * How long to wait, in milliseconds, before running `validate` after a change.
+   * Only applies to `validationMode="onChange"`; a blur or a form submitting
+   * validates immediately and cancels anything pending.
+   *
+   * `0` validates on every keystroke, which is fine for a cheap synchronous
+   * check and wasteful for anything else.
+   * @default 0
+   */
+  validationDebounceTime?: number | undefined;
   /**
    * The field's name. Used for identity and labelling; there is no form
    * submission in React Native.

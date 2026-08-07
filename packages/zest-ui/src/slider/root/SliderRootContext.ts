@@ -25,6 +25,12 @@ export interface SliderRootContext {
    * The id of the `Slider.Label`, associated with every thumb. `undefined` when
    * there is no label.
    */
+  /**
+   * The consumer's text alternative for a thumb's value, if any.
+   */
+  getAccessibilityValueText:
+    | ((formattedValue: string, value: number, index: number) => string)
+    | undefined;
   labelId: string | undefined;
   setLabelId: (id: string | undefined) => void;
   /**

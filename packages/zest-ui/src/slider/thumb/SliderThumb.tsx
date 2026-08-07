@@ -18,7 +18,18 @@ import type { ZestUIComponentProps } from '../../types';
 export function SliderThumb(componentProps: SliderThumb.Props) {
   const { render, className, style, index = 0, ref, ...elementProps } = componentProps;
 
-  const { disabled, format, labelId, locale, max, min, orientation, state, values } =
+  const {
+    disabled,
+    format,
+    getAccessibilityValueText,
+    labelId,
+    locale,
+    max,
+    min,
+    orientation,
+    state,
+    values,
+  } =
     useSliderRootContext();
 
   // The thumb is what assistive tech announces and adjusts, so a surrounding
@@ -27,6 +38,15 @@ export function SliderThumb(componentProps: SliderThumb.Props) {
 
   const value = values[index] ?? min;
   const percent = max === min ? 0 : ((value - min) / (max - min)) * 100;
+
+  // The formatted value is what a screen reader reads out; the consumer can
+  // replace it, which is how the two ends of a range read differently. Without
+  // `format` there is no text and React Native announces `now` instead — but a
+  // consumer's callback still gets a string to build on.
+  const formattedValue = formatValue(value, format, locale);
+  const valueText = getAccessibilityValueText
+    ? getAccessibilityValueText(formattedValue ?? String(value), value, index)
+    : formattedValue;
 
   const positionStyle =
     orientation === 'vertical'
@@ -47,7 +67,7 @@ export function SliderThumb(componentProps: SliderThumb.Props) {
           min,
           max,
           now: value,
-          text: formatValue(value, format, locale),
+          text: valueText,
         },
         'aria-orientation': orientation,
         ...fieldProps,

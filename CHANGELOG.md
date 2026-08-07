@@ -163,12 +163,28 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   against the writing direction, so a popup can be placed on the reading-start edge without the
   consumer branching on `useDirection`. `state.side` still reports a physical side, narrowed to
   `PhysicalSide` so a `switch` over it is exhaustive.
+- **Props Base UI has that zest did not**, found by diffing every part's props against upstream
+  rather than by eye:
+  - `placeholder` on `Select.Value` and `Combobox.Value`, with `state.placeholder` so it can be
+    styled differently from a real value. A select's label is unknown until the popup has been
+    opened once unless `items` was given, and the placeholder covers that too.
+  - `disabled` on `Combobox.Item` — `Select.Item` already had it.
+  - `getAccessibilityValueText` on `Slider.Root`, which `Progress` and `Meter` already had. The
+    third argument is the thumb's index, so the ends of a range can read differently. Upstream's
+    `getAriaValueText`, renamed: React Native has `accessibilityValue.text`.
+  - `validationDebounceTime` on `Field.Root`, for an `onChange` validation that should not run on
+    every keystroke. A blur or a submit validates immediately and cancels what is pending.
 - **`Menu.Root` takes `disabled`**, which also disables its triggers.
 
 - **`ContextMenu.Arrow`**, re-exported from `Menu` — `ContextMenu.Positioner` already provides the
   context it reads.
 
 ### Fixed
+
+- **A blur could validate against a stale value.** `Field.Control` read the value from its render
+  closure, so a change and the blur it causes landing in one batch — before React re-rendered —
+  validated the value from *before* the change. The handler now writes the ref it reads, which is
+  the pattern `Slider` already used for its gesture callbacks.
 
 - **Every arrow rendered in its popup's top-left corner.** floating-ui's `arrow` middleware needs the
   arrow element to exist *and* to have been measured, and React Native measures asynchronously. The
@@ -230,7 +246,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   `isValueSelected`/`toggleSelectedValue` and now take a comparer, shared with `Combobox`. Neither
   was exported from the package.
 - React Doctor: 98/100. The one remaining warning is the documented `expo-image` rejection.
-- 1062 tests, up from 912.
+- 1077 tests, up from 912.
 
 ---
 
