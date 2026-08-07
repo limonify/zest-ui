@@ -182,6 +182,11 @@ rather than being merely absent — object values in `Select` and `Combobox`.
     `getAriaValueText`, renamed: React Native has `accessibilityValue.text`.
   - `validationDebounceTime` on `Field.Root`, for an `onChange` validation that should not run on
     every keystroke. A blur or a submit validates immediately and cancels what is pending.
+- **`Combobox.List` publishes its filtered entries on `state.items`, and `children` is now
+  optional.** Together they are what lets a `render` function hand the rows to a `FlatList`, which
+  takes them from `data` rather than from children — the React Native answer to upstream's
+  DOM-bound `virtualized` prop. Omitting `children` also skips building the rows zest would
+  otherwise map and `FlatList` would ignore. Recipe in the docs, with tests.
 - **`Menu.Root` takes `disabled`**, which also disables its triggers.
 
 - **`ContextMenu.Arrow`**, re-exported from `Menu` — `ContextMenu.Positioner` already provides the
@@ -268,7 +273,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   `isValueSelected`/`toggleSelectedValue` and now take a comparer, shared with `Combobox`. Neither
   was exported from the package.
 - React Doctor: 98/100. The one remaining warning is the documented `expo-image` rejection.
-- 1085 tests, up from 912.
+- 1089 tests, up from 912.
 
 ---
 

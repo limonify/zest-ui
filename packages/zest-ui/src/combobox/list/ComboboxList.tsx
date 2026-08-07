@@ -18,6 +18,9 @@ import { useStoreState } from '../../store/ReactStore';
  *
  * When `items` holds groups, the render function receives each group instead —
  * wrap it in `Combobox.Group` and render its items with `Combobox.Collection`.
+ *
+ * The filtered entries are also on `state.items`, which is what lets a `render`
+ * function hand them to a virtualized list instead.
  */
 export function ComboboxList(componentProps: ComboboxList.Props) {
   const { render, className, style, children, ref, ...elementProps } = componentProps;
@@ -27,12 +30,18 @@ export function ComboboxList(componentProps: ComboboxList.Props) {
 
   const open = useStoreState(store, 'open');
 
-  const state: ComboboxListState = { open, empty: filteredItemCount === 0 };
+  const state: ComboboxListState = React.useMemo(
+    () => ({ open, empty: filteredItemCount === 0, items: filteredItems }),
+    [open, filteredItemCount, filteredItems],
+  );
 
   return useRenderElement(View, componentProps, {
     state,
     ref,
-    props: [{ children: filteredItems.map((entry, index) => children(entry, index)) }, elementProps],
+    props: [
+      { children: children ? filteredItems.map((entry, index) => children(entry, index)) : undefined },
+      elementProps,
+    ],
   });
 }
 
@@ -43,11 +52,21 @@ export interface ComboboxListState {
    * empty group is not content.
    */
   empty: boolean;
+  /**
+   * The entries left after filtering, in order — the same ones `children`
+   * receives. A `render` function needs them to feed a virtualized list, which
+   * takes its rows from `data` rather than from children.
+   */
+  items: ComboboxEntry[];
 }
 
 export interface ComboboxListProps
   extends Omit<ZestUIComponentProps<typeof View, ComboboxListState>, 'children'> {
-  children: (entry: ComboboxEntry, index: number) => React.ReactNode;
+  /**
+   * Renders one entry. Omit it when a `render` function draws the rows itself —
+   * a `FlatList`, say, which takes them from `data`.
+   */
+  children?: ((entry: ComboboxEntry, index: number) => React.ReactNode) | undefined;
 }
 
 export namespace ComboboxList {

@@ -234,6 +234,50 @@ Used outside a group, `Combobox.Collection` renders every filtered item with gro
 `Combobox.ItemIndicator` renders only while its item is selected; `keepMounted` keeps it mounted so
 you can hide it with a style instead, which is what an exit animation needs.
 
+## Long lists
+
+`Combobox.List` mounts a row for every filtered entry. That is the right default — most lists are
+short, and virtualizing one costs you `getItemLayout`, key management and a scroll container you
+did not ask for. Past a few hundred rows it stops being right.
+
+zest has no `virtualized` prop: upstream's is built on DOM measurement, and React Native already
+ships the answer in `FlatList`. What zest owes you is the filtered data, which is on
+`state.items` — so swap the element and hand it over:
+
+```tsx
+import { FlatList, Text } from 'react-native';
+
+<Combobox.List
+  render={(props, state) => (
+    <FlatList
+      {...props}
+      children={undefined}
+      data={state.items}
+      keyExtractor={(item) => String(item.value)}
+      renderItem={({ item }) => (
+        <Combobox.Item item={item} style={styles.item}>
+          <Text>{item.label}</Text>
+        </Combobox.Item>
+      )}
+    />
+  )}
+/>
+```
+
+Two details make it work:
+
+- **Drop `children`.** `FlatList` takes its rows from `data`; the mapped children zest would
+  otherwise pass are ignored, and passing them wastes the work of building them. Omitting the
+  `children` prop on `Combobox.List` skips that mapping entirely.
+- **`state.items` is the filtered list**, the same entries `children` would have received, in the
+  same order. It re-narrows as the query does, so `FlatList` re-renders from it for free.
+
+With grouped `items` the entries are groups, so either flatten them yourself for a `SectionList` or
+keep `Combobox.List`'s children form — grouping and virtualization do not compose on their own.
+
+`Select.List` needs nothing equivalent: its rows are your own JSX, so use a `FlatList` inside
+`Select.Popup` directly, or swap `Select.List`'s element the same way.
+
 ## Announcing results
 
 Filtering never moves focus, so a screen reader is not told that the list behind the input just
