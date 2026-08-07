@@ -31,6 +31,23 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   …if you want the platform transition back. Affects `Dialog`, `AlertDialog`, `Popover`, `Menu`,
   `ContextMenu`, `Select` and `Combobox`.
 
+- **`react-native-gesture-handler` is now a required peer, not an optional one.** The optional
+  declaration was true for npm and false for the bundler: the package root re-exports every
+  component and Metro does not tree-shake, so `import { Dialog } from '@limonify/zest-ui'` pulls
+  `Slider`, `Drawer`, `Toast` and `NumberField` into the graph, and each imports gesture-handler at
+  the top level. Anyone who followed the old "install it only if you use them" advice and imported
+  from the root got `Unable to resolve module react-native-gesture-handler` at bundle time, with
+  the docs saying it was unnecessary.
+
+  ```bash
+  bun add react-native-gesture-handler
+  ```
+
+  Nothing about the code changed — this makes the install-time contract match what the bundler
+  already required. The per-component subpaths still avoid it entirely
+  (`@limonify/zest-ui/dialog`), and `GestureHandlerRootView` is still only needed when you actually
+  render `Slider`, `Drawer`, `Toast` or `NumberField.ScrubArea`.
+
 - **A range slider's thumbs now push each other by default.** Dragging a thumb into its neighbour
   used to stop it dead and drop the excess movement; it now pushes the neighbour along the track,
   which is upstream's default. The old behaviour is still available:

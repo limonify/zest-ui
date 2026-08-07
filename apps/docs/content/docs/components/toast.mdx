@@ -5,9 +5,9 @@ description: Transient messages queued above the app, without blocking it.
 
 `Toast` is the one popup that is **not** a Modal — the app underneath must stay usable. Place `Toast.Provider` at the app root with a `Toast.Viewport`, and raise toasts imperatively with `useToastManager()`.
 
-`Toast.Root` is built on a swipe gesture, so `Toast` needs
-[`react-native-gesture-handler`](/docs/installation#peer-dependencies) and the app wrapped in
-`GestureHandlerRootView` — even if you never swipe one away.
+`Toast.Root` is built on a swipe gesture, so a `Toast` needs the app wrapped in
+`GestureHandlerRootView` — even if you never swipe one away. See
+[peer dependencies](/docs/installation#peer-dependencies).
 
 <Demo>A toast sliding in, pausing on press, and swiping away.</Demo>
 

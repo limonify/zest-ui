@@ -263,11 +263,6 @@
   "dependencies": {
     "@floating-ui/react-native": "^0.10.10"
   },
-  "peerDependenciesMeta": {
-    "react-native-gesture-handler": {
-      "optional": true
-    }
-  },
   "size-limit": [
     {
       "name": "full",

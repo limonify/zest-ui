@@ -12,24 +12,30 @@ bun add @limonify/zest-ui
 
 ### Peer dependencies
 
-zest needs React 19+ and React Native 0.79+. Five parts are built on
-`react-native-gesture-handler` (an **optional** peer):
-
-| Part | When you need it |
-| --- | --- |
-| `Slider.Control` | always, for a `Slider` |
-| `Drawer.Popup`, `Drawer.SwipeArea` | always, for a `Drawer` |
-| `Toast.Root` | always, for a `Toast` |
-| `NumberField.ScrubArea` | only if you render the scrub area |
-
-Each imports it at the top level, so it has to be installed if any of those are in your tree.
-Install it if so:
+zest needs React 19+ and React Native 0.79+, plus `react-native-gesture-handler`, which is a
+**required** peer:
 
 ```bash
 bun add react-native-gesture-handler
 ```
 
-Wrap your app once in `GestureHandlerRootView`:
+### Why it is required, and when you must wrap the app
+
+Five parts are built on gestures — `Slider.Control`, `Drawer.Popup`, `Drawer.SwipeArea`,
+`Toast.Root` and `NumberField.ScrubArea` — and each imports the library at the top level.
+
+The package is required rather than optional because the package root re-exports every component
+and Metro does not tree-shake, so `import { Dialog } from '@limonify/zest-ui'` pulls the gesture
+parts into the bundle whether you render them or not. A per-component subpath does not:
+
+```tsx
+import { Dialog } from '@limonify/zest-ui/dialog';   // no gesture handler in this graph
+```
+
+**Wrapping the app is a separate question.** `GestureHandlerRootView` is only needed if you
+actually render one of those five parts. Without it they throw
+`GestureDetector must be used as a descendant of GestureHandlerRootView`; every other component
+works without it:
 
 ```tsx
 import { GestureHandlerRootView } from 'react-native-gesture-handler';

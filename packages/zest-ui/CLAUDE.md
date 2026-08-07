@@ -7,7 +7,7 @@ Headless React Native port of [Base UI](https://github.com/mui/base-ui). When po
 - **Part names come from real Base UI**, never Radix: `Popup`/`Backdrop`/`Viewport`/`Panel`/`Positioner`, not `Content`/`Overlay`.
 - **React 19 only**: `ref` is a regular prop (no `forwardRef`), use `React.useId`, `React.useSyncExternalStore` directly.
 - **Zero DOM**: no `document`, `window` DOM APIs, `Event`, `HTMLElement`. Native events are `ZestNativeEvent` (`GestureResponderEvent | NativeSyntheticEvent<unknown> | undefined`).
-- **Two runtime deps, and no more without a decision**: `@floating-ui/react-native` (positioning) and `react-native-gesture-handler` (an *optional* peer, imported by `Slider.Control`, `Drawer.Popup`, `Drawer.SwipeArea`, `Toast.Root` and `NumberField.ScrubArea` — five parts, all static top-level imports). `reanimated` is not used and is not planned — see the animation contract.
+- **Two runtime deps, and no more without a decision**: `@floating-ui/react-native` (positioning) and `react-native-gesture-handler` (a *required* peer, imported by `Slider.Control`, `Drawer.Popup`, `Drawer.SwipeArea`, `Toast.Root` and `NumberField.ScrubArea`). It was an optional peer until the root barrel made that untrue: `src/index.ts` re-exports every component and Metro does not tree-shake, so any root import pulls all five in. Only the subpath entries avoid it. `reanimated` is not used and is not planned — see the animation contract.
 - Always port from the upstream source, not from memory. Clone shallow into the session scratchpad if the reference copy is gone:
   `git clone --depth 1 https://github.com/mui/base-ui <scratchpad>/base-ui`
 
@@ -184,7 +184,7 @@ There is no `autoUpdate` equivalent in RN: parts re-measure by calling the retur
 
 ## Gestures (`react-native-gesture-handler`)
 
-Only `Slider.Control` and `Drawer.Popup` use it, which is why it is an **optional** peer dependency. Both need the app wrapped in `<GestureHandlerRootView>` — including in tests, or `GestureDetector` throws.
+Five parts use it: `Slider.Control`, `Drawer.Popup`, `Drawer.SwipeArea`, `Toast.Root` and `NumberField.ScrubArea`. It is a **required** peer — see the ground rules for why the root barrel makes it impossible to keep optional. Every one of them needs the app wrapped in `<GestureHandlerRootView>` — including in tests, or `GestureDetector` throws.
 
 - Gesture callbacks touch React state, so they must be `.runOnJS(true)`.
 - **Gesture callbacks read stale state.** A drag emits several changes in one synchronous batch (its last move and its release land before React re-renders), so any value the callbacks both read and write lives in a ref, synced back from render by a `useIsoLayoutEffect` with **no dependency array** — it must also resync when a controlled consumer ignores a change, which re-renders nothing. `SliderRoot`'s `valuesRef` is the reference implementation.

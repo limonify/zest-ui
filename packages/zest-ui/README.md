@@ -28,11 +28,19 @@ bun add @limonify/zest-ui
 
 **Peers:** React 19+, React Native 0.79+.
 
-`Slider`, `Drawer`, `Toast` and `NumberField.ScrubArea` need `react-native-gesture-handler` (optional peer) — `NumberField` only for that one part, the other three always. Install it if you use any of them, and wrap your app once:
+`react-native-gesture-handler` is a **required** peer — install it alongside zest:
 
 ```bash
 bun add react-native-gesture-handler
 ```
+
+It is required rather than optional because the package root re-exports every component, and Metro
+does not tree-shake: importing anything from `@limonify/zest-ui` pulls in `Slider`, `Drawer`,
+`Toast` and `NumberField`, which import it statically. Reach for the per-component subpaths
+(`@limonify/zest-ui/dialog`) if you want a bundle without it.
+
+Wrapping the app is separate, and only needed if you actually render one of the gesture-driven
+parts — `Slider`, `Drawer`, `Toast`, or `NumberField.ScrubArea`:
 
 ```tsx
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
