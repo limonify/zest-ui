@@ -135,4 +135,57 @@ describe('arrow re-measure', () => {
     // The consumer's handler is chained, not replaced.
     expect(onLayout).toHaveBeenCalled();
   });
+
+  it("a consumer's own style still wins over the computed position", async () => {
+    await render(
+      <Popover.Root defaultOpen>
+        <Popover.Trigger testID="trigger">
+          <Text>Open</Text>
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Popover.Arrow testID="arrow" style={{ left: 999 }} />
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>,
+    );
+
+    // Styles merge as `[internal, external]`, so the consumer is last and wins.
+    expect(screen.getByTestId('arrow').props.style).toEqual(
+      expect.arrayContaining([expect.objectContaining({ left: 999 })]),
+    );
+  });
+
+  it("zest's own re-measure survives a consumer taking onLayout", async () => {
+    // The risk of injecting a handler into a part: a consumer who supplies their
+    // own must not silently switch our positioning off.
+    const onLayout = jest.fn();
+
+    await render(
+      <Popover.Root defaultOpen>
+        <Popover.Trigger testID="trigger">
+          <Text>Open</Text>
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Positioner>
+            <Popover.Popup>
+              <Popover.Arrow testID="arrow" onLayout={onLayout} />
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>,
+    );
+
+    const withConsumer = screen.getByTestId('arrow').props.onLayout;
+
+    // The merged handler is not the consumer's function itself — it is the chain
+    // of both, so ours still runs.
+    expect(withConsumer).not.toBe(onLayout);
+    expect(typeof withConsumer).toBe('function');
+
+    await layout('arrow', 12, 6);
+    expect(onLayout).toHaveBeenCalledTimes(1);
+  });
 });
