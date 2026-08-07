@@ -28,7 +28,7 @@ bun add @limonify/zest-ui
 
 **Peers:** React 19+, React Native 0.79+.
 
-`Slider` and `Drawer` need `react-native-gesture-handler` (optional peer). Install it only if you use them, and wrap your app once:
+`Slider`, `Drawer`, `Toast` and `NumberField.ScrubArea` need `react-native-gesture-handler` (optional peer) — `NumberField` only for that one part, the other three always. Install it if you use any of them, and wrap your app once:
 
 ```bash
 bun add react-native-gesture-handler

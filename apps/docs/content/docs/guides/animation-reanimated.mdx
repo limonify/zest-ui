@@ -165,9 +165,9 @@ every example that uses the hook is covered. For `entering`/`exiting` presets, p
 
 ## Gesture-following values
 
-`Slider` and `Drawer` already use `react-native-gesture-handler`, and publish their live drag on the
-state object — `Drawer.Popup` as `state.swipeMovement`, `Slider` as `state.values` (plus
-`state.dragging`). Feed those straight into a shared value for a sheet or thumb that tracks the finger
+`Slider`, `Drawer` and `Toast` are built on `react-native-gesture-handler`, and publish their live
+drag on the state object — `Drawer.Popup` and `Toast.Root` as `state.swipeMovement`, `Slider` as
+`state.values` (plus `state.dragging`). Feed those straight into a shared value for a sheet or thumb that tracks the finger
 and springs home on release:
 
 ```tsx

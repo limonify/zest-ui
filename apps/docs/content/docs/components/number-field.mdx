@@ -5,6 +5,10 @@ description: A numeric input with steppers and a scrub area.
 
 `NumberField` is a numeric text input with increment/decrement buttons and a drag-to-scrub area, with locale-aware parsing and formatting.
 
+`NumberField.ScrubArea` is the one part built on a drag gesture, so rendering it needs
+[`react-native-gesture-handler`](/docs/installation#peer-dependencies) and the app wrapped in
+`GestureHandlerRootView`. Leave it out and the rest of the component needs neither.
+
 <Demo>Stepping and scrubbing a number.</Demo>
 
 ## Anatomy

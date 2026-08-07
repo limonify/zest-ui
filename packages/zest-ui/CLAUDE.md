@@ -7,7 +7,7 @@ Headless React Native port of [Base UI](https://github.com/mui/base-ui). When po
 - **Part names come from real Base UI**, never Radix: `Popup`/`Backdrop`/`Viewport`/`Panel`/`Positioner`, not `Content`/`Overlay`.
 - **React 19 only**: `ref` is a regular prop (no `forwardRef`), use `React.useId`, `React.useSyncExternalStore` directly.
 - **Zero DOM**: no `document`, `window` DOM APIs, `Event`, `HTMLElement`. Native events are `ZestNativeEvent` (`GestureResponderEvent | NativeSyntheticEvent<unknown> | undefined`).
-- **Two runtime deps, and no more without a decision**: `@floating-ui/react-native` (positioning) and `react-native-gesture-handler` (an *optional* peer, imported only by Slider and Drawer). `reanimated` is not used and is not planned — see the animation contract.
+- **Two runtime deps, and no more without a decision**: `@floating-ui/react-native` (positioning) and `react-native-gesture-handler` (an *optional* peer, imported by `Slider.Control`, `Drawer.Popup`, `Drawer.SwipeArea`, `Toast.Root` and `NumberField.ScrubArea` — five parts, all static top-level imports). `reanimated` is not used and is not planned — see the animation contract.
 - Always port from the upstream source, not from memory. Clone shallow into the session scratchpad if the reference copy is gone:
   `git clone --depth 1 https://github.com/mui/base-ui <scratchpad>/base-ui`
 

@@ -12,8 +12,18 @@ bun add @limonify/zest-ui
 
 ### Peer dependencies
 
-zest needs React 19+ and React Native 0.79+. Two components — `Slider` and `Drawer` — use
-`react-native-gesture-handler` (an **optional** peer). Install it only if you use them:
+zest needs React 19+ and React Native 0.79+. Five parts are built on
+`react-native-gesture-handler` (an **optional** peer):
+
+| Part | When you need it |
+| --- | --- |
+| `Slider.Control` | always, for a `Slider` |
+| `Drawer.Popup`, `Drawer.SwipeArea` | always, for a `Drawer` |
+| `Toast.Root` | always, for a `Toast` |
+| `NumberField.ScrubArea` | only if you render the scrub area |
+
+Each imports it at the top level, so it has to be installed if any of those are in your tree.
+Install it if so:
 
 ```bash
 bun add react-native-gesture-handler
