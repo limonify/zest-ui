@@ -185,9 +185,25 @@ input moves *inside* the popup where it filters:
 </Combobox.Root>
 ```
 
-The trigger is `role="combobox"` with `aria-haspopup="listbox"` and reports `state.open`. The popup
-anchors to whichever of trigger and input was pressed last, so use one or the other — not both as
-anchors. `Autocomplete.Trigger` is the same part, re-exported.
+The trigger is `role="combobox"` with `aria-haspopup="listbox"` and reports `state.open`.
+`Autocomplete.Trigger` is the same part, re-exported.
+
+The popup anchors to `Combobox.Trigger` whenever there is one, and to `Combobox.Input` otherwise —
+it has to be that way round, because in this shape the input is *inside* the popup and anchoring to
+it would position the popup against itself. `state.triggerWidth` follows the same rule, so it is
+always the width of the control the user pressed.
+
+Two things are worth knowing about the popup's height in this shape. React Native does not clip a
+child to its parent's bounds, so a `maxHeight` popup needs `overflow: 'hidden'`; and once it is
+clipped, the rows have to scroll — `Combobox.List` is headless, so that is a `ScrollView` (or a
+`FlatList`, see [Long lists](#long-lists)) you supply:
+
+```tsx
+<Combobox.Popup style={{ maxHeight: 240, overflow: 'hidden' }}>
+  <Combobox.Input placeholder="Search" />
+  <Combobox.List render={(props) => <ScrollView {...props} />}>{/* … */}</Combobox.List>
+</Combobox.Popup>
+```
 
 ## Grouping items
 
@@ -405,14 +421,16 @@ anything left to clear:
 
 ### Sizing the popup to its trigger
 
-The positioner and the popup both publish `triggerWidth` and `triggerHeight` — the trigger's
-measured size, and the React Native counterpart of the web's `--anchor-width` CSS variable:
+The positioner and the popup both publish `triggerWidth` and `triggerHeight` — the measured size of
+whatever the popup is anchored to, and the React Native counterpart of the web's `--anchor-width`
+CSS variable:
 
 ```tsx
 <Combobox.Popup style={(state) => [styles.popup, { minWidth: state.triggerWidth }]} />
 ```
 
-Both are `undefined` until the trigger has been laid out once.
+That is `Combobox.Trigger` when there is one and `Combobox.Input` otherwise, matching what the
+popup is positioned against. Both are `undefined` until the anchor has been laid out once.
 
 ## Animation
 

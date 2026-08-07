@@ -66,10 +66,14 @@ export function ComboboxInput<Payload = unknown>(componentProps: ComboboxInput.P
   }, [store]);
 
   const triggerRef = React.useRef<unknown>(null);
+  // Its own slot, not `triggerNode`: with a `Combobox.Trigger` the input lives
+  // inside the popup, and anchoring the popup to an element it contains would
+  // walk it across the screen. The positioner falls back to this when there is
+  // no trigger, which is the plain combobox.
   const anchorRef = React.useCallback(
     (node: unknown) => {
       triggerRef.current = node;
-      store.set('triggerNode', node);
+      store.set('inputNode', node);
     },
     [store],
   );
@@ -134,8 +138,8 @@ export function ComboboxInput<Payload = unknown>(componentProps: ComboboxInput.P
         },
         onLayout(event: LayoutChangeEvent) {
           const { width, height } = event.nativeEvent.layout;
-          store.set('triggerWidth', width);
-          store.set('triggerHeight', height);
+          store.set('inputWidth', width);
+          store.set('inputHeight', height);
           update?.();
         },
         onBlur() {

@@ -199,6 +199,9 @@ export const styles = StyleSheet.create({
   comboboxPopup: {
     maxHeight: 240,
     marginTop: 4,
+    // React Native does not clip to a parent's bounds by default, so a capped
+    // popup spills its rows over the app underneath without this.
+    overflow: 'hidden',
   },
   comboboxEmpty: {
     padding: 12,

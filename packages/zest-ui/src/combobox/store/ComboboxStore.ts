@@ -176,17 +176,29 @@ export type State = {
    */
   suppressFocusOpen: boolean;
   /**
-   * The anchor's native node, carried across the portal boundary.
+   * `Combobox.Trigger`'s native node, carried across the portal boundary.
    */
   triggerNode: unknown;
   /**
-   * The input's measured width, used to size the popup.
+   * The trigger's measured width, used to size the popup.
    */
   triggerWidth: number | undefined;
   /**
-   * The input's measured height.
+   * The trigger's measured height.
    */
   triggerHeight: number | undefined;
+  /**
+   * `Combobox.Input`'s native node, and its measurements.
+   *
+   * The input is the anchor of a plain combobox, but it is *inside the popup*
+   * in the trigger shape — so it cannot share `triggerNode`. It mounts later
+   * than the trigger does, and it would win: the popup would be positioned
+   * against an element it contains, and would walk across the screen each time
+   * it opened. The positioner prefers the trigger and falls back to these.
+   */
+  inputNode: unknown;
+  inputWidth: number | undefined;
+  inputHeight: number | undefined;
   update: (() => void) | undefined;
   /**
    * Ref to the input element, for programmatic blur.
@@ -256,6 +268,9 @@ const selectors = {
   triggerNode: createSelector((state: State) => state.triggerNode),
   triggerWidth: createSelector((state: State) => state.triggerWidth),
   triggerHeight: createSelector((state: State) => state.triggerHeight),
+  inputNode: createSelector((state: State) => state.inputNode),
+  inputWidth: createSelector((state: State) => state.inputWidth),
+  inputHeight: createSelector((state: State) => state.inputHeight),
   update: createSelector((state: State) => state.update),
   inputRef: createSelector((state: State) => state.inputRef),
   payload: createSelector((state: State) => state.payload),
@@ -290,6 +305,9 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
         triggerNode: null,
         triggerWidth: undefined,
         triggerHeight: undefined,
+        inputNode: null,
+        inputWidth: undefined,
+        inputHeight: undefined,
         update: undefined,
         inputRef: undefined,
         payload: undefined,

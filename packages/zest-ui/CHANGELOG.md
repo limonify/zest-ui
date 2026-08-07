@@ -218,6 +218,20 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 
 ### Fixed
 
+- **A `Combobox` with a `Trigger` no longer positions its popup against itself.** `Combobox.Trigger`
+  and `Combobox.Input` both wrote the same anchor slot from their ref callback, and in the shape the
+  docs recommend for a phone — a button outside, the search input *inside* the popup — the input
+  mounts second and won. The popup was then anchored to an element it contains: it opened offset
+  from its trigger, and moved again on every open. `state.triggerWidth` had the same problem, so
+  sizing a popup to its trigger sized it to the input instead. The anchor is now the trigger
+  whenever there is one, and the input only in its absence, which is the plain combobox. Found by
+  opening the example app on a simulator.
+
+- **`Slider.Thumb` and `Slider.Indicator` now flip under RTL.** Only the touch-to-value mapping was
+  flipped, so the two halves disagreed: a touch 25% from the left became 75, and the thumb was then
+  drawn 75% from the left — travelling away from the finger dragging it. Both parts now anchor with
+  `right` when the direction is `rtl`. Also found by running the app.
+
 - **Choosing one row no longer re-renders the whole list.** Every item subscribed to the entire
   selection, so picking one of fifty re-rendered all fifty — and the selected items shared a context
   with the filtered ones, so a selection also produced a new context value and re-rendered

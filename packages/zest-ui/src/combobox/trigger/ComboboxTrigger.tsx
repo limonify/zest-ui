@@ -40,9 +40,10 @@ import { useStoreState } from '../../store/ReactStore';
  * </Combobox.Root>
  * ```
  *
- * The popup anchors to whichever of the two was pressed last, so a combobox
- * normally has one or the other. Pass a `handle` to render a trigger outside of
- * its `Combobox.Root`.
+ * The popup anchors to the trigger whenever there is one — the input in that
+ * shape is inside the popup, and anchoring to it would position the popup
+ * against itself. Without a trigger the input is the anchor, which is the plain
+ * combobox. Pass a `handle` to render a trigger outside of its `Combobox.Root`.
  */
 export function ComboboxTrigger<Payload = unknown>(componentProps: ComboboxTrigger.Props<Payload>) {
   const {

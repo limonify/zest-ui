@@ -17,7 +17,8 @@ import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
 
 /**
- * Positions the list against the input.
+ * Positions the list against `Combobox.Trigger`, or against `Combobox.Input`
+ * when there is no trigger.
  * Renders a `<View>`.
  */
 export function ComboboxPositioner(componentProps: ComboboxPositioner.Props) {
@@ -40,9 +41,25 @@ export function ComboboxPositioner(componentProps: ComboboxPositioner.Props) {
   const store = useComboboxRootContext();
 
   const open = useStoreState(store, 'open');
+
+  // A `Combobox.Trigger` is the anchor when there is one; without it the input
+  // is, which is the plain combobox. The two cannot share a slot: in the
+  // trigger shape the input sits *inside* this popup, and anchoring to it would
+  // position the popup against itself.
   const triggerNode = useStoreState(store, 'triggerNode');
-  const triggerWidth = useStoreState(store, 'triggerWidth');
-  const triggerHeight = useStoreState(store, 'triggerHeight');
+  const inputNode = useStoreState(store, 'inputNode');
+  const anchorIsTrigger = triggerNode != null;
+  const anchorNode = anchorIsTrigger ? triggerNode : inputNode;
+
+  const measuredTriggerWidth = useStoreState(store, 'triggerWidth');
+  const measuredTriggerHeight = useStoreState(store, 'triggerHeight');
+  const measuredInputWidth = useStoreState(store, 'inputWidth');
+  const measuredInputHeight = useStoreState(store, 'inputHeight');
+
+  // The measurements follow the anchor, so `triggerWidth` still means "the
+  // width of the thing this popup is positioned against".
+  const triggerWidth = anchorIsTrigger ? measuredTriggerWidth : measuredInputWidth;
+  const triggerHeight = anchorIsTrigger ? measuredTriggerHeight : measuredInputHeight;
 
   const positioning = useAnchorPositioning({
     align,
@@ -58,8 +75,8 @@ export function ComboboxPositioner(componentProps: ComboboxPositioner.Props) {
   const { positionerStyles, refs, update } = positioning;
 
   useIsoLayoutEffect(() => {
-    refs.setReference(triggerNode ?? null);
-  }, [refs, triggerNode]);
+    refs.setReference(anchorNode ?? null);
+  }, [refs, anchorNode]);
 
   useIsoLayoutEffect(() => {
     store.set('update', update);
@@ -109,12 +126,14 @@ export interface ComboboxPositionerState {
   side: PhysicalSide;
   align: Align;
   /**
-   * The input's measured width, available for consumers to apply to the popup.
-   * This is the React Native equivalent of the web's `--anchor-width` CSS variable.
+   * The measured width of whatever the popup is anchored to — `Combobox.Trigger`
+   * if there is one, otherwise `Combobox.Input` — available for consumers to
+   * apply to the popup. This is the React Native equivalent of the web's
+   * `--anchor-width` CSS variable.
    */
   triggerWidth: number | undefined;
   /**
-   * The input's measured height.
+   * The anchor's measured height.
    */
   triggerHeight: number | undefined;
 }

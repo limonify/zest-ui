@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
   Accordion,
   AlertDialog,
@@ -1029,14 +1029,26 @@ export function VerifySection() {
         </Combobox.Trigger>
         <Combobox.Portal>
           <Combobox.Backdrop style={styles.transparentBackdrop} />
-          <Combobox.Positioner>
+          {/*
+            `triggerWidth` is the measured width of whatever the popup is
+            anchored to — the trigger here, not the input inside the popup — so
+            this is how a list is made to match the control that opened it.
+          */}
+          <Combobox.Positioner
+            style={(state) => (state.triggerWidth ? { width: state.triggerWidth } : undefined)}
+          >
             <Combobox.Popup style={[styles.floatingPopup, styles.comboboxPopup]}>
               <Combobox.Input placeholder="Search" style={styles.fieldControl} />
               <Combobox.Status style={styles.label} />
               <Combobox.Empty style={styles.comboboxEmpty}>
                 <Text style={styles.label}>No match</Text>
               </Combobox.Empty>
-              <Combobox.List>
+              {/*
+                The popup is capped at 240pt, so the rows have to scroll rather
+                than spill: `Combobox.List` is headless, and here that means a
+                ScrollView.
+              */}
+              <Combobox.List render={(elementProps) => <ScrollView {...elementProps} />}>
                 {(entry) =>
                   isComboboxGroup(entry) ? (
                     <Combobox.Group key={String(entry.value)} items={entry.items}>
