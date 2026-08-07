@@ -195,7 +195,7 @@ Only `Slider.Control` and `Drawer.Popup` use it, which is why it is an **optiona
 | Upstream (web) | Zest (RN) |
 |---|---|
 | tag name (`'div'`, `'button'`) | default component (`View`, `Pressable`, `Text`) |
-| Portal to `document.body` | RN `Modal` (transparent, `animationType="fade"`, `statusBarTranslucent`), overridable via the Portal's `modalProps` — for **every** popup family (see below) |
+| Portal to `document.body` | RN `Modal` (transparent, `animationType="none"` — a native transition would fight the consumer's own, `statusBarTranslucent`), overridable via the Portal's `modalProps` — for **every** popup family (see below) |
 | outside click / dismiss | full-screen `Viewport` Pressable; popup claims responder via `onStartShouldSetResponder: () => true` |
 | Escape key | `Modal.onRequestClose` → `REASONS.escapeKey` |
 | `aria-labelledby` + ids | `useId` + `nativeID` + `accessibilityLabelledBy` (+ keep the `aria-*` prop for RN-web) |

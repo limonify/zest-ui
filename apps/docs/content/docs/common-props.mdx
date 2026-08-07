@@ -71,10 +71,10 @@ Each popup family's `Portal` (`Dialog`, `Drawer`, `AlertDialog`, `Menu`, `Contex
 Modal is out of reach:
 
 ```tsx
-<Dialog.Portal modalProps={{ animationType: 'none' }}>
+<Dialog.Portal modalProps={{ animationType: 'fade' }}>
 ```
 
-The defaults are `transparent`, `animationType="fade"`, `statusBarTranslucent` and
+The defaults are `transparent`, `animationType="none"`, `statusBarTranslucent` and
 `navigationBarTranslucent`. Two of them are load-bearing:
 
 - **`transparent`** is what lets the backdrop show the app underneath.
@@ -88,8 +88,10 @@ Two props stay owned by zest:
   the `escape-key` reason. This is the Android hardware back button, and Escape on web.
 
 <Callout type="info">
-  Pass `animationType: 'none'` when you drive the enter animation yourself — otherwise your animation
-  plays on top of the Modal's own native cross-fade. See
+  `animationType` is `'none'` because zest never animates anything — a native transition you did not
+  ask for competes with the enter/exit you wrote, and tears the surface away mid-exit on close. Pass
+  `'fade'` or `'slide'` to hand the transition back to the platform, which is the right call when
+  you are not animating the popup yourself. See
   [Animating with Reanimated](/docs/guides/animation-reanimated).
 </Callout>
 
