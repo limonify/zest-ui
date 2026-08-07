@@ -7,6 +7,7 @@ import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ZestPortalModalProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
+import { PortalGestureRoot } from '../../internals/portal/PortalGestureRoot';
 
 /**
  * Moves the popup to the top of the app, as an RN `Modal` like the rest of the
@@ -37,7 +38,7 @@ export function ComboboxPortal(props: ComboboxPortal.Props) {
           store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
         }}
       >
-        {children}
+        <PortalGestureRoot>{children}</PortalGestureRoot>
       </Modal>
     </ComboboxPortalContext.Provider>
   );

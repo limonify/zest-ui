@@ -210,6 +210,16 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 
 ### Fixed
 
+- **A touch inside a popup no longer reaches gestures in the app underneath it.** A `Portal` is a
+  React Native `Modal`, which is its own native window, and `react-native-gesture-handler` attaches
+  its recognizer to the root of the tree it was mounted in — so a tap on a `Select` row also went to
+  whatever gesture happened to sit beneath it. Opening a combobox over a `Slider` and picking a row
+  moved the slider. Every `Portal` now renders its children inside their own
+  `GestureHandlerRootView`, which is gesture-handler's documented requirement for `Modal` and also
+  what makes gestures work *inside* a popup — a swipeable `Drawer` needs a gesture root in its own
+  window. Consumers need no change; it lives inside the portal. Verified on a simulator with the
+  same tap before and after.
+
 - **A `Combobox` with a `Trigger` no longer positions its popup against itself.** `Combobox.Trigger`
   and `Combobox.Input` both wrote the same anchor slot from their ref callback, and in the shape the
   docs recommend for a phone — a button outside, the search input *inside* the popup — the input

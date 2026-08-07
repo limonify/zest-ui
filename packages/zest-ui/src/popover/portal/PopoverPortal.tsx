@@ -7,6 +7,7 @@ import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ZestPortalModalProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
+import { PortalGestureRoot } from '../../internals/portal/PortalGestureRoot';
 
 /**
  * A portal element that moves the popup to the top of the app.
@@ -44,7 +45,7 @@ export function PopoverPortal(props: PopoverPortal.Props) {
           store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
         }}
       >
-        {children}
+        <PortalGestureRoot>{children}</PortalGestureRoot>
       </Modal>
     </PopoverPortalContext.Provider>
   );
