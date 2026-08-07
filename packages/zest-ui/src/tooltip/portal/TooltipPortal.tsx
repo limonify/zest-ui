@@ -51,20 +51,22 @@ export function TooltipPortal(props: TooltipPortal.Props) {
           store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
         }}
       >
-        {/* A bare touch catcher rather than a Pressable: it is not a control,
-            it just closes the tooltip. The popup claims the responder itself, so
-            presses inside it never reach here. */}
-        <View
-          style={StyleSheet.absoluteFill}
-          onStartShouldSetResponder={() => true}
-          onResponderRelease={(event: GestureResponderEvent) => {
-            if (disablePointerDismissal) {
-              return;
-            }
-            store.setOpen(false, createChangeEventDetails(REASONS.outsidePress, event));
-          }}
-        />
-        <PortalGestureRoot>{children}</PortalGestureRoot>
+        <PortalGestureRoot>
+          {/* A bare touch catcher rather than a Pressable: it is not a control,
+              it just closes the tooltip. The popup claims the responder itself,
+              so presses inside it never reach here. */}
+          <View
+            style={StyleSheet.absoluteFill}
+            onStartShouldSetResponder={() => true}
+            onResponderRelease={(event: GestureResponderEvent) => {
+              if (disablePointerDismissal) {
+                return;
+              }
+              store.setOpen(false, createChangeEventDetails(REASONS.outsidePress, event));
+            }}
+          />
+          {children}
+        </PortalGestureRoot>
       </Modal>
     </TooltipPortalContext.Provider>
   );
