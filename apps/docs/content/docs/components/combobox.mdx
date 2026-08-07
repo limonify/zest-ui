@@ -243,6 +243,11 @@ changed. `Combobox.Status` is a polite live region that says how many items are 
 Without a function child it announces an English count. It renders nothing while the list is
 closed, and it counts items inside groups rather than the groups.
 
+React Native's `accessibilityLiveRegion` is Android-only, so on iOS the same text is spoken through
+`AccessibilityInfo.announceForAccessibility` instead — announcing on both would say it twice on
+Android. Either way it only speaks when the text actually changes, so a keystroke that does not
+change the count stays quiet.
+
 ## Multiple selection
 
 With `multiple`, the value is an array and pressing an item toggles it instead of replacing the

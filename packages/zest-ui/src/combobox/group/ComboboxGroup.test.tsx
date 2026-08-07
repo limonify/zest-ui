@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text } from 'react-native';
+import { AccessibilityInfo, Text } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Combobox } from '../../index';
 import { isComboboxGroup } from '../store/ComboboxStore';
@@ -262,5 +262,46 @@ describe('Combobox.Status', () => {
     );
 
     expect(screen.getByTestId('status')).toHaveTextContent('2 sonuç');
+  });
+});
+
+describe('Combobox.Status on iOS', () => {
+  /**
+   * `accessibilityLiveRegion` is Android-only, so on iOS the same text has to be
+   * spoken explicitly or the part would do nothing there at all.
+   */
+  const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility');
+
+  beforeEach(() => {
+    announce.mockClear();
+  });
+
+  it('announces the count, and only when it changes', async () => {
+    await render(
+      <Combobox.Root items={['Apple', 'Apricot', 'Banana']} defaultOpen>
+        <Combobox.Input testID="input" />
+        <Combobox.Status testID="status" />
+      </Combobox.Root>,
+    );
+
+    expect(announce).toHaveBeenLastCalledWith('3 results');
+
+    await type('ap');
+    expect(announce).toHaveBeenLastCalledWith('2 results');
+
+    // A keystroke that does not change the count says nothing new.
+    announce.mockClear();
+    await type('ap ');
+    expect(announce).not.toHaveBeenCalled();
+  });
+
+  it('says nothing while the list is closed', async () => {
+    await render(
+      <Combobox.Root items={['Apple']}>
+        <Combobox.Status testID="status" />
+      </Combobox.Root>,
+    );
+
+    expect(announce).not.toHaveBeenCalled();
   });
 });

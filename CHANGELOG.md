@@ -181,6 +181,11 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 
 ### Fixed
 
+- **`Combobox.Status` now announces on iOS too.** It was built on
+  `accessibilityLiveRegion`, which React Native only implements on Android, so on iOS the part did
+  nothing at all. iOS now gets the same text through `AccessibilityInfo.announceForAccessibility`,
+  and only when it changes — a keystroke that does not change the count stays quiet.
+
 - **A blur could validate against a stale value.** `Field.Control` read the value from its render
   closure, so a change and the blur it causes landing in one batch — before React re-rendered —
   validated the value from *before* the change. The handler now writes the ref it reads, which is
@@ -246,7 +251,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   `isValueSelected`/`toggleSelectedValue` and now take a comparer, shared with `Combobox`. Neither
   was exported from the package.
 - React Doctor: 98/100. The one remaining warning is the documented `expo-image` rejection.
-- 1077 tests, up from 912.
+- 1079 tests, up from 912.
 
 ---
 
