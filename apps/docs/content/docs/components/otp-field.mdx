@@ -10,7 +10,11 @@ description: A one-time-code input of single-character slots.
 ## Anatomy
 
 <Anatomy code={`OTPField.Root
-  OTPField.Input (× length)`} />
+  OTPField.Input (× length)
+  OTPField.Separator`} />
+
+`OTPField.Separator` is the standalone `Separator`, re-exported — put one between groups of digits
+for a code like `123-456`.
 
 ## Usage
 

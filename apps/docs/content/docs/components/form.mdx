@@ -11,6 +11,8 @@ that failed.
 submit event — so submission is imperative, through `actionsRef`. What upstream's `Form` does that
 still earns its place here is exactly the two things above.
 
+<Demo>Submitting an incomplete form, and a server error landing on one field.</Demo>
+
 ## Anatomy
 
 <Anatomy code={`Form
@@ -103,6 +105,19 @@ value or function of state, `render`, `ref`).
 <AutoType path="../../packages/zest-ui/src/form/Form.tsx" name="FormProps" />
 
 <AutoType path="../../packages/zest-ui/src/form/Form.tsx" name="FormActions" />
+
+## State
+
+`Form` renders a plain grouping element and carries no state of its own — there is nothing about a
+form as a whole that you would style differently. Everything worth branching on lives on the fields
+inside it, and reaches your `style`/`render` functions there:
+
+<AutoType path="../../packages/zest-ui/src/field/root/FieldRoot.tsx" name="FieldRootState" />
+
+`Field.Error` adds every validation message on top of those, so a `validate` returning several can
+render them all:
+
+<AutoType path="../../packages/zest-ui/src/field/error/FieldError.tsx" name="FieldErrorState" />
 
 ## Accessibility
 

@@ -103,6 +103,29 @@ These fields reach your `style` and `render` functions on **Toast.Root** (`style
 
 <AutoType path="../../packages/zest-ui/src/toast/root/ToastRoot.tsx" name="ToastRootState" />
 
+### Raising a toast from outside React
+
+`useToastManager()` needs a component. When the caller is not one — an API client, a navigation
+guard, a store subscription — create a manager and hand it to the provider:
+
+```tsx
+import { Toast } from '@limonify/zest-ui';
+
+// module scope, outside any component
+export const toasts = Toast.createToastManager();
+
+<Toast.Provider toastManager={toasts}>{/* … */}</Toast.Provider>
+```
+
+```ts
+// anywhere, with no React in sight
+toasts.add({ title: 'Saved' });
+```
+
+The manager has the same surface as the hook — `add`, `update`, `close`, `remove`, `promise` — and
+the two work side by side: toasts raised either way land in the same queue and obey the provider's
+`limit` and `timeout`.
+
 ## Animation
 
 `Toast.Root` publishes `state.transitionStatus`, its stacking `offsetY`/`index`, and `swipeMovement`. Set `removeOnClose={false}` so the row survives its exit, remove it from the queue when the exit finishes, and use `LinearTransition` so the stack reflows smoothly:

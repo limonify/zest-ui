@@ -22,10 +22,15 @@ description: A trigger that opens a list to choose one (or several) values.
   Select.Portal
     Select.Backdrop
     Select.Positioner
+      Select.Arrow
       Select.Popup
         Select.List
           Select.Group / Select.GroupLabel
-          Select.Item > Select.ItemText / Select.ItemIndicator`} />
+          Select.Item > Select.ItemText / Select.ItemIndicator
+          Select.Separator`} />
+
+`Select.Arrow` points the popup at its trigger and is positioned for you; `Select.Separator` is the
+standalone `Separator`, re-exported so a divider between groups reads in the same vocabulary.
 
 ## Usage
 
