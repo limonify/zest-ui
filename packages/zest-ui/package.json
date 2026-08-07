@@ -77,6 +77,11 @@
       "react-native": "./src/dialog/index.ts",
       "default": "./lib/dialog/index.js"
     },
+    "./direction-provider": {
+      "types": "./lib/direction-provider/index.d.ts",
+      "react-native": "./src/direction-provider/index.ts",
+      "default": "./lib/direction-provider/index.js"
+    },
     "./drawer": {
       "types": "./lib/drawer/index.d.ts",
       "react-native": "./src/drawer/index.ts",
@@ -181,6 +186,11 @@
       "types": "./lib/tooltip/index.d.ts",
       "react-native": "./src/tooltip/index.ts",
       "default": "./lib/tooltip/index.js"
+    },
+    "./form": {
+      "types": "./lib/form/index.d.ts",
+      "react-native": "./src/form/index.ts",
+      "default": "./lib/form/index.js"
     },
     "./hooks": {
       "types": "./lib/hooks/index.d.ts",

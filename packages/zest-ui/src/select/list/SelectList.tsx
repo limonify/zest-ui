@@ -1,7 +1,8 @@
 'use client';
 import { ScrollView } from 'react-native';
+import { useSelectRootContext } from '../root/SelectRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import { EMPTY_OBJECT } from '../../utils/empty';
+import { useStoreState } from '../../store/ReactStore';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -14,7 +15,10 @@ import type { ZestUIComponentProps } from '../../types';
 export function SelectList(componentProps: SelectList.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const state: SelectListState = EMPTY_OBJECT;
+  const store = useSelectRootContext();
+  const open = useStoreState(store, 'open');
+
+  const state: SelectListState = { open };
 
   return useRenderElement(ScrollView, componentProps, {
     state,
@@ -31,7 +35,13 @@ export function SelectList(componentProps: SelectList.Props) {
   });
 }
 
-export interface SelectListState {}
+export interface SelectListState {
+  /**
+   * Whether the select popup is currently open. `Combobox.List` publishes the
+   * same, so a list styled from state reads the same either way.
+   */
+  open: boolean;
+}
 
 export interface SelectListProps extends ZestUIComponentProps<typeof ScrollView, SelectListState> {}
 

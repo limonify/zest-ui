@@ -132,6 +132,10 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   list counts as the blur that `validationMode="onBlur"` fires on, and a form focuses the input when
   submission stops there. An autocomplete's value is the typed text, so that is what its field
   validates.
+- **`./form` and `./direction-provider` subpath exports.** Every other component had one; the two
+  new ones were missing, so `import { Form } from '@limonify/zest-ui/form'` failed.
+- **`Select.List` publishes `open`**, matching `Combobox.List`. It was the one list whose state
+  object was empty, so it could not be styled by whether the popup was open.
 - **`Field.Error` publishes `errors` on its state**, so a `validate` returning several messages can
   render them all. `children` still defaults to the first.
 - **`Combobox.Empty` takes `keepMounted`**, and publishes `empty` — the exit-animation lever every
@@ -186,7 +190,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   `isValueSelected`/`toggleSelectedValue` and now take a comparer, shared with `Combobox`. Neither
   was exported from the package.
 - React Doctor: 98/100. The one remaining warning is the documented `expo-image` rejection.
-- 1039 tests, up from 912.
+- 1040 tests, up from 912.
 
 ---
 

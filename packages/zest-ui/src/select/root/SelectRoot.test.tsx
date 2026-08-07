@@ -525,3 +525,24 @@ describe('Select handles and dismissal', () => {
     expect(seen.at(-1)).toBe(240);
   });
 });
+
+describe('Select.List state', () => {
+  it('publishes open, like Combobox.List does', async () => {
+    const styleFn = jest.fn(() => undefined);
+
+    await render(
+      <Select.Root defaultOpen>
+        <Select.Trigger testID="trigger" />
+        <Select.Portal>
+          <Select.Positioner>
+            <Select.Popup>
+              <Select.List testID="list" style={styleFn} />
+            </Select.Popup>
+          </Select.Positioner>
+        </Select.Portal>
+      </Select.Root>,
+    );
+
+    expect(styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ open: true }));
+  });
+});
