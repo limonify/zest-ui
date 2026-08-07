@@ -47,6 +47,19 @@ one placed beside its anchor, `start`/`end` run vertically.
 `state.align` still reports what you asked for. You wrote `start`, so a collision that moved the
 popup reports `end` — never the physical edge RTL happened to put `start` on.
 
+**Logical sides.** Every anchored positioner takes `side="inline-start"` and `side="inline-end"`
+alongside the four physical ones. They resolve against the direction — `inline-start` is the left
+under LTR and the right under RTL — so a popup can be placed on the reading-start edge without you
+branching on `useDirection` yourself:
+
+```tsx
+<Menu.Positioner side="inline-end" align="start" />
+```
+
+`state.side` still reports a **physical** side, never a logical one: it is what you style against,
+and it is narrowed to `PhysicalSide` (`'top' | 'right' | 'bottom' | 'left'`) so a `switch` over it
+is exhaustive.
+
 **Slider.** A horizontal slider's value grows right to left, and `Slider.Root` publishes
 `state.direction` so you can mirror your own thumb and indicator. React Native's `start` style prop
 is direction-aware and `left` is not, so position from `start`:

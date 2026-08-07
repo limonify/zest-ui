@@ -83,5 +83,28 @@ const styles = StyleSheet.create({
 });
 ```
 
+## Importing
+
+Everything is exported from the package root, which is the simplest thing to reach for:
+
+```tsx
+import { Dialog, Form, DirectionProvider } from '@limonify/zest-ui';
+```
+
+Every component and utility also has its own subpath, which is what a bundler needs to drop the
+rest of the library:
+
+```tsx
+import { Dialog } from '@limonify/zest-ui/dialog';
+import { Form } from '@limonify/zest-ui/form';
+import { DirectionProvider } from '@limonify/zest-ui/direction-provider';
+import { useFilter } from '@limonify/zest-ui/filter';
+```
+
+The subpath is the component's directory name — `alert-dialog`, `number-field`, `radio-group` and
+so on — plus `filter`, `hooks`, `store`, `use-render`, `merge-props` and `types`. Metro resolves
+these to the source through the package's `react-native` condition and transforms it with your own
+Babel; everyone else gets the compiled `lib/`.
+
 Next: skim the shared [Common props](/docs/common-props) that every part accepts, then browse the
 [components](/docs/components/dialog).
