@@ -17,6 +17,7 @@ import {
   Field,
   Fieldset,
   Form,
+  DirectionProvider,
   Input,
   Menu,
   Meter,
@@ -36,6 +37,7 @@ import {
   ToggleGroup,
   Tooltip,
   useFilter,
+  isComboboxGroup,
 } from '@limonify/zest-ui';
 import { styles } from './styles';
 
@@ -920,6 +922,183 @@ export function FormSection() {
       </View>
 
       <Text style={styles.label}>Submitted {submitted} time(s)</Text>
+    </View>
+  );
+}
+
+
+const VERIFY_ITEMS = ['Ankara', 'Berlin', 'Cairo', 'Delhi', 'Edinburgh'];
+const VERIFY_GROUPS = [
+  { label: 'Europe', items: ['Berlin', 'Edinburgh', 'Madrid'] },
+  { label: 'Asia', items: ['Delhi', 'Seoul'] },
+];
+
+/**
+ * Everything added recently that had never been rendered on a screen. Grouped
+ * here on purpose: each row is one claim to check with your eyes, not a design
+ * to copy.
+ */
+export function VerifySection() {
+  const [range, setRange] = React.useState<readonly number[]>([30, 70]);
+  const [swapRange, setSwapRange] = React.useState<readonly number[]>([30, 70]);
+  const [rtlValue, setRtlValue] = React.useState(25);
+  const [picked, setPicked] = React.useState<unknown>(null);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Verify</Text>
+
+      {/* 1. Arrow positioning — must sit under the trigger, not the popup corner. */}
+      <Text style={styles.label}>1 · Popover arrow should point at its trigger</Text>
+      <Popover.Root>
+        <Popover.Trigger style={(s) => [styles.button, s.pressed && styles.buttonPressed]}>
+          <Text style={styles.buttonText}>Open popover</Text>
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Backdrop style={styles.transparentBackdrop} />
+          <Popover.Positioner side="bottom" align="center" sideOffset={8}>
+            <Popover.Arrow style={styles.arrow} />
+            <Popover.Popup style={styles.floatingPopup}>
+              <Text style={styles.label}>The arrow above should be centred on the button.</Text>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
+
+      {/* 2. RTL — align="start" flips, and the slider grows right to left. */}
+      <Text style={styles.label}>2 · RTL: menu anchors right, slider grows right-to-left</Text>
+      <DirectionProvider direction="rtl">
+        <View style={styles.verifyBox}>
+          <Menu.Root>
+            <Menu.Trigger style={(s) => [styles.button, s.pressed && styles.buttonPressed]}>
+              <Text style={styles.buttonText}>RTL menu (align start)</Text>
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Backdrop style={styles.transparentBackdrop} />
+              <Menu.Positioner side="bottom" align="start" sideOffset={4}>
+                <Menu.Popup style={styles.floatingPopup}>
+                  <Menu.Item style={styles.menuItem}>
+                    <Text style={styles.label}>Anchored to the right edge</Text>
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
+
+          <Text style={styles.label}>RTL slider — value {String(rtlValue)}</Text>
+          <Slider.Root value={rtlValue} onValueChange={setRtlValue}>
+            <Slider.Control style={styles.rtlSlider}>
+              <Slider.Track style={styles.sliderTrack}>
+                <Slider.Indicator style={styles.sliderIndicator} />
+                <Slider.Thumb index={0} style={styles.sliderThumb} />
+              </Slider.Track>
+            </Slider.Control>
+          </Slider.Root>
+        </View>
+      </DirectionProvider>
+
+      {/* 3. Thumb collisions — drag the left thumb into the right one. */}
+      <Text style={styles.label}>3 · push: {JSON.stringify(range)}</Text>
+      <Slider.Root value={range} onValueChange={setRange} minStepsBetweenValues={5}>
+        <Slider.Control style={styles.rtlSlider}>
+          <Slider.Track style={styles.sliderTrack}>
+            <Slider.Indicator style={styles.sliderIndicator} />
+            <Slider.Thumb index={0} style={styles.sliderThumb} />
+            <Slider.Thumb index={1} style={styles.sliderThumb} />
+          </Slider.Track>
+        </Slider.Control>
+      </Slider.Root>
+
+      <Text style={styles.label}>3b · swap: {JSON.stringify(swapRange)}</Text>
+      <Slider.Root value={swapRange} onValueChange={setSwapRange} thumbCollisionBehavior="swap">
+        <Slider.Control style={styles.rtlSlider}>
+          <Slider.Track style={styles.sliderTrack}>
+            <Slider.Indicator style={styles.sliderIndicator} />
+            <Slider.Thumb index={0} style={styles.sliderThumb} />
+            <Slider.Thumb index={1} style={styles.sliderThumb} />
+          </Slider.Track>
+        </Slider.Control>
+      </Slider.Root>
+
+      {/* 4. Combobox.Trigger + Group + Status, and the reopen-after-select fix. */}
+      <Text style={styles.label}>4 · Trigger + groups; picking must not reopen the list</Text>
+      <Text style={styles.label}>Picked: {String(picked ?? '—')}</Text>
+      <Combobox.Root items={VERIFY_GROUPS} value={picked} onValueChange={setPicked}>
+        <Combobox.Trigger style={(s) => [styles.fieldControl, s.pressed && styles.buttonPressed]}>
+          <Combobox.Value placeholder="Pick a city" style={styles.label} />
+        </Combobox.Trigger>
+        <Combobox.Portal>
+          <Combobox.Backdrop style={styles.transparentBackdrop} />
+          <Combobox.Positioner>
+            <Combobox.Popup style={[styles.floatingPopup, styles.comboboxPopup]}>
+              <Combobox.Input placeholder="Search" style={styles.fieldControl} />
+              <Combobox.Status style={styles.label} />
+              <Combobox.Empty style={styles.comboboxEmpty}>
+                <Text style={styles.label}>No match</Text>
+              </Combobox.Empty>
+              <Combobox.List>
+                {(entry) =>
+                  isComboboxGroup(entry) ? (
+                    <Combobox.Group key={String(entry.value)} items={entry.items}>
+                      <Combobox.GroupLabel style={styles.fieldLabel}>
+                        {entry.label}
+                      </Combobox.GroupLabel>
+                      <Combobox.Collection>
+                        {(item) => (
+                          <Combobox.Item
+                            key={String(item.value)}
+                            item={item}
+                            style={(s) => [styles.menuItem, s.pressed && styles.menuItemPressed]}
+                          >
+                            <Text style={styles.label}>{item.label}</Text>
+                            <Combobox.ItemIndicator>
+                              <Text style={styles.label}>✓</Text>
+                            </Combobox.ItemIndicator>
+                          </Combobox.Item>
+                        )}
+                      </Combobox.Collection>
+                    </Combobox.Group>
+                  ) : null
+                }
+              </Combobox.List>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Portal>
+      </Combobox.Root>
+
+      {/* 5. Field.Item — each row gets its own label. */}
+      <Text style={styles.label}>5 · Field.Item: each checkbox labelled on its own</Text>
+      <Field.Root style={styles.fieldRoot}>
+        <Field.Label style={styles.fieldLabel}>Notifications</Field.Label>
+        <CheckboxGroup>
+          <Field.Item style={styles.verifyRow}>
+            <Checkbox.Root
+              value="email"
+              style={(s) => [styles.checkboxBox, s.checked && styles.checkboxBoxChecked]}
+            >
+              <Checkbox.Indicator>
+                <Text style={styles.checkboxTick}>✓</Text>
+              </Checkbox.Indicator>
+            </Checkbox.Root>
+            <Field.Label style={styles.label}>Email</Field.Label>
+          </Field.Item>
+          <Field.Item style={styles.verifyRow}>
+            <Checkbox.Root
+              value="sms"
+              style={(s) => [styles.checkboxBox, s.checked && styles.checkboxBoxChecked]}
+            >
+              <Checkbox.Indicator>
+                <Text style={styles.checkboxTick}>✓</Text>
+              </Checkbox.Indicator>
+            </Checkbox.Root>
+            <Field.Label style={styles.label}>SMS</Field.Label>
+          </Field.Item>
+        </CheckboxGroup>
+      </Field.Root>
+
+      <Text style={styles.label}>
+        Flat list for reference: {VERIFY_ITEMS.length} cities in the grouped combobox above.
+      </Text>
     </View>
   );
 }

@@ -249,3 +249,52 @@ describe('logical sides', () => {
     );
   });
 });
+
+describe('Slider positioning under RTL', () => {
+  /**
+   * zest positions the thumb and the indicator itself, so flipping only the
+   * touch-to-value mapping made the two disagree: a touch 25% from the left
+   * became 75, and the thumb was then drawn 75% from the left — travelling away
+   * from the finger. Found by running the app, not by the suite.
+   */
+  function positioned(direction: 'ltr' | 'rtl') {
+    return (
+      <GestureHandlerRootView>
+        <DirectionProvider direction={direction}>
+          <Slider.Root value={25}>
+            <Slider.Control testID="control">
+              <Slider.Track>
+                <Slider.Indicator testID="indicator" />
+                <Slider.Thumb testID="thumb" index={0} />
+              </Slider.Track>
+            </Slider.Control>
+          </Slider.Root>
+        </DirectionProvider>
+      </GestureHandlerRootView>
+    );
+  }
+
+  it('anchors the thumb from the left under LTR', async () => {
+    await render(positioned('ltr'));
+
+    expect(screen.getByTestId('thumb').props.style).toEqual(
+      expect.objectContaining({ left: '25%' }),
+    );
+  });
+
+  it('anchors it from the right under RTL', async () => {
+    await render(positioned('rtl'));
+
+    const style = screen.getByTestId('thumb').props.style;
+    expect(style).toEqual(expect.objectContaining({ right: '25%' }));
+    expect(style.left).toBeUndefined();
+  });
+
+  it('flips the indicator with it', async () => {
+    await render(positioned('rtl'));
+
+    const style = screen.getByTestId('indicator').props.style;
+    expect(style).toEqual(expect.objectContaining({ right: '0%' }));
+    expect(style.left).toBeUndefined();
+  });
+});

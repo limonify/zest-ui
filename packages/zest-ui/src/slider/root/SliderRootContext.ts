@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import type { Direction } from '../../direction-provider/DirectionContext';
 import type { Orientation } from '../../types';
 import type { SliderRoot, SliderRootState } from './SliderRoot';
 
@@ -22,15 +23,20 @@ export interface SliderRootContext {
   setControlSize: (size: number) => void;
   setDragging: (dragging: boolean) => void;
   /**
-   * The id of the `Slider.Label`, associated with every thumb. `undefined` when
-   * there is no label.
+   * The writing direction the slider is laid out for. `Slider.Thumb` and
+   * `Slider.Indicator` anchor from the track's start, which flips with it.
    */
+  direction: Direction;
   /**
    * The consumer's text alternative for a thumb's value, if any.
    */
   getAccessibilityValueText:
     | ((formattedValue: string, value: number, index: number) => string)
     | undefined;
+  /**
+   * The id of the `Slider.Label`, associated with every thumb. `undefined` when
+   * there is no label.
+   */
   labelId: string | undefined;
   setLabelId: (id: string | undefined) => void;
   /**

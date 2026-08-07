@@ -19,6 +19,7 @@ export function SliderThumb(componentProps: SliderThumb.Props) {
   const { render, className, style, index = 0, ref, ...elementProps } = componentProps;
 
   const {
+    direction,
     disabled,
     format,
     getAccessibilityValueText,
@@ -48,10 +49,15 @@ export function SliderThumb(componentProps: SliderThumb.Props) {
     ? getAccessibilityValueText(formattedValue ?? String(value), value, index)
     : formattedValue;
 
+  // A horizontal track runs right to left under RTL, and zest positions the
+  // thumb itself — so this has to flip with the direction, or the thumb would
+  // travel away from the finger that is dragging it.
   const positionStyle =
     orientation === 'vertical'
       ? { position: 'absolute' as const, bottom: `${percent}%` as const }
-      : { position: 'absolute' as const, left: `${percent}%` as const };
+      : direction === 'rtl'
+        ? { position: 'absolute' as const, right: `${percent}%` as const }
+        : { position: 'absolute' as const, left: `${percent}%` as const };
 
   const thumbState: SliderThumbState = { ...state, index, value, percent };
 

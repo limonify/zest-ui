@@ -12,7 +12,7 @@ import type { ZestUIComponentProps } from '../../types';
 export function SliderIndicator(componentProps: SliderIndicator.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const { max, min, orientation, state, values } = useSliderRootContext();
+  const { direction, max, min, orientation, state, values } = useSliderRootContext();
 
   // A single-thumb slider fills from the start; a range fills between thumbs.
   const start = values.length > 1 ? Math.min(...values) : min;
@@ -24,10 +24,13 @@ export function SliderIndicator(componentProps: SliderIndicator.Props) {
   const offset = `${startPercent}%` as const;
   const size = `${endPercent - startPercent}%` as const;
 
+  // Anchored from the track's start, which is the right edge under RTL.
   const positionStyle =
     orientation === 'vertical'
       ? { position: 'absolute' as const, bottom: offset, height: size }
-      : { position: 'absolute' as const, left: offset, width: size };
+      : direction === 'rtl'
+        ? { position: 'absolute' as const, right: offset, width: size }
+        : { position: 'absolute' as const, left: offset, width: size };
 
   return useRenderElement(View, componentProps, {
     state,

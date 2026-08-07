@@ -279,6 +279,31 @@ export const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
+  indent: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  indentBackground: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: '#111',
+  },
+  verifyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  verifyBox: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 10,
+    gap: 8,
+  },
+  rtlSlider: {
+    height: 32,
+    justifyContent: 'center',
+  },
   arrow: {
     width: 12,
     height: 12,

@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { ScrollView, Text } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { Separator, Toast } from '@limonify/zest-ui';
+import { Drawer, Separator, Toast } from '@limonify/zest-ui';
 import { styles } from './styles';
 import {
   AccordionSection,
@@ -18,6 +18,7 @@ import {
   DrawerSection,
   FieldSection,
   FormSection,
+  VerifySection,
   FilterSection,
   HandleSection,
   MenuSection,
@@ -53,6 +54,15 @@ export default function App() {
         buttons that raise toasts live down in ToastSection, inside this Provider.
       */}
       <Toast.Provider timeout={4000} limit={3}>
+      <Drawer.Provider>
+        {/* The surface revealed as the app scales back behind an open drawer. */}
+        <Drawer.IndentBackground style={styles.indentBackground} />
+        <Drawer.Indent
+          style={(state) => [
+            styles.indent,
+            state.active && { transform: [{ scale: 0.92 }], borderRadius: 20, overflow: 'hidden' },
+          ]}
+        >
         <SafeAreaView style={styles.safeArea}>
           <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.heading}>@limonify/zest-ui</Text>
@@ -61,6 +71,8 @@ export default function App() {
             applied by the consumer.
           </Text>
 
+          <VerifySection />
+          <Separator style={styles.separator} />
           <ButtonSection />
           <Separator style={styles.separator} />
           <CheckboxSection />
@@ -128,6 +140,8 @@ export default function App() {
         {/* Screen-anchored overlay: sits above everything, lets touches through. */}
         <ToastOverlay />
         </SafeAreaView>
+        </Drawer.Indent>
+      </Drawer.Provider>
       </Toast.Provider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

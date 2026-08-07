@@ -231,6 +231,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
     () => ({
       commitValue,
       controlSize,
+      direction,
       disabled,
       dragging,
       format,
@@ -253,6 +254,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
     [
       commitValue,
       controlSize,
+      direction,
       disabled,
       dragging,
       format,

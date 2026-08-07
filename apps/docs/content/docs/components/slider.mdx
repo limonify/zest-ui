@@ -117,6 +117,14 @@ A range slider's thumbs have to do *something* when one is dragged into another,
 `thumbAlignment` has no counterpart here. On the web it is CSS inset positioning for the thumb at
 `min`/`max`; zest is headless, so you place the thumb yourself from `state.values`.
 
+### Right-to-left
+
+`Slider.Root` reads the direction from [`DirectionProvider`](/docs/utilities/direction-provider), or
+takes a `direction` prop of its own. Under `rtl` a horizontal track runs from the right, so both the
+touch-to-value mapping and the positioning flip: `Slider.Thumb` and `Slider.Indicator` anchor with
+`right` instead of `left`. Your own styles should stay off those two properties for the same
+reason — position from `state.values` and let the part place itself.
+
 ## State
 
 These fields reach your `style` and `render` functions on **every Slider part** (`style={(state) => ...}`).
