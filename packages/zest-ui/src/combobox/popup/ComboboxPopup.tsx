@@ -22,6 +22,7 @@ export function ComboboxPopup(componentProps: ComboboxPopup.Props) {
   const { transitionStatus } = useComboboxTransitionContext() ?? { transitionStatus: undefined };
 
   const open = useStoreState(store, 'open');
+  const multiple = useStoreState(store, 'multiple');
   const triggerWidth = useStoreState(store, 'triggerWidth');
   const triggerHeight = useStoreState(store, 'triggerHeight');
 
@@ -40,6 +41,7 @@ export function ComboboxPopup(componentProps: ComboboxPopup.Props) {
     props: [
       {
         accessibilityRole: 'list' as const,
+        'aria-multiselectable': multiple || undefined,
         // Claim the responder so presses inside never reach the backdrop.
         onStartShouldSetResponder: () => true,
       },

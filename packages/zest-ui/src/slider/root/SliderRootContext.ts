@@ -28,13 +28,17 @@ export interface SliderRootContext {
   labelId: string | undefined;
   setLabelId: (id: string | undefined) => void;
   /**
-   * Commits a value for one thumb, clamped to the range and to its neighbours.
+   * Commits a value for one thumb, resolving collisions with its neighbours
+   * according to `thumbCollisionBehavior`.
+   *
+   * Returns the index the thumb ended up at — `'swap'` moves it, so a drag has
+   * to follow this to keep hold of the same thumb.
    */
   setThumbValue: (
     index: number,
     value: number,
     eventDetails: SliderRoot.ChangeEventDetails,
-  ) => void;
+  ) => number;
   /**
    * Converts a position along the control into a value, or `undefined` while the
    * control has not been measured yet.

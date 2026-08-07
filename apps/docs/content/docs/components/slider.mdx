@@ -83,6 +83,22 @@ import { Slider } from '@limonify/zest-ui';
 
 <AutoType path="../../packages/zest-ui/src/slider/root/SliderRoot.tsx" name="SliderRootProps" />
 
+### Range thumbs colliding
+
+A range slider's thumbs have to do *something* when one is dragged into another, and
+`thumbCollisionBehavior` picks what:
+
+- **`'push'`** (default) — the dragged thumb pushes the ones in its way along the track, stopping
+  when the thumb it is pushing runs out of room.
+- **`'swap'`** — thumbs trade places when one is dragged past another. The drag keeps hold of the
+  thumb the finger started on, so dragging past and back returns it where it came from.
+  `minStepsBetweenValues` is not enforced while they cross: thumbs allowed to pass each other
+  cannot be held apart while they do it.
+- **`'none'`** — a thumb stops at its neighbour and the excess movement is dropped.
+
+`thumbAlignment` has no counterpart here. On the web it is CSS inset positioning for the thumb at
+`min`/`max`; zest is headless, so you place the thumb yourself from `state.values`.
+
 ## State
 
 These fields reach your `style` and `render` functions on **every Slider part** (`style={(state) => ...}`).

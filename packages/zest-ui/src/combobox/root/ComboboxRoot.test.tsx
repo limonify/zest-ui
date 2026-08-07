@@ -304,3 +304,150 @@ describe('Combobox', () => {
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 });
+
+describe('Combobox multiple', () => {
+  it('adds to the selection and keeps the list open', async () => {
+    const onValueChange = jest.fn();
+    await render(<TestCombobox multiple defaultOpen onValueChange={onValueChange} />);
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-Banana'));
+
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      ['Banana'],
+      expect.objectContaining({ reason: 'item-press' }),
+    );
+    // Picking one of many is rarely the end of the interaction.
+    expect(screen.getByTestId('popup')).toBeTruthy();
+
+    await user.press(screen.getByTestId('item-Apple'));
+    expect(onValueChange).toHaveBeenLastCalledWith(['Banana', 'Apple'], expect.anything());
+  });
+
+  it('toggles an already selected item back off', async () => {
+    const onValueChange = jest.fn();
+    await render(
+      <TestCombobox
+        multiple
+        defaultOpen
+        defaultValue={['Banana', 'Apple']}
+        onValueChange={onValueChange}
+      />,
+    );
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-Banana'));
+
+    expect(onValueChange).toHaveBeenLastCalledWith(['Apple'], expect.anything());
+  });
+
+  it('never fills the input with the selected label', async () => {
+    await render(<TestCombobox multiple defaultOpen defaultValue={['Banana']} />);
+
+    expect(screen.getByTestId('input').props.value).toBe('');
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-Apple'));
+
+    expect(screen.getByTestId('input').props.value).toBe('');
+  });
+
+  it('marks every selected item, not just the last one', async () => {
+    await render(<TestCombobox multiple defaultOpen defaultValue={['Apple', 'Cherry']} />);
+
+    expect(screen.getByTestId('item-Apple').props.accessibilityState.selected).toBe(true);
+    expect(screen.getByTestId('item-Cherry').props.accessibilityState.selected).toBe(true);
+    expect(screen.getByTestId('item-Banana').props.accessibilityState.selected).toBe(false);
+  });
+
+  it('closes and clears the query when an item is picked out of a filtered list', async () => {
+    const onInputValueChange = jest.fn();
+    await render(
+      <TestCombobox multiple defaultOpen onInputValueChange={onInputValueChange} />,
+    );
+
+    await type('input', 'ban');
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-Banana'));
+
+    expect(screen.queryByTestId('popup')).toBeNull();
+    expect(screen.getByTestId('input').props.value).toBe('');
+    expect(onInputValueChange).toHaveBeenLastCalledWith(
+      '',
+      expect.objectContaining({ reason: 'input-clear' }),
+    );
+  });
+
+  it('drops a leftover query when the list is dismissed', async () => {
+    await render(<TestCombobox multiple defaultOpen />);
+
+    await type('input', 'ban');
+    expect(screen.getByTestId('input').props.value).toBe('ban');
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('backdrop', hidden));
+
+    expect(screen.getByTestId('input').props.value).toBe('');
+  });
+
+  it('follows a controlled array value', async () => {
+    function Controlled() {
+      const [value, setValue] = React.useState<unknown>(['Apple']);
+      return <TestCombobox multiple defaultOpen value={value} onValueChange={setValue} />;
+    }
+    await render(<Controlled />);
+
+    expect(screen.getByTestId('item-Apple').props.accessibilityState.selected).toBe(true);
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-Cherry'));
+
+    expect(screen.getByTestId('item-Cherry').props.accessibilityState.selected).toBe(true);
+    expect(screen.getByTestId('item-Apple').props.accessibilityState.selected).toBe(true);
+  });
+
+  it('does not warn about a changing default when no defaultValue is given', async () => {
+    const warn = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      function Controlled() {
+        const [value, setValue] = React.useState<unknown>(undefined);
+        return <TestCombobox multiple defaultOpen value={value} onValueChange={setValue} />;
+      }
+      await render(<Controlled />);
+
+      const user = userEvent.setup();
+      await user.press(screen.getByTestId('item-Banana'));
+
+      expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('changing the default'));
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('lets onValueChange cancel a selection', async () => {
+    await render(
+      <TestCombobox
+        multiple
+        defaultOpen
+        onValueChange={(_value, details) => {
+          details.cancel();
+        }}
+      />,
+    );
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-Banana'));
+
+    expect(screen.getByTestId('item-Banana').props.accessibilityState.selected).toBe(false);
+  });
+
+  it('still replaces and closes when multiple is false', async () => {
+    await render(<TestCombobox multiple={false} defaultOpen defaultValue="Apple" />);
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-Banana'));
+
+    expect(screen.getByTestId('input').props.value).toBe('Banana');
+    expect(screen.queryByTestId('popup')).toBeNull();
+  });
+});

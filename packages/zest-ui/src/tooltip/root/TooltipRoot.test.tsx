@@ -183,3 +183,157 @@ describe('Tooltip', () => {
     expect(styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ side: 'top', open: true }));
   });
 });
+
+describe('Tooltip parity with the other popups', () => {
+  it('cannot be opened while disabled', async () => {
+    const onOpenChange = jest.fn();
+    await render(<TestTooltip disabled onOpenChange={onOpenChange} />);
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('trigger'));
+
+    expect(screen.queryByTestId('popup')).toBeNull();
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.getByTestId('trigger').props.accessibilityState.disabled).toBe(true);
+  });
+
+  it('still closes when it is disabled while open', async () => {
+    // Disabling only blocks opening — an already-open tooltip must still be
+    // dismissible, or it would be stuck on screen.
+    const view = await render(<TestTooltip defaultOpen />);
+    expect(screen.getByTestId('popup')).toBeTruthy();
+
+    await view.rerender(<TestTooltip defaultOpen disabled />);
+
+    const modal = findNodeByProp(view.container as unknown as TreeNode, 'onRequestClose');
+    const surface = findNodeByProp(modal!, 'onResponderRelease');
+    await act(async () => {
+      surface!.props!.onResponderRelease({});
+    });
+
+    expect(screen.queryByTestId('popup')).toBeNull();
+  });
+
+  it('stays open on an outside press when dismissal is disabled', async () => {
+    const view = await render(<TestTooltip defaultOpen disablePointerDismissal />);
+
+    const modal = findNodeByProp(view.container as unknown as TreeNode, 'onRequestClose');
+    const surface = findNodeByProp(modal!, 'onResponderRelease');
+    await act(async () => {
+      surface!.props!.onResponderRelease({});
+    });
+
+    expect(screen.getByTestId('popup')).toBeTruthy();
+  });
+
+  it('opens and closes through a handle from a detached trigger', async () => {
+    const handle = Tooltip.createHandle();
+
+    await render(
+      <>
+        <Tooltip.Trigger testID="trigger" nativeID="help-trigger" handle={handle}>
+          <Text>Help</Text>
+        </Tooltip.Trigger>
+        <Tooltip.Root handle={handle}>
+          <Tooltip.Portal>
+            <Tooltip.Positioner>
+              <Tooltip.Popup testID="popup">
+                <Text>Tooltip content</Text>
+              </Tooltip.Popup>
+            </Tooltip.Positioner>
+          </Tooltip.Portal>
+        </Tooltip.Root>
+      </>,
+    );
+
+    expect(screen.queryByTestId('popup')).toBeNull();
+
+    await act(async () => {
+      handle.open('help-trigger');
+    });
+    expect(screen.getByTestId('popup')).toBeTruthy();
+    expect(handle.isOpen).toBe(true);
+
+    await act(async () => {
+      handle.close();
+    });
+    expect(screen.queryByTestId('popup')).toBeNull();
+  });
+
+  it('hands a detached trigger payload to the root children', async () => {
+    const handle = Tooltip.createHandle<{ topic: string }>();
+
+    await render(
+      <>
+        <Tooltip.Trigger testID="trigger" nativeID="t" handle={handle} payload={{ topic: 'billing' }}>
+          <Text>Help</Text>
+        </Tooltip.Trigger>
+        <Tooltip.Root handle={handle}>
+          {(payload) => (
+            <Tooltip.Portal>
+              <Tooltip.Positioner>
+                <Tooltip.Popup testID="popup">
+                  <Text>{payload?.topic ?? 'none'}</Text>
+                </Tooltip.Popup>
+              </Tooltip.Positioner>
+            </Tooltip.Portal>
+          )}
+        </Tooltip.Root>
+      </>,
+    );
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('trigger'));
+
+    expect(screen.getByTestId('popup')).toHaveTextContent('billing');
+  });
+
+  it('closes through actionsRef without firing onOpenChange for the unmount', async () => {
+    const actionsRef = React.createRef<Tooltip.Root.Actions>();
+    const onOpenChange = jest.fn();
+
+    await render(
+      <TestTooltip defaultOpen actionsRef={actionsRef} onOpenChange={onOpenChange} />,
+    );
+
+    await act(async () => {
+      actionsRef.current!.unmount();
+    });
+
+    expect(screen.queryByTestId('popup')).toBeNull();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it('reports the imperative-action reason when actionsRef closes it', async () => {
+    const actionsRef = React.createRef<Tooltip.Root.Actions>();
+    const onOpenChange = jest.fn();
+
+    await render(
+      <TestTooltip defaultOpen actionsRef={actionsRef} onOpenChange={onOpenChange} />,
+    );
+
+    await act(async () => {
+      actionsRef.current!.close();
+    });
+
+    expect(onOpenChange).toHaveBeenLastCalledWith(
+      false,
+      expect.objectContaining({ reason: 'imperative-action' }),
+    );
+  });
+
+  it('throws when a trigger has neither a root nor a handle', async () => {
+    const warn = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      await expect(
+        render(
+          <Tooltip.Trigger>
+            <Text>Help</Text>
+          </Tooltip.Trigger>,
+        ),
+      ).rejects.toThrow(/must be placed within <Tooltip.Root>/);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+});

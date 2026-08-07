@@ -210,8 +210,10 @@ describe('Slider', () => {
       expect(thumbValue(1)).toBe(90);
     });
 
-    it('stops a thumb at its neighbour', async () => {
-      await render(<TestSlider thumbs={2} defaultValue={[20, 50]} />);
+    it('stops a thumb at its neighbour when collisions are disallowed', async () => {
+      await render(
+        <TestSlider thumbs={2} defaultValue={[20, 50]} thumbCollisionBehavior="none" />,
+      );
       await layoutControl();
 
       // Press nearest the lower thumb, then drag it past the upper one.
@@ -222,12 +224,94 @@ describe('Slider', () => {
     });
 
     it('keeps minStepsBetweenValues between thumbs', async () => {
-      await render(<TestSlider thumbs={2} defaultValue={[20, 50]} minStepsBetweenValues={10} />);
+      await render(
+        <TestSlider
+          thumbs={2}
+          defaultValue={[20, 50]}
+          minStepsBetweenValues={10}
+          thumbCollisionBehavior="none"
+        />,
+      );
       await layoutControl();
 
       await drag(CONTROL_SIZE * 0.2, CONTROL_SIZE * 0.9);
 
       expect(thumbValue(0)).toBe(40);
+    });
+  });
+
+  describe('thumbCollisionBehavior', () => {
+    it('pushes the neighbour along by default', async () => {
+      await render(<TestSlider thumbs={2} defaultValue={[20, 50]} />);
+      await layoutControl();
+
+      await drag(CONTROL_SIZE * 0.2, CONTROL_SIZE * 0.9);
+
+      expect(thumbValue(0)).toBe(90);
+      expect(thumbValue(1)).toBe(90);
+    });
+
+    it('pushes the neighbour while keeping minStepsBetweenValues', async () => {
+      await render(
+        <TestSlider thumbs={2} defaultValue={[20, 50]} minStepsBetweenValues={10} />,
+      );
+      await layoutControl();
+
+      await drag(CONTROL_SIZE * 0.2, CONTROL_SIZE * 0.8);
+
+      expect(thumbValue(0)).toBe(80);
+      expect(thumbValue(1)).toBe(90);
+    });
+
+    it('stops pushing at the end of the track', async () => {
+      await render(
+        <TestSlider thumbs={2} defaultValue={[20, 50]} minStepsBetweenValues={10} />,
+      );
+      await layoutControl();
+
+      // There is no room past 90 for the thumb being pushed, so the dragged one
+      // stops there too rather than running the other off the track.
+      await drag(CONTROL_SIZE * 0.2, CONTROL_SIZE * 1.2);
+
+      expect(thumbValue(0)).toBe(90);
+      expect(thumbValue(1)).toBe(100);
+    });
+
+    it('swaps places when a thumb is dragged past another', async () => {
+      await render(
+        <TestSlider thumbs={2} defaultValue={[20, 50]} thumbCollisionBehavior="swap" />,
+      );
+      await layoutControl();
+
+      await drag(CONTROL_SIZE * 0.2, CONTROL_SIZE * 0.9);
+
+      // The dragged thumb passed the other, so it is now the upper one and the
+      // values stay sorted.
+      expect(thumbValue(0)).toBe(50);
+      expect(thumbValue(1)).toBe(90);
+    });
+
+    it('keeps hold of the same thumb across a swap', async () => {
+      await render(
+        <TestSlider thumbs={2} defaultValue={[20, 50]} thumbCollisionBehavior="swap" />,
+      );
+      await layoutControl();
+
+      // Drag past the neighbour and back again. If the drag lost track of which
+      // thumb it held, the second half would move the wrong one.
+      await drag(CONTROL_SIZE * 0.2, CONTROL_SIZE * 0.9, CONTROL_SIZE * 0.1);
+
+      expect(thumbValue(0)).toBe(10);
+      expect(thumbValue(1)).toBe(50);
+    });
+
+    it('leaves a single-thumb slider unaffected', async () => {
+      await render(<TestSlider defaultValue={20} thumbCollisionBehavior="swap" />);
+      await layoutControl();
+
+      await drag(CONTROL_SIZE * 0.7);
+
+      expect(thumbValue(0)).toBe(70);
     });
   });
 

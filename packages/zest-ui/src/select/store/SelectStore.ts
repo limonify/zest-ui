@@ -1,5 +1,10 @@
 import { createSelector } from '../../store/createSelector';
 import { ReactStore } from '../../store/ReactStore';
+import {
+  compareItemEquality,
+  defaultItemEquality,
+  type ItemEqualityComparer,
+} from '../../internals/itemEquality';
 import { PopupTriggerMap } from '../../utils/popups/PopupTriggerMap';
 import type { SelectRoot } from '../root/SelectRoot';
 
@@ -12,42 +17,6 @@ export type SelectItems =
   | ReadonlyArray<{ value: unknown; label: string }>;
 
 /**
- * Whether `value` is selected, given the current selection. In multiple mode the
- * selection is an array and membership is what counts.
- */
-export function isSelectValueSelected(
-  selectedValue: unknown,
-  value: unknown,
-  multiple: boolean,
-): boolean {
-  if (multiple) {
-    return Array.isArray(selectedValue) && selectedValue.includes(value);
-  }
-
-  return selectedValue === value;
-}
-
-/**
- * The selection after `value` is pressed: a replacement normally, a toggle in
- * multiple mode.
- */
-export function toggleSelectValue(
-  selectedValue: unknown,
-  value: unknown,
-  multiple: boolean,
-): unknown {
-  if (!multiple) {
-    return value;
-  }
-
-  const current = Array.isArray(selectedValue) ? selectedValue : [];
-
-  return current.includes(value)
-    ? current.filter((item) => item !== value)
-    : [...current, value];
-}
-
-/**
  * Resolves a value's label from the consumer's `items`, falling back to the
  * labels items registered as they mounted.
  */
@@ -55,10 +24,11 @@ export function resolveSelectLabel(
   items: SelectItems | undefined,
   labelsByValue: Map<unknown, string>,
   value: unknown,
+  comparer: ItemEqualityComparer = defaultItemEquality,
 ): string | undefined {
   if (items) {
     if (Array.isArray(items)) {
-      const match = items.find((item) => item.value === value);
+      const match = items.find((item) => compareItemEquality(item.value, value, comparer));
       if (match) {
         return match.label;
       }
@@ -70,7 +40,20 @@ export function resolveSelectLabel(
     }
   }
 
-  return labelsByValue.get(value);
+  const registered = labelsByValue.get(value);
+  if (registered !== undefined || comparer === defaultItemEquality) {
+    return registered;
+  }
+
+  // The map is keyed by reference, so an object value only ever hits above by
+  // identity. A custom comparer means identity is not the question — scan.
+  for (const [itemValue, label] of labelsByValue) {
+    if (compareItemEquality(itemValue, value, comparer)) {
+      return label;
+    }
+  }
+
+  return undefined;
 }
 
 export type State = {
@@ -99,6 +82,11 @@ export type State = {
    * Whether more than one item can be selected, which makes `value` an array.
    */
   multiple: boolean;
+  /**
+   * How an item's value is matched against the selection. Defaults to
+   * `Object.is`, so object values need one of their own.
+   */
+  isItemEqualToValue: ItemEqualityComparer;
   disabled: boolean;
   readOnly: boolean;
   required: boolean;
@@ -154,6 +142,7 @@ const selectors = {
   labelsByValue: createSelector((state: State) => state.labelsByValue),
   items: createSelector((state: State) => state.items),
   multiple: createSelector((state: State) => state.multiple),
+  isItemEqualToValue: createSelector((state: State) => state.isItemEqualToValue),
   disabled: createSelector((state: State) => state.disabled),
   readOnly: createSelector((state: State) => state.readOnly),
   required: createSelector((state: State) => state.required),
@@ -178,6 +167,7 @@ export class SelectStore extends ReactStore<Readonly<State>, Context, typeof sel
         labelsByValue: new Map(),
         items: undefined,
         multiple: false,
+        isItemEqualToValue: defaultItemEquality,
         disabled: false,
         readOnly: false,
         required: false,

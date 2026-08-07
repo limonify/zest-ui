@@ -27,6 +27,7 @@ export function MenuRoot<Payload = unknown>(props: MenuRoot.Props<Payload>) {
     children,
     defaultOpen = false,
     defaultTriggerId = null,
+    disabled = false,
     disablePointerDismissal = false,
     handle,
     onOpenChange,
@@ -41,6 +42,7 @@ export function MenuRoot<Payload = unknown>(props: MenuRoot.Props<Payload>) {
         openProp: open,
         triggerId: defaultTriggerId,
         triggerIdProp: triggerId,
+        disabled,
         disablePointerDismissal,
       }),
   ).current;
@@ -48,7 +50,7 @@ export function MenuRoot<Payload = unknown>(props: MenuRoot.Props<Payload>) {
   useControlledProp(store, 'openProp', open);
   useControlledProp(store, 'triggerIdProp', triggerId);
   useContextCallback(store, 'onOpenChange', onOpenChange);
-  useSyncedValues(store, { disablePointerDismissal });
+  useSyncedValues(store, { disabled, disablePointerDismissal });
 
   usePopupRootHandle({ store, handle, actionsRef });
 
@@ -101,6 +103,15 @@ export interface MenuRootProps<Payload = unknown> {
    * Event handler called when the menu is opened or closed.
    */
   onOpenChange?: ((open: boolean, eventDetails: MenuRoot.ChangeEventDetails) => void) | undefined;
+  /**
+   * Whether the component should ignore user interaction.
+   *
+   * A disabled menu cannot be opened by a press or through its handle, and its
+   * triggers report themselves as disabled. Closing is always allowed, so
+   * disabling one that is already open puts it away.
+   * @default false
+   */
+  disabled?: boolean | undefined;
   /**
    * Whether to prevent the menu from closing on presses outside the popup.
    * @default false

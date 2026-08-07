@@ -11,6 +11,7 @@ import {
   type Padding,
   type Placement,
 } from '@floating-ui/react-native';
+import { useDirection } from '../direction-provider/DirectionContext';
 
 export type Side = 'top' | 'right' | 'bottom' | 'left';
 export type Align = 'start' | 'center' | 'end';
@@ -47,11 +48,32 @@ export function useAnchorPositioning(
 
   const arrowRef = React.useRef<unknown>(null);
 
-  const placement: Placement = align === 'center' ? side : (`${side}-${align}` as Placement);
+  const direction = useDirection();
+
+  // `start`/`end` are writing-direction relative, and only along the horizontal
+  // axis — which is the cross axis when the popup sits above or below its
+  // anchor. `@floating-ui/react-native` has no direction option, so the swap
+  // happens here, in the placement itself.
+  const flipsAlignment = direction === 'rtl' && (side === 'top' || side === 'bottom');
+  const resolvedAlignProp: Align = flipsAlignment
+    ? align === 'start'
+      ? 'end'
+      : align === 'end'
+        ? 'start'
+        : 'center'
+    : align;
+  // The cross-axis offset is measured along that same mirrored axis.
+  const resolvedAlignOffset = flipsAlignment ? -alignOffset : alignOffset;
+
+  const placement: Placement =
+    resolvedAlignProp === 'center' ? side : (`${side}-${resolvedAlignProp}` as Placement);
 
   const middleware: Middleware[] = React.useMemo(
     () => [
-      offset({ mainAxis: sideOffset, crossAxis: alignOffset }, [sideOffset, alignOffset]),
+      offset({ mainAxis: sideOffset, crossAxis: resolvedAlignOffset }, [
+        sideOffset,
+        resolvedAlignOffset,
+      ]),
       flip({ padding: collisionPadding }, [collisionPadding]),
       shift(
         {
@@ -64,14 +86,27 @@ export function useAnchorPositioning(
       ),
       arrow({ element: arrowRef, padding: arrowPadding }, [arrowPadding]),
     ],
-    [sideOffset, alignOffset, collisionPadding, sticky, arrowPadding],
+    [sideOffset, resolvedAlignOffset, collisionPadding, sticky, arrowPadding],
   );
 
   const floating = useFloating({ placement, middleware, sameScrollView: false });
 
   const { x, y, placement: resolvedPlacement, middlewareData, refs, update } = floating;
 
-  const [resolvedSide, resolvedAlign] = parsePlacement(resolvedPlacement);
+  const [resolvedSide, physicalAlign] = parsePlacement(resolvedPlacement);
+
+  // Report the alignment in the same vocabulary the consumer wrote it in: they
+  // asked for `start`, so a collision that moved it should say `end`, not
+  // whichever physical edge RTL happens to put `start` on.
+  const flipsResolvedAlignment =
+    direction === 'rtl' && (resolvedSide === 'top' || resolvedSide === 'bottom');
+  const resolvedAlign: Align = flipsResolvedAlignment
+    ? physicalAlign === 'start'
+      ? 'end'
+      : physicalAlign === 'end'
+        ? 'start'
+        : 'center'
+    : physicalAlign;
 
   const positionerStyles = React.useMemo(
     () => ({ position: 'absolute' as const, left: x, top: y }),

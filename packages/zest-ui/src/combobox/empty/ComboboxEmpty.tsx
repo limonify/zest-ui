@@ -14,7 +14,7 @@ export function ComboboxEmpty(componentProps: ComboboxEmpty.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
   const store = useComboboxRootContext();
-  const { filteredItems } = useComboboxItemsContext();
+  const { filteredItemCount } = useComboboxItemsContext();
 
   const open = useStoreState(store, 'open');
 
@@ -23,7 +23,9 @@ export function ComboboxEmpty(componentProps: ComboboxEmpty.Props) {
   return useRenderElement(View, componentProps, {
     state,
     ref,
-    enabled: filteredItems.length === 0,
+    // Counting selectable items, not entries: a group that filtered down to
+    // nothing is still an entry, and the list is still empty.
+    enabled: filteredItemCount === 0,
     props: [{ accessibilityLiveRegion: 'polite' as const }, elementProps],
   });
 }

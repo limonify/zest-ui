@@ -16,6 +16,7 @@ import {
   Drawer,
   Field,
   Fieldset,
+  Form,
   Input,
   Menu,
   Meter,
@@ -766,6 +767,159 @@ export function ComboboxSection() {
           </Autocomplete.Positioner>
         </Autocomplete.Portal>
       </Autocomplete.Root>
+    </View>
+  );
+}
+
+const LANGUAGES = [
+  'C', 'C++', 'Elixir', 'Go', 'Haskell', 'Java', 'JavaScript', 'Kotlin', 'Lua', 'OCaml',
+  'PHP', 'Python', 'Ruby', 'Rust', 'Swift', 'TypeScript', 'Zig',
+];
+
+export function MultiComboboxSection() {
+  const [values, setValues] = React.useState<unknown>(['TypeScript']);
+  const selected = values as string[];
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Combobox (multiple)</Text>
+      <Text style={styles.label}>
+        A multiple combobox toggles items instead of replacing, stays open for the next pick, and
+        leaves the input to the query. Chips render the selection.
+      </Text>
+
+      <Combobox.Root items={LANGUAGES} multiple value={values} onValueChange={setValues}>
+        <Combobox.Chips style={styles.comboboxChips}>
+          <Combobox.Value>
+            {(items) =>
+              items.map((item) => (
+                <Combobox.Chip key={String(item.value)} style={styles.comboboxChip}>
+                  <Text style={styles.label}>{item.label}</Text>
+                  <Combobox.ChipRemove
+                    accessibilityLabel={`Remove ${item.label}`}
+                    style={(state) => [
+                      styles.comboboxChipRemove,
+                      state.pressed && styles.buttonPressed,
+                    ]}
+                  >
+                    <Text style={styles.label}>×</Text>
+                  </Combobox.ChipRemove>
+                </Combobox.Chip>
+              ))
+            }
+          </Combobox.Value>
+          <Combobox.Input
+            placeholder={selected.length > 0 ? '' : 'Pick languages'}
+            style={styles.comboboxChipsInput}
+          />
+        </Combobox.Chips>
+
+        <Combobox.Clear accessibilityLabel="Clear selection" style={styles.comboboxClear}>
+          <Text style={styles.label}>Clear all</Text>
+        </Combobox.Clear>
+
+        <Combobox.Portal>
+          <Combobox.Backdrop style={styles.transparentBackdrop} />
+          <Combobox.Positioner>
+            <Combobox.Popup style={[styles.floatingPopup, styles.comboboxPopup]}>
+              <Combobox.Empty style={styles.comboboxEmpty}>
+                <Text style={styles.label}>No match</Text>
+              </Combobox.Empty>
+              <Combobox.List>
+                {(item) => (
+                  <Combobox.Item
+                    key={String(item.value)}
+                    item={item}
+                    style={(state) => [
+                      styles.menuItem,
+                      state.pressed && styles.menuItemPressed,
+                      state.selected && styles.menuItemSelected,
+                    ]}
+                  >
+                    <Text style={styles.label}>{item.label}</Text>
+                  </Combobox.Item>
+                )}
+              </Combobox.List>
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Portal>
+      </Combobox.Root>
+    </View>
+  );
+}
+
+export function FormSection() {
+  const form = React.useRef<Form.Actions>(null);
+  const [errors, setErrors] = React.useState<Record<string, string | string[]>>({});
+  const [submitted, setSubmitted] = React.useState(0);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Form</Text>
+      <Text style={styles.label}>
+        Submitting validates every field and stops at the first that fails. Try it empty, then fill
+        the first one only. "Take" the email to see a server error land on that field.
+      </Text>
+
+      <Form
+        actionsRef={form}
+        errors={errors}
+        onClearErrors={setErrors}
+        onSubmit={() => setSubmitted((count) => count + 1)}
+        style={styles.fieldRoot}
+      >
+        <Field.Root
+          name="email"
+          validate={(value) => (String(value ?? '').includes('@') ? null : 'Enter a valid email')}
+          style={styles.fieldRoot}
+        >
+          <Field.Label style={styles.fieldLabel}>Email</Field.Label>
+          <Field.Control
+            placeholder="you@example.com"
+            autoCapitalize="none"
+            style={(state) => [
+              styles.fieldControl,
+              state.focused && styles.fieldControlFocused,
+              state.valid === false && styles.fieldControlInvalid,
+            ]}
+          />
+          <Field.Error style={styles.fieldError} />
+        </Field.Root>
+
+        <Field.Root
+          name="name"
+          validate={(value) => (String(value ?? '').length > 0 ? null : 'Name is required')}
+          style={styles.fieldRoot}
+        >
+          <Field.Label style={styles.fieldLabel}>Name</Field.Label>
+          <Field.Control
+            placeholder="Eren"
+            style={(state) => [
+              styles.fieldControl,
+              state.focused && styles.fieldControlFocused,
+              state.valid === false && styles.fieldControlInvalid,
+            ]}
+          />
+          <Field.Error style={styles.fieldError} />
+        </Field.Root>
+      </Form>
+
+      <View style={styles.row}>
+        <Button
+          onPress={() => form.current?.submit()}
+          style={(state) => [styles.button, state.pressed && styles.buttonPressed]}
+        >
+          <Text style={styles.buttonText}>Submit</Text>
+        </Button>
+        <Button
+          onPress={() => setErrors({ email: 'Already taken' })}
+          style={(state) => [styles.button, state.pressed && styles.buttonPressed]}
+        >
+          <Text style={styles.buttonText}>Take the email</Text>
+        </Button>
+      </View>
+
+      <Text style={styles.label}>Submitted {submitted} time(s)</Text>
     </View>
   );
 }

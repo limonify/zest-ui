@@ -8,7 +8,7 @@ import { useCompositeListItem } from '../../internals/composite/list/useComposit
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
-import { isSelectValueSelected, toggleSelectValue } from '../store/SelectStore';
+import { isValueSelected, toggleSelectedValue } from '../../utils/selection';
 import { SelectItemContext } from './SelectItemContext';
 import { useStoreState } from '../../store/ReactStore';
 
@@ -31,6 +31,7 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
   const selectedValue = useStoreState(store, 'value');
   const readOnly = useStoreState(store, 'readOnly');
   const multiple = useStoreState(store, 'multiple');
+  const isItemEqualToValue = useStoreState(store, 'isItemEqualToValue');
 
   const { index, onLayout } = useCompositeListItem();
 
@@ -38,7 +39,7 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
 
   const { getButtonProps } = useButton({ disabled });
 
-  const selected = isSelectValueSelected(selectedValue, value, multiple);
+  const selected = isValueSelected(selectedValue, value, multiple, isItemEqualToValue);
 
   const state: SelectItemState = React.useMemo(
     () => ({ disabled, pressed, selected, index }),
@@ -66,7 +67,10 @@ export function SelectItem<Value = any>(componentProps: SelectItem.Props<Value>)
           // also stops the popup from closing.
           const eventDetails = createChangeEventDetails(REASONS.itemPress, event);
 
-          store.setValue(toggleSelectValue(selectedValue, value, multiple), eventDetails);
+          store.setValue(
+            toggleSelectedValue(selectedValue, value, multiple, isItemEqualToValue),
+            eventDetails,
+          );
 
           if (eventDetails.isCanceled) {
             return;

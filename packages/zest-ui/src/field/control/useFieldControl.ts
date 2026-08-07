@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import type { NativeSyntheticEvent, TextInputFocusEventData } from 'react-native';
+import type { NativeSyntheticEvent, TextInput, TextInputFocusEventData } from 'react-native';
 import { useControlled } from '../../hooks/useControlled';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
@@ -12,6 +12,11 @@ export interface UseFieldControlParameters {
   defaultValue?: string | undefined;
   onValueChange?: ((value: string) => void) | undefined;
   nativeID?: string | undefined;
+  /**
+   * The input element, so a surrounding `Form` can focus it when submission
+   * stops here.
+   */
+  inputRef?: React.RefObject<TextInput | null> | undefined;
   /**
    * Whether a surrounding `Field.Root` is required. `Field.Control` passes
    * `true`; a standalone `Input` passes `false` and works without one.
@@ -25,7 +30,14 @@ export interface UseFieldControlParameters {
  * bookkeeping, and the accessibility wiring to the label and messages.
  */
 export function useFieldControl(parameters: UseFieldControlParameters) {
-  const { value: valueProp, defaultValue, onValueChange, nativeID, requireField } = parameters;
+  const {
+    value: valueProp,
+    defaultValue,
+    onValueChange,
+    nativeID,
+    inputRef,
+    requireField,
+  } = parameters;
 
   const field: FieldRootContext | undefined = useFieldRootContext(false);
   if (requireField && field === undefined) {
@@ -62,6 +74,29 @@ export function useFieldControl(parameters: UseFieldControlParameters) {
     field.setValidityData({ valid: errors.length === 0, errors });
   });
 
+  // The form's copy of the value is what `validate()` runs against on submit,
+  // and the change handler is not the only way it moves (a controlled consumer
+  // can set it), so track render rather than the handler.
+  const valueRef = React.useRef(value);
+  useIsoLayoutEffect(() => {
+    valueRef.current = value;
+  });
+
+  useIsoLayoutEffect(() => {
+    if (!field) {
+      return undefined;
+    }
+
+    return field.registerControl({
+      validate: () => {
+        const errors = field.runValidation(valueRef.current);
+        field.setValidityData({ valid: errors.length === 0, errors });
+        return errors;
+      },
+      focus: () => inputRef?.current?.focus(),
+    });
+  }, [field, inputRef]);
+
   const handleChangeText = useStableCallback((text: string) => {
     if (field?.disabled) {
       return;
@@ -70,6 +105,8 @@ export function useFieldControl(parameters: UseFieldControlParameters) {
     setValueState(text);
     onValueChange?.(text);
 
+    // A server's complaint was about the value that was sent, not this one.
+    field?.clearExternalError();
     field?.setDirty(text !== initialValueRef.current);
 
     if (field?.validationMode === 'onChange') {

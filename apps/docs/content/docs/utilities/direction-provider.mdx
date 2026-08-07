@@ -1,0 +1,79 @@
+---
+title: DirectionProvider
+description: Sets the writing direction that zest derives its layout decisions from.
+---
+
+Most of what "supporting RTL" means in React Native is the platform's job: enable it through
+`I18nManager` and Yoga mirrors your layout. What the platform *cannot* know is what zest derives
+from direction — which edge `align="start"` should anchor a popup to, and which way a horizontal
+slider's value grows. `useDirection` is where those decisions read from, and `DirectionProvider` is
+how you override it.
+
+## Without a provider
+
+Nothing is required. `useDirection` falls back to React Native's own `I18nManager.isRTL`, so an app
+that has enabled RTL already behaves correctly:
+
+```tsx
+import { I18nManager } from 'react-native';
+
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
+// …restart the app; zest follows from here.
+```
+
+## Overriding a subtree
+
+`I18nManager.forceRTL` needs an app restart, which is wrong for a language picker or a preview
+pane. Wrap the subtree instead:
+
+```tsx
+import { DirectionProvider } from '@limonify/zest-ui';
+
+<DirectionProvider direction={locale === 'ar' ? 'rtl' : 'ltr'}>
+  <App />
+</DirectionProvider>
+```
+
+Providers nest, and the nearest one wins.
+
+## What it changes
+
+**Anchored popups.** `align="start"` anchors to the right edge under RTL and to the left under LTR,
+for every popup family (`Popover`, `Menu`, `Select`, `Combobox`, `Tooltip`, `ContextMenu`), along
+with the sign of `alignOffset`. Only popups placed *above or below* their anchor are affected: with
+one placed beside its anchor, `start`/`end` run vertically.
+
+`state.align` still reports what you asked for. You wrote `start`, so a collision that moved the
+popup reports `end` — never the physical edge RTL happened to put `start` on.
+
+**Slider.** A horizontal slider's value grows right to left, and `Slider.Root` publishes
+`state.direction` so you can mirror your own thumb and indicator. React Native's `start` style prop
+is direction-aware and `left` is not, so position from `start`:
+
+```tsx
+<Slider.Thumb
+  index={0}
+  style={(state) => [styles.thumb, { start: `${state.values[0]}%` }]}
+/>
+```
+
+## What it does not change
+
+It does not turn RTL layout on. `flexDirection`, text alignment and `start`/`end` styles are
+mirrored by React Native itself, and only `I18nManager` controls that — a `DirectionProvider` alone
+will not flip your rows.
+
+`Tabs` needs nothing either way: its indicator is positioned from measured `onLayout` coordinates,
+which the platform already reports in the mirrored layout.
+
+## Reading it yourself
+
+```tsx
+import { useDirection } from '@limonify/zest-ui';
+
+function Chevron() {
+  const direction = useDirection();
+  return <Text>{direction === 'rtl' ? '‹' : '›'}</Text>;
+}
+```

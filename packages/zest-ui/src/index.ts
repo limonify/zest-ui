@@ -12,6 +12,7 @@ export * from './dialog';
 export * from './drawer';
 export * from './field';
 export * from './fieldset';
+export * from './form';
 export * from './input';
 export * from './menu';
 export * from './meter';
@@ -32,6 +33,7 @@ export * from './toggle';
 export * from './toggle-group';
 
 export * from './filter';
+export * from './direction-provider';
 export * from './store';
 export * from './hooks';
 export * from './types';

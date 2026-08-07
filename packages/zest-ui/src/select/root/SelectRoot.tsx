@@ -5,6 +5,7 @@ import { useStableCallback } from '../../hooks/useStableCallback';
 import { useTransitionStatus } from '../../internals/useTransitionStatus';
 import { usePopupRootHandle } from '../../utils/popups/usePopupRootHandle';
 import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
+import { defaultItemEquality, type ItemEqualityComparer } from '../../internals/itemEquality';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import type { SelectHandle } from '../store/SelectHandle';
@@ -18,7 +19,7 @@ import { useContextCallback, useControlledProp, useStoreState, useSyncedValues }
  * Doesn't render its own element.
  *
  * Unlike the web version there is no hidden `<select>`: React Native has no form
- * submission, so `name`/`form` are omitted. Multi-select is not ported yet.
+ * submission, so `name`/`form` are omitted.
  */
 export function SelectRoot<Value = any, Payload = unknown>(
   props: SelectRoot.Props<Value, Payload>,
@@ -32,6 +33,7 @@ export function SelectRoot<Value = any, Payload = unknown>(
     disablePointerDismissal = false,
     disabled: disabledProp = false,
     handle,
+    isItemEqualToValue = defaultItemEquality,
     items,
     multiple = false,
     onOpenChange,
@@ -60,6 +62,7 @@ export function SelectRoot<Value = any, Payload = unknown>(
         valueProp: value,
         items,
         multiple,
+        isItemEqualToValue,
         disabled,
         readOnly,
         required,
@@ -107,6 +110,7 @@ export function SelectRoot<Value = any, Payload = unknown>(
     required,
     items,
     multiple,
+    isItemEqualToValue,
     disablePointerDismissal,
   });
 
@@ -187,6 +191,22 @@ export interface SelectRootProps<Value = any, Payload = unknown> {
    * @default false
    */
   multiple?: boolean | undefined;
+  /**
+   * How an item's value is matched against the selection.
+   *
+   * Values are compared with `Object.is` by default, so an object value only
+   * ever matches itself — rebuilding `items` on every render would drop the
+   * selection. Pass a comparer to match by content instead.
+   *
+   * `null` and `undefined` never reach it: an empty selection is not something
+   * a comparer should have to guard against.
+   *
+   * @example
+   * ```tsx
+   * <Select.Root isItemEqualToValue={(item, value) => item.id === value.id} />
+   * ```
+   */
+  isItemEqualToValue?: ItemEqualityComparer | undefined;
   /**
    * Whether the component should ignore user interaction.
    * @default false

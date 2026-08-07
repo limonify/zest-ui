@@ -27,13 +27,14 @@ export function SelectValue(componentProps: SelectValue.Props) {
   const labelsByValue = useStoreState(store, 'labelsByValue');
   const items = useStoreState(store, 'items');
   const multiple = useStoreState(store, 'multiple');
+  const isItemEqualToValue = useStoreState(store, 'isItemEqualToValue');
 
   const labels =
     multiple && Array.isArray(value)
       ? value
-          .map((item) => resolveSelectLabel(items, labelsByValue, item))
+          .map((item) => resolveSelectLabel(items, labelsByValue, item, isItemEqualToValue))
           .filter((item): item is string => item !== undefined)
-      : [resolveSelectLabel(items, labelsByValue, value)].filter(
+      : [resolveSelectLabel(items, labelsByValue, value, isItemEqualToValue)].filter(
           (item): item is string => item !== undefined,
         );
 

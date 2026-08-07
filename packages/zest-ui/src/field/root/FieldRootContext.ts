@@ -16,6 +16,21 @@ export interface FieldValidityData {
   errors: string[];
 }
 
+/**
+ * What a control offers its field so a surrounding `Form` can drive it.
+ */
+export interface FieldControlEntry {
+  /**
+   * Revalidates against the control's current value, returning the messages.
+   */
+  validate: () => string[];
+  /**
+   * Focuses the control, where there is something focusable. A `Pressable`
+   * control (checkbox, slider, select trigger) has nothing to focus.
+   */
+  focus: () => void;
+}
+
 export interface FieldRootContext {
   /**
    * Whether the field, or the fieldset it belongs to, is disabled.
@@ -45,6 +60,17 @@ export interface FieldRootContext {
    * Runs the consumer's `validate`, returning the messages (or none).
    */
   runValidation: (value: unknown) => string[];
+  /**
+   * Registers the field's control, so a surrounding `Form` can revalidate it on
+   * submit and focus it when it fails. Returns the cleanup.
+   */
+  registerControl: (entry: FieldControlEntry) => () => void;
+  /**
+   * Drops any error a surrounding `Form` put on this field. Controls call it
+   * when the user changes the value: a server's complaint describes the value
+   * that was sent, not the one being typed now.
+   */
+  clearExternalError: () => void;
   validationMode: 'onBlur' | 'onChange';
   invalid: boolean | undefined;
   touched: boolean;

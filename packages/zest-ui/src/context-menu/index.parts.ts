@@ -6,6 +6,7 @@ export { ContextMenuPositioner as Positioner } from './positioner/ContextMenuPos
 // Trigger and Positioner is the menu's own, reused unchanged.
 export { MenuPortal as Portal } from '../menu/portal/MenuPortal';
 export { MenuBackdrop as Backdrop } from '../menu/backdrop/MenuBackdrop';
+export { MenuArrow as Arrow } from '../menu/arrow/MenuArrow';
 export { MenuPopup as Popup } from '../menu/popup/MenuPopup';
 export { MenuItem as Item } from '../menu/item/MenuItem';
 export { MenuLinkItem as LinkItem } from '../menu/link-item/MenuLinkItem';

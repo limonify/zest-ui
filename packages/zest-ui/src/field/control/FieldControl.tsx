@@ -1,6 +1,8 @@
 'use client';
+import * as React from 'react';
 import { TextInput } from 'react-native';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { useMergedRefs } from '../../hooks/useMergedRefs';
 import { useFieldRootContext } from '../root/FieldRootContext';
 import type { FieldRoot } from '../root/FieldRoot';
 import type { ZestUIComponentProps } from '../../types';
@@ -25,17 +27,23 @@ export function FieldControl(componentProps: FieldControl.Props) {
 
   const { state } = useFieldRootContext();
 
+  // The form focuses the first invalid field on submit, and needs a handle on
+  // the input to do it.
+  const inputRef = React.useRef<TextInput>(null);
+  const mergedRef = useMergedRefs(ref, inputRef);
+
   const { props } = useFieldControl({
     value: valueProp,
     defaultValue,
     onValueChange,
     nativeID,
+    inputRef,
     requireField: true,
   });
 
   return useRenderElement(TextInput, componentProps, {
     state,
-    ref,
+    ref: mergedRef,
     props: [props, elementProps],
   });
 }

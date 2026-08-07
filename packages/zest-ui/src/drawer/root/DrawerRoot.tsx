@@ -24,9 +24,10 @@ import {
  * and there is no page behind it to scroll-lock) and `onOpenChangeComplete` (see
  * the animation contract in CLAUDE.md — nothing in RN reports that a closing
  * animation finished).
- * Upstream's `Indent`/`IndentBackground` parts have no counterpart either: they
- * scale the page behind the drawer, which a `Modal` renders in a separate native
- * window from.
+ * `Drawer.Indent`/`IndentBackground` *are* ported, but differently: upstream
+ * drives them with CSS variables it writes on the element, and here the numbers
+ * go on the state object for the consumer to animate. They need a
+ * `Drawer.Provider` above both the drawer and the app's own UI.
  */
 export function DrawerRoot<Payload = unknown>(props: DrawerRoot.Props<Payload>) {
   const {

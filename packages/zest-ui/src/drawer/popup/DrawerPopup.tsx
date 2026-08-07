@@ -5,6 +5,10 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useDialogPopupProps } from '../../dialog/popup/useDialogPopupProps';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
+import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
+import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { clamp } from '../../utils/clamp';
+import { useDrawerProviderContext } from '../provider/DrawerProviderContext';
 import type { ZestUIComponentProps } from '../../types';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
@@ -51,7 +55,8 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
   } = componentProps;
 
   const { testID } = elementProps;
-  const { swipeDirection, onPopupHeightChange } = useDrawerRootContext();
+  const { swipeDirection, popupHeight, onPopupHeightChange } = useDrawerRootContext();
+  const provider = useDrawerProviderContext();
   const {
     activeSnapPoint,
     activeSnapPointOffset,
@@ -77,6 +82,35 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
   const handleLayout = useStableCallback((event: LayoutChangeEvent) => {
     onPopupHeightChange(event.nativeEvent.layout.height);
   });
+
+  // Registering with the provider is what a `Drawer.Indent` outside this tree
+  // reacts to. The key is this popup's own identity, so two drawers open at once
+  // both count.
+  const providerKey = useRefWithInit(() => ({})).current;
+
+  useIsoLayoutEffect(() => {
+    if (!provider || !open) {
+      return undefined;
+    }
+
+    provider.setDrawerOpen(providerKey, true);
+
+    return () => {
+      provider.setDrawerOpen(providerKey, false);
+    };
+  }, [provider, open, providerKey]);
+
+  // A swipe towards dismissal runs from 0 to the popup's own height, which is
+  // what turns it into the 0–1 the indent scales back by. Dragging *open* past
+  // a snap point is negative movement and is not progress towards anything.
+  useIsoLayoutEffect(() => {
+    if (!provider || !open) {
+      return;
+    }
+
+    const progress = popupHeight > 0 ? clamp(swipeMovement / popupHeight, 0, 1) : 0;
+    provider.setVisualState(progress, popupHeight);
+  }, [provider, open, swipeMovement, popupHeight]);
 
   const baseOffset = activeSnapPointOffset ?? 0;
 

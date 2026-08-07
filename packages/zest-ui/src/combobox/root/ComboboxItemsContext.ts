@@ -1,20 +1,31 @@
 'use client';
 import * as React from 'react';
-import type { ComboboxItem } from '../store/ComboboxStore';
+import type { ComboboxEntry, ComboboxItem } from '../store/ComboboxStore';
 
 export interface ComboboxItemsContext {
   /**
-   * The items left after filtering by the current query.
+   * The entries left after filtering by the current query — items, groups, or
+   * both, matching the shape of the `items` prop.
    */
-  filteredItems: ComboboxItem[];
+  filteredItems: ComboboxEntry[];
+  /**
+   * How many selectable items survived filtering, with groups flattened away.
+   */
+  filteredItemCount: number;
+  /**
+   * The selected value(s), resolved to items. Empty when nothing is selected,
+   * and at most one entry unless the combobox is `multiple`.
+   */
+  selectedItems: ComboboxItem[];
 }
 
 /**
- * The filtered view of the items.
+ * The filtered and the selected views of the items.
  *
- * This is derived from the store rather than stored in it: a synced store value
+ * Both are derived from the store rather than stored in it: a synced store value
  * only lands in a layout effect, which would leave the list one commit behind
- * the text the user just typed.
+ * the text the user just typed. Deriving them once in the root also keeps
+ * `Value`, `Chips`, `Chip` and `Clear` from each repeating the same resolution.
  */
 export const ComboboxItemsContext = React.createContext<ComboboxItemsContext | undefined>(
   undefined,

@@ -1,0 +1,110 @@
+---
+title: Form
+description: Groups fields, distributes server errors to them, and validates them all at once.
+---
+
+`Form` wraps a set of [`Field`](/docs/components/field)s. It puts errors from a server onto the
+fields they belong to, and on submit it validates every field and sends the user to the first one
+that failed.
+
+**Adapted from upstream.** React Native has no HTML form submission — no `<form>`, no `action`, no
+submit event — so submission is imperative, through `actionsRef`. What upstream's `Form` does that
+still earns its place here is exactly the two things above.
+
+## Anatomy
+
+<Anatomy code={`Form
+  Field.Root (name="…")
+    Field.Label
+    Field.Control
+    Field.Error`} />
+
+A field takes part only if it has a `name`; that is the key `errors` is looked up by.
+
+## Usage
+
+```tsx
+import * as React from 'react';
+import { Button, Field, Form } from '@limonify/zest-ui';
+
+function SignUp() {
+  const form = React.useRef<Form.Actions>(null);
+  const [errors, setErrors] = React.useState<Record<string, string | string[]>>({});
+
+  async function save() {
+    const response = await api.signUp();
+    if (!response.ok) {
+      setErrors(response.errors);
+    }
+  }
+
+  return (
+    <>
+      <Form actionsRef={form} errors={errors} onClearErrors={setErrors} onSubmit={save}>
+        <Field.Root name="email" validate={(value) => (value ? null : 'Email is required')}>
+          <Field.Label>Email</Field.Label>
+          <Field.Control style={styles.input} />
+          <Field.Error style={styles.error} />
+        </Field.Root>
+
+        <Field.Root name="password" validate={(value) => (value ? null : 'Password is required')}>
+          <Field.Label>Password</Field.Label>
+          <Field.Control secureTextEntry style={styles.input} />
+          <Field.Error style={styles.error} />
+        </Field.Root>
+      </Form>
+
+      <Button onPress={() => form.current?.submit()}>Sign up</Button>
+    </>
+  );
+}
+```
+
+## Submitting
+
+There is no submit event to hook, so `actionsRef` is how a form is submitted:
+
+- **`submit()`** validates every field. If one fails it focuses the first that can be focused and
+  returns `false`; otherwise it calls `onSubmit` and returns `true`.
+- **`validate()`** does the same validation and reports the verdict without submitting — useful for
+  enabling a button, or for a wizard step.
+
+Submitting marks every field touched, which is what allows their `Field.Error` to show. A field the
+user never reached would otherwise keep its error hidden.
+
+"The first invalid field" is the first in **tree order**: fields register from a layout effect, and
+React runs those in child order.
+
+Not every control can take focus. A `Field.Control` is a `TextInput` and can; a checkbox, switch,
+slider or select trigger is a `Pressable` and cannot. Those fields are still marked invalid and
+still show their error — there is simply nothing to move the cursor to.
+
+## Errors from a server
+
+`errors` is keyed by field name, and takes precedence over what the field's own `validate` thinks —
+a field cannot know the server disagreed with it. A value can be one message or several.
+
+```tsx
+<Form errors={{ email: 'Already taken', password: ['Too short', 'Too common'] }} onClearErrors={setErrors} />
+```
+
+A field drops its error the moment the user changes it: the server's complaint was about the value
+that was sent, not the one being typed now. `onClearErrors` is called with what is left, so keep
+your state in sync with it.
+
+An external error blocks submission even when the field's own `validate` passes — until the user
+edits it and clears it.
+
+## API
+
+`Form` — every part also accepts the [common props](/docs/common-props) (`style`/`className` as a
+value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest-ui/src/form/Form.tsx" name="FormProps" />
+
+<AutoType path="../../packages/zest-ui/src/form/Form.tsx" name="FormActions" />
+
+## Accessibility
+
+The container is `role="form"`. Everything else — labelling, descriptions, `aria-invalid`, error
+announcements — belongs to the fields inside it; see [Field](/docs/components/field).

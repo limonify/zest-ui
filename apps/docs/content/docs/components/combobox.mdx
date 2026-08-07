@@ -1,10 +1,11 @@
 ---
 title: Combobox
-description: A text input that filters a list of items, with single selection.
+description: A text input that filters a list of items, with single or multiple selection.
 ---
 
 `Combobox` is a text input paired with a filtered list. Typing filters the items; choosing one
-fills the input and closes the list. For free-text suggestions without a bound value, use
+fills the input and closes the list. Set `multiple` to select several, shown as chips. For
+free-text suggestions without a bound value, use
 [`Autocomplete`](/docs/components/autocomplete), which reuses every combobox part.
 
 <Demo>Filtering a list and selecting an item.</Demo>
@@ -12,14 +13,28 @@ fills the input and closes the list. For free-text suggestions without a bound v
 ## Anatomy
 
 <Anatomy code={`Combobox.Root
-  Combobox.Input
+  Combobox.Chips
+    Combobox.Value
+      Combobox.Chip
+        Combobox.ChipRemove
+    Combobox.Input
+  Combobox.Clear
   Combobox.Portal
     Combobox.Backdrop
     Combobox.Positioner
       Combobox.Popup
+        Combobox.Status
         Combobox.Empty
         Combobox.List
-          Combobox.Item`} />
+          Combobox.Group
+            Combobox.GroupLabel
+            Combobox.Collection
+              Combobox.Item
+                Combobox.ItemIndicator`} />
+
+`Combobox.Chips` and its children are only for `multiple`; a single-selection combobox is just
+`Combobox.Input` and the portal. `Combobox.Group`/`Collection` are only for grouped `items` — a
+flat list renders items straight from `Combobox.List`.
 
 ## Usage
 
@@ -110,6 +125,132 @@ import { Combobox } from '@limonify/zest-ui';
 Filtering defaults to a locale-aware label match — "resume" finds "Résumé". Pass `filter` to change
 it, and build your own predicate with [`useFilter`](/docs/utilities/use-filter).
 
+### Object values
+
+Values are compared with `Object.is`, so an object value only ever matches itself. If `items` is
+rebuilt on every render — a plain inline array is — the selection is dropped the moment the
+identity changes. `isItemEqualToValue` is how you match by content instead:
+
+```tsx
+<Combobox.Root
+  items={people}
+  value={selected}
+  onValueChange={setSelected}
+  isItemEqualToValue={(item, value) => item.id === value.id}
+/>
+```
+
+It applies everywhere the selection is compared: which item is marked selected, the label filled
+into the input, which chips render, and what a `multiple` press toggles. `null` and `undefined`
+never reach your comparer, so it does not have to guard against an empty selection.
+
+## Grouping items
+
+An entry in `items` becomes a group when it carries its own `items`. Filtering then runs **inside**
+each group, and a group whose items all filtered out is dropped — so a group never renders empty.
+A group is never matched on its own label: a query that happens to spell "Fruit" should not
+resurrect everything under it.
+
+`Combobox.List` hands you each surviving entry; `isComboboxGroup` tells the two apart.
+
+```tsx
+import { Combobox, isComboboxGroup } from '@limonify/zest-ui';
+
+<Combobox.Root items={[
+  { label: 'Fruit', items: ['Apple', 'Apricot'] },
+  { label: 'Vegetable', items: ['Carrot'] },
+]}>
+  {/* … */}
+  <Combobox.List>
+    {(entry) =>
+      isComboboxGroup(entry) ? (
+        <Combobox.Group key={String(entry.value)} items={entry.items}>
+          <Combobox.GroupLabel style={styles.groupLabel}>{entry.label}</Combobox.GroupLabel>
+          <Combobox.Collection>
+            {(item) => (
+              <Combobox.Item key={String(item.value)} item={item} style={styles.item}>
+                <Text>{item.label}</Text>
+                <Combobox.ItemIndicator><Text>✓</Text></Combobox.ItemIndicator>
+              </Combobox.Item>
+            )}
+          </Combobox.Collection>
+        </Combobox.Group>
+      ) : null
+    }
+  </Combobox.List>
+</Combobox.Root>
+```
+
+A group's `value` defaults to its label and is only ever an identity — groups are not selectable,
+and selection is always resolved against the flat list of items.
+
+Used outside a group, `Combobox.Collection` renders every filtered item with groups flattened away.
+
+`Combobox.ItemIndicator` renders only while its item is selected; `keepMounted` keeps it mounted so
+you can hide it with a style instead, which is what an exit animation needs.
+
+## Announcing results
+
+Filtering never moves focus, so a screen reader is not told that the list behind the input just
+changed. `Combobox.Status` is a polite live region that says how many items are left:
+
+```tsx
+<Combobox.Status>{(state) => (state.count === 0 ? 'Sonuç yok' : `${state.count} sonuç`)}</Combobox.Status>
+```
+
+Without a function child it announces an English count. It renders nothing while the list is
+closed, and it counts items inside groups rather than the groups.
+
+## Multiple selection
+
+With `multiple`, the value is an array and pressing an item toggles it instead of replacing the
+selection. The list **stays open** so the next pick costs nothing, and the input is left to the
+query — it is never filled with a selected label. The one exception is a list you have filtered:
+selecting there ends that query, so the list closes and the input clears with the `input-clear`
+reason.
+
+Render the selection with `Combobox.Chips`. `Combobox.Value` hands the selected items to a function
+child and then renders no element of its own, which is what keeps chips out of a `Text`:
+
+```tsx
+<Combobox.Root items={LANGUAGES} multiple value={value} onValueChange={setValue}>
+  <Combobox.Chips style={styles.chips}>
+    <Combobox.Value>
+      {(items) =>
+        items.map((item) => (
+          <Combobox.Chip key={String(item.value)} style={styles.chip}>
+            <Text>{item.label}</Text>
+            <Combobox.ChipRemove accessibilityLabel={`Remove ${item.label}`}>
+              <Text>×</Text>
+            </Combobox.ChipRemove>
+          </Combobox.Chip>
+        ))
+      }
+    </Combobox.Value>
+    <Combobox.Input placeholder="Add a language" style={styles.chipsInput} />
+  </Combobox.Chips>
+  {/* the portal, exactly as above */}
+</Combobox.Root>
+```
+
+A chip is removed by its **position** in the selection, so render chips in the order
+`Combobox.Value` gives them — mapping over that array does it for you.
+
+`Combobox.Clear` empties the selection and the input together. It renders nothing while there is
+nothing to clear; pass `keepMounted` to hide it with a style instead, which is what an exit
+animation needs. It works in a single-selection combobox too, and in an `Autocomplete` it clears
+the input text.
+
+```tsx
+<Combobox.Clear accessibilityLabel="Clear" style={styles.clear}>
+  <Text>✕</Text>
+</Combobox.Clear>
+```
+
+Neither `Combobox.ChipRemove` nor `Combobox.Clear` returns focus to the input, unlike the web
+version: with `openOnFocus` that would reopen the list, which is not what removing a chip asks for.
+Upstream's arrow-key navigation between chips is not ported either — there is no Tab key on mobile.
+
 ### Cancelling a change
 
 Every callback receives an event details object alongside the new value. Calling `cancel()` on it
@@ -126,8 +267,9 @@ vetoes the change — and because one object is shared across a single interacti
 />
 ```
 
-The reasons a combobox reports are `input-press`, `input-change`, `trigger-focus`, `item-press`,
-`outside-press`, `escape-key`, `imperative-action` and `none`.
+The reasons a combobox reports are `input-press`, `input-change`, `input-clear`, `trigger-focus`,
+`item-press`, `chip-remove-press`, `clear-press`, `outside-press`, `escape-key`,
+`imperative-action` and `none`.
 
 ### Opening it from elsewhere
 
@@ -155,6 +297,17 @@ These fields reach your `style` and `render` functions on **Combobox.Input** (`s
 
 <AutoType path="../../packages/zest-ui/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
 
+**Combobox.Value** publishes the input text alongside the resolved selection, so a single style
+function can render both:
+
+<AutoType path="../../packages/zest-ui/src/combobox/value/ComboboxValue.tsx" name="ComboboxValueState" />
+
+**Combobox.Chip** knows where it sits in the selection, and **Combobox.Clear** whether there is
+anything left to clear:
+
+<AutoType path="../../packages/zest-ui/src/combobox/chip/ComboboxChip.tsx" name="ComboboxChipState" />
+
+<AutoType path="../../packages/zest-ui/src/combobox/clear/ComboboxClear.tsx" name="ComboboxClearState" />
 
 ### Sizing the popup to its trigger
 
@@ -187,4 +340,12 @@ See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contr
 ## Accessibility
 
 The input is `accessibilityRole="search"` with `aria-expanded` and `aria-autocomplete="list"`; each
-item is `role="option"` with `aria-selected`.
+item is `role="option"` with `aria-selected`. In `multiple` mode the popup adds
+`aria-multiselectable`, and `Combobox.Chips` becomes a `role="toolbar"` once it holds chips.
+
+`Combobox.ChipRemove` and `Combobox.Clear` have no label of their own — give them one:
+
+```tsx
+<Combobox.ChipRemove accessibilityLabel={`Remove ${item.label}`} />
+<Combobox.Clear accessibilityLabel="Clear selection" />
+```

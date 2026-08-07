@@ -12,3 +12,7 @@ export { DialogViewport as Viewport } from '../dialog/viewport/DialogViewport';
 export { DialogTitle as Title } from '../dialog/title/DialogTitle';
 export { DialogDescription as Description } from '../dialog/description/DialogDescription';
 export { DialogClose as Close } from '../dialog/close/DialogClose';
+
+export { DrawerProvider as Provider } from './provider/DrawerProvider';
+export { DrawerIndent as Indent } from './indent/DrawerIndent';
+export { DrawerIndentBackground as IndentBackground } from './indent-background/DrawerIndentBackground';

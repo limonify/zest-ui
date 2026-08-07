@@ -29,6 +29,7 @@ export function TooltipPortal(props: TooltipPortal.Props) {
 
   const store = useTooltipRootContext();
   const open = useStoreState(store, 'open');
+  const disablePointerDismissal = useStoreState(store, 'disablePointerDismissal');
 
   const shouldRender = open || keepMounted;
   if (!shouldRender) {
@@ -56,6 +57,9 @@ export function TooltipPortal(props: TooltipPortal.Props) {
           style={StyleSheet.absoluteFill}
           onStartShouldSetResponder={() => true}
           onResponderRelease={(event: GestureResponderEvent) => {
+            if (disablePointerDismissal) {
+              return;
+            }
             store.setOpen(false, createChangeEventDetails(REASONS.outsidePress, event));
           }}
         />

@@ -1,28 +1,117 @@
 import type { TextInput } from 'react-native';
 import { createSelector } from '../../store/createSelector';
 import { ReactStore } from '../../store/ReactStore';
+import {
+  compareItemEquality,
+  defaultItemEquality,
+  type ItemEqualityComparer,
+} from '../../internals/itemEquality';
+import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { PopupTriggerMap } from '../../utils/popups/PopupTriggerMap';
+import { REASONS } from '../../utils/reasons';
+import { toggleSelectedValue } from '../../utils/selection';
 import type { ComboboxRoot } from '../root/ComboboxRoot';
 
 /**
- * The items to filter and choose from: strings, or `{ value, label }` records
- * for non-string values.
+ * The items to filter and choose from: strings, `{ value, label }` records for
+ * non-string values, or `{ label, items }` records to group them.
  */
-export type ComboboxItems = ReadonlyArray<string | { value: unknown; label: string }>;
+export type ComboboxItems = ReadonlyArray<
+  | string
+  | { value: unknown; label: string }
+  | { value?: unknown; label: string; items: ReadonlyArray<string | { value: unknown; label: string }> }
+>;
 
 export interface ComboboxItem {
   value: unknown;
   label: string;
 }
 
-/** Normalizes the `items` prop into `{ value, label }` records. */
-export function normalizeComboboxItems(items: ComboboxItems | undefined): ComboboxItem[] {
+/**
+ * A group of items, which is what `Combobox.Group` renders. Its `value` defaults
+ * to its label, and is only ever an identity — a group is never selectable.
+ */
+export interface ComboboxItemGroup {
+  value: unknown;
+  label: string;
+  items: ComboboxItem[];
+}
+
+/**
+ * An entry in the list: either a selectable item or a group of them.
+ */
+export type ComboboxEntry = ComboboxItem | ComboboxItemGroup;
+
+/** Whether a list entry is a group rather than a selectable item. */
+export function isComboboxGroup(entry: ComboboxEntry): entry is ComboboxItemGroup {
+  return Array.isArray((entry as ComboboxItemGroup).items);
+}
+
+function normalizeComboboxItem(item: string | { value: unknown; label: string }): ComboboxItem {
+  return typeof item === 'string'
+    ? { value: item, label: item }
+    : { value: item.value, label: item.label };
+}
+
+/** Normalizes the `items` prop into `{ value, label }` records and groups. */
+export function normalizeComboboxItems(items: ComboboxItems | undefined): ComboboxEntry[] {
   if (!items) {
     return [];
   }
 
-  return items.map((item) =>
-    typeof item === 'string' ? { value: item, label: item } : { value: item.value, label: item.label },
+  return items.map((item) => {
+    if (typeof item !== 'string' && 'items' in item && Array.isArray(item.items)) {
+      return {
+        value: 'value' in item && item.value !== undefined ? item.value : item.label,
+        label: item.label,
+        items: item.items.map(normalizeComboboxItem),
+      };
+    }
+
+    return normalizeComboboxItem(item as string | { value: unknown; label: string });
+  });
+}
+
+/**
+ * Every selectable item in the list, groups flattened away. Selection is always
+ * resolved against this — a group is a rendering concern, not a value.
+ */
+export function flattenComboboxEntries(entries: ComboboxEntry[]): ComboboxItem[] {
+  const flat: ComboboxItem[] = [];
+
+  for (const entry of entries) {
+    if (isComboboxGroup(entry)) {
+      flat.push(...entry.items);
+    } else {
+      flat.push(entry);
+    }
+  }
+
+  return flat;
+}
+
+/**
+ * The selected value(s) resolved back to `{ value, label }` records — what
+ * `Combobox.Value`, `Combobox.Chips` and `Combobox.Clear` all render from.
+ *
+ * A value with no matching item still gets a record, labeled by stringifying it,
+ * so a selection made before `items` caught up is never dropped. Single
+ * selection resolves to zero or one record.
+ */
+export function resolveComboboxSelection(
+  items: ComboboxItem[],
+  value: unknown,
+  multiple: boolean,
+  comparer: ItemEqualityComparer = defaultItemEquality,
+): ComboboxItem[] {
+  const values = multiple ? (Array.isArray(value) ? value : []) : value == null ? [] : [value];
+
+  return values.map(
+    (selected) =>
+      items.find((item) => compareItemEquality(item.value, selected, comparer)) ?? {
+        value: selected,
+        label: String(selected),
+      },
   );
 }
 
@@ -61,6 +150,16 @@ export type State = {
    * text with suggestions, where the typed string is the value.
    */
   mode: 'combobox' | 'autocomplete';
+  /**
+   * Whether more than one item can be selected, which makes `value` an array.
+   * Only meaningful in `'combobox'` mode — an autocomplete has no selection.
+   */
+  multiple: boolean;
+  /**
+   * How an item's value is matched against the selection. Defaults to
+   * `Object.is`, so object values need one of their own.
+   */
+  isItemEqualToValue: ItemEqualityComparer;
   disabled: boolean;
   disablePointerDismissal: boolean;
   /**
@@ -124,6 +223,8 @@ const selectors = {
   inputValue: createSelector((state: State) => state.inputValueProp ?? state.inputValue),
   items: createSelector((state: State) => state.items),
   mode: createSelector((state: State) => state.mode),
+  multiple: createSelector((state: State) => state.multiple),
+  isItemEqualToValue: createSelector((state: State) => state.isItemEqualToValue),
   disabled: createSelector((state: State) => state.disabled),
   disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
   openOnFocus: createSelector((state: State) => state.openOnFocus),
@@ -155,6 +256,8 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
         inputValueProp: undefined,
         items: [],
         mode: 'combobox',
+        multiple: false,
+        isItemEqualToValue: defaultItemEquality,
         disabled: false,
         disablePointerDismissal: false,
         openOnFocus: true,
@@ -190,6 +293,15 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
     }
 
     this.set('open', nextOpen);
+
+    // A multiple combobox never mirrors its selection in the input, so whatever
+    // is left there is a filter query — and it would still be filtering the list
+    // the next time it opens. Dropping it here covers every way the list can
+    // close (item press, outside press, escape, imperative) at once. It is a
+    // change of its own, so it carries its own reason rather than sharing one.
+    if (!nextOpen && this.select('multiple') && this.select('inputValue') !== '') {
+      this.setInputValue('', createChangeEventDetails(REASONS.inputClear, eventDetails.event));
+    }
   };
 
   public setValue = (nextValue: unknown, eventDetails: ComboboxRoot.ChangeEventDetails) => {
@@ -228,14 +340,38 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
    *
    * One `eventDetails` object is shared by all three, so canceling in any
    * handler stops the rest — the same contract the group components use.
+   *
+   * A `multiple` combobox toggles the value instead, and neither fills the input
+   * nor closes: picking one of many is rarely the end of the interaction. The
+   * exception is a list the user has filtered — there, upstream treats the
+   * selection as the end of that query and closes, which drops the query
+   * through `setOpen`.
    */
   public selectItem = (item: ComboboxItem, eventDetails: ComboboxRoot.ChangeEventDetails) => {
+    const multiple = this.select('multiple');
+
     if (this.select('mode') === 'combobox') {
-      this.setValue(item.value, eventDetails);
+      this.setValue(
+        toggleSelectedValue(
+          this.select('value'),
+          item.value,
+          multiple,
+          this.select('isItemEqualToValue'),
+        ),
+        eventDetails,
+      );
 
       if (eventDetails.isCanceled) {
         return;
       }
+    }
+
+    if (multiple) {
+      if (this.select('inputValue').trim() !== '') {
+        this.setOpen(false, eventDetails);
+      }
+
+      return;
     }
 
     this.setInputValue(item.label, eventDetails);
@@ -245,5 +381,23 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
     }
 
     this.setOpen(false, eventDetails);
+  };
+
+  /**
+   * Clears the selection and the input text, as `Combobox.Clear` does.
+   *
+   * The two share one `eventDetails`, so canceling in `onValueChange` also
+   * leaves the input alone.
+   */
+  public clear = (eventDetails: ComboboxRoot.ChangeEventDetails) => {
+    if (this.select('mode') === 'combobox') {
+      this.setValue(this.select('multiple') ? [] : null, eventDetails);
+
+      if (eventDetails.isCanceled) {
+        return;
+      }
+    }
+
+    this.setInputValue('', eventDetails);
   };
 }

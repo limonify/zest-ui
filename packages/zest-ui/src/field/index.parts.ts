@@ -1,4 +1,5 @@
 export { FieldRoot as Root } from './root/FieldRoot';
+export { FieldItem as Item } from './item/FieldItem';
 export { FieldLabel as Label } from './label/FieldLabel';
 export { FieldControl as Control } from './control/FieldControl';
 export { FieldDescription as Description } from './description/FieldDescription';

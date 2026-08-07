@@ -6,7 +6,9 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { isValueSelected } from '../../utils/selection';
 import type { ComboboxItem as ComboboxItemData } from '../store/ComboboxStore';
+import { ComboboxItemContext } from './ComboboxItemContext';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
 
@@ -19,18 +21,22 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
 
   const store = useComboboxRootContext();
   const selectedValue = useStoreState(store, 'value');
+  const multiple = useStoreState(store, 'multiple');
+  const isItemEqualToValue = useStoreState(store, 'isItemEqualToValue');
 
   const { index, onLayout } = useCompositeListItem();
 
   const [pressed, setPressed] = React.useState(false);
-  const selected = selectedValue === item.value;
+  const selected = isValueSelected(selectedValue, item.value, multiple, isItemEqualToValue);
 
   const state: ComboboxItemState = React.useMemo(
     () => ({ selected, pressed, index }),
     [selected, pressed, index],
   );
 
-  return useRenderElement(Pressable, componentProps, {
+  const contextValue: ComboboxItemContext = React.useMemo(() => ({ state }), [state]);
+
+  const element = useRenderElement(Pressable, componentProps, {
     state,
     ref,
     props: [
@@ -38,7 +44,13 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
         onLayout,
         onPress(event: GestureResponderEvent) {
           store.selectItem(item, createChangeEventDetails(REASONS.itemPress, event));
-          store.select('inputRef')?.current?.blur();
+
+          // Dismissing the keyboard is right when the selection ends the
+          // interaction. A multiple combobox expects the next pick — and clears
+          // the input for it — so taking the keyboard away would be wrong.
+          if (!store.select('multiple')) {
+            store.select('inputRef')?.current?.blur();
+          }
         },
         onPressIn: () => setPressed(true),
         onPressOut: () => setPressed(false),
@@ -50,6 +62,8 @@ export function ComboboxItem(componentProps: ComboboxItem.Props) {
       elementProps,
     ],
   });
+
+  return <ComboboxItemContext.Provider value={contextValue}>{element}</ComboboxItemContext.Provider>;
 }
 
 export interface ComboboxItemState {

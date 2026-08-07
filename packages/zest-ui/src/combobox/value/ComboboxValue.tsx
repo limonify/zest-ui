@@ -1,38 +1,75 @@
 'use client';
-import type * as React from 'react';
+import * as React from 'react';
 import { Text } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
+import { useComboboxItemsContext } from '../root/ComboboxItemsContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import type { ComboboxItem } from '../store/ComboboxStore';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
 
 /**
- * Displays the current input text (the selected label in combobox mode).
+ * Displays the current input text (the selected label in a single-selection
+ * combobox).
  * Renders a `<Text>`. Reads `state.value` in a style/render function for custom
  * formatting.
+ *
+ * Pass a **function** as `children` to render the selection yourself — it
+ * receives the selected items and this part then renders no element of its own,
+ * so chips are not trapped inside a `<Text>`:
+ *
+ * ```tsx
+ * <Combobox.Value>
+ *   {(items) => items.map((item) => <Combobox.Chip key={String(item.value)}>…</Combobox.Chip>)}
+ * </Combobox.Value>
+ * ```
+ *
+ * `style`, `className` and `render` do nothing in that form.
  */
 export function ComboboxValue(componentProps: ComboboxValue.Props) {
   const { render, className, style, children, ref, ...elementProps } = componentProps;
 
   const store = useComboboxRootContext();
+  const { selectedItems } = useComboboxItemsContext();
   const inputValue = useStoreState(store, 'inputValue');
 
-  const state: ComboboxValueState = { value: inputValue };
+  const rendersSelection = typeof children === 'function';
 
-  return useRenderElement(Text, componentProps, {
+  const state: ComboboxValueState = { value: inputValue, items: selectedItems };
+
+  const element = useRenderElement(Text, componentProps, {
     state,
     ref,
-    props: [{ children: children ?? inputValue }, elementProps],
+    props: [{ children: rendersSelection ? undefined : (children ?? inputValue) }, elementProps],
+    enabled: !rendersSelection,
   });
+
+  if (rendersSelection) {
+    return <React.Fragment>{children(selectedItems)}</React.Fragment>;
+  }
+
+  return element;
 }
 
 export interface ComboboxValueState {
+  /**
+   * The current input text.
+   */
   value: string;
+  /**
+   * The selected value(s), resolved to items. Empty when nothing is selected,
+   * and at most one entry unless the combobox is `multiple`.
+   */
+  items: ComboboxItem[];
 }
 
 export interface ComboboxValueProps
   extends Omit<ZestUIComponentProps<typeof Text, ComboboxValueState>, 'children'> {
-  children?: React.ReactNode;
+  /**
+   * The content to render. A function receives the selected items and replaces
+   * this part's own element entirely.
+   */
+  children?: React.ReactNode | ((items: ComboboxItem[]) => React.ReactNode);
 }
 
 export namespace ComboboxValue {

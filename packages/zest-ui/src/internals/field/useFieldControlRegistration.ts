@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import { useFieldRootContext } from '../../field/root/FieldRootContext';
+import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
 
 /** Whether a value counts as "the user has put something in this control". */
@@ -26,6 +27,12 @@ export interface UseFieldControlRegistrationParameters {
    * Whether a value counts as filled. Defaults to "not null, empty, or false".
    */
   isFilled?: ((value: unknown) => boolean) | undefined;
+  /**
+   * Something with a `focus()` method, so a surrounding `Form` can put the user
+   * in front of this control when submission stops here. Most of these controls
+   * are `Pressable`s with nothing to focus, and leave it out.
+   */
+  focusRef?: React.RefObject<{ focus?: () => void } | null> | undefined;
 }
 
 /**
@@ -46,7 +53,7 @@ export interface UseFieldControlRegistrationParameters {
 export function useFieldControlRegistration(
   parameters: UseFieldControlRegistrationParameters = {},
 ) {
-  const { initialValue, isFilled = defaultIsFilled } = parameters;
+  const { initialValue, isFilled = defaultIsFilled, focusRef } = parameters;
 
   const field = useFieldRootContext(false);
 
@@ -72,6 +79,10 @@ export function useFieldControlRegistration(
       return;
     }
 
+    latestValueRef.current = value;
+
+    // A server's complaint was about the value that was sent, not this one.
+    field.clearExternalError();
     field.setDirty(!Object.is(value, initialValueRef.current));
     field.setFilled(isFilled(value));
 
@@ -99,6 +110,25 @@ export function useFieldControlRegistration(
   const markFocused = useStableCallback((focused: boolean) => {
     field?.setFocused(focused);
   });
+
+  // What a surrounding `Form` revalidates against on submit. `markChanged` keeps
+  // it current; until the user touches anything it is the mount value.
+  const latestValueRef = React.useRef(initialValue);
+
+  useIsoLayoutEffect(() => {
+    if (!field) {
+      return undefined;
+    }
+
+    return field.registerControl({
+      validate: () => {
+        const errors = field.runValidation(latestValueRef.current);
+        field.setValidityData({ valid: errors.length === 0, errors });
+        return errors;
+      },
+      focus: () => focusRef?.current?.focus?.(),
+    });
+  }, [field, focusRef]);
 
   const describedBy =
     field && field.messageIds.length > 0 ? field.messageIds.join(' ') : undefined;

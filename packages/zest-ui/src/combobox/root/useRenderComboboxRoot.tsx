@@ -5,10 +5,19 @@ import { useRefWithInit } from '../../hooks/useRefWithInit';
 import { useTransitionStatus } from '../../internals/useTransitionStatus';
 import { usePopupRootHandle } from '../../utils/popups/usePopupRootHandle';
 import { useFilter } from '../../filter/useFilter';
+import {
+  compareItemEquality,
+  defaultItemEquality,
+  type ItemEqualityComparer,
+} from '../../internals/itemEquality';
 import type { ComboboxHandle } from '../store/ComboboxHandle';
 import {
   ComboboxStore,
+  flattenComboboxEntries,
+  isComboboxGroup,
   normalizeComboboxItems,
+  resolveComboboxSelection,
+  type ComboboxEntry,
   type ComboboxItem,
   type ComboboxItems,
 } from '../store/ComboboxStore';
@@ -29,6 +38,8 @@ export interface UseRenderComboboxRootProps<Payload = unknown> {
   value?: unknown;
   defaultValue?: unknown;
   onValueChange?: ((value: any, eventDetails: ComboboxRoot.ChangeEventDetails) => void) | undefined;
+  multiple?: boolean | undefined;
+  isItemEqualToValue?: ItemEqualityComparer | undefined;
   inputValue?: string | undefined;
   defaultInputValue?: string | undefined;
   onInputValueChange?:
@@ -71,7 +82,9 @@ export function useRenderComboboxRoot<Payload = unknown>(
     filter,
     handle,
     inputValue,
+    isItemEqualToValue = defaultItemEquality,
     items,
+    multiple = false,
     onInputValueChange,
     onOpenChange,
     onValueChange,
@@ -81,7 +94,10 @@ export function useRenderComboboxRoot<Payload = unknown>(
     value,
   } = props;
 
-  const normalizedItems = React.useMemo(() => normalizeComboboxItems(items), [items]);
+  // `entries` keeps the grouping the consumer wrote; `normalizedItems` is the flat
+  // list of selectable items, which is what every selection lookup runs against.
+  const entries = React.useMemo(() => normalizeComboboxItems(items), [items]);
+  const normalizedItems = React.useMemo(() => flattenComboboxEntries(entries), [entries]);
 
   const { contains } = useFilter();
   const filterItem = React.useMemo(
@@ -94,20 +110,27 @@ export function useRenderComboboxRoot<Payload = unknown>(
       new ComboboxStore({
         open: defaultOpen,
         openProp: open,
-        value: defaultValue ?? null,
+        // A multiple combobox's selection is a list, so an omitted default is an
+        // empty one rather than "nothing selected".
+        value: defaultValue ?? (multiple ? [] : null),
         valueProp: value,
         // The initial input text is only ever read here, and this closure only runs on the
         // first render — so deriving it inline keeps it stable. Recomputing it later would
         // make a selection that changes the controlled `value` (and with it the derived
-        // label) look like a controlled/uncontrolled switch.
+        // label) look like a controlled/uncontrolled switch. A multiple combobox never
+        // shows its selection in the input, so it starts blank.
         inputValue:
           defaultInputValue ??
-          (mode === 'combobox'
-            ? (normalizedItems.find((item) => item.value === (value ?? defaultValue))?.label ?? '')
+          (mode === 'combobox' && !multiple
+            ? (normalizedItems.find((item) =>
+                compareItemEquality(item.value, value ?? defaultValue, isItemEqualToValue),
+              )?.label ?? '')
             : ''),
         inputValueProp: inputValue,
         items: normalizedItems,
         mode,
+        multiple,
+        isItemEqualToValue,
         disabled,
         disablePointerDismissal,
         openOnFocus,
@@ -125,6 +148,8 @@ export function useRenderComboboxRoot<Payload = unknown>(
   useContextCallback(store, 'onInputValueChange', onInputValueChange);
   useSyncedValues(store, {
     mode,
+    multiple,
+    isItemEqualToValue,
     disabled,
     disablePointerDismissal,
     openOnFocus,
@@ -137,39 +162,78 @@ export function useRenderComboboxRoot<Payload = unknown>(
   const selectedValue = useStoreState(store, 'value');
   const currentInputValue = useStoreState(store, 'inputValue');
 
-  // The label of the currently selected value (combobox mode only).
-  const selectedLabel =
-    mode === 'combobox'
-      ? (normalizedItems.find((item) => item.value === selectedValue)?.label ?? '')
-      : '';
+  // The label of the currently selected value. Only single selection has one:
+  // a multiple combobox keeps its input free for the query, and an autocomplete
+  // has no selection at all.
+  const singleSelection = mode === 'combobox' && !multiple;
+  const selectedLabel = singleSelection
+    ? (normalizedItems.find((item) =>
+        compareItemEquality(item.value, selectedValue, isItemEqualToValue),
+      )?.label ?? '')
+    : '';
 
   // Reflect a controlled `value` that changed from outside into the input text.
   // `selectItem` already sets both, so the ref guard makes that a no-op and stops
   // this from fighting the user's typing (typing never changes the selection).
   const lastReflectedValueRef = React.useRef(selectedValue);
   useIsoLayoutEffect(() => {
-    if (mode !== 'combobox' || selectedValue === lastReflectedValueRef.current) {
+    if (!singleSelection || selectedValue === lastReflectedValueRef.current) {
       return;
     }
     lastReflectedValueRef.current = selectedValue;
     store.reflectInputValue(selectedLabel);
-  }, [mode, selectedValue, selectedLabel, store]);
+  }, [singleSelection, selectedValue, selectedLabel, store]);
 
   const filteredItems = React.useMemo(() => {
     // When the input still shows the current selection, the user has not started
     // filtering — show every item so a fresh focus reveals the whole list rather
-    // than the single selected row.
+    // than the single selected row. Only single selection can be in that state;
+    // everywhere else the input holds nothing but the query.
     const query =
-      mode === 'combobox' && currentInputValue === selectedLabel ? '' : currentInputValue.trim();
+      singleSelection && currentInputValue === selectedLabel ? '' : currentInputValue.trim();
     if (query.length === 0) {
-      return normalizedItems;
+      return entries;
     }
-    return normalizedItems.filter((item) => filterItem(item, query));
-  }, [normalizedItems, currentInputValue, selectedLabel, mode, filterItem]);
+
+    // Filtering runs inside a group and the group survives only if something in
+    // it did. A group is never matched on its own label: a query that happens to
+    // spell a group name should not resurrect every item under it.
+    const matches: ComboboxEntry[] = [];
+    for (const entry of entries) {
+      if (!isComboboxGroup(entry)) {
+        if (filterItem(entry, query)) {
+          matches.push(entry);
+        }
+        continue;
+      }
+
+      const items = entry.items.filter((item) => filterItem(item, query));
+      if (items.length > 0) {
+        matches.push({ ...entry, items });
+      }
+    }
+
+    return matches;
+  }, [entries, currentInputValue, selectedLabel, singleSelection, filterItem]);
+
+  // Groups are structure, not content — the list is empty when no selectable
+  // item survived, whatever wrappers are left standing.
+  const filteredItemCount = React.useMemo(
+    () => flattenComboboxEntries(filteredItems).length,
+    [filteredItems],
+  );
+
+  const selectedItems = React.useMemo(
+    () => resolveComboboxSelection(normalizedItems, selectedValue, multiple, isItemEqualToValue),
+    [normalizedItems, selectedValue, multiple, isItemEqualToValue],
+  );
 
   const { transitionStatus } = useTransitionStatus(resolvedOpen, false, true);
 
-  const itemsContextValue = React.useMemo(() => ({ filteredItems }), [filteredItems]);
+  const itemsContextValue = React.useMemo(
+    () => ({ filteredItems, filteredItemCount, selectedItems }),
+    [filteredItems, filteredItemCount, selectedItems],
+  );
   const transitionContextValue = React.useMemo(() => ({ transitionStatus }), [transitionStatus]);
 
   const payload = useStoreState(store, 'payload') as Payload;

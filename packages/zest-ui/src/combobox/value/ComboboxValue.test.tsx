@@ -53,6 +53,34 @@ describe('Combobox.Value', () => {
     expect(styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ value: 'apple' }));
   });
 
+  it('exposes the resolved selection on state', async () => {
+    const styleFn = jest.fn(() => ({}));
+
+    await render(
+      <Combobox.Root items={['Apple', 'Banana']} defaultValue="Banana">
+        <Combobox.Value testID="value" style={styleFn} />
+      </Combobox.Root>,
+    );
+
+    expect(styleFn).toHaveBeenLastCalledWith(
+      expect.objectContaining({ items: [{ value: 'Banana', label: 'Banana' }] }),
+    );
+  });
+
+  it('hands the selected items to a function child and renders no element of its own', async () => {
+    await render(
+      <Combobox.Root items={['Apple', 'Banana', 'Cherry']} multiple defaultValue={['Apple', 'Cherry']}>
+        <Combobox.Value testID="value">
+          {(items) => <Text testID="labels">{items.map((item) => item.label).join(', ')}</Text>}
+        </Combobox.Value>
+      </Combobox.Root>,
+    );
+
+    expect(screen.getByTestId('labels')).toHaveTextContent('Apple, Cherry');
+    // The part steps out of the way entirely, so chips are not trapped in a `Text`.
+    expect(screen.queryByTestId('value')).toBeNull();
+  });
+
   it('can be replaced through the render prop', async () => {
     await render(
       <Combobox.Root defaultInputValue="apple">

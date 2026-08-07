@@ -203,6 +203,38 @@ export const styles = StyleSheet.create({
   comboboxEmpty: {
     padding: 12,
   },
+  comboboxChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 8,
+  },
+  comboboxChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#E5E5EA',
+    borderRadius: 999,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+  },
+  comboboxChipRemove: {
+    paddingHorizontal: 2,
+  },
+  comboboxChipsInput: {
+    flexGrow: 1,
+    minWidth: 120,
+    paddingVertical: 6,
+    fontSize: 15,
+  },
+  comboboxClear: {
+    alignSelf: 'flex-start',
+    paddingVertical: 6,
+  },
   fieldRoot: {
     gap: 6,
     marginBottom: 12,

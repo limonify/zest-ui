@@ -1,5 +1,6 @@
 'use client';
 import type * as React from 'react';
+import type { ItemEqualityComparer } from '../../internals/itemEquality';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
 import type { ComboboxHandle } from '../store/ComboboxHandle';
@@ -12,9 +13,9 @@ import { useRenderComboboxRoot } from './useRenderComboboxRoot';
  * Doesn't render its own element.
  *
  * **Adapted from upstream.** Base UI's Combobox is a large component built on a
- * shared collection/filter core with chips, groups, rows and virtualization.
- * This is a focused React Native port: an input, a filtered list, and single
- * selection. Filtering is a locale-aware label match by default (see
+ * shared collection/filter core with groups, rows and virtualization. This is a
+ * focused React Native port: an input, a filtered list, single or `multiple`
+ * selection, and chips. Filtering is a locale-aware label match by default (see
  * `useFilter`); pass `filter` to change it.
  */
 export function ComboboxRoot<Payload = unknown>(props: ComboboxRoot.Props<Payload>) {
@@ -57,6 +58,32 @@ export interface ComboboxRootProps<Payload = unknown> {
    * Event handler called when the selection changes.
    */
   onValueChange?: ((value: any, eventDetails: ComboboxRoot.ChangeEventDetails) => void) | undefined;
+  /**
+   * Whether more than one item can be selected.
+   *
+   * The value becomes an array, pressing an item toggles it rather than
+   * replacing the selection, and the list stays open until it is dismissed. The
+   * input is left to the query — it is never filled with the selected label —
+   * so render the selection with `Combobox.Chips` instead.
+   * @default false
+   */
+  multiple?: boolean | undefined;
+  /**
+   * How an item's value is matched against the selection.
+   *
+   * Values are compared with `Object.is` by default, so an object value only
+   * ever matches itself — rebuilding `items` on every render would drop the
+   * selection. Pass a comparer to match by content instead.
+   *
+   * `null` and `undefined` never reach it: an empty selection is not something
+   * a comparer should have to guard against.
+   *
+   * @example
+   * ```tsx
+   * <Combobox.Root isItemEqualToValue={(item, value) => item.id === value.id} />
+   * ```
+   */
+  isItemEqualToValue?: ItemEqualityComparer | undefined;
   /**
    * The controlled input text.
    */
@@ -140,8 +167,11 @@ export interface ComboboxRootProps<Payload = unknown> {
 export type ComboboxRootChangeEventReason =
   | typeof REASONS.inputPress
   | typeof REASONS.inputChange
+  | typeof REASONS.inputClear
   | typeof REASONS.triggerFocus
   | typeof REASONS.itemPress
+  | typeof REASONS.chipRemovePress
+  | typeof REASONS.clearPress
   | typeof REASONS.outsidePress
   | typeof REASONS.escapeKey
   | typeof REASONS.imperativeAction

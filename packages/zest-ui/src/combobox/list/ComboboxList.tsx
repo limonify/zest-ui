@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { useComboboxItemsContext } from '../root/ComboboxItemsContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { ComboboxItem } from '../store/ComboboxStore';
+import type { ComboboxEntry } from '../store/ComboboxStore';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
 
@@ -15,32 +15,39 @@ import { useStoreState } from '../../store/ReactStore';
  * ```tsx
  * <Combobox.List>{(item) => <Combobox.Item key={String(item.value)} item={item} />}</Combobox.List>
  * ```
+ *
+ * When `items` holds groups, the render function receives each group instead —
+ * wrap it in `Combobox.Group` and render its items with `Combobox.Collection`.
  */
 export function ComboboxList(componentProps: ComboboxList.Props) {
   const { render, className, style, children, ref, ...elementProps } = componentProps;
 
   const store = useComboboxRootContext();
-  const { filteredItems } = useComboboxItemsContext();
+  const { filteredItems, filteredItemCount } = useComboboxItemsContext();
 
   const open = useStoreState(store, 'open');
 
-  const state: ComboboxListState = { open, empty: filteredItems.length === 0 };
+  const state: ComboboxListState = { open, empty: filteredItemCount === 0 };
 
   return useRenderElement(View, componentProps, {
     state,
     ref,
-    props: [{ children: filteredItems.map((item) => children(item)) }, elementProps],
+    props: [{ children: filteredItems.map((entry, index) => children(entry, index)) }, elementProps],
   });
 }
 
 export interface ComboboxListState {
   open: boolean;
+  /**
+   * Whether no selectable item survived filtering. Groups do not count — an
+   * empty group is not content.
+   */
   empty: boolean;
 }
 
 export interface ComboboxListProps
   extends Omit<ZestUIComponentProps<typeof View, ComboboxListState>, 'children'> {
-  children: (item: ComboboxItem) => React.ReactNode;
+  children: (entry: ComboboxEntry, index: number) => React.ReactNode;
 }
 
 export namespace ComboboxList {

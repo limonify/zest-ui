@@ -17,10 +17,12 @@ import {
   DialogSection,
   DrawerSection,
   FieldSection,
+  FormSection,
   FilterSection,
   HandleSection,
   MenuSection,
   MeterSection,
+  MultiComboboxSection,
   MultiSelectSection,
   NumberFieldSection,
   OTPFieldSection,
@@ -91,7 +93,10 @@ export default function App() {
           <Separator style={styles.separator} />
           <FieldSection />
           <Separator style={styles.separator} />
+          <FormSection />
+          <Separator style={styles.separator} />
           <ComboboxSection />
+          <MultiComboboxSection />
           <Separator style={styles.separator} />
           <SelectSection />
           <Separator style={styles.separator} />

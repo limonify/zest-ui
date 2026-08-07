@@ -14,7 +14,10 @@ description: Labels, describes and validates a text input.
   Field.Control
   Field.Description
   Field.Error
-  Field.Validity`} />
+  Field.Validity
+  Field.Item
+    Field.Label
+    Field.Description`} />
 
 ## Usage
 
@@ -82,6 +85,32 @@ import { Field } from '@limonify/zest-ui';
 `Field` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
 
 <AutoType path="../../packages/zest-ui/src/field/root/FieldRoot.tsx" name="FieldRootProps" />
+
+### Labelling each item of a group
+
+A `Field.Root` labels one control, so a checkbox or radio group inside it would have every item
+pointing at the same label. `Field.Item` opens a nested labelling scope: the `Field.Label` and
+`Field.Description` inside it associate with *its* control and nothing else, while validity,
+`disabled` and the rest still come from the surrounding field.
+
+```tsx
+<Field.Root>
+  <Field.Label>Notifications</Field.Label>
+  <CheckboxGroup value={value} onValueChange={setValue}>
+    <Field.Item style={styles.row}>
+      <Checkbox.Root value="email" />
+      <Field.Label>Email</Field.Label>
+      <Field.Description>At most one digest a day</Field.Description>
+    </Field.Item>
+    <Field.Item style={styles.row}>
+      <Checkbox.Root value="sms" />
+      <Field.Label>SMS</Field.Label>
+    </Field.Item>
+  </CheckboxGroup>
+</Field.Root>
+```
+
+An item can be `disabled` on its own; a disabled `Field.Root` disables all of them.
 
 ## State
 

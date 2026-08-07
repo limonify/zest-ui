@@ -24,7 +24,7 @@ export function MenuTrigger<Payload = unknown>(componentProps: MenuTrigger.Props
     render,
     className,
     style,
-    disabled = false,
+    disabled: disabledProp = false,
     handle,
     nativeID: idProp,
     payload,
@@ -47,6 +47,9 @@ export function MenuTrigger<Payload = unknown>(componentProps: MenuTrigger.Props
 
   const id = useId(idProp ?? undefined);
   const open = useStoreState(store, 'open');
+  const rootDisabled = useStoreState(store, 'disabled');
+
+  const disabled = disabledProp || rootDisabled;
 
   const [pressed, setPressed] = React.useState(false);
 
@@ -134,7 +137,8 @@ export interface MenuTriggerProps<Payload = unknown>
    */
   payload?: Payload | undefined;
   /**
-   * Whether the component should ignore user interaction.
+   * Whether the component should ignore user interaction. A disabled
+   * `Menu.Root` disables its triggers too.
    * @default false
    */
   disabled?: boolean | undefined;

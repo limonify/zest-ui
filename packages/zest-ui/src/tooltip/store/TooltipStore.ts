@@ -1,10 +1,26 @@
 import { createSelector } from '../../store/createSelector';
 import { ReactStore } from '../../store/ReactStore';
+import { PopupTriggerMap } from '../../utils/popups/PopupTriggerMap';
 import type { TooltipRoot } from '../root/TooltipRoot';
 
 export type State = {
+  /**
+   * The uncontrolled open state. Read through the `open` selector, which
+   * resolves the controlled prop first.
+   */
   open: boolean;
+  /**
+   * The controlled `open` prop, when provided.
+   */
   openProp: boolean | undefined;
+  /**
+   * Whether the tooltip should ignore user interaction entirely.
+   */
+  disabled: boolean;
+  /**
+   * Whether to prevent the tooltip from closing on presses outside the popup.
+   */
+  disablePointerDismissal: boolean;
   /**
    * The anchor's native node, carried across the portal boundary.
    */
@@ -19,18 +35,40 @@ export type State = {
    */
   triggerHeight: number | undefined;
   update: (() => void) | undefined;
+  /**
+   * The payload of the trigger the tooltip was opened by, handed to the root's
+   * children when they are a function.
+   */
+  payload: unknown;
+  /**
+   * The id of the trigger the tooltip is associated with, or `null` for none.
+   */
+  triggerId: string | null;
+  /**
+   * The controlled `triggerId` prop, when provided.
+   */
+  triggerIdProp: string | null | undefined;
 };
 
 type Context = {
   onOpenChange: ((open: boolean, eventDetails: TooltipRoot.ChangeEventDetails) => void) | undefined;
+  /**
+   * Every trigger bound to this tooltip, by id. A handle resolves `open(id)`
+   * through this, which is what lets a trigger rendered outside the root open it.
+   */
+  triggerNodes: PopupTriggerMap;
 };
 
 const selectors = {
   open: createSelector((state: State) => state.openProp ?? state.open),
+  disabled: createSelector((state: State) => state.disabled),
+  disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
   triggerNode: createSelector((state: State) => state.triggerNode),
   triggerWidth: createSelector((state: State) => state.triggerWidth),
   triggerHeight: createSelector((state: State) => state.triggerHeight),
   update: createSelector((state: State) => state.update),
+  payload: createSelector((state: State) => state.payload),
+  triggerId: createSelector((state: State) => state.triggerIdProp ?? state.triggerId),
 };
 
 export class TooltipStore extends ReactStore<Readonly<State>, Context, typeof selectors> {
@@ -39,19 +77,30 @@ export class TooltipStore extends ReactStore<Readonly<State>, Context, typeof se
       {
         open: false,
         openProp: undefined,
+        disabled: false,
+        disablePointerDismissal: false,
         triggerNode: null,
         triggerWidth: undefined,
         triggerHeight: undefined,
         update: undefined,
+        payload: undefined,
+        triggerId: null,
+        triggerIdProp: undefined,
         ...initialState,
       },
-      { onOpenChange: undefined },
+      { onOpenChange: undefined, triggerNodes: new PopupTriggerMap() },
       selectors,
     );
   }
 
   public setOpen = (nextOpen: boolean, eventDetails: TooltipRoot.ChangeEventDetails) => {
     if (nextOpen === this.select('open')) {
+      return;
+    }
+
+    // A disabled tooltip cannot be opened, by a press or by a handle. Closing it
+    // is always allowed, so disabling one that is already open puts it away.
+    if (nextOpen && this.select('disabled')) {
       return;
     }
 

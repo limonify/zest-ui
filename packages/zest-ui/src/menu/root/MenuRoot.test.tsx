@@ -185,3 +185,31 @@ describe('Menu', () => {
     expect(styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ index: 1 }));
   });
 });
+
+describe('Menu disabled', () => {
+  it('cannot be opened while the root is disabled', async () => {
+    const onOpenChange = jest.fn();
+    await render(<TestMenu disabled onOpenChange={onOpenChange} />);
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('trigger'));
+
+    expect(screen.queryByTestId('popup')).toBeNull();
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it('marks its triggers disabled', async () => {
+    await render(<TestMenu disabled />);
+
+    expect(screen.getByTestId('trigger').props.accessibilityState.disabled).toBe(true);
+  });
+
+  it('still opens when the root is not disabled', async () => {
+    await render(<TestMenu />);
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('trigger'));
+
+    expect(screen.getByTestId('popup')).toBeTruthy();
+  });
+});

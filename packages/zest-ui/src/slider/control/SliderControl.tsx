@@ -53,7 +53,10 @@ export function SliderControl(componentProps: SliderControl.Props) {
         return;
       }
 
-      setThumbValue(index, value, createChangeEventDetails(REASONS.drag));
+      // With `thumbCollisionBehavior="swap"` the dragged thumb changes index the
+      // moment it passes another, so the drag follows it there — otherwise the
+      // finger would silently pick up the thumb it just went past.
+      activeThumbRef.current = setThumbValue(index, value, createChangeEventDetails(REASONS.drag));
     },
     [setThumbValue, getValueFromPosition],
   );

@@ -163,7 +163,7 @@ Skip `GestureHandlerRootView` if you use neither Slider nor Drawer; skip Toast s
 
 ## Components
 
-32 components. Import from `@limonify/zest-ui`:
+33 components. Import from `@limonify/zest-ui`:
 
 ```tsx
 import { Dialog, Switch, Toast } from '@limonify/zest-ui';
@@ -185,11 +185,12 @@ import { Dialog, Switch, Toast } from '@limonify/zest-ui';
 | `Slider` | Root, Label, Value, Control, Track, Indicator, Thumb |
 | `NumberField` | Root, Group, Input, Increment, Decrement, ScrubArea |
 | `OTPField` | Root, Input, Separator |
-| `Field` | Root, Label, Control, Description, Error, Validity |
+| `Field` | Root, Item, Label, Control, Description, Error, Validity |
+| `Form` | Form |
 | `Fieldset` | Root, Legend |
 | `Select` | Root, Label, Trigger, Value, Icon, Portal, Backdrop, Positioner, Arrow, Popup, List, Group, GroupLabel, Item, ItemText, ItemIndicator, Separator |
-| `Combobox` | Root, Input, Portal, Backdrop, Positioner, Popup, List, Item, Empty, Value |
-| `Autocomplete` | Root, Input, Portal, Backdrop, Positioner, Popup, List, Item, Empty |
+| `Combobox` | Root, Input, Chips, Chip, ChipRemove, Clear, Portal, Backdrop, Positioner, Popup, List, Group, GroupLabel, Collection, Item, ItemIndicator, Empty, Status, Value |
+| `Autocomplete` | Root, Input, Clear, Portal, Backdrop, Positioner, Popup, List, Group, GroupLabel, Collection, Item, Empty, Status |
 
 ### Disclosure
 
@@ -205,11 +206,11 @@ import { Dialog, Switch, Toast } from '@limonify/zest-ui';
 | --- | --- |
 | `Dialog` | Root, Trigger, Portal, Backdrop, Viewport, Popup, Title, Description, Close |
 | `AlertDialog` | same shape as Dialog |
-| `Drawer` | Root, Trigger, Portal, Backdrop, Viewport, Popup, SwipeArea, Title, Description, Close |
+| `Drawer` | Root, Provider, Indent, IndentBackground, Trigger, Portal, Backdrop, Viewport, Popup, SwipeArea, Title, Description, Close |
 | `Popover` | Root, Trigger, Portal, Backdrop, Positioner, Popup, Arrow, Title, Description, Close |
 | `Tooltip` | Root, Trigger, Portal, Positioner, Popup, Arrow |
 | `Menu` | Root, Trigger, Portal, Backdrop, Positioner, Popup, Arrow, Item, LinkItem, CheckboxItem, RadioGroup, RadioItem, Group, GroupLabel, SubmenuRoot, SubmenuTrigger, Separator |
-| `ContextMenu` | Root, Trigger, Positioner (+ Menu item family) |
+| `ContextMenu` | Root, Trigger, Positioner, Arrow (+ Menu item family) |
 
 ### Feedback & misc
 
@@ -237,7 +238,6 @@ These Base UI pieces stay web/desktop-only:
 
 | Component | Why |
 | --- | --- |
-| `Form` | Aggregates HTML form submit validation — RN has no `<form>` submission; use `Field`’s `validate` |
 | `PreviewCard` | Hover card — no hover on touch |
 | `Menubar` | Desktop navigation pattern |
 | `NavigationMenu` | Desktop multi-level hover menu |
@@ -245,8 +245,17 @@ These Base UI pieces stay web/desktop-only:
 | `Toolbar` | Desktop toolbar / roving tabindex |
 | `CSPProvider` | Content Security Policy is web-only |
 
+`Form` **is** ported, adapted: there is no `<form>` submission, so it does the parts that still
+matter — spreading a server's `errors` onto the fields they name, and validating every field on
+submit. Submission is imperative, through `actionsRef`.
+
 Base UI's `useFilter` **is** ported — `Combobox` and `Autocomplete` filter through it, and it is
 exported for filtering your own lists. See [the docs](https://zestui.limonify.com/docs/utilities/use-filter).
+
+`DirectionProvider` **is** ported. Direction defaults to React Native's own `I18nManager.isRTL`;
+wrap a subtree to override it. It decides which edge `align="start"` anchors a popup to and which
+way a horizontal slider grows — React Native mirrors the layout itself. See
+[the docs](https://zestui.limonify.com/docs/utilities/direction-provider).
 
 ## Monorepo
 

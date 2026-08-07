@@ -6,7 +6,14 @@ import { useStableCallback } from '../../hooks/useStableCallback';
 import { useControlled } from '../../hooks/useControlled';
 import { useFieldsetRootContext } from '../../fieldset/root/FieldsetRootContext';
 import type { ZestUIComponentProps } from '../../types';
-import { FieldRootContext, type FieldValidityData } from './FieldRootContext';
+import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
+import { useFormContext } from '../../form/FormContext';
+import {
+  FieldRootContext,
+  type FieldControlEntry,
+  type FieldValidityData,
+} from './FieldRootContext';
 
 /**
  * Groups a label, a control, and its description/error messages, wiring them
@@ -75,7 +82,62 @@ export function FieldRoot(componentProps: FieldRoot.Props) {
     return Array.isArray(result) ? result : [result];
   });
 
-  const valid = invalid === true ? false : validityData.valid;
+  const form = useFormContext(false);
+
+  // Errors the consumer put on the form for this field, by name.
+  const externalErrors = React.useMemo(() => {
+    if (!form || !name || !(name in form.errors)) {
+      return undefined;
+    }
+    const entry = form.errors[name]!;
+    return Array.isArray(entry) ? entry : [entry];
+  }, [form, name]);
+
+  // A control registers itself so the form can revalidate and focus it. There is
+  // normally exactly one; a Set copes with a field that renders none, or two.
+  const controls = useRefWithInit(() => new Set<FieldControlEntry>()).current;
+
+  const registerControl = useStableCallback((entry: FieldControlEntry) => {
+    controls.add(entry);
+    return () => {
+      controls.delete(entry);
+    };
+  });
+
+  const clearExternalError = useStableCallback(() => {
+    if (name) {
+      form?.clearError(name);
+    }
+  });
+
+  // Registering with the form from a layout effect is what puts fields in tree
+  // order, which is the order "the first invalid field" is resolved in.
+  useIsoLayoutEffect(() => {
+    if (!form || !name) {
+      return undefined;
+    }
+
+    return form.registerField(name, {
+      validate() {
+        const messages: string[] = [];
+        controls.forEach((control) => {
+          messages.push(...control.validate());
+        });
+        return messages;
+      },
+      focus() {
+        controls.forEach((control) => control.focus());
+      },
+      markTouched() {
+        setTouched(true);
+      },
+    });
+  }, [form, name, controls, setTouched]);
+
+  // An error from outside outranks the local verdict: the field cannot know the
+  // server disagreed with it.
+  const valid = invalid === true || externalErrors ? false : validityData.valid;
+  const errors = externalErrors ?? validityData.errors;
 
   const state: FieldRoot.State = React.useMemo(
     () => ({ disabled, valid, touched, dirty, filled, focused }),
@@ -92,9 +154,11 @@ export function FieldRoot(componentProps: FieldRoot.Props) {
       setLabelId,
       messageIds,
       setMessageIds,
-      validityData: { valid, errors: validityData.errors },
+      validityData: { valid, errors },
       setValidityData,
       runValidation,
+      registerControl,
+      clearExternalError,
       validationMode,
       invalid,
       touched,
@@ -115,8 +179,10 @@ export function FieldRoot(componentProps: FieldRoot.Props) {
       messageIds,
       setMessageIds,
       valid,
-      validityData.errors,
+      errors,
       runValidation,
+      registerControl,
+      clearExternalError,
       validationMode,
       invalid,
       touched,

@@ -6,6 +6,10 @@ import type { MenuRoot } from '../root/MenuRoot';
 export type State = {
   open: boolean;
   openProp: boolean | undefined;
+  /**
+   * Whether the menu should ignore user interaction entirely.
+   */
+  disabled: boolean;
   disablePointerDismissal: boolean;
   /**
    * The anchor's native node, carried across the portal boundary.
@@ -47,6 +51,7 @@ type Context = {
 
 const selectors = {
   open: createSelector((state: State) => state.openProp ?? state.open),
+  disabled: createSelector((state: State) => state.disabled),
   disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
   triggerNode: createSelector((state: State) => state.triggerNode),
   triggerWidth: createSelector((state: State) => state.triggerWidth),
@@ -62,6 +67,7 @@ export class MenuStore extends ReactStore<Readonly<State>, Context, typeof selec
       {
         open: false,
         openProp: undefined,
+        disabled: false,
         disablePointerDismissal: false,
         triggerNode: null,
         triggerWidth: undefined,
@@ -79,6 +85,12 @@ export class MenuStore extends ReactStore<Readonly<State>, Context, typeof selec
 
   public setOpen = (nextOpen: boolean, eventDetails: MenuRoot.ChangeEventDetails) => {
     if (nextOpen === this.select('open')) {
+      return;
+    }
+
+    // A disabled menu cannot be opened, by a press or by a handle. Closing it is
+    // always allowed, so disabling one that is already open puts it away.
+    if (nextOpen && this.select('disabled')) {
       return;
     }
 

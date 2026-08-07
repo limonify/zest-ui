@@ -9,16 +9,22 @@ description: A dialog that also opens and dismisses by swiping, with snap points
 
 ## Anatomy
 
-<Anatomy code={`Drawer.Root
-  Drawer.Trigger
-  Drawer.SwipeArea
-  Drawer.Portal
-    Drawer.Backdrop
-    Drawer.Viewport
-      Drawer.Popup
-        Drawer.Title
-        Drawer.Description
-        Drawer.Close`} />
+<Anatomy code={`Drawer.Provider
+  Drawer.IndentBackground
+  Drawer.Indent
+  Drawer.Root
+    Drawer.Trigger
+    Drawer.SwipeArea
+    Drawer.Portal
+      Drawer.Backdrop
+      Drawer.Viewport
+        Drawer.Popup
+          Drawer.Title
+          Drawer.Description
+          Drawer.Close`} />
+
+`Drawer.Provider`, `Indent` and `IndentBackground` are only for the shrink-back effect below; a
+plain drawer is `Drawer.Root` and the portal.
 
 `Drawer.Title` and `Drawer.Description` are the dialog's own parts, re-exported: the title names
 the drawer for assistive technology and the description is announced with it.
@@ -103,6 +109,43 @@ import { Drawer } from '@limonify/zest-ui';
 These fields reach your `style` and `render` functions on **Drawer.Popup** (`style={(state) => ...}`).
 
 <AutoType path="../../packages/zest-ui/src/drawer/popup/DrawerPopup.tsx" name="DrawerPopupState" />
+
+## Shrinking the app behind it
+
+The iOS-style effect where the app scales back as a sheet comes up. `Drawer.Provider` tracks
+whether any drawer under it is open; `Drawer.Indent` wraps your own UI and publishes that, and
+`Drawer.IndentBackground` is the surface revealed in the gap the scaled-down app leaves.
+
+Upstream drives this with CSS variables. Following the [animation
+contract](/docs/guides/animation-reanimated), zest publishes the numbers and you animate:
+
+```tsx
+<Drawer.Provider>
+  <Drawer.IndentBackground style={styles.indentBackground} />
+  <Drawer.Indent
+    style={(state) => [
+      styles.app,
+      { transform: [{ scale: state.active ? 0.94 : 1 }], borderRadius: state.active ? 16 : 0 },
+    ]}
+  >
+    <App />
+  </Drawer.Indent>
+
+  <Drawer.Root>{/* … */}</Drawer.Root>
+</Drawer.Provider>
+```
+
+<AutoType path="../../packages/zest-ui/src/drawer/indent/DrawerIndent.tsx" name="DrawerIndentState" />
+
+`swipeProgress` is what lets the app scale back *with the finger* as the sheet is swiped away,
+rather than snapping when it finally closes. `frontmostHeight` is the popup's measured height, for
+an indent that scales in proportion to how tall the sheet is.
+
+Two drawers open at once both count: `active` stays `true` until the last one closes. Without a
+`Drawer.Provider` the parts still render, inertly — `active` is always `false`.
+
+This effect assumes the app behind a transparent `Modal` is visible, which is how the backdrop
+dimming already works. It has not been verified on a device.
 
 ## Animation
 

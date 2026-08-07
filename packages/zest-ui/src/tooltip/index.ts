@@ -1,6 +1,7 @@
 export * as Tooltip from './index.parts';
 
 export type * from './root/TooltipRoot';
+export { createTooltipHandle, TooltipHandle } from './store/TooltipHandle';
 export type * from './trigger/TooltipTrigger';
 export type * from './portal/TooltipPortal';
 export type * from './positioner/TooltipPositioner';
