@@ -104,6 +104,7 @@ export function useRenderComboboxRoot<Payload = unknown>(
   // A combobox reports itself to a surrounding `Field.Root` exactly as `Select`
   // does. An autocomplete has no separate selection, so the text it holds *is*
   // its value as far as the field is concerned.
+
   const ownsText = mode === 'autocomplete';
 
   // The field needs a way to focus the input when a form stops on this control,

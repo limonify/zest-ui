@@ -50,6 +50,7 @@ export function SelectRoot<Value = any, Payload = unknown>(
     ownsValue: true,
   });
 
+
   const disabled = disabledProp || fieldDisabled;
 
   const store = useRefWithInit(
