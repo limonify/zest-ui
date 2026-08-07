@@ -243,7 +243,7 @@
   "peerDependencies": {
     "react": ">=19.0.0",
     "react-native": ">=0.79.0",
-    "react-native-gesture-handler": ">=3.0.0"
+    "react-native-gesture-handler": ">=2.32.0"
   },
   "devDependencies": {
     "@babel/runtime": "^8.0.0",

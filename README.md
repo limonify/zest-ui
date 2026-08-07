@@ -28,7 +28,9 @@ bun add @limonify/zest-ui
 
 **Peers:** React 19+, React Native 0.79+.
 
-`react-native-gesture-handler` is a **required** peer — install it alongside zest:
+`react-native-gesture-handler` is a **required** peer — install it alongside zest. On Expo, use
+`npx expo install react-native-gesture-handler` so you get the version your SDK's Expo Go ships;
+a mismatch crashes at gesture attach rather than at build:
 
 ```bash
 bun add react-native-gesture-handler

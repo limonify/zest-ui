@@ -23,6 +23,13 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   …if you want the platform transition back. Affects `Dialog`, `AlertDialog`, `Popover`, `Menu`,
   `ContextMenu`, `Select` and `Combobox`.
 
+- **`react-native-gesture-handler`'s peer range widened from `>=3.0.0` to `>=2.32.0`.** The old floor
+  locked zest out of every Expo app: Expo SDK 57 installs `~2.32.0`, and Expo Go ships that native
+  build, so a project on gesture-handler 3.x bundled fine and then died at gesture attach with
+  `undefined is not a function` in `attachHandlers.ts`. zest only uses `Gesture`, `GestureDetector`,
+  `.withTestId()` and `.runOnJS()`, all of which 2.32 has. Verified by running the example app on an
+  iOS simulator: 3.x crashed on launch, 2.32 rendered every section with no errors.
+
 - **`react-native-gesture-handler` is now a required peer, not an optional one.** The optional
   declaration was true for npm and false for the bundler: the package root re-exports every
   component and Metro does not tree-shake, so `import { Dialog } from '@limonify/zest-ui'` pulls
