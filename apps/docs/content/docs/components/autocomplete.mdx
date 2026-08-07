@@ -11,10 +11,21 @@ description: A free-text input with a filtered suggestion list.
 
 <Anatomy code={`Autocomplete.Root
   Autocomplete.Input
+  Autocomplete.Clear
   Autocomplete.Portal
     Autocomplete.Positioner
       Autocomplete.Popup
-        Autocomplete.List > Autocomplete.Item`} />
+        Autocomplete.Status
+        Autocomplete.Empty
+        Autocomplete.List
+          Autocomplete.Group
+            Autocomplete.GroupLabel
+            Autocomplete.Collection
+              Autocomplete.Item`} />
+
+`Autocomplete.Group`/`Collection` are only for grouped `items`; a flat list renders items straight
+from `Autocomplete.List`. The chip parts a combobox has are absent here on purpose — an
+autocomplete's value *is* the typed text, so there is no separate selection to render.
 
 ## Usage
 
@@ -102,6 +113,21 @@ These fields reach your `style` and `render` functions on **Autocomplete.Input**
 
 <AutoType path="../../packages/zest-ui/src/combobox/input/ComboboxInput.tsx" name="ComboboxInputState" />
 
+
+### Clearing, grouping and announcing
+
+These three parts are the combobox's, and behave the same here:
+
+- **`Autocomplete.Clear`** empties the input. It renders nothing while the input is empty; pass
+  `keepMounted` to hide it with a style instead. It does not return focus to the input, unlike the
+  web version — with `openOnFocus` that would reopen the list.
+- **`Autocomplete.Group`/`GroupLabel`/`Collection`** render grouped `items`. An entry becomes a
+  group when it carries its own `items`; filtering runs inside each group and drops the ones left
+  empty. `isComboboxGroup` tells an entry from a group.
+- **`Autocomplete.Status`** is a polite live region announcing how many suggestions are left —
+  filtering never moves focus, so nothing else tells a screen reader the list changed.
+
+See [Combobox](/docs/components/combobox) for the worked examples; each one applies here.
 
 ### Cancelling a change, and opening it from elsewhere
 

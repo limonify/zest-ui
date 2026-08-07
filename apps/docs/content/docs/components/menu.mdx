@@ -106,6 +106,11 @@ import { Menu } from '@limonify/zest-ui';
 
 <AutoType path="../../packages/zest-ui/src/menu/root/MenuRoot.tsx" name="MenuRootProps" />
 
+A `disabled` menu cannot be opened, by a press or through its handle, and its triggers report
+themselves disabled. Closing is always allowed, so disabling one that is already open puts it away
+rather than stranding it on screen. `Menu.Trigger` also takes its own `disabled`, for one trigger
+out of several.
+
 ## State
 
 These fields reach your `style` and `render` functions on **Menu.Popup** (`style={(state) => ...}`).
