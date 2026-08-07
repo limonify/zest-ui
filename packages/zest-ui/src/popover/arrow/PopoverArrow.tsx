@@ -4,7 +4,7 @@ import { usePopoverRootContext } from '../root/PopoverRootContext';
 import { usePopoverPositionerContext } from '../positioner/PopoverPositionerContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
 
@@ -19,7 +19,7 @@ export function PopoverArrow(componentProps: PopoverArrow.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
   const store = usePopoverRootContext();
-  const { side, align, arrowRef, arrowStyles } = usePopoverPositionerContext();
+  const { side, align, arrowRef, arrowStyles, onArrowLayout } = usePopoverPositionerContext();
 
   const open = useStoreState(store, 'open');
 
@@ -30,7 +30,10 @@ export function PopoverArrow(componentProps: PopoverArrow.Props) {
   return useRenderElement(View, componentProps, {
     state,
     ref: mergedRef,
-    props: [{ style: { position: 'absolute' as const, ...arrowStyles } }, elementProps],
+    props: [
+      { onLayout: onArrowLayout, style: { position: 'absolute' as const, ...arrowStyles } },
+      elementProps,
+    ],
   });
 }
 
@@ -42,7 +45,7 @@ export interface PopoverArrowState {
   /**
    * The side the popup was actually placed on, after collision handling.
    */
-  side: Side;
+  side: PhysicalSide;
   /**
    * The alignment the popup was actually placed with.
    */

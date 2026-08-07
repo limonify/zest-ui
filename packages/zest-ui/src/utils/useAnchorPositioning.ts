@@ -11,9 +11,29 @@ import {
   type Padding,
   type Placement,
 } from '@floating-ui/react-native';
-import { useDirection } from '../direction-provider/DirectionContext';
+import type { LayoutChangeEvent } from 'react-native';
+import { AnimationFrame } from '../hooks/useAnimationFrame';
+import { useIsoLayoutEffect } from '../hooks/useIsoLayoutEffect';
+import { useDirection, type Direction } from '../direction-provider/DirectionContext';
 
-export type Side = 'top' | 'right' | 'bottom' | 'left';
+/**
+ * A physical side, or a logical one that follows the writing direction:
+ * `inline-start` is the left in LTR and the right in RTL.
+ */
+export type Side = 'top' | 'right' | 'bottom' | 'left' | 'inline-start' | 'inline-end';
+
+/** The physical side a `Side` resolves to, which is what floating-ui places by. */
+export type PhysicalSide = 'top' | 'right' | 'bottom' | 'left';
+
+function resolveSide(side: Side, direction: Direction): PhysicalSide {
+  if (side === 'inline-start') {
+    return direction === 'rtl' ? 'right' : 'left';
+  }
+  if (side === 'inline-end') {
+    return direction === 'rtl' ? 'left' : 'right';
+  }
+  return side;
+}
 export type Align = 'start' | 'center' | 'end';
 
 /**
@@ -41,6 +61,7 @@ export function useAnchorPositioning(
     alignOffset = 0,
     arrowPadding = 5,
     collisionPadding = 5,
+    open = false,
     side = 'bottom',
     sideOffset = 0,
     sticky = false,
@@ -54,7 +75,10 @@ export function useAnchorPositioning(
   // axis — which is the cross axis when the popup sits above or below its
   // anchor. `@floating-ui/react-native` has no direction option, so the swap
   // happens here, in the placement itself.
-  const flipsAlignment = direction === 'rtl' && (side === 'top' || side === 'bottom');
+  const physicalSide = resolveSide(side, direction);
+
+  const flipsAlignment =
+    direction === 'rtl' && (physicalSide === 'top' || physicalSide === 'bottom');
   const resolvedAlignProp: Align = flipsAlignment
     ? align === 'start'
       ? 'end'
@@ -66,7 +90,9 @@ export function useAnchorPositioning(
   const resolvedAlignOffset = flipsAlignment ? -alignOffset : alignOffset;
 
   const placement: Placement =
-    resolvedAlignProp === 'center' ? side : (`${side}-${resolvedAlignProp}` as Placement);
+    resolvedAlignProp === 'center'
+      ? physicalSide
+      : (`${physicalSide}-${resolvedAlignProp}` as Placement);
 
   const middleware: Middleware[] = React.useMemo(
     () => [
@@ -113,6 +139,40 @@ export function useAnchorPositioning(
     [x, y],
   );
 
+  // Re-measure every time the popup opens. The anchor's screen position is read
+  // at compute time, and nothing in React Native observes layout globally — so
+  // after the page behind has scrolled, a popup whose content stayed mounted
+  // would otherwise reopen at wherever its trigger was the *last* time it
+  // opened. The extra frame covers the case where the Modal has not laid its
+  // children out yet when the effect runs.
+  useIsoLayoutEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    update();
+    const frame = AnimationFrame.request(update);
+
+    return () => {
+      AnimationFrame.cancel(frame);
+    };
+  }, [open, update]);
+
+  // Recompute once the arrow has a size, and only then: `update()` feeds back
+  // into this layout, so an unguarded call would loop.
+  const arrowSizeRef = React.useRef({ width: 0, height: 0 });
+  const onArrowLayout = React.useCallback(
+    (event: LayoutChangeEvent) => {
+      const { width, height } = event.nativeEvent.layout;
+      if (width === arrowSizeRef.current.width && height === arrowSizeRef.current.height) {
+        return;
+      }
+      arrowSizeRef.current = { width, height };
+      update();
+    },
+    [update],
+  );
+
   const arrowStyles = React.useMemo(() => {
     const data = middlewareData.arrow;
     if (!data) {
@@ -129,6 +189,7 @@ export function useAnchorPositioning(
     align: resolvedAlign,
     arrowRef,
     arrowStyles,
+    onArrowLayout,
     positionerStyles,
     refs,
     side: resolvedSide,
@@ -136,8 +197,8 @@ export function useAnchorPositioning(
   };
 }
 
-function parsePlacement(placement: Placement): [Side, Align] {
-  const [side, alignment] = placement.split('-') as [Side, Alignment | undefined];
+function parsePlacement(placement: Placement): [PhysicalSide, Align] {
+  const [side, alignment] = placement.split('-') as [PhysicalSide, Alignment | undefined];
   return [side, alignment ?? 'center'];
 }
 
@@ -182,14 +243,22 @@ export interface UseAnchorPositioningSharedParameters {
   arrowPadding?: number | undefined;
 }
 
-export interface UseAnchorPositioningParameters extends UseAnchorPositioningSharedParameters {}
+export interface UseAnchorPositioningParameters extends UseAnchorPositioningSharedParameters {
+  /**
+   * Whether the popup is open. Opening re-measures the anchor, which is what
+   * keeps a popup whose content stays mounted from reopening at the position
+   * its trigger had the last time — after the page behind it has scrolled, for
+   * instance.
+   */
+  open?: boolean | undefined;
+}
 
 export interface UseAnchorPositioningReturnValue {
   /**
    * The side the popup was actually placed on, which differs from the requested
    * `side` when `flip` had to move it.
    */
-  side: Side;
+  side: PhysicalSide;
   /**
    * The alignment the popup was actually placed with.
    */
@@ -197,6 +266,17 @@ export interface UseAnchorPositioningReturnValue {
   positionerStyles: { position: 'absolute'; left: number; top: number };
   arrowStyles: { left?: number; top?: number };
   arrowRef: React.RefObject<unknown>;
+  /**
+   * Must be spread onto the `Arrow` part.
+   *
+   * floating-ui's `arrow` middleware needs the arrow element to exist and to
+   * have been measured, and on React Native measuring is asynchronous. The
+   * first position is computed as soon as the anchor and the popup have their
+   * refs — before the arrow has laid out — and nothing observes layout globally
+   * to try again. Without this the middleware returns no data and the arrow
+   * sits in the popup's top-left corner.
+   */
+  onArrowLayout: (event: LayoutChangeEvent) => void;
   refs: ReturnType<typeof useFloating>['refs'];
   /**
    * Recomputes the position. Nothing observes layout globally in React Native,

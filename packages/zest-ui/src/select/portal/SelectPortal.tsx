@@ -28,7 +28,7 @@ export function SelectPortal(props: SelectPortal.Props) {
     <SelectPortalContext.Provider value={keepMounted}>
       <Modal
         transparent
-        animationType="fade"
+        animationType="none"
         statusBarTranslucent
         navigationBarTranslucent
         {...modalProps}
@@ -53,7 +53,8 @@ export interface SelectPortalProps {
   keepMounted?: boolean | undefined;
   /**
    * Props forwarded to the underlying React Native `Modal`. Lets you replace
-   * the default `animationType="fade"`, or reach the rest of the Modal API.
+   * the default `animationType="none"` with a native `"fade"`/`"slide"`, or reach
+   * the rest of the Modal API.
    * `visible` stays owned by the select's open state, and `onRequestClose` is
    * chained rather than replaced.
    */

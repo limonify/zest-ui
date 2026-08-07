@@ -9,7 +9,7 @@ import { useMergedRefs } from '../../hooks/useMergedRefs';
 import {
   useAnchorPositioning,
   type Align,
-  type Side,
+  type PhysicalSide,
   type UseAnchorPositioningSharedParameters,
 } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
@@ -45,6 +45,7 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
 
   const positioning = useAnchorPositioning({
     align,
+    open,
     alignOffset,
     arrowPadding,
     collisionPadding,
@@ -53,7 +54,7 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
     sticky,
   });
 
-  const { positionerStyles, refs, update, arrowRef, arrowStyles } = positioning;
+  const { positionerStyles, refs, update, arrowRef, arrowStyles, onArrowLayout } = positioning;
 
   useIsoLayoutEffect(() => {
     refs.setReference(triggerNode ?? null);
@@ -77,8 +78,14 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
   };
 
   const contextValue: SelectPositionerContext = React.useMemo(
-    () => ({ side: positioning.side, align: positioning.align, arrowRef, arrowStyles }),
-    [positioning.side, positioning.align, arrowRef, arrowStyles],
+    () => ({
+      side: positioning.side,
+      align: positioning.align,
+      arrowRef,
+      arrowStyles,
+      onArrowLayout,
+    }),
+    [positioning.side, positioning.align, arrowRef, arrowStyles, onArrowLayout],
   );
 
   const element = useRenderElement(View, componentProps, {
@@ -104,7 +111,7 @@ export function SelectPositioner(componentProps: SelectPositioner.Props) {
 
 export interface SelectPositionerState {
   open: boolean;
-  side: Side;
+  side: PhysicalSide;
   align: Align;
   /**
    * The trigger's measured width, available for consumers to apply to the popup.

@@ -1,18 +1,24 @@
 'use client';
 import * as React from 'react';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { LayoutChangeEvent } from 'react-native';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 
 export interface PopoverPositionerContext {
   /**
    * The side the popup was actually placed on, after collision handling.
    */
-  side: Side;
+  side: PhysicalSide;
   /**
    * The alignment the popup was actually placed with.
    */
   align: Align;
   arrowRef: React.RefObject<unknown>;
   arrowStyles: { left?: number; top?: number };
+  /**
+   * Spread onto the `Arrow` part so its position is recomputed once it has been
+   * measured — see `useAnchorPositioning`.
+   */
+  onArrowLayout: (event: LayoutChangeEvent) => void;
 }
 
 export const PopoverPositionerContext = React.createContext<PopoverPositionerContext | undefined>(

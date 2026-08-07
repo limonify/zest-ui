@@ -2,6 +2,7 @@ export * as Combobox from './index.parts';
 
 export type * from './root/ComboboxRoot';
 export type * from './input/ComboboxInput';
+export type * from './trigger/ComboboxTrigger';
 export type * from './chips/ComboboxChips';
 export type * from './chip/ComboboxChip';
 export type * from './chip-remove/ComboboxChipRemove';

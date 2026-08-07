@@ -13,6 +13,7 @@ free-text suggestions without a bound value, use
 ## Anatomy
 
 <Anatomy code={`Combobox.Root
+  Combobox.Trigger
   Combobox.Chips
     Combobox.Value
       Combobox.Chip
@@ -143,6 +144,34 @@ identity changes. `isItemEqualToValue` is how you match by content instead:
 It applies everywhere the selection is compared: which item is marked selected, the label filled
 into the input, which chips render, and what a `multiple` press toggles. `null` and `undefined`
 never reach your comparer, so it does not have to guard against an empty selection.
+
+## A button instead of a text field
+
+`Combobox.Input` makes the closed state a text field. On a phone that often reads wrong — a bare
+input gives no hint that a list will appear. `Combobox.Trigger` makes it a button instead, and the
+input moves *inside* the popup where it filters:
+
+```tsx
+<Combobox.Root items={COUNTRIES} value={value} onValueChange={setValue}>
+  <Combobox.Trigger style={styles.trigger}>
+    <Combobox.Value />
+  </Combobox.Trigger>
+
+  <Combobox.Portal>
+    <Combobox.Backdrop style={styles.transparent} />
+    <Combobox.Positioner>
+      <Combobox.Popup style={styles.popup}>
+        <Combobox.Input placeholder="Search" style={styles.input} />
+        <Combobox.List>{/* … */}</Combobox.List>
+      </Combobox.Popup>
+    </Combobox.Positioner>
+  </Combobox.Portal>
+</Combobox.Root>
+```
+
+The trigger is `role="combobox"` with `aria-haspopup="listbox"` and reports `state.open`. The popup
+anchors to whichever of trigger and input was pressed last, so use one or the other — not both as
+anchors. `Autocomplete.Trigger` is the same part, re-exported.
 
 ## Grouping items
 

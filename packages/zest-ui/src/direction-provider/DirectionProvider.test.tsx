@@ -194,3 +194,58 @@ describe('Anchored popups under RTL', () => {
     expect(styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ align: 'start' }));
   });
 });
+
+describe('logical sides', () => {
+  function positioned(side: 'inline-start' | 'inline-end', direction: 'ltr' | 'rtl') {
+    const styleFn = jest.fn(() => undefined);
+    return {
+      styleFn,
+      element: (
+        <DirectionProvider direction={direction}>
+          <Popover.Root defaultOpen>
+            <Popover.Trigger testID="trigger">
+              <Text>Open</Text>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Positioner side={side} style={styleFn}>
+                <Popover.Popup testID="popup">
+                  <Text>Content</Text>
+                </Popover.Popup>
+              </Popover.Positioner>
+            </Popover.Portal>
+          </Popover.Root>
+        </DirectionProvider>
+      ),
+    };
+  }
+
+  it('resolves inline-start to left under LTR', async () => {
+    const { styleFn, element } = positioned('inline-start', 'ltr');
+    await render(element);
+    expect(styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ side: 'left' }));
+  });
+
+  it('resolves inline-start to right under RTL', async () => {
+    const { styleFn, element } = positioned('inline-start', 'rtl');
+    await render(element);
+    expect(styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ side: 'right' }));
+  });
+
+  it('resolves inline-end the other way round', async () => {
+    const ltr = positioned('inline-end', 'ltr');
+    await render(ltr.element);
+    expect(ltr.styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ side: 'right' }));
+
+    const rtl = positioned('inline-end', 'rtl');
+    await render(rtl.element);
+    expect(rtl.styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ side: 'left' }));
+  });
+
+  it('reports a physical side, so styling never sees a logical one', async () => {
+    const { styleFn, element } = positioned('inline-start', 'rtl');
+    await render(element);
+    expect(styleFn).toHaveBeenLastCalledWith(
+      expect.objectContaining({ side: expect.stringMatching(/^(top|right|bottom|left)$/) }),
+    );
+  });
+});

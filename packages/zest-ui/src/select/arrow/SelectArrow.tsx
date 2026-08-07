@@ -5,7 +5,7 @@ import { useSelectRootContext } from '../root/SelectRootContext';
 import { useSelectPositionerContext } from '../positioner/SelectPositionerContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
 
@@ -20,7 +20,7 @@ export function SelectArrow(componentProps: SelectArrow.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
   const store = useSelectRootContext();
-  const { side, align, arrowRef, arrowStyles } = useSelectPositionerContext();
+  const { side, align, arrowRef, arrowStyles, onArrowLayout } = useSelectPositionerContext();
 
   const open = useStoreState(store, 'open');
 
@@ -32,7 +32,11 @@ export function SelectArrow(componentProps: SelectArrow.Props) {
     state,
     ref: mergedRef,
     props: [
-      { style: { position: 'absolute' as const, ...arrowStyles }, 'aria-hidden': true },
+      {
+        onLayout: onArrowLayout,
+        style: { position: 'absolute' as const, ...arrowStyles },
+        'aria-hidden': true,
+      },
       elementProps,
     ],
   });
@@ -46,7 +50,7 @@ export interface SelectArrowState {
   /**
    * The side the popup was actually placed on, after collision handling.
    */
-  side: Side;
+  side: PhysicalSide;
   /**
    * The alignment the popup was actually placed with.
    */

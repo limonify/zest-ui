@@ -1,6 +1,7 @@
 export { ComboboxRoot as Root } from './root/ComboboxRoot';
 export { createComboboxHandle as createHandle, ComboboxHandle as Handle } from './store/ComboboxHandle';
 export { ComboboxInput as Input } from './input/ComboboxInput';
+export { ComboboxTrigger as Trigger } from './trigger/ComboboxTrigger';
 export { ComboboxChips as Chips } from './chips/ComboboxChips';
 export { ComboboxChip as Chip } from './chip/ComboboxChip';
 export { ComboboxChipRemove as ChipRemove } from './chip-remove/ComboboxChipRemove';

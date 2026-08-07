@@ -5,7 +5,7 @@ import { useTooltipRootContext } from '../root/TooltipRootContext';
 import { useTooltipPositionerContext } from '../positioner/TooltipPositionerContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
 
@@ -17,7 +17,7 @@ export function TooltipArrow(componentProps: TooltipArrow.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
   const store = useTooltipRootContext();
-  const { side, align, arrowRef, arrowStyles } = useTooltipPositionerContext();
+  const { side, align, arrowRef, arrowStyles, onArrowLayout } = useTooltipPositionerContext();
 
   const open = useStoreState(store, 'open');
 
@@ -28,13 +28,16 @@ export function TooltipArrow(componentProps: TooltipArrow.Props) {
   return useRenderElement(View, componentProps, {
     state,
     ref: mergedRef,
-    props: [{ style: { position: 'absolute' as const, ...arrowStyles } }, elementProps],
+    props: [
+      { onLayout: onArrowLayout, style: { position: 'absolute' as const, ...arrowStyles } },
+      elementProps,
+    ],
   });
 }
 
 export interface TooltipArrowState {
   open: boolean;
-  side: Side;
+  side: PhysicalSide;
   align: Align;
 }
 

@@ -8,7 +8,7 @@ import { useMergedRefs } from '../../hooks/useMergedRefs';
 import {
   useAnchorPositioning,
   type Align,
-  type Side,
+  type PhysicalSide,
   type UseAnchorPositioningSharedParameters,
 } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
@@ -101,7 +101,7 @@ export function ToastPositioner(componentProps: ToastPositioner.Props) {
 }
 
 export interface ToastPositionerState {
-  side: Side;
+  side: PhysicalSide;
   align: Align;
 }
 

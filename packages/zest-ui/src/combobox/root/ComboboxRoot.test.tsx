@@ -477,3 +477,64 @@ describe('Combobox multiple', () => {
     expect(screen.queryByTestId('popup')).toBeNull();
   });
 });
+
+describe('Combobox reopen after a selection', () => {
+  /**
+   * Choosing an item closes the list, but `blur()` cannot take effect while the
+   * Modal still holds focus. When the Modal goes away, focus returns to the
+   * `TextInput` — and `openOnFocus` would reopen the list the user just
+   * dismissed.
+   */
+  it('does not reopen when focus returns after choosing', async () => {
+    const onOpenChange = jest.fn();
+    await render(<TestCombobox defaultOpen onOpenChange={onOpenChange} />);
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-Banana'));
+    expect(screen.queryByTestId('popup')).toBeNull();
+
+    // The Modal handing focus back.
+    await focus('input');
+
+    expect(screen.queryByTestId('popup')).toBeNull();
+    expect(onOpenChange).not.toHaveBeenLastCalledWith(true, expect.anything());
+  });
+
+  it('still opens on the focus after that', async () => {
+    await render(<TestCombobox defaultOpen />);
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-Banana'));
+
+    // The suppression is spent by the focus the close caused…
+    await focus('input');
+    expect(screen.queryByTestId('popup')).toBeNull();
+
+    // …so a deliberate focus after it works normally.
+    await focus('input');
+    expect(screen.getByTestId('popup')).toBeTruthy();
+  });
+
+  it('does not suppress a focus after an ordinary dismissal', async () => {
+    await render(<TestCombobox defaultOpen />);
+
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('backdrop', hidden));
+    expect(screen.queryByTestId('popup')).toBeNull();
+
+    await focus('input');
+    expect(screen.getByTestId('popup')).toBeTruthy();
+  });
+
+  it('suppresses it in multiple mode too, when a filtered pick closes the list', async () => {
+    await render(<TestCombobox multiple defaultOpen />);
+
+    await type('input', 'ban');
+    const user = userEvent.setup();
+    await user.press(screen.getByTestId('item-Banana'));
+    expect(screen.queryByTestId('popup')).toBeNull();
+
+    await focus('input');
+    expect(screen.queryByTestId('popup')).toBeNull();
+  });
+});

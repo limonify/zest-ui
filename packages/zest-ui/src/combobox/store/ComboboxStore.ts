@@ -167,6 +167,15 @@ export type State = {
    */
   openOnFocus: boolean;
   /**
+   * Whether the next focus of the input should be ignored by `openOnFocus`.
+   *
+   * Choosing an item closes the list, and the input's `blur()` cannot take
+   * effect while the Modal still holds focus. When the Modal goes away, focus
+   * returns to the input and `openOnFocus` would reopen the list the user just
+   * dismissed. This is armed by that close and spent by the focus it causes.
+   */
+  suppressFocusOpen: boolean;
+  /**
    * The anchor's native node, carried across the portal boundary.
    */
   triggerNode: unknown;
@@ -228,6 +237,7 @@ const selectors = {
   disabled: createSelector((state: State) => state.disabled),
   disablePointerDismissal: createSelector((state: State) => state.disablePointerDismissal),
   openOnFocus: createSelector((state: State) => state.openOnFocus),
+  suppressFocusOpen: createSelector((state: State) => state.suppressFocusOpen),
   triggerNode: createSelector((state: State) => state.triggerNode),
   triggerWidth: createSelector((state: State) => state.triggerWidth),
   triggerHeight: createSelector((state: State) => state.triggerHeight),
@@ -261,6 +271,7 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
         disabled: false,
         disablePointerDismissal: false,
         openOnFocus: true,
+        suppressFocusOpen: false,
         triggerNode: null,
         triggerWidth: undefined,
         triggerHeight: undefined,
@@ -368,6 +379,7 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
 
     if (multiple) {
       if (this.select('inputValue').trim() !== '') {
+        this.set('suppressFocusOpen', true);
         this.setOpen(false, eventDetails);
       }
 
@@ -380,7 +392,21 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
       return;
     }
 
+    this.set('suppressFocusOpen', true);
     this.setOpen(false, eventDetails);
+  };
+
+  /**
+   * Whether this focus is the one caused by a selection closing the list, and
+   * spends the flag if so. Anything else opens normally.
+   */
+  public consumeSuppressedFocus = () => {
+    if (!this.select('suppressFocusOpen')) {
+      return false;
+    }
+
+    this.set('suppressFocusOpen', false);
+    return true;
   };
 
   /**

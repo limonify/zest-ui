@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { useToastPositionerContext } from '../positioner/ToastPositionerContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
 
 /**
@@ -28,7 +28,7 @@ export function ToastArrow(componentProps: ToastArrow.Props) {
 }
 
 export interface ToastArrowState {
-  side: Side;
+  side: PhysicalSide;
   align: Align;
 }
 

@@ -4,7 +4,7 @@ import { useTooltipRootContext } from '../root/TooltipRootContext';
 import { useTooltipPositionerContext } from '../positioner/TooltipPositionerContext';
 import { useTooltipTransitionContext } from '../root/TooltipTransitionContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
@@ -62,7 +62,7 @@ export interface TooltipPopupState {
   /**
    * The side the popup was actually placed on, after collision handling.
    */
-  side: Side;
+  side: PhysicalSide;
   /**
    * The alignment the popup was actually placed with.
    */

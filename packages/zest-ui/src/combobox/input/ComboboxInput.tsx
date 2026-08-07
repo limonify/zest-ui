@@ -126,7 +126,9 @@ export function ComboboxInput<Payload = unknown>(componentProps: ComboboxInput.P
             store.set('triggerId', id);
           }
 
-          if (openOnFocus) {
+          // The focus that follows a selection is the Modal handing focus back,
+          // not the user asking for the list again.
+          if (openOnFocus && !store.consumeSuppressedFocus()) {
             store.setOpen(true, createChangeEventDetails(REASONS.triggerFocus));
           }
         },

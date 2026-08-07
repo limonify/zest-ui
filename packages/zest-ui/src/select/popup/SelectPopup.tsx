@@ -5,7 +5,7 @@ import { useSelectPositionerContext } from '../positioner/SelectPositionerContex
 import { useSelectTransitionContext } from '../root/SelectTransitionContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { CompositeList } from '../../internals/composite/list/CompositeList';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
@@ -64,7 +64,7 @@ export interface SelectPopupState {
   /**
    * The side the popup was actually placed on, after collision handling.
    */
-  side: Side;
+  side: PhysicalSide;
   /**
    * The alignment the popup was actually placed with.
    */

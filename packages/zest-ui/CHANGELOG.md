@@ -17,6 +17,20 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 
 ### Breaking
 
+- **A popup's `Portal` no longer applies a native `Modal` transition.** `animationType` defaulted to
+  `"fade"`, which competes with the enter/exit the consumer drives — on close the native cross-fade
+  tears the surface away mid-exit, and every overlay in a serious app ended up passing
+  `modalProps={{ animationType: 'none' }}`, silently broken wherever it was forgotten. zest never
+  animates anything; this default did. It is now `"none"`:
+
+  ```diff
+  - <Dialog.Portal />
+  + <Dialog.Portal modalProps={{ animationType: 'fade' }} />
+  ```
+
+  …if you want the platform transition back. Affects `Dialog`, `AlertDialog`, `Popover`, `Menu`,
+  `ContextMenu`, `Select` and `Combobox`.
+
 - **A range slider's thumbs now push each other by default.** Dragging a thumb into its neighbour
   used to stop it dead and drop the excess movement; it now pushes the neighbour along the track,
   which is upstream's default. The old behaviour is still available:
@@ -149,12 +163,38 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 - **`Combobox.Empty` takes `keepMounted`**, and publishes `empty` — the exit-animation lever every
   other conditionally rendered part already had.
 
+- **`Combobox.Trigger`** (and `Autocomplete.Trigger`, the same part). `Combobox.Input` makes the
+  closed state a text field; on a phone that often reads wrong, because a bare input gives no hint
+  that a list will appear. The trigger makes it a button instead, and the input moves inside the
+  popup where it filters. `role="combobox"` with `aria-haspopup="listbox"`.
+- **Logical `side` values on every anchored positioner** — `inline-start` and `inline-end` resolve
+  against the writing direction, so a popup can be placed on the reading-start edge without the
+  consumer branching on `useDirection`. `state.side` still reports a physical side, narrowed to
+  `PhysicalSide` so a `switch` over it is exhaustive.
 - **`Menu.Root` takes `disabled`**, which also disables its triggers.
 
 - **`ContextMenu.Arrow`**, re-exported from `Menu` — `ContextMenu.Positioner` already provides the
   context it reads.
 
 ### Fixed
+
+- **Every arrow rendered in its popup's top-left corner.** floating-ui's `arrow` middleware needs the
+  arrow element to exist *and* to have been measured, and React Native measures asynchronously. The
+  first position is computed as soon as the anchor and the popup have their refs — before the arrow
+  has laid out — and nothing observes layout globally to try again, so the middleware returned no
+  data at all and `Popover.Arrow`, `Tooltip.Arrow`, `Menu.Arrow` and `Select.Arrow` fell back to
+  their container's origin. Each now reports its own layout, which recomputes the position once
+  (and only once — reporting the same size again is dropped, or `update()` would loop).
+- **A popup could reopen at a stale position.** The anchor's screen position is read at compute
+  time, and nothing re-measured on open. A popup whose content stayed mounted therefore reopened
+  wherever its trigger was the *last* time — after the page behind it had scrolled, somewhere
+  unrelated. Opening now re-measures, and again on the next frame for the case where the Modal has
+  not laid its children out yet.
+- **A combobox reopened its own list after you chose from it.** `Combobox.Item` blurs the input on
+  selection, but the Modal still holds focus, so the blur does nothing; when the Modal goes away
+  focus returns to the `TextInput` and `openOnFocus` opened the list the user had just dismissed.
+  The close now arms a one-shot suppression that the returning focus spends. A deliberate focus
+  after that opens normally, and an ordinary dismissal is unaffected.
 
 - **A non-text control could not be submitted, even when valid.** `Select`, `NumberField` and
   `Slider` call `useFieldControlRegistration` twice — once at the root, where the value is, and once
@@ -198,7 +238,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   `isValueSelected`/`toggleSelectedValue` and now take a comparer, shared with `Combobox`. Neither
   was exported from the package.
 - React Doctor: 98/100. The one remaining warning is the documented `expo-image` rejection.
-- 1040 tests, up from 912.
+- 1062 tests, up from 912.
 
 ---
 

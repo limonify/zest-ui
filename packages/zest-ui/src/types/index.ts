@@ -12,8 +12,9 @@ export type ZestStyleValue = StyleProp<ViewStyle | TextStyle | ImageStyle>;
  *
  * `visible` and `children` are omitted because the Portal owns them: visibility
  * follows the popup's open state, and the children are the popup's own parts.
- * Everything else is yours, including `animationType` — pass `'none'` to switch
- * the Modal's native cross-fade off and drive the whole enter/exit yourself.
+ * Everything else is yours, including `animationType`, which defaults to
+ * `'none'` so nothing competes with the enter/exit you drive yourself. Pass
+ * `'fade'` or `'slide'` to hand the transition back to the platform.
  *
  * `onRequestClose` is *chained*, not replaced: yours runs first, then Zest's own
  * handler closes the popup with the `escape-key` reason.

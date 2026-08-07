@@ -6,9 +6,11 @@ import { useMenuPortalContext } from '../../menu/portal/MenuPortalContext';
 import { MenuPositionerContext } from '../../menu/positioner/MenuPositionerContext';
 import { useContextMenuRootContext } from '../root/ContextMenuRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
+
+const NO_ARROW_LAYOUT = () => {};
 
 const NO_ARROW = { current: null };
 
@@ -61,7 +63,7 @@ export function ContextMenuPositioner(componentProps: ContextMenuPositioner.Prop
 
   const placement = React.useMemo(() => {
     if (size === undefined) {
-      return { left: anchor.x, top: anchor.y, side: 'bottom' as Side, align: 'start' as Align };
+      return { left: anchor.x, top: anchor.y, side: 'bottom' as PhysicalSide, align: 'start' as Align };
     }
 
     const flipHorizontally = anchor.x + size.width > screenWidth - collisionPadding;
@@ -78,7 +80,7 @@ export function ContextMenuPositioner(componentProps: ContextMenuPositioner.Prop
     return {
       left: Math.min(Math.max(rawLeft, collisionPadding), maxLeft),
       top: Math.min(Math.max(rawTop, collisionPadding), maxTop),
-      side: (flipVertically ? 'top' : 'bottom') as Side,
+      side: (flipVertically ? 'top' : 'bottom') as PhysicalSide,
       align: (flipHorizontally ? 'end' : 'start') as Align,
     };
   }, [anchor.x, anchor.y, size, screenWidth, screenHeight, collisionPadding]);
@@ -95,6 +97,9 @@ export function ContextMenuPositioner(componentProps: ContextMenuPositioner.Prop
       align: placement.align,
       arrowRef: NO_ARROW,
       arrowStyles: {},
+      // A context menu is anchored to the point the finger landed, not to an
+      // element, so there is nothing for an arrow to re-measure against.
+      onArrowLayout: NO_ARROW_LAYOUT,
     }),
     [placement.side, placement.align],
   );
@@ -124,7 +129,7 @@ export interface ContextMenuPositionerState {
    * `'bottom'` when the popup hangs below the press point, `'top'` when it was
    * flipped above it to stay on screen.
    */
-  side: Side;
+  side: PhysicalSide;
   /**
    * `'start'` when the popup extends right of the press point, `'end'` when it
    * was flipped to its left.

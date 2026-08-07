@@ -5,7 +5,7 @@ import { useMenuRootContext } from '../root/MenuRootContext';
 import { useMenuPositionerContext } from '../positioner/MenuPositionerContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
 
@@ -17,7 +17,7 @@ export function MenuArrow(componentProps: MenuArrow.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
   const store = useMenuRootContext();
-  const { side, align, arrowRef, arrowStyles } = useMenuPositionerContext();
+  const { side, align, arrowRef, arrowStyles, onArrowLayout } = useMenuPositionerContext();
 
   const open = useStoreState(store, 'open');
 
@@ -28,13 +28,16 @@ export function MenuArrow(componentProps: MenuArrow.Props) {
   return useRenderElement(View, componentProps, {
     state,
     ref: mergedRef,
-    props: [{ style: { position: 'absolute' as const, ...arrowStyles } }, elementProps],
+    props: [
+      { onLayout: onArrowLayout, style: { position: 'absolute' as const, ...arrowStyles } },
+      elementProps,
+    ],
   });
 }
 
 export interface MenuArrowState {
   open: boolean;
-  side: Side;
+  side: PhysicalSide;
   align: Align;
 }
 

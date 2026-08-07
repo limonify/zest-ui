@@ -9,7 +9,7 @@ import { useMergedRefs } from '../../hooks/useMergedRefs';
 import {
   useAnchorPositioning,
   type Align,
-  type Side,
+  type PhysicalSide,
   type UseAnchorPositioningSharedParameters,
 } from '../../utils/useAnchorPositioning';
 import type { ZestUIComponentProps } from '../../types';
@@ -45,6 +45,7 @@ export function PopoverPositioner(componentProps: PopoverPositioner.Props) {
 
   const positioning = useAnchorPositioning({
     align,
+    open,
     alignOffset,
     arrowPadding,
     collisionPadding,
@@ -53,7 +54,7 @@ export function PopoverPositioner(componentProps: PopoverPositioner.Props) {
     sticky,
   });
 
-  const { arrowRef, arrowStyles, positionerStyles, refs, update } = positioning;
+  const { arrowRef, arrowStyles, onArrowLayout, positionerStyles, refs, update } = positioning;
 
   // The anchor is measured from the trigger, which lives outside the portal.
   useIsoLayoutEffect(() => {
@@ -80,8 +81,14 @@ export function PopoverPositioner(componentProps: PopoverPositioner.Props) {
   };
 
   const contextValue: PopoverPositionerContext = React.useMemo(
-    () => ({ side: positioning.side, align: positioning.align, arrowRef, arrowStyles }),
-    [positioning.side, positioning.align, arrowRef, arrowStyles],
+    () => ({
+      side: positioning.side,
+      align: positioning.align,
+      arrowRef,
+      arrowStyles,
+      onArrowLayout,
+    }),
+    [positioning.side, positioning.align, arrowRef, arrowStyles, onArrowLayout],
   );
 
   const element = useRenderElement(View, componentProps, {
@@ -114,7 +121,7 @@ export interface PopoverPositionerState {
   /**
    * The side the popup was actually placed on, after collision handling.
    */
-  side: Side;
+  side: PhysicalSide;
   /**
    * The alignment the popup was actually placed with.
    */

@@ -5,6 +5,7 @@ export { createAutocompleteHandle as createHandle } from './handle';
 // the exception: they render a selection, and an autocomplete's value is the
 // typed text itself.
 export { ComboboxInput as Input } from '../combobox/input/ComboboxInput';
+export { ComboboxTrigger as Trigger } from '../combobox/trigger/ComboboxTrigger';
 export { ComboboxClear as Clear } from '../combobox/clear/ComboboxClear';
 export { ComboboxPortal as Portal } from '../combobox/portal/ComboboxPortal';
 export { ComboboxBackdrop as Backdrop } from '../combobox/backdrop/ComboboxBackdrop';

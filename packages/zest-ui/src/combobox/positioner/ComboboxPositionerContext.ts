@@ -1,9 +1,9 @@
 'use client';
 import * as React from 'react';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 
 export interface ComboboxPositionerContext {
-  side: Side;
+  side: PhysicalSide;
   align: Align;
 }
 

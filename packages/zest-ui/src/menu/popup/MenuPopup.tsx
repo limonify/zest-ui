@@ -5,7 +5,7 @@ import { useMenuPositionerContext } from '../positioner/MenuPositionerContext';
 import { useMenuTransitionContext } from '../root/MenuTransitionContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { CompositeList } from '../../internals/composite/list/CompositeList';
-import type { Align, Side } from '../../utils/useAnchorPositioning';
+import type { Align, PhysicalSide } from '../../utils/useAnchorPositioning';
 import type { TransitionStatus } from '../../internals/useTransitionStatus';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
@@ -65,7 +65,7 @@ export interface MenuPopupState {
   /**
    * The side the popup was actually placed on, after collision handling.
    */
-  side: Side;
+  side: PhysicalSide;
   /**
    * The alignment the popup was actually placed with.
    */
