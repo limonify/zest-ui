@@ -14,6 +14,23 @@ a natural fit — and often cleaner, because its layout animations don't need a 
   is the shared contract and the reusable recipes behind them.
 </Callout>
 
+## On the web
+
+Reanimated runs in a browser, and it interpolates for real rather than jumping — measured on this
+repo's example app exported with `expo export --platform web`: 120 ms into a 250 ms `withTiming`, the
+transform was two thirds of the way there.
+
+What it needs is **Expo's bundler**. Its Babel plugin is what turns your worklets into something a
+browser can run, and `babel-preset-expo` includes it. Bundlers that do not run Babel — Next.js with
+Turbopack, which is what these docs are built with — cannot resolve it: Reanimated deep-imports
+`react-native/Libraries/…` and `TurboModuleRegistry`, neither of which survives an alias to
+`react-native-web`. Worse, merely *installing* it is enough to break such a build, because
+`react-native-gesture-handler` imports Reanimated whenever it can resolve it — so a `Slider` stops
+bundling too.
+
+If you are putting zest on the web outside Expo, RN's built-in `Animated` is the option with no
+setup at all: `react-native-web` implements it, and it is what the live demos on these pages use.
+
 ## Enter / exit with layout animations
 
 For a `Dialog`, `Drawer`, `Popover`, `Menu` or `Toast`, the simplest approach is Reanimated's
