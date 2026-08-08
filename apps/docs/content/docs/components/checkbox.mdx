@@ -5,18 +5,17 @@ description: A tri-state checkbox that tracks checked, indeterminate and disable
 
 `Checkbox` is a tri-state toggle (checked, unchecked, indeterminate). It renders a `Pressable` with `accessibilityRole="checkbox"` and exposes `checked`/`indeterminate`/`disabled` on state.
 
-<Demo name="checkbox">A controlled and an uncontrolled checkbox.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Checkbox.Root
-  Checkbox.Indicator`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="checkbox" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -92,6 +91,12 @@ import { Checkbox } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Checkbox.Root
+  Checkbox.Indicator`} />
 
 ## API
 

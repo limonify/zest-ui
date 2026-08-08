@@ -5,26 +5,17 @@ description: A non-modal overlay anchored to a trigger.
 
 `Popover` floats content next to a trigger using `@floating-ui/react-native` for collision-aware placement. `Popover.Arrow` points at the anchor.
 
-<Demo name="popover">Opening a popover above and below its trigger.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Popover.Root
-  Popover.Trigger
-  Popover.Portal
-    Popover.Backdrop
-    Popover.Positioner
-      Popover.Popup
-        Popover.Arrow
-        Popover.Title
-        Popover.Description
-        Popover.Close`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="popover" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -88,6 +79,20 @@ import { Popover } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Popover.Root
+  Popover.Trigger
+  Popover.Portal
+    Popover.Backdrop
+    Popover.Positioner
+      Popover.Popup
+        Popover.Arrow
+        Popover.Title
+        Popover.Description
+        Popover.Close`} />
 
 ## API
 

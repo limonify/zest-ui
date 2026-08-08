@@ -5,23 +5,17 @@ description: A short hint anchored to a trigger, opened on press.
 
 `Tooltip` is an anchored hint. A touch screen has no hover, so it opens on press rather than hover — there is no hover-delay provider.
 
-<Demo name="tooltip">Tapping to reveal a tooltip.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Tooltip.createHandle()
-Tooltip.Root
-  Tooltip.Trigger
-  Tooltip.Portal
-    Tooltip.Positioner
-      Tooltip.Popup
-        Tooltip.Arrow`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="tooltip" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -81,6 +75,17 @@ import { Tooltip } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Tooltip.createHandle()
+Tooltip.Root
+  Tooltip.Trigger
+  Tooltip.Portal
+    Tooltip.Positioner
+      Tooltip.Popup
+        Tooltip.Arrow`} />
 
 ## API
 

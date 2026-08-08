@@ -5,25 +5,17 @@ description: A modal dialog that demands a deliberate choice and ignores outside
 
 `AlertDialog` is a `Dialog` variant for destructive or blocking confirmations: it does **not** close on an outside press or the back button — the user must pick an action.
 
-<Demo name="alert-dialog">A confirm/cancel alert.</Demo>
-
-## Anatomy
-
-<Anatomy code={`AlertDialog.Root
-  AlertDialog.Trigger
-  AlertDialog.Portal
-    AlertDialog.Backdrop
-    AlertDialog.Viewport
-      AlertDialog.Popup
-        AlertDialog.Title
-        AlertDialog.Description
-        AlertDialog.Close`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="alert-dialog" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -90,6 +82,19 @@ import { AlertDialog } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`AlertDialog.Root
+  AlertDialog.Trigger
+  AlertDialog.Portal
+    AlertDialog.Backdrop
+    AlertDialog.Viewport
+      AlertDialog.Popup
+        AlertDialog.Title
+        AlertDialog.Description
+        AlertDialog.Close`} />
 
 ## API
 

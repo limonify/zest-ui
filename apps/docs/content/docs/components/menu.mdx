@@ -5,37 +5,17 @@ description: A list of actions opened from a trigger, with submenus and checkabl
 
 `Menu` is an anchored list of actions. It supports submenus (each a nested `Modal`), checkbox and radio items, groups and separators.
 
-<Demo name="menu">Opening a menu with a submenu and a radio group.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Menu.Root
-  Menu.Trigger
-  Menu.Portal
-    Menu.Backdrop
-    Menu.Positioner
-      Menu.Popup
-        Menu.Arrow
-        Menu.Group / Menu.GroupLabel
-        Menu.Item
-        Menu.LinkItem
-        Menu.CheckboxItem > Menu.CheckboxItemIndicator
-        Menu.RadioGroup
-          Menu.RadioItem > Menu.RadioItemIndicator
-        Menu.Separator
-        Menu.SubmenuRoot > Menu.SubmenuTrigger`} />
-
-`Menu.Arrow` is optional and points at the trigger; it reads `side`/`align` from the
-positioner, so it follows the popup when collision handling flips it.
-`Menu.LinkItem` is an item that opens a link rather than running an action, and it closes the
-menu with the `link-press` reason. `Menu.Separator` is the shared
-[`Separator`](/docs/components/separator), re-exported for convenience.
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="menu" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -99,6 +79,31 @@ import { Menu } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Menu.Root
+  Menu.Trigger
+  Menu.Portal
+    Menu.Backdrop
+    Menu.Positioner
+      Menu.Popup
+        Menu.Arrow
+        Menu.Group / Menu.GroupLabel
+        Menu.Item
+        Menu.LinkItem
+        Menu.CheckboxItem > Menu.CheckboxItemIndicator
+        Menu.RadioGroup
+          Menu.RadioItem > Menu.RadioItemIndicator
+        Menu.Separator
+        Menu.SubmenuRoot > Menu.SubmenuTrigger`} />
+
+`Menu.Arrow` is optional and points at the trigger; it reads `side`/`align` from the
+positioner, so it follows the popup when collision handling flips it.
+`Menu.LinkItem` is an item that opens a link rather than running an action, and it closes the
+menu with the `link-press` reason. `Menu.Separator` is the shared
+[`Separator`](/docs/components/separator), re-exported for convenience.
 
 ## API
 

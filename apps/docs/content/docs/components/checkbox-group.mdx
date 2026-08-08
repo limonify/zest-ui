@@ -5,19 +5,17 @@ description: A group of checkboxes sharing one value array, with an optional par
 
 `CheckboxGroup` shares one value array across several checkboxes, with an optional parent checkbox that reflects and toggles all its children.
 
-<Demo name="checkbox-group">A parent checkbox toggling three children.</Demo>
-
-## Anatomy
-
-<Anatomy code={`CheckboxGroup
-  Checkbox.Root (parent)
-  Checkbox.Root (child, value=…)`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="checkbox-group" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -72,6 +70,13 @@ import { CheckboxGroup, Checkbox } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`CheckboxGroup
+  Checkbox.Root (parent)
+  Checkbox.Root (child, value=…)`} />
 
 ## API
 

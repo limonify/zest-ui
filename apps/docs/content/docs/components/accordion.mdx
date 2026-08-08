@@ -5,21 +5,17 @@ description: A set of collapsible sections, one or many open at a time.
 
 `Accordion` groups several collapsible items. Each `Accordion.Panel` publishes its measured height and `transitionStatus` on state so you drive the open/close animation.
 
-<Demo name="accordion">Expanding accordion sections.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Accordion.Root
-  Accordion.Item
-    Accordion.Header
-      Accordion.Trigger
-    Accordion.Panel`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="accordion" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -95,6 +91,15 @@ import { Accordion } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Accordion.Root
+  Accordion.Item
+    Accordion.Header
+      Accordion.Trigger
+    Accordion.Panel`} />
 
 ## API
 

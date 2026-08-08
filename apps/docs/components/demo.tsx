@@ -30,8 +30,10 @@ export function Demo({ name, children }: { name?: string; children?: ReactNode }
     return <Placeholder>{children}</Placeholder>;
   }
 
+  // No frame of its own: every demo sits in the Preview tab of a Usage block,
+  // and nesting a bordered card inside a bordered tab panel reads as two boxes.
   return (
-    <div className="not-prose my-6 overflow-hidden rounded-xl border border-fd-border bg-fd-muted">
+    <div className="not-prose -mx-2 overflow-hidden">
       <DemoStage name={name} />
     </div>
   );

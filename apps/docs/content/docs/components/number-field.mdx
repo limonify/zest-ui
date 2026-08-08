@@ -9,22 +9,17 @@ description: A numeric input with steppers and a scrub area.
 wrapped in `GestureHandlerRootView`. Leave it out and the rest of the component needs no wrapper.
 See [peer dependencies](/docs/installation#peer-dependencies).
 
-<Demo name="number-field">Stepping and scrubbing a number.</Demo>
-
-## Anatomy
-
-<Anatomy code={`NumberField.Root
-  NumberField.Group
-    NumberField.Decrement
-    NumberField.Input
-    NumberField.Increment
-  NumberField.ScrubArea`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="number-field" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -75,6 +70,16 @@ import { NumberField } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`NumberField.Root
+  NumberField.Group
+    NumberField.Decrement
+    NumberField.Input
+    NumberField.Increment
+  NumberField.ScrubArea`} />
 
 ## API
 

@@ -6,19 +6,17 @@ description: A pressable that tracks its own pressed and disabled state.
 `Button` renders a `Pressable` with `accessibilityRole="button"` and exposes `pressed`/`disabled`
 on its state, so you can style each visually without tracking press state yourself.
 
-<Demo name="button">An enabled and a disabled button.</Demo>
-
-## Anatomy
-
-Button is a single part.
-
-<Anatomy code={`Button`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="button" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -84,6 +82,13 @@ import { Button } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+Button is a single part.
+
+<Anatomy code={`Button`} />
 
 ## API
 
