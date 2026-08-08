@@ -8,40 +8,17 @@ fills the input and closes the list. Set `multiple` to select several, shown as 
 free-text suggestions without a bound value, use
 [`Autocomplete`](/docs/components/autocomplete), which reuses every combobox part.
 
-<Demo>Filtering a list and selecting an item.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Combobox.Root
-  Combobox.Trigger
-  Combobox.Chips
-    Combobox.Value
-      Combobox.Chip
-        Combobox.ChipRemove
-    Combobox.Input
-  Combobox.Clear
-  Combobox.Portal
-    Combobox.Backdrop
-    Combobox.Positioner
-      Combobox.Popup
-        Combobox.Status
-        Combobox.Empty
-        Combobox.List
-          Combobox.Group
-            Combobox.GroupLabel
-            Combobox.Collection
-              Combobox.Item
-                Combobox.ItemIndicator`} />
-
-`Combobox.Chips` and its children are only for `multiple`; a single-selection combobox is just
-`Combobox.Input` and the portal. `Combobox.Group`/`Collection` are only for grouped `items` — a
-flat list renders items straight from `Combobox.List`.
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="combobox" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -116,6 +93,34 @@ import { Combobox } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Combobox.Root
+  Combobox.Trigger
+  Combobox.Chips
+    Combobox.Value
+      Combobox.Chip
+        Combobox.ChipRemove
+    Combobox.Input
+  Combobox.Clear
+  Combobox.Portal
+    Combobox.Backdrop
+    Combobox.Positioner
+      Combobox.Popup
+        Combobox.Status
+        Combobox.Empty
+        Combobox.List
+          Combobox.Group
+            Combobox.GroupLabel
+            Combobox.Collection
+              Combobox.Item
+                Combobox.ItemIndicator`} />
+
+`Combobox.Chips` and its children are only for `multiple`; a single-selection combobox is just
+`Combobox.Input` and the portal. `Combobox.Group`/`Collection` are only for grouped `items` — a
+flat list renders items straight from `Combobox.List`.
 
 ## API
 

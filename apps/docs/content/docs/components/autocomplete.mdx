@@ -5,35 +5,17 @@ description: A free-text input with a filtered suggestion list.
 
 `Autocomplete` is a `Combobox` in free-text mode: the typed string **is** the value, and choosing a suggestion fills the input rather than selecting a bound value. It reuses every combobox part.
 
-<Demo>Filtering tag suggestions as you type.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Autocomplete.Root
-  Autocomplete.Trigger
-  Autocomplete.Input
-  Autocomplete.Clear
-  Autocomplete.Portal
-    Autocomplete.Backdrop
-    Autocomplete.Positioner
-      Autocomplete.Popup
-        Autocomplete.Status
-        Autocomplete.Empty
-        Autocomplete.List
-          Autocomplete.Group
-            Autocomplete.GroupLabel
-            Autocomplete.Collection
-              Autocomplete.Item`} />
-
-`Autocomplete.Group`/`Collection` are only for grouped `items`; a flat list renders items straight
-from `Autocomplete.List`. The chip parts a combobox has are absent here on purpose — an
-autocomplete's value *is* the typed text, so there is no separate selection to render.
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="autocomplete" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -102,6 +84,29 @@ import { Autocomplete } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Autocomplete.Root
+  Autocomplete.Trigger
+  Autocomplete.Input
+  Autocomplete.Clear
+  Autocomplete.Portal
+    Autocomplete.Backdrop
+    Autocomplete.Positioner
+      Autocomplete.Popup
+        Autocomplete.Status
+        Autocomplete.Empty
+        Autocomplete.List
+          Autocomplete.Group
+            Autocomplete.GroupLabel
+            Autocomplete.Collection
+              Autocomplete.Item`} />
+
+`Autocomplete.Group`/`Collection` are only for grouped `items`; a flat list renders items straight
+from `Autocomplete.List`. The chip parts a combobox has are absent here on purpose — an
+autocomplete's value *is* the typed text, so there is no separate selection to render.
 
 ## API
 

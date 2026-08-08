@@ -5,22 +5,17 @@ description: A one-time-code input of single-character slots.
 
 `OTPField` is a one-time-code input: a row of single-character slots backed by one hidden input.
 
-<Demo>Typing a 6-digit code.</Demo>
-
-## Anatomy
-
-<Anatomy code={`OTPField.Root
-  OTPField.Input (× length)
-  OTPField.Separator`} />
-
-`OTPField.Separator` is the standalone `Separator`, re-exported — put one between groups of digits
-for a code like `123-456`.
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="otp-field" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -69,6 +64,16 @@ import { OTPField } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`OTPField.Root
+  OTPField.Input (× length)
+  OTPField.Separator`} />
+
+`OTPField.Separator` is the standalone `Separator`, re-exported — put one between groups of digits
+for a code like `123-456`.
 
 ## API
 

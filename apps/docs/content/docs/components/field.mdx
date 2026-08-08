@@ -5,25 +5,17 @@ description: Labels, describes and validates a text input.
 
 `Field` wires a label, a text input, a description and validation together for accessibility. Validation is a `validate` function (React Native has no HTML constraint API).
 
-<Demo>Validating an email field on blur.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Field.Root
-  Field.Label
-  Field.Control
-  Field.Description
-  Field.Error
-  Field.Validity
-  Field.Item
-    Field.Label
-    Field.Description`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="field" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -79,6 +71,19 @@ import { Field } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Field.Root
+  Field.Label
+  Field.Control
+  Field.Description
+  Field.Error
+  Field.Validity
+  Field.Item
+    Field.Label
+    Field.Description`} />
 
 ## API
 

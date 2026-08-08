@@ -6,32 +6,17 @@ description: A modal dialog built on React Native's Modal, with a backdrop and f
 `Dialog` is a modal overlay. Its `Portal` is a React Native `Modal`, so the popup renders above the
 app with focus containment and Android back-button dismissal handled for you.
 
-<Demo>Opening and dismissing a dialog.</Demo>
-
-<Callout type="info">
-  **Dialog vs AlertDialog vs Drawer.** Use **Dialog** for general modal content;
-  **[AlertDialog](/docs/components/alert-dialog)** for a blocking confirm that must not be dismissed
-  by an outside tap; **[Drawer](/docs/components/drawer)** for a swipeable sheet anchored to a screen
-  edge.
-</Callout>
-
-## Anatomy
-
-<Anatomy code={`Dialog.Root
-  Dialog.Trigger
-  Dialog.Portal
-    Dialog.Backdrop
-    Dialog.Viewport
-      Dialog.Popup
-        Dialog.Title
-        Dialog.Description
-        Dialog.Close`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="dialog" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -114,6 +99,26 @@ import { Dialog } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+<Callout type="info">
+  **Dialog vs AlertDialog vs Drawer.** Use **Dialog** for general modal content;
+  **[AlertDialog](/docs/components/alert-dialog)** for a blocking confirm that must not be dismissed
+  by an outside tap; **[Drawer](/docs/components/drawer)** for a swipeable sheet anchored to a screen
+  edge.
+</Callout>
+
+## Anatomy
+
+<Anatomy code={`Dialog.Root
+  Dialog.Trigger
+  Dialog.Portal
+    Dialog.Backdrop
+    Dialog.Viewport
+      Dialog.Popup
+        Dialog.Title
+        Dialog.Description
+        Dialog.Close`} />
 
 ## Dismissal
 

@@ -63,6 +63,17 @@ export function AvatarImage(componentProps: AvatarImage.Props) {
     return () => setImageLoadingStatus('idle');
   }, [setImageLoadingStatus]);
 
+  // These three have to keep their identity between renders. React Native's own
+  // `Image` does not care, but `react-native-web`'s keys the effect that starts
+  // the load on them — a fresh closure each render restarts the load, which
+  // publishes a status, which renders, which makes fresh closures. That is an
+  // infinite loop, and React ends it with "Maximum update depth exceeded".
+  const handleLoadStart = useStableCallback(() => publishStatus('loading'));
+  const handleLoad = useStableCallback(() => publishStatus('loaded'));
+  const handleError = useStableCallback((_event: NativeSyntheticEvent<ImageErrorEventData>) =>
+    publishStatus('error'),
+  );
+
   const state: AvatarImageState = { imageLoadingStatus, transitionStatus };
 
   return useRenderElement(Image, componentProps, {
@@ -75,15 +86,9 @@ export function AvatarImage(componentProps: AvatarImage.Props) {
         // `alt`) for the person it depicts; leave it off and RN treats the
         // image as unlabelled, which is the right default for a decorative one.
         accessibilityRole: 'image' as const,
-        onLoadStart() {
-          publishStatus('loading');
-        },
-        onLoad() {
-          publishStatus('loaded');
-        },
-        onError(_event: NativeSyntheticEvent<ImageErrorEventData>) {
-          publishStatus('error');
-        },
+        onLoadStart: handleLoadStart,
+        onLoad: handleLoad,
+        onError: handleError,
       },
       elementProps,
     ],

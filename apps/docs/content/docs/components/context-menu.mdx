@@ -5,35 +5,17 @@ description: A menu opened by long-pressing an area, anchored to the touch point
 
 `ContextMenu` is a `Menu` opened by a **long press** instead of a tapped trigger, anchored to where your finger landed. It reuses every menu part.
 
-<Demo>Long-pressing a card to open a menu at the touch point.</Demo>
-
-## Anatomy
-
-<Anatomy code={`ContextMenu.Root
-  ContextMenu.Trigger
-  ContextMenu.Portal
-    ContextMenu.Backdrop
-    ContextMenu.Positioner
-      ContextMenu.Popup
-        ContextMenu.Arrow
-        ContextMenu.Item
-        ContextMenu.LinkItem
-        ContextMenu.CheckboxItem > ContextMenu.CheckboxItemIndicator
-        ContextMenu.RadioGroup
-          ContextMenu.RadioItem > ContextMenu.RadioItemIndicator
-        ContextMenu.Group / ContextMenu.GroupLabel
-        ContextMenu.Separator
-        ContextMenu.SubmenuRoot > ContextMenu.SubmenuTrigger`} />
-
-Only `Root`, `Trigger` and `Positioner` are the context menu's own — every item part above is
-`Menu`'s, re-exported under this namespace and behaving identically. See
-[Menu](/docs/components/menu) for what each one does.
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="context-menu" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -95,6 +77,29 @@ import { ContextMenu } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`ContextMenu.Root
+  ContextMenu.Trigger
+  ContextMenu.Portal
+    ContextMenu.Backdrop
+    ContextMenu.Positioner
+      ContextMenu.Popup
+        ContextMenu.Arrow
+        ContextMenu.Item
+        ContextMenu.LinkItem
+        ContextMenu.CheckboxItem > ContextMenu.CheckboxItemIndicator
+        ContextMenu.RadioGroup
+          ContextMenu.RadioItem > ContextMenu.RadioItemIndicator
+        ContextMenu.Group / ContextMenu.GroupLabel
+        ContextMenu.Separator
+        ContextMenu.SubmenuRoot > ContextMenu.SubmenuTrigger`} />
+
+Only `Root`, `Trigger` and `Positioner` are the context menu's own — every item part above is
+`Menu`'s, re-exported under this namespace and behaving identically. See
+[Menu](/docs/components/menu) for what each one does.
 
 ## API
 

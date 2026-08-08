@@ -5,19 +5,17 @@ description: Groups related fields under a legend.
 
 `Fieldset` groups related fields under a legend; a disabled fieldset disables every field inside it.
 
-<Demo>A disabled fieldset.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Fieldset.Root
-  Fieldset.Legend
-  Field.Root …`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="fieldset" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -65,6 +63,13 @@ import { Fieldset, Field } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Fieldset.Root
+  Fieldset.Legend
+  Field.Root …`} />
 
 ## API
 

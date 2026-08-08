@@ -5,21 +5,17 @@ description: A bar that tracks a task towards completion.
 
 `Progress` shows determinate or indeterminate progress. It publishes `status` (`indeterminate | progressing | complete`) and the fill percentage on state; `value={null}` is indeterminate.
 
-<Demo>A determinate bar filling, and an indeterminate one.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Progress.Root
-  Progress.Label
-  Progress.Value
-  Progress.Track
-    Progress.Indicator`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="progress" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -70,6 +66,15 @@ import { Progress } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Progress.Root
+  Progress.Label
+  Progress.Value
+  Progress.Track
+    Progress.Indicator`} />
 
 ## API
 

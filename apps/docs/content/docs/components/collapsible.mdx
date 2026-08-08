@@ -5,19 +5,17 @@ description: A single show/hide region.
 
 `Collapsible` is one open/close disclosure. `Collapsible.Panel` publishes its measured height and `transitionStatus`; keep it mounted with `keepMounted` to animate the exit.
 
-<Demo>Toggling a details region.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Collapsible.Root
-  Collapsible.Trigger
-  Collapsible.Panel`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="collapsible" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -71,6 +69,13 @@ import { Collapsible } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Collapsible.Root
+  Collapsible.Trigger
+  Collapsible.Panel`} />
 
 ## API
 

@@ -9,29 +9,17 @@ description: Transient messages queued above the app, without blocking it.
 `GestureHandlerRootView` — even if you never swipe one away. See
 [peer dependencies](/docs/installation#peer-dependencies).
 
-<Demo>A toast sliding in, pausing on press, and swiping away.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Toast.Provider
-  Toast.Viewport
-    Toast.Positioner
-      Toast.Root
-        Toast.Arrow
-        Toast.Title
-        Toast.Description
-        Toast.Action
-        Toast.Close`} />
-
-`Toast.Positioner` and `Toast.Arrow` are for a toast anchored to something on screen — the
-positioner corrects for the viewport's own origin (a toast is not inside a Modal), and the arrow
-reads `side`/`align` from it. A stacked list of toasts needs neither.
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="toast" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -94,6 +82,23 @@ import { Toast } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Toast.Provider
+  Toast.Viewport
+    Toast.Positioner
+      Toast.Root
+        Toast.Arrow
+        Toast.Title
+        Toast.Description
+        Toast.Action
+        Toast.Close`} />
+
+`Toast.Positioner` and `Toast.Arrow` are for a toast anchored to something on screen — the
+positioner corrects for the viewport's own origin (a toast is not inside a Modal), and the arrow
+reads `side`/`align` from it. A stacked list of toasts needs neither.
 
 ## API
 

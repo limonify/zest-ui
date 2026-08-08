@@ -5,21 +5,17 @@ description: A static gauge, like disk usage or battery level.
 
 `Meter` is a static measurement, not a task in progress — so it has no indeterminate state and no `status`. Its parts mirror `Progress`.
 
-<Demo>A storage-used gauge.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Meter.Root
-  Meter.Label
-  Meter.Value
-  Meter.Track
-    Meter.Indicator`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="meter" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -68,6 +64,15 @@ import { Meter } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Meter.Root
+  Meter.Label
+  Meter.Value
+  Meter.Track
+    Meter.Indicator`} />
 
 ## API
 

@@ -5,18 +5,17 @@ description: A single radio button; requires a RadioGroup.
 
 `Radio` is a single choice within a `RadioGroup`. A standalone radio has no source of truth, so `Radio.Root` requires a group and throws without one.
 
-<Demo>Selecting one of three radios.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Radio.Root
-  Radio.Indicator`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="radio" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -76,6 +75,12 @@ import { RadioGroup, Radio } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Radio.Root
+  Radio.Indicator`} />
 
 ## API
 

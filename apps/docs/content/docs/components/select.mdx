@@ -5,38 +5,17 @@ description: A trigger that opens a list to choose one (or several) values.
 
 `Select` shows the chosen label on a trigger and opens an anchored list to pick from. `items` lets `Select.Value` render a label before the popup has ever mounted; set `multiple` for multi-select.
 
-<Demo>Choosing a fruit, and a multi-select.</Demo>
-
-<Callout type="info">
-  **Select vs Combobox vs Autocomplete.** Reach for **Select** to pick from a known list with no
-  typing; **[Combobox](/docs/components/combobox)** when the user types to filter and choose a bound
-  value; **[Autocomplete](/docs/components/autocomplete)** when the typed text itself is the value
-  (free-text with suggestions).
-</Callout>
-
-## Anatomy
-
-<Anatomy code={`Select.Root
-  Select.Label
-  Select.Trigger > Select.Value / Select.Icon
-  Select.Portal
-    Select.Backdrop
-    Select.Positioner
-      Select.Arrow
-      Select.Popup
-        Select.List
-          Select.Group / Select.GroupLabel
-          Select.Item > Select.ItemText / Select.ItemIndicator
-          Select.Separator`} />
-
-`Select.Arrow` points the popup at its trigger and is positioned for you; `Select.Separator` is the
-standalone `Separator`, re-exported so a divider between groups reads in the same vocabulary.
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="select" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -117,6 +96,32 @@ import { Select } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+<Callout type="info">
+  **Select vs Combobox vs Autocomplete.** Reach for **Select** to pick from a known list with no
+  typing; **[Combobox](/docs/components/combobox)** when the user types to filter and choose a bound
+  value; **[Autocomplete](/docs/components/autocomplete)** when the typed text itself is the value
+  (free-text with suggestions).
+</Callout>
+
+## Anatomy
+
+<Anatomy code={`Select.Root
+  Select.Label
+  Select.Trigger > Select.Value / Select.Icon
+  Select.Portal
+    Select.Backdrop
+    Select.Positioner
+      Select.Arrow
+      Select.Popup
+        Select.List
+          Select.Group / Select.GroupLabel
+          Select.Item > Select.ItemText / Select.ItemIndicator
+          Select.Separator`} />
+
+`Select.Arrow` points the popup at its trigger and is positioned for you; `Select.Separator` is the
+standalone `Separator`, re-exported so a divider between groups reads in the same vocabulary.
 
 ## API
 

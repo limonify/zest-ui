@@ -5,19 +5,17 @@ description: An image with a fallback for when it fails or is loading.
 
 `Avatar` shows an image and reveals a fallback when it can't load. `Avatar.Image` publishes its loading status on state.
 
-<Demo>An avatar falling back to initials.</Demo>
-
-## Anatomy
-
-<Anatomy code={`Avatar.Root
-  Avatar.Image
-  Avatar.Fallback`} />
-
 ## Usage
 
-The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
+Press it, then read it. The behaviour is headless — the **Code** tab is the component; the **StyleSheet** and **Uniwind** tabs are two ways to design it.
 
-<Tabs items={['Code', 'StyleSheet', 'Uniwind']}>
+<Tabs items={['Preview', 'Code', 'StyleSheet', 'Uniwind']}>
+
+<Tab value="Preview">
+
+<Demo name="avatar" />
+
+</Tab>
 
 <Tab value="Code">
 
@@ -67,6 +65,13 @@ import { Avatar } from '@limonify/zest-ui';
 </Tab>
 
 </Tabs>
+
+
+## Anatomy
+
+<Anatomy code={`Avatar.Root
+  Avatar.Image
+  Avatar.Fallback`} />
 
 ## API
 
