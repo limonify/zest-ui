@@ -11,13 +11,17 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
+    "@limonify/zest-ui": "workspace:*",
+    "fumadocs-core": "^16.11.5",
+    "fumadocs-mdx": "^15.2.0",
+    "fumadocs-typescript": "^5.3.0",
+    "fumadocs-ui": "^16.11.5",
     "next": "^16.2.10",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "fumadocs-ui": "^16.11.5",
-    "fumadocs-core": "^16.11.5",
-    "fumadocs-mdx": "^15.2.0",
-    "fumadocs-typescript": "^5.3.0"
+    "react-native": "0.86.0",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-web": "^0.21.2"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
