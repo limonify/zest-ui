@@ -19,6 +19,7 @@
       "name": "docs",
       "version": "0.0.0",
       "dependencies": {
+        "@floating-ui/react-native": "^0.10.10",
         "@limonify/zest-ui": "workspace:*",
         "fumadocs-core": "^16.11.5",
         "fumadocs-mdx": "^15.2.0",

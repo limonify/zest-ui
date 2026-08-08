@@ -14,6 +14,11 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/docs/node_modules ./apps/docs/node_modules
+# The docs bundle zest from source, so TypeScript reads that source and has to
+# resolve what it imports — `react-native`, `@types/react` — which bun installed
+# into the package's own node_modules. Without this the build type-checks the
+# library with everything implicitly `any` and fails.
+COPY --from=deps /app/packages/zest-ui/node_modules ./packages/zest-ui/node_modules
 COPY package.json bun.lock ./
 COPY CHANGELOG.md ./
 COPY packages/zest-ui ./packages/zest-ui
