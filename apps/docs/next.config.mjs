@@ -4,7 +4,7 @@ const withMDX = createMDX();
 
 /**
  * The demos on these pages are the real components, running through
- * `react-native-web`. Three things are needed for that:
+ * `react-native-web`. Four things are needed for that:
  *
  * - `react-native` has to resolve to `react-native-web`, which is the whole
  *   trick — every `View`, `Pressable` and `Modal` zest imports becomes its web
@@ -15,9 +15,25 @@ const withMDX = createMDX();
  *   is not Metro the compiled `lib/`, which would mean building the package
  *   before the docs; pointing at `src/` keeps the demos on whatever is checked
  *   out, and `transpilePackages` compiles the TypeScript.
+ * - **Its two runtime dependencies resolve from here, not from the package.**
+ *   Consuming the source means Node resolution walks up from
+ *   `packages/zest-ui/src/**`, which finds that package's own `node_modules`.
+ *   Two things go wrong with that. The Docker build never copies it, so the
+ *   build fails outright with `Can't resolve 'react-native-gesture-handler'`;
+ *   and where it *is* present it holds a different gesture-handler (the
+ *   package dev-installs 3.x to test against) so the bundle would carry two
+ *   copies, with the root view from one and the gestures from the other.
+ *   Pinning both here makes the app the single source of truth, which is what
+ *   it is for any other consumer.
  */
+// Relative, not absolute: Turbopack resolves an alias value as a request from
+// the project root, so an absolute path would be read as a relative one.
+const appModule = (id) => `./node_modules/${id}`;
+
 const reactNativeAliases = {
   'react-native': 'react-native-web',
+  'react-native-gesture-handler': appModule('react-native-gesture-handler'),
+  '@floating-ui/react-native': appModule('@floating-ui/react-native'),
   '@limonify/zest-ui': '../../packages/zest-ui/src/index.ts',
 };
 
