@@ -23,7 +23,13 @@ const reactNativeAliases = {
 
 /** @type {import('next').NextConfig} */
 const config = {
-  reactStrictMode: true,
+  // Off, and it has to be: react-native-web's `ModalPortal` creates its
+  // container element *during render* and removes it in an unmount cleanup —
+  // the exact pattern StrictMode exists to catch. Its double-mount deletes the
+  // container and nothing recreates it, so every popup (Dialog, Popover, Menu,
+  // Select, Combobox, Tooltip) opens its store and renders nothing. Native is
+  // unaffected: there `Modal` is a real native view.
+  reactStrictMode: false,
   output: 'export',
   images: { unoptimized: true },
   transpilePackages: [

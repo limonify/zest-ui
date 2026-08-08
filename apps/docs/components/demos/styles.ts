@@ -99,6 +99,7 @@ export const s = StyleSheet.create({
     padding: 14,
     gap: 8,
     minWidth: 220,
+    maxWidth: 420,
     // React Native does not clip to a parent's bounds, so anything with a
     // maxHeight needs this or its rows spill over the page.
     overflow: 'hidden',
@@ -107,7 +108,7 @@ export const s = StyleSheet.create({
   // `StyleSheet.absoluteFill` in an array at the call site rather than
   // spreading it in here.
   backdrop: {
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.55)',
   },
   centered: {
     alignItems: 'center',

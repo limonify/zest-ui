@@ -21,7 +21,9 @@ export function SwitchDemo() {
           onCheckedChange={setChecked}
           style={(state) => [track, state.checked && trackOn]}
         >
-          <Switch.Thumb style={(state) => [thumb, state.checked && thumbOn]} />
+          {/* `keepMounted` or the thumb disappears when the switch is off: it
+              unmounts on uncheck so an exit animation is opt-in. */}
+          <Switch.Thumb keepMounted style={(state) => [thumb, state.checked && thumbOn]} />
         </Switch.Root>
         <Text style={s.label}>{checked ? 'On' : 'Off'}</Text>
       </View>
