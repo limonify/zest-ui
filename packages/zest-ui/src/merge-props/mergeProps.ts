@@ -197,6 +197,24 @@ function resolvePropsGetter<T extends ElementType>(
   return inputProps ?? (EMPTY_PROPS as PropsOf<T>);
 }
 
+/**
+ * Wrappers are cached by the handlers they wrap.
+ *
+ * Merging produces a new function for every handler on every render, so a
+ * component that keeps its handler stable still handed the element a different
+ * one each time. React Native does not care. `react-native-web` does:
+ * `Image` keys the effect that starts the load on `onLoad`/`onLoadStart`/
+ * `onError`, so a fresh identity restarts the load, which publishes a status,
+ * which renders, which wraps again — an infinite loop that React ends with
+ * "Maximum update depth exceeded".
+ *
+ * Both wrappers below are pure functions of the handlers they close over, so
+ * caching on those handlers is safe: same inputs, same wrapper. Entries die
+ * with the handlers, which is what makes a `WeakMap` the right shape.
+ */
+const wrappedHandlers = new WeakMap<Function, Function>();
+const mergedHandlers = new WeakMap<Function, WeakMap<Function, Function>>();
+
 function mergeEventHandlers(ourHandler: Function | undefined, theirHandler: Function | undefined) {
   if (!theirHandler) {
     return ourHandler;
@@ -205,7 +223,18 @@ function mergeEventHandlers(ourHandler: Function | undefined, theirHandler: Func
     return wrapEventHandler(theirHandler);
   }
 
-  return (...args: unknown[]) => {
+  let byTheirs = mergedHandlers.get(ourHandler);
+  if (byTheirs === undefined) {
+    byTheirs = new WeakMap();
+    mergedHandlers.set(ourHandler, byTheirs);
+  }
+
+  const cached = byTheirs.get(theirHandler);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const merged = (...args: unknown[]) => {
     const event = args[0];
 
     if (isSyntheticEvent(event)) {
@@ -226,6 +255,9 @@ function mergeEventHandlers(ourHandler: Function | undefined, theirHandler: Func
     ourHandler?.(...args);
     return result;
   };
+
+  byTheirs.set(theirHandler, merged);
+  return merged;
 }
 
 function wrapEventHandler(handler: Function | undefined) {
@@ -233,7 +265,12 @@ function wrapEventHandler(handler: Function | undefined) {
     return handler;
   }
 
-  return (...args: unknown[]) => {
+  const cached = wrappedHandlers.get(handler);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const wrapped = (...args: unknown[]) => {
     const event = args[0];
 
     if (isSyntheticEvent(event)) {
@@ -242,6 +279,9 @@ function wrapEventHandler(handler: Function | undefined) {
 
     return handler(...args);
   };
+
+  wrappedHandlers.set(handler, wrapped);
+  return wrapped;
 }
 
 export function makeEventPreventable<T extends object>(event: ZestUIEvent<T>) {
