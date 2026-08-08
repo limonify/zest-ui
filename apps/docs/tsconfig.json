@@ -20,6 +20,12 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@limonify/zest-ui": [
+        "../../packages/zest-ui/src/index.ts"
+      ],
+      "@limonify/zest-ui/*": [
+        "../../packages/zest-ui/src/*"
       ]
     },
     "plugins": [
