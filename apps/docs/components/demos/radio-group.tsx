@@ -27,12 +27,17 @@ export function RadioGroupDemo() {
           { value: 'standard', label: 'Standard — 3 to 5 days' },
           { value: 'express', label: 'Express — next day' },
           { value: 'pickup', label: 'Collect in store' },
+          { value: 'overnight', label: 'Overnight (disabled)', disabled: true },
         ].map((option) => (
           <View key={option.value} style={s.row}>
-            <Radio.Root value={option.value} style={outer}>
+            <Radio.Root
+              value={option.value}
+              disabled={option.disabled}
+              style={(state) => [outer, state.disabled && s.buttonDisabled]}
+            >
               <Radio.Indicator style={inner} />
             </Radio.Root>
-            <Text style={s.label}>{option.label}</Text>
+            <Text style={option.disabled ? s.muted : s.label}>{option.label}</Text>
           </View>
         ))}
       </RadioGroup>

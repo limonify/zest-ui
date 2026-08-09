@@ -13,8 +13,10 @@ export const c = {
   muted: 'var(--color-fd-muted-foreground)',
   border: 'var(--color-fd-border)',
   card: 'var(--color-fd-card)',
-  accent: '#2563eb',
-  accentText: '#ffffff',
+  // The site's own palette: the accent follows the Fumadocs primary (lime) and
+  // its readable foreground, so a demo matches the page in both themes.
+  accent: 'var(--color-fd-primary)',
+  accentText: 'var(--color-fd-primary-foreground)',
   danger: '#dc2626',
 } as const;
 
@@ -48,6 +50,11 @@ export const s = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   buttonPressed: {
     opacity: 0.75,
@@ -100,6 +107,11 @@ export const s = StyleSheet.create({
     gap: 8,
     minWidth: 220,
     maxWidth: 420,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
     // React Native does not clip to a parent's bounds, so anything with a
     // maxHeight needs this or its rows spill over the page.
     overflow: 'hidden',
@@ -144,7 +156,7 @@ export const s = StyleSheet.create({
     height: 22,
     width: 22,
     marginLeft: -11,
-    marginTop: -9,
+    top: -9,
     borderRadius: 11,
     backgroundColor: c.card,
     borderWidth: 2,
@@ -153,5 +165,10 @@ export const s = StyleSheet.create({
   sliderControl: {
     height: 36,
     justifyContent: 'center',
+  },
+
+  selectTrigger: {
+    alignSelf: 'flex-start',
+    minWidth: 220,
   },
 });

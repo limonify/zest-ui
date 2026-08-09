@@ -105,17 +105,6 @@ positioner, so it follows the popup when collision handling flips it.
 menu with the `link-press` reason. `Menu.Separator` is the shared
 [`Separator`](/docs/components/separator), re-exported for convenience.
 
-## API
-
-`Menu` — root props below. Every part also accepts the [common props](/docs/common-props).
-
-<AutoType path="../../packages/zest-ui/src/menu/root/MenuRoot.tsx" name="MenuRootProps" />
-
-A `disabled` menu cannot be opened, by a press or through its handle, and its triggers report
-themselves disabled. Closing is always allowed, so disabling one that is already open puts it away
-rather than stranding it on screen. `Menu.Trigger` also takes its own `disabled`, for one trigger
-out of several.
-
 ## State
 
 These fields reach your `style` and `render` functions on **Menu.Popup** (`style={(state) => ...}`).
@@ -155,3 +144,14 @@ See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contr
 
 Each menu level is its own `Modal`, so **every level that should dismiss on an outside tap needs its own `Menu.Backdrop`**. Items close the menu on press by default; set `closeOnPress={false}` to keep it open (the web-era
 `closeOnClick` is still accepted as a deprecated alias).
+
+## API
+
+`Menu` — root props below. Every part also accepts the [common props](/docs/common-props).
+
+<AutoType path="../../packages/zest-ui/src/menu/root/MenuRoot.tsx" name="MenuRootProps" />
+
+A `disabled` menu cannot be opened, by a press or through its handle, and its triggers report
+themselves disabled. Closing is always allowed, so disabling one that is already open puts it away
+rather than stranding it on screen. `Menu.Trigger` also takes its own `disabled`, for one trigger
+out of several.

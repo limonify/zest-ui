@@ -87,40 +87,6 @@ Tooltip.Root
       Tooltip.Popup
         Tooltip.Arrow`} />
 
-## API
-
-`Tooltip` — root props below. Every part also accepts the [common props](/docs/common-props).
-
-<AutoType path="../../packages/zest-ui/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootProps" />
-
-Upstream's `delay`, `closeDelay`, `hoverable` and `trackCursorAxis` are absent on purpose: they all
-exist to read hover intent, and a touch screen has no hover. A zest tooltip opens on press, or on
-long press via `Tooltip.Trigger`'s `longPress` prop.
-
-### Opening it from elsewhere
-
-Like every other popup family, a tooltip can be driven from outside its root.
-`Tooltip.createHandle()` connects a root to triggers rendered anywhere in the tree, and opens or
-closes it imperatively:
-
-```tsx
-const handle = Tooltip.createHandle();
-
-<Tooltip.Trigger nativeID="help" handle={handle}>{/* … */}</Tooltip.Trigger>
-// …anywhere else in the tree
-<Tooltip.Root handle={handle}>{/* … */}</Tooltip.Root>
-
-handle.open('help');
-handle.close();
-```
-
-`actionsRef` is the other half: `actionsRef.current.close()` closes with the `imperative-action`
-reason, and `unmount()` closes *without* firing `onOpenChange` — which is what you call once your
-own closing animation has finished.
-
-A `disabled` tooltip cannot be opened, by a press or through its handle. Closing is always allowed,
-so disabling one that is already open puts it away rather than stranding it on screen.
-
 ## State
 
 These fields reach your `style` and `render` functions on **Tooltip parts** (`style={(state) => ...}`).
@@ -159,3 +125,37 @@ See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contr
 ## Accessibility
 
 The popup is `accessibilityRole="tooltip"`. Upstream's hover-delay `Tooltip.Provider` is not ported — there is no hover on touch.
+
+## API
+
+`Tooltip` — root props below. Every part also accepts the [common props](/docs/common-props).
+
+<AutoType path="../../packages/zest-ui/src/tooltip/root/TooltipRoot.tsx" name="TooltipRootProps" />
+
+Upstream's `delay`, `closeDelay`, `hoverable` and `trackCursorAxis` are absent on purpose: they all
+exist to read hover intent, and a touch screen has no hover. A zest tooltip opens on press, or on
+long press via `Tooltip.Trigger`'s `longPress` prop.
+
+### Opening it from elsewhere
+
+Like every other popup family, a tooltip can be driven from outside its root.
+`Tooltip.createHandle()` connects a root to triggers rendered anywhere in the tree, and opens or
+closes it imperatively:
+
+```tsx
+const handle = Tooltip.createHandle();
+
+<Tooltip.Trigger nativeID="help" handle={handle}>{/* … */}</Tooltip.Trigger>
+// …anywhere else in the tree
+<Tooltip.Root handle={handle}>{/* … */}</Tooltip.Root>
+
+handle.open('help');
+handle.close();
+```
+
+`actionsRef` is the other half: `actionsRef.current.close()` closes with the `imperative-action`
+reason, and `unmount()` closes *without* firing `onOpenChange` — which is what you call once your
+own closing animation has finished.
+
+A `disabled` tooltip cannot be opened, by a press or through its handle. Closing is always allowed,
+so disabling one that is already open puts it away rather than stranding it on screen.

@@ -82,6 +82,49 @@ import { Slider } from '@limonify/zest-ui';
       Slider.Indicator
       Slider.Thumb`} />
 
+## State
+
+These fields reach your `style` and `render` functions on **every Slider part** (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest-ui/src/slider/root/SliderRoot.tsx" name="SliderRootState" />
+
+**Slider.Thumb** additionally exposes:
+
+<AutoType path="../../packages/zest-ui/src/slider/thumb/SliderThumb.tsx" name="SliderThumbState" />
+
+## Animation
+
+The built-in gesture already moves the thumb live, so you rarely animate its position. Instead react to `state.dragging` (on `Slider.Thumb`) — for example, grow the thumb while it is held:
+
+```tsx
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
+import { Slider } from '@limonify/zest-ui';
+
+function Thumb({ props, state }) {
+  const scale = useAnimatedValue(state.dragging ? 1.25 : 1, { duration: 120 });
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+  return <Animated.View {...props} style={[styles.thumb, style]} />;
+}
+
+<Slider.Thumb render={(props, state) => <Thumb props={props} state={state} />} />
+```
+
+To make the thumb *follow* the finger with spring physics instead, feed `state.values` into a shared value — see **Gesture-following values** in the [Reanimated guide](/docs/guides/animation-reanimated).
+
+
+## Inside a Field
+
+Wrapped in a [`Field.Root`](/docs/components/field), the slider inherits its `disabled` and
+`Slider.Thumb` is labelled by `Field.Label` — the thumb rather than the root, because that is the
+element assistive technology announces and adjusts. `Slider.Label` is still the fallback for a
+slider that stands on its own. Dragging marks the field dirty; releasing the thumb marks it
+touched, which is when `validationMode="onBlur"` runs.
+
+## Accessibility
+
+Pass an array `value` for a range slider. Each `Slider.Thumb` is `accessibilityRole="adjustable"` and labelled by `Slider.Label`. Requires `react-native-gesture-handler`.
+
 ## API
 
 `Slider` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
@@ -129,46 +172,3 @@ takes a `direction` prop of its own. Under `rtl` a horizontal track runs from th
 touch-to-value mapping and the positioning flip: `Slider.Thumb` and `Slider.Indicator` anchor with
 `right` instead of `left`. Your own styles should stay off those two properties for the same
 reason — position from `state.values` and let the part place itself.
-
-## State
-
-These fields reach your `style` and `render` functions on **every Slider part** (`style={(state) => ...}`).
-
-<AutoType path="../../packages/zest-ui/src/slider/root/SliderRoot.tsx" name="SliderRootState" />
-
-**Slider.Thumb** additionally exposes:
-
-<AutoType path="../../packages/zest-ui/src/slider/thumb/SliderThumb.tsx" name="SliderThumbState" />
-
-## Animation
-
-The built-in gesture already moves the thumb live, so you rarely animate its position. Instead react to `state.dragging` (on `Slider.Thumb`) — for example, grow the thumb while it is held:
-
-```tsx
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import { useAnimatedValue } from './useAnimatedValue'; // small helper — see the guide
-import { Slider } from '@limonify/zest-ui';
-
-function Thumb({ props, state }) {
-  const scale = useAnimatedValue(state.dragging ? 1.25 : 1, { duration: 120 });
-  const style = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  return <Animated.View {...props} style={[styles.thumb, style]} />;
-}
-
-<Slider.Thumb render={(props, state) => <Thumb props={props} state={state} />} />
-```
-
-To make the thumb *follow* the finger with spring physics instead, feed `state.values` into a shared value — see **Gesture-following values** in the [Reanimated guide](/docs/guides/animation-reanimated).
-
-
-## Inside a Field
-
-Wrapped in a [`Field.Root`](/docs/components/field), the slider inherits its `disabled` and
-`Slider.Thumb` is labelled by `Field.Label` — the thumb rather than the root, because that is the
-element assistive technology announces and adjusts. `Slider.Label` is still the fallback for a
-slider that stands on its own. Dragging marks the field dirty; releasing the thumb marks it
-touched, which is when `validationMode="onBlur"` runs.
-
-## Accessibility
-
-Pass an array `value` for a range slider. Each `Slider.Thumb` is `accessibilityRole="adjustable"` and labelled by `Slider.Label`. Requires `react-native-gesture-handler`.

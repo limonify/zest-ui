@@ -11,7 +11,10 @@ const image = { width: 48, height: 48 };
 // render, and react-native-web's `Image` reloads whenever the source's identity
 // changes — the reload sets loading status, which renders, which makes another
 // object. That loops until React gives up with "Maximum update depth exceeded".
-const PHOTO = { uri: 'https://i.pravatar.cc/96?img=12' };
+// The first source is a data URI, so the demo needs no network to render it.
+const PHOTO = {
+  uri: 'data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2296%22 height=%2296%22%3E%3Crect width=%2296%22 height=%2296%22 fill=%22%234c7a0b%22/%3E%3Ctext x=%2248%22 y=%2260%22 font-family=%22sans-serif%22 font-size=%2236%22 font-weight=%22700%22 text-anchor=%22middle%22 fill=%22%23fbfaf5%22%3EEB%3C/text%3E%3C/svg%3E',
+};
 const MISSING = { uri: '/this-image-does-not-exist.png' };
 // The fallback has to overlay the image rather than follow it in flow, or the
 // root's `overflow: 'hidden'` clips it away.

@@ -2,7 +2,7 @@
 
 import { Text, View } from 'react-native';
 import { Tooltip } from '@limonify/zest-ui';
-import { s } from './styles';
+import { c, s } from './styles';
 
 export function TooltipDemo() {
   return (
@@ -14,10 +14,17 @@ export function TooltipDemo() {
 
         <Tooltip.Portal>
           <Tooltip.Positioner side="top" sideOffset={8}>
+            {/* A tooltip inverts the theme: the foreground colour becomes the
+                surface and the surface becomes the text. */}
             <Tooltip.Popup
-              style={{ backgroundColor: '#111827', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 }}
+              style={{
+                backgroundColor: c.fg,
+                borderRadius: 8,
+                paddingHorizontal: 10,
+                paddingVertical: 6,
+              }}
             >
-              <Text style={{ color: '#fff', fontSize: 13 }}>Opened by press, not hover</Text>
+              <Text style={{ color: c.card, fontSize: 13 }}>Opened by press, not hover</Text>
             </Tooltip.Popup>
           </Tooltip.Positioner>
         </Tooltip.Portal>

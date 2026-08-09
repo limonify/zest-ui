@@ -112,15 +112,6 @@ your state in sync with it.
 An external error blocks submission even when the field's own `validate` passes — until the user
 edits it and clears it.
 
-## API
-
-`Form` — every part also accepts the [common props](/docs/common-props) (`style`/`className` as a
-value or function of state, `render`, `ref`).
-
-<AutoType path="../../packages/zest-ui/src/form/Form.tsx" name="FormProps" />
-
-<AutoType path="../../packages/zest-ui/src/form/Form.tsx" name="FormActions" />
-
 ## State
 
 `Form` renders a plain grouping element and carries no state of its own — there is nothing about a
@@ -138,3 +129,12 @@ render them all:
 
 The container is `role="form"`. Everything else — labelling, descriptions, `aria-invalid`, error
 announcements — belongs to the fields inside it; see [Field](/docs/components/field).
+
+## API
+
+`Form` — every part also accepts the [common props](/docs/common-props) (`style`/`className` as a
+value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest-ui/src/form/Form.tsx" name="FormProps" />
+
+<AutoType path="../../packages/zest-ui/src/form/Form.tsx" name="FormActions" />

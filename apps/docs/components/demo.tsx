@@ -32,8 +32,10 @@ export function Demo({ name, children }: { name?: string; children?: ReactNode }
 
   // No frame of its own: every demo sits in the Preview tab of a Usage block,
   // and nesting a bordered card inside a bordered tab panel reads as two boxes.
+  // The width is capped and centred so controls read like a focused canvas
+  // instead of spanning the whole content column on wide screens.
   return (
-    <div className="not-prose -mx-2 overflow-hidden">
+    <div className="not-prose mx-auto w-full max-w-md overflow-hidden">
       <DemoStage name={name} />
     </div>
   );

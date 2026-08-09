@@ -18,7 +18,9 @@ export function SelectDemo() {
     <View style={s.stage}>
       <Select.Root items={FRUITS} value={value} onValueChange={setValue}>
         <Select.Label style={s.muted}>Fruit</Select.Label>
-        <Select.Trigger style={(state) => [s.control, s.row, state.pressed && s.buttonPressed]}>
+        <Select.Trigger
+          style={(state) => [s.control, s.row, s.selectTrigger, state.pressed && s.buttonPressed]}
+        >
           <Select.Value style={s.label}>{(state) => state.label ?? 'Pick a fruit'}</Select.Value>
           <Select.Icon>
             <Text style={s.muted}>▾</Text>
@@ -28,7 +30,13 @@ export function SelectDemo() {
         <Select.Portal>
           <Select.Backdrop style={StyleSheet.absoluteFill} />
           <Select.Positioner side="bottom" align="start" sideOffset={6}>
-            <Select.Popup style={s.popup}>
+            {/* `triggerWidth` is the trigger's measured width, so the list lines
+                up with the control that opened it. */}
+            <Select.Popup
+              style={(state) =>
+                [s.popup, state.triggerWidth ? { minWidth: state.triggerWidth } : undefined]
+              }
+            >
               <Select.List>
                 {FRUITS.map((fruit) => (
                   <Select.Item

@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Menu } from '@limonify/zest-ui';
-import { s } from './styles';
+import { c, s } from './styles';
 
 export function MenuDemo() {
   const [last, setLast] = useState<string | null>(null);
+  const [showNumbers, setShowNumbers] = useState(true);
 
   return (
     <View style={s.stage}>
@@ -31,11 +32,33 @@ export function MenuDemo() {
                   </Menu.Item>
                 ))}
               </Menu.Group>
+
+              <Menu.Separator style={{ height: 1, backgroundColor: c.border }} />
+
+              <Menu.CheckboxItem
+                checked={showNumbers}
+                onCheckedChange={setShowNumbers}
+                style={(state) => [s.item, state.pressed && s.itemPressed]}
+              >
+                <Text style={s.label}>Show line numbers</Text>
+                <Menu.CheckboxItemIndicator>
+                  <Text style={s.label}>✓</Text>
+                </Menu.CheckboxItemIndicator>
+              </Menu.CheckboxItem>
+
+              <Menu.Item
+                disabled
+                style={(state) => [s.item, state.disabled && s.buttonDisabled]}
+              >
+                <Text style={s.muted}>Delete — disabled</Text>
+              </Menu.Item>
             </Menu.Popup>
           </Menu.Positioner>
         </Menu.Portal>
       </Menu.Root>
-      <Text style={s.muted}>Last action: {last ?? '—'}</Text>
+      <Text style={s.muted}>
+        Last action: {last ?? '—'} · Line numbers: {showNumbers ? 'on' : 'off'}
+      </Text>
     </View>
   );
 }

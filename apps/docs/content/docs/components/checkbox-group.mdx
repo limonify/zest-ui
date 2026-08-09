@@ -78,12 +78,6 @@ import { CheckboxGroup, Checkbox } from '@limonify/zest-ui';
   Checkbox.Root (parent)
   Checkbox.Root (child, value=…)`} />
 
-## API
-
-`Checkbox Group` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
-
-<AutoType path="../../packages/zest-ui/src/checkbox-group/CheckboxGroup.tsx" name="CheckboxGroupProps" />
-
 ## State
 
 These fields reach your `style` and `render` functions on **each Checkbox.Root** (`style={(state) => ...}`).
@@ -93,3 +87,9 @@ These fields reach your `style` and `render` functions on **each Checkbox.Root**
 ## Accessibility
 
 The parent checkbox reports `'mixed'` when only some children are checked, and toggles all of them on press.
+
+## API
+
+`Checkbox Group` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest-ui/src/checkbox-group/CheckboxGroup.tsx" name="CheckboxGroupProps" />

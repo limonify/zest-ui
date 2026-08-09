@@ -22,9 +22,7 @@ export function ToggleDemo() {
       <ToggleGroup multiple value={formatting} onValueChange={setFormatting} style={s.row}>
         {['bold', 'italic', 'underline'].map((item) => (
           <Toggle key={item} value={item} style={(state) => [chip, state.pressed && chipOn]}>
-            <Text style={(formatting.includes(item) ? s.buttonText : s.label) as never}>
-              {item}
-            </Text>
+            <Text style={formatting.includes(item) ? s.buttonText : s.label}>{item}</Text>
           </Toggle>
         ))}
       </ToggleGroup>

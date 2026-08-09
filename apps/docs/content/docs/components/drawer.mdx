@@ -103,12 +103,6 @@ plain drawer is `Drawer.Root` and the portal.
 `Drawer.Title` and `Drawer.Description` are the dialog's own parts, re-exported: the title names
 the drawer for assistive technology and the description is announced with it.
 
-## API
-
-`Drawer` — root props below. Every part also accepts the [common props](/docs/common-props).
-
-<AutoType path="../../packages/zest-ui/src/drawer/root/DrawerRoot.tsx" name="DrawerRootProps" />
-
 ## State
 
 These fields reach your `style` and `render` functions on **Drawer.Popup** (`style={(state) => ...}`).
@@ -175,3 +169,9 @@ See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contr
 ## Accessibility
 
 A bottom sheet is `<Drawer.Root snapPoints={[0.25, 0.5, 0.9]}>`. Swipe dismissal reports the `swipe` reason through `onOpenChange`.
+
+## API
+
+`Drawer` — root props below. Every part also accepts the [common props](/docs/common-props).
+
+<AutoType path="../../packages/zest-ui/src/drawer/root/DrawerRoot.tsx" name="DrawerRootProps" />

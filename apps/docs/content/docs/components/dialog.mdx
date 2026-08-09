@@ -126,13 +126,6 @@ The `Backdrop` (or a press outside the `Popup` in the `Viewport`) closes the dia
 `outside-press` reason; the Android back button and the OS close it with `escape-key`. Every close
 reports through `onOpenChange(open, eventDetails)` so you can veto it with `eventDetails.cancel()`.
 
-## API
-
-`Dialog.Root` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
-
-<AutoType path="../../packages/zest-ui/src/dialog/root/DialogRoot.tsx" name="DialogRootProps" />
-
-
 ## State
 
 These fields reach your `style` and `render` functions on **Dialog.Popup** (`style={(state) => ...}`).
@@ -195,3 +188,9 @@ The hook throws if used outside `<Dialog.Root>`.
 The popup is `accessibilityViewIsModal` with `accessibilityLabelledBy` pointing at `Dialog.Title`
 and `accessibilityDescribedBy` at `Dialog.Description`. Unlike the web version there is no
 `aria-modal`-only fallback — the RN `Modal` contains focus natively.
+
+## API
+
+`Dialog.Root` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest-ui/src/dialog/root/DialogRoot.tsx" name="DialogRootProps" />

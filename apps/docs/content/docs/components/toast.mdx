@@ -100,12 +100,6 @@ import { Toast } from '@limonify/zest-ui';
 positioner corrects for the viewport's own origin (a toast is not inside a Modal), and the arrow
 reads `side`/`align` from it. A stacked list of toasts needs neither.
 
-## API
-
-`Toast` — root props below. Every part also accepts the [common props](/docs/common-props).
-
-<AutoType path="../../packages/zest-ui/src/toast/root/ToastRoot.tsx" name="ToastRootProps" />
-
 ## State
 
 These fields reach your `style` and `render` functions on **Toast.Root** (`style={(state) => ...}`).
@@ -169,3 +163,9 @@ See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contr
 ## Accessibility
 
 The viewport uses `pointerEvents="box-none"` so touches pass through to the app; only the toasts are interactive. `accessibilityLiveRegion="polite"` announces new toasts.
+
+## API
+
+`Toast` — root props below. Every part also accepts the [common props](/docs/common-props).
+
+<AutoType path="../../packages/zest-ui/src/toast/root/ToastRoot.tsx" name="ToastRootProps" />

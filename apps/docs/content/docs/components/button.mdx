@@ -90,16 +90,6 @@ Button is a single part.
 
 <Anatomy code={`Button`} />
 
-## API
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `disabled` | `boolean` | `false` | Ignore user interaction and expose `disabled` on state. |
-| `onPress` | `(event) => void` | — | Called when the button is pressed. |
-
-Every part also accepts the [common props](/docs/common-props) — `style` (a value or a function of
-state), `render`, and `ref`.
-
 ## State
 
 These fields reach your `style` and `render` functions on **Button** (`style={(state) => ...}`).
@@ -113,3 +103,12 @@ These fields reach your `style` and `render` functions on **Button** (`style={(s
 `accessibilityLabel`) so assistive tech has something to announce. To render a different element
 while keeping the button semantics, use `render` — the role and disabled state travel with it.
 
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `disabled` | `boolean` | `false` | Ignore user interaction and expose `disabled` on state. |
+| `onPress` | `(event) => void` | — | Called when the button is pressed. |
+
+Every part also accepts the [common props](/docs/common-props) — `style` (a value or a function of
+state), `render`, and `ref`.

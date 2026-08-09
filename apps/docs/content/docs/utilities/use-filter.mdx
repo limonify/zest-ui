@@ -54,14 +54,6 @@ contains('Résumé', 'Resume'); // true  — accents still fold
 contains('Résumé', 'resume'); // false — case now counts
 ```
 
-## API
-
-<AutoType path="../../packages/zest-ui/src/filter/useFilter.ts" name="UseFilterParameters" />
-
-<AutoType path="../../packages/zest-ui/src/filter/useFilter.ts" name="UseFilterReturnValue" />
-
-An empty query matches everything, so an untouched search field filters nothing out.
-
 ## One limitation
 
 All three matchers compare a **fixed-width** window of the string, so a query only ever matches a
@@ -74,3 +66,11 @@ contains('STRASSE', 'straße'); // false — 6 characters cannot match 7
 
 Scanning every width instead would make each keystroke quadratic in the length of the list, which
 is the wrong trade for a filter that runs on every character typed.
+
+## API
+
+<AutoType path="../../packages/zest-ui/src/filter/useFilter.ts" name="UseFilterParameters" />
+
+<AutoType path="../../packages/zest-ui/src/filter/useFilter.ts" name="UseFilterReturnValue" />
+
+An empty query matches everything, so an untouched search field filters nothing out.

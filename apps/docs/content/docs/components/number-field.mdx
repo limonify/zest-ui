@@ -81,12 +81,6 @@ import { NumberField } from '@limonify/zest-ui';
     NumberField.Increment
   NumberField.ScrubArea`} />
 
-## API
-
-`Number Field` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
-
-<AutoType path="../../packages/zest-ui/src/number-field/root/NumberFieldRoot.tsx" name="NumberFieldRootProps" />
-
 ## State
 
 These fields reach your `style` and `render` functions on **every NumberField part** (`style={(state) => ...}`).
@@ -96,3 +90,9 @@ These fields reach your `style` and `render` functions on **every NumberField pa
 ## Accessibility
 
 The input is `accessibilityRole="spinbutton"` with `accessibilityValue`. Parsing/formatting is locale-aware via `format`/`locale`. Field-aware inside a `Field.Root`.
+
+## API
+
+`Number Field` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest-ui/src/number-field/root/NumberFieldRoot.tsx" name="NumberFieldRootProps" />

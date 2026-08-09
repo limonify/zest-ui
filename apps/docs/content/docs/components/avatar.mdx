@@ -73,12 +73,6 @@ import { Avatar } from '@limonify/zest-ui';
   Avatar.Image
   Avatar.Fallback`} />
 
-## API
-
-`Avatar` — root props below. Every part also accepts the [common props](/docs/common-props).
-
-<AutoType path="../../packages/zest-ui/src/avatar/root/AvatarRoot.tsx" name="AvatarRootProps" />
-
 ## State
 
 These fields reach your `style` and `render` functions on **Avatar.Image** (`style={(state) => ...}`).
@@ -93,3 +87,9 @@ The fallback shows until the image reports `loaded`. React Native's `Image` fetc
 showing announces as one thing rather than as an unlabelled view. Name the person with
 `accessibilityLabel` on the image; leave it off and the avatar reads as decorative, which is the
 right default when a nearby name already says who it is.
+
+## API
+
+`Avatar` — root props below. Every part also accepts the [common props](/docs/common-props).
+
+<AutoType path="../../packages/zest-ui/src/avatar/root/AvatarRoot.tsx" name="AvatarRootProps" />

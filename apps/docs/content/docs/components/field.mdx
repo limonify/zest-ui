@@ -85,6 +85,41 @@ import { Field } from '@limonify/zest-ui';
     Field.Label
     Field.Description`} />
 
+## State
+
+These fields reach your `style` and `render` functions on **every Field part** (`style={(state) => ...}`).
+
+<AutoType path="../../packages/zest-ui/src/field/root/FieldRoot.tsx" name="FieldRootState" />
+
+
+### What counts as a control
+
+`Field.Control` and [`Input`](/docs/components/input) are the text controls, but a field also picks
+up **Checkbox**, **Switch**, **RadioGroup**, **NumberField**, **Slider**, **Select** and
+**OTPField**. Each of them inherits the field's `disabled`, is labelled by `Field.Label`, described
+by `Field.Description`/`Field.Error`, and runs `validate` as its value changes.
+
+They report `dirty`, `filled` and `touched` too, so `Field.Validity` reads the same for a checkbox
+as for a text input:
+
+```tsx
+<Field.Root validate={(value) => (value ? null : 'Pick a plan')}>
+  <Field.Label>Plan</Field.Label>
+  <RadioGroup>{/* … */}</RadioGroup>
+  <Field.Validity>
+    {({ field, errors }) => (field.touched && errors.length > 0 ? <Text>{errors[0]}</Text> : null)}
+  </Field.Validity>
+</Field.Root>
+```
+
+Since none of these blur the way a text input does, "touched" is the end of the interaction:
+committing a press for a checkbox or radio, releasing the thumb for a slider, closing the popup for
+a select, completing the code for an OTP field.
+
+## Accessibility
+
+The control is labelled by `Field.Label` and described by `Field.Description`/`Field.Error` via `accessibilityLabelledBy`/`accessibilityDescribedBy`. `validationMode` runs `validate` on blur or change. `Checkbox`, `Switch`, `RadioGroup` and `NumberField` are also field-aware.
+
 ## API
 
 `Field` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
@@ -149,38 +184,3 @@ them all — `children` defaults to the first:
 ```
 
 Pass `match` to keep it rendered regardless of validity — that is this part's `keepMounted`.
-
-## State
-
-These fields reach your `style` and `render` functions on **every Field part** (`style={(state) => ...}`).
-
-<AutoType path="../../packages/zest-ui/src/field/root/FieldRoot.tsx" name="FieldRootState" />
-
-
-### What counts as a control
-
-`Field.Control` and [`Input`](/docs/components/input) are the text controls, but a field also picks
-up **Checkbox**, **Switch**, **RadioGroup**, **NumberField**, **Slider**, **Select** and
-**OTPField**. Each of them inherits the field's `disabled`, is labelled by `Field.Label`, described
-by `Field.Description`/`Field.Error`, and runs `validate` as its value changes.
-
-They report `dirty`, `filled` and `touched` too, so `Field.Validity` reads the same for a checkbox
-as for a text input:
-
-```tsx
-<Field.Root validate={(value) => (value ? null : 'Pick a plan')}>
-  <Field.Label>Plan</Field.Label>
-  <RadioGroup>{/* … */}</RadioGroup>
-  <Field.Validity>
-    {({ field, errors }) => (field.touched && errors.length > 0 ? <Text>{errors[0]}</Text> : null)}
-  </Field.Validity>
-</Field.Root>
-```
-
-Since none of these blur the way a text input does, "touched" is the end of the interaction:
-committing a press for a checkbox or radio, releasing the thumb for a slider, closing the popup for
-a select, completing the code for an OTP field.
-
-## Accessibility
-
-The control is labelled by `Field.Label` and described by `Field.Description`/`Field.Error` via `accessibilityLabelledBy`/`accessibilityDescribedBy`. `validationMode` runs `validate` on blur or change. `Checkbox`, `Switch`, `RadioGroup` and `NumberField` are also field-aware.

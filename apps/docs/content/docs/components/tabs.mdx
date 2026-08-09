@@ -108,12 +108,6 @@ import { Tabs } from '@limonify/zest-ui';
     Tabs.Indicator
   Tabs.Panel`} />
 
-## API
-
-`Tabs` — root props below. Every part also accepts the [common props](/docs/common-props).
-
-<AutoType path="../../packages/zest-ui/src/tabs/root/TabsRoot.tsx" name="TabsRootProps" />
-
 ## State
 
 These fields reach your `style` and `render` functions on **Tabs.Tab** (`style={(state) => ...}`).
@@ -144,3 +138,9 @@ See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contr
 ## Accessibility
 
 Tabs are `accessibilityRole="tab"`, panels `role="tabpanel"`. Item order is read from measured layout via `CompositeList`, so the indicator tracks the real visual order.
+
+## API
+
+`Tabs` — root props below. Every part also accepts the [common props](/docs/common-props).
+
+<AutoType path="../../packages/zest-ui/src/tabs/root/TabsRoot.tsx" name="TabsRootProps" />

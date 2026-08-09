@@ -98,12 +98,6 @@ import { Checkbox } from '@limonify/zest-ui';
 <Anatomy code={`Checkbox.Root
   Checkbox.Indicator`} />
 
-## API
-
-`Checkbox` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
-
-<AutoType path="../../packages/zest-ui/src/checkbox/root/CheckboxRoot.tsx" name="CheckboxRootProps" />
-
 ## State
 
 These fields reach your `style` and `render` functions on **Checkbox.Root** (`style={(state) => ...}`).
@@ -158,3 +152,9 @@ The hook throws if used outside `<Checkbox.Root>`.
 ## Accessibility
 
 `accessibilityState.checked` is `true`, `false`, or `'mixed'` when indeterminate. Inside a `Field.Root` the checkbox is labelled by `Field.Label` automatically.
+
+## API
+
+`Checkbox` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest-ui/src/checkbox/root/CheckboxRoot.tsx" name="CheckboxRootProps" />

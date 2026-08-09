@@ -76,12 +76,6 @@ import { Progress } from '@limonify/zest-ui';
   Progress.Track
     Progress.Indicator`} />
 
-## API
-
-`Progress` — root props below. Every part also accepts the [common props](/docs/common-props).
-
-<AutoType path="../../packages/zest-ui/src/progress/root/ProgressRoot.tsx" name="ProgressRootProps" />
-
 ## State
 
 These fields reach your `style` and `render` functions on **every Progress part** (`style={(state) => ...}`).
@@ -115,3 +109,9 @@ Skip the animation while indeterminate (`value == null`) — there is no width t
 ## Accessibility
 
 `accessibilityRole="progressbar"` with `accessibilityValue` (min/max/now/text). While indeterminate no width is applied — the appearance is yours (usually an animation).
+
+## API
+
+`Progress` — root props below. Every part also accepts the [common props](/docs/common-props).
+
+<AutoType path="../../packages/zest-ui/src/progress/root/ProgressRoot.tsx" name="ProgressRootProps" />

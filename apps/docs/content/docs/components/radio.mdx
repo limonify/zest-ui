@@ -82,12 +82,6 @@ import { RadioGroup, Radio } from '@limonify/zest-ui';
 <Anatomy code={`Radio.Root
   Radio.Indicator`} />
 
-## API
-
-`Radio` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
-
-<AutoType path="../../packages/zest-ui/src/radio/root/RadioRoot.tsx" name="RadioRootProps" />
-
 ## State
 
 These fields reach your `style` and `render` functions on **Radio.Root** (`style={(state) => ...}`).
@@ -133,3 +127,9 @@ The hook throws if used outside `<Radio.Root>`.
 ## Accessibility
 
 `Radio.Root` is `accessibilityRole="radio"` with `accessibilityState.checked`. `Radio.Indicator` supports `keepMounted` + `transitionStatus` for exit animations.
+
+## API
+
+`Radio` — the props below sit on the root. Every part also accepts the [common props](/docs/common-props) (`style`/`className` as a value or function of state, `render`, `ref`).
+
+<AutoType path="../../packages/zest-ui/src/radio/root/RadioRoot.tsx" name="RadioRootProps" />

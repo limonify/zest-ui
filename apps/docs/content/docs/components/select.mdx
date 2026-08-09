@@ -123,46 +123,6 @@ import { Select } from '@limonify/zest-ui';
 `Select.Arrow` points the popup at its trigger and is positioned for you; `Select.Separator` is the
 standalone `Separator`, re-exported so a divider between groups reads in the same vocabulary.
 
-## API
-
-`Select` — root props below. Every part also accepts the [common props](/docs/common-props).
-
-<AutoType path="../../packages/zest-ui/src/select/root/SelectRoot.tsx" name="SelectRootProps" />
-
-### Before anything is selected
-
-`Select.Value` takes a `placeholder`, shown while no label is known — which is not only "nothing is
-selected": without `items`, the selected label is unknown until the popup has been opened once.
-`state.placeholder` says which of the two is on screen, so it can be styled differently.
-
-```tsx
-<Select.Value
-  placeholder="Pick a fruit"
-  style={(state) => [styles.value, state.placeholder && styles.muted]}
-/>
-```
-
-### Object values
-
-Values are compared with `Object.is`, so an object value only ever matches itself. If `items` is
-rebuilt on every render — a plain inline array is — the selection is dropped the moment the
-identity changes. `isItemEqualToValue` is how you match by content instead:
-
-```tsx
-<Select.Root
-  value={selected}
-  onValueChange={setSelected}
-  isItemEqualToValue={(item, value) => item.id === value.id}
-/>
-```
-
-It applies everywhere the selection is compared: which item is marked selected, which label
-`Select.Value` resolves, and what a `multiple` press toggles. `null` and `undefined` never reach
-your comparer, so it does not have to guard against an empty selection.
-
-Writing it inline costs nothing: items subscribe to whether *they* are selected, not to the
-comparer, so one whose identity changed but whose answer did not re-renders nothing.
-
 ## State
 
 These fields reach your `style` and `render` functions on **Select.Trigger** (`style={(state) => ...}`).
@@ -226,3 +186,43 @@ See the [Reanimated guide](/docs/guides/animation-reanimated) for the full contr
 ## Accessibility
 
 The trigger is `accessibilityRole="combobox"` with `aria-haspopup="listbox"`; items are `role="option"`. In `multiple` mode the popup stays open and `Select.Value` exposes `labels`.
+
+## API
+
+`Select` — root props below. Every part also accepts the [common props](/docs/common-props).
+
+<AutoType path="../../packages/zest-ui/src/select/root/SelectRoot.tsx" name="SelectRootProps" />
+
+### Before anything is selected
+
+`Select.Value` takes a `placeholder`, shown while no label is known — which is not only "nothing is
+selected": without `items`, the selected label is unknown until the popup has been opened once.
+`state.placeholder` says which of the two is on screen, so it can be styled differently.
+
+```tsx
+<Select.Value
+  placeholder="Pick a fruit"
+  style={(state) => [styles.value, state.placeholder && styles.muted]}
+/>
+```
+
+### Object values
+
+Values are compared with `Object.is`, so an object value only ever matches itself. If `items` is
+rebuilt on every render — a plain inline array is — the selection is dropped the moment the
+identity changes. `isItemEqualToValue` is how you match by content instead:
+
+```tsx
+<Select.Root
+  value={selected}
+  onValueChange={setSelected}
+  isItemEqualToValue={(item, value) => item.id === value.id}
+/>
+```
+
+It applies everywhere the selection is compared: which item is marked selected, which label
+`Select.Value` resolves, and what a `multiple` press toggles. `null` and `undefined` never reach
+your comparer, so it does not have to guard against an empty selection.
+
+Writing it inline costs nothing: items subscribe to whether *they* are selected, not to the
+comparer, so one whose identity changed but whose answer did not re-renders nothing.
