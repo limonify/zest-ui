@@ -25,21 +25,24 @@ function VirtualizedCombobox(props: { onValueChange?: (value: unknown) => void }
           <Combobox.Popup>
             <Combobox.List
               testID="list"
-              render={(elementProps, state) => (
-                <FlatList
-                  {...elementProps}
-                  // The rows come from `data`, not from children.
-                  children={undefined}
-                  data={state.items as ComboboxItem[]}
-                  keyExtractor={(item) => String(item.value)}
-                  initialNumToRender={10}
-                  renderItem={({ item }) => (
-                    <Combobox.Item testID={`item-${item.value}`} item={item}>
-                      <Text>{item.label}</Text>
-                    </Combobox.Item>
-                  )}
-                />
-              )}
+              render={(elementProps, state) => {
+                // The rows come from `data`, not from children, so drop whatever
+                // the List forwarded before handing the props to FlatList.
+                const { children: _children, ...listProps } = elementProps;
+                return (
+                  <FlatList
+                    {...listProps}
+                    data={state.items as ComboboxItem[]}
+                    keyExtractor={(item) => String(item.value)}
+                    initialNumToRender={10}
+                    renderItem={({ item }) => (
+                      <Combobox.Item testID={`item-${item.value}`} item={item}>
+                        <Text>{item.label}</Text>
+                      </Combobox.Item>
+                    )}
+                  />
+                );
+              }}
             />
           </Combobox.Popup>
         </Combobox.Positioner>
