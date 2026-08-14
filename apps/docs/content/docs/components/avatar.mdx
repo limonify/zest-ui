@@ -88,6 +88,22 @@ showing announces as one thing rather than as an unlabelled view. Name the perso
 `accessibilityLabel` on the image; leave it off and the avatar reads as decorative, which is the
 right default when a nearby name already says who it is.
 
+## Image caching
+
+`Avatar.Image` renders React Native's `Image`, which has no cache of its own — a URL re-fetches
+whenever the avatar remounts. That is the right default for a headless library (no forced
+dependencies), but if reloads matter, swap in `expo-image` through the `render` prop — same props,
+plus caching, placeholders and crossfades:
+
+```tsx
+import { Image } from 'expo-image';
+
+<Avatar.Image
+  source={{ uri: user.avatar }}
+  render={(props) => <Image {...props} transition={150} />}
+/>
+```
+
 ## API
 
 `Avatar` — root props below. Every part also accepts the [common props](/docs/common-props).

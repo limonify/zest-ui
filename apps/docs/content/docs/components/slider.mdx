@@ -112,6 +112,56 @@ function Thumb({ props, state }) {
 
 To make the thumb *follow* the finger with spring physics instead, feed `state.values` into a shared value — see **Gesture-following values** in the [Reanimated guide](/docs/guides/animation-reanimated).
 
+### Smooth drags without Reanimated
+
+The built-in drag already moves the thumb (zest positions it with a percentage, updated from the
+committed value each frame), so most sliders never animate their thumb's position at all. If you
+want a native-driver follow instead — RN's `Animated` with `useNativeDriver: true` runs the
+transform on the UI thread, no Reanimated — place the thumb yourself and let the driver move it:
+
+```tsx
+import * as React from 'react';
+import { Animated, StyleSheet } from 'react-native';
+import { Slider } from '@limonify/zest-ui';
+
+const THUMB_WIDTH = 24;
+
+function Thumb({ props, state, trackWidth }) {
+  const translateX = React.useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    // `duration: 0` — the commit already happens each frame; the driver just
+    // applies it on the UI thread instead of going through JS layout.
+    Animated.timing(translateX, {
+      toValue: ((trackWidth - THUMB_WIDTH) * (state.value - state.min)) / (state.max - state.min),
+      duration: 0,
+      useNativeDriver: true,
+    }).start();
+  }, [state.value, state.min, state.max, trackWidth, translateX]);
+
+  return (
+    // `left: 0` overrides zest's own percentage positioning (your style wins),
+    // so the thumb starts at the track's start and the transform does the rest.
+    <Animated.View {...props} style={[styles.thumb, { transform: [{ translateX }] }]} />
+  );
+}
+
+// `trackWidth` comes from your own `onLayout` on `Slider.Control`; the styles.thumb
+// must carry `position: 'absolute', left: 0` to take over from zest's placement.
+```
+
+Two caveats: `useNativeDriver` only animates `transform`/`opacity` (never `left`), and the drag's
+value still commits on the JS thread — the native driver smooths the *visual*, it does not move the
+value off the thread.
+
+Reanimated drops right in for the same job — `useAnimatedStyle` reads the same `state.value` on the
+UI thread and needs no `trackWidth` bookkeeping. The two are interchangeable because zest only
+publishes state; it never dictates which animation library you bring.
+
+A drag also re-renders only the parts whose values changed: each thumb subscribes to its own value,
+so in a range slider a drag re-renders the thumb being moved, the indicator and the value text —
+not every thumb on the track.
+
 
 ## Inside a Field
 
