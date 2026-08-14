@@ -242,4 +242,91 @@ export class SliderStore extends ReactStore<Readonly<State>, Context, typeof sel
     );
     this.liveValues = this.select('values');
   }
+
+  // The pre-store `SliderRootContext` surface, preserved for custom controls
+  // built against `useSliderRootContext`. The reactive fields are snapshots read
+  // at access time; subscribe with `useStoreState` when you need to re-render.
+  get values() {
+    return this.select('values');
+  }
+
+  get min() {
+    return this.context.min;
+  }
+
+  get max() {
+    return this.context.max;
+  }
+
+  get step() {
+    return this.context.step;
+  }
+
+  get disabled() {
+    return this.context.disabled;
+  }
+
+  get orientation() {
+    return this.context.orientation;
+  }
+
+  get dragging() {
+    return this.state.dragging;
+  }
+
+  get format() {
+    return this.context.format;
+  }
+
+  get locale() {
+    return this.context.locale;
+  }
+
+  get controlSize() {
+    return this.state.controlSize;
+  }
+
+  get direction() {
+    return this.context.direction;
+  }
+
+  get getAccessibilityValueText() {
+    return this.context.getAccessibilityValueText;
+  }
+
+  get labelId() {
+    return this.state.labelId;
+  }
+
+  get setControlSize() {
+    return this.context.setControlSize;
+  }
+
+  get setDragging() {
+    return this.context.setDragging;
+  }
+
+  get setLabelId() {
+    return this.context.setLabelId;
+  }
+
+  get setThumbValue() {
+    return this.context.setThumbValue;
+  }
+
+  get getValueFromPosition() {
+    return this.context.getValueFromPosition;
+  }
+
+  get getClosestThumbIndex() {
+    return this.context.getClosestThumbIndex;
+  }
+
+  get commitValue() {
+    return this.context.commitValue;
+  }
+
+  get flushValues() {
+    return this.context.flushValues;
+  }
 }
