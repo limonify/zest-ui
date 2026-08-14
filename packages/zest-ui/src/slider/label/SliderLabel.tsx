@@ -4,6 +4,7 @@ import { useSliderRootContext } from '../root/SliderRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
+import { getSliderRootState } from '../store/SliderStore';
 import type { SliderRootState } from '../root/SliderRoot';
 import type { ZestUIComponentProps } from '../../types';
 
@@ -18,17 +19,17 @@ import type { ZestUIComponentProps } from '../../types';
 export function SliderLabel(componentProps: SliderLabel.Props) {
   const { render, className, style, nativeID: idProp, ref, ...elementProps } = componentProps;
 
-  const { setLabelId, state } = useSliderRootContext();
+  const store = useSliderRootContext();
 
   const id = useId(idProp ?? undefined);
 
   useIsoLayoutEffect(() => {
-    setLabelId(id);
-    return () => setLabelId(undefined);
-  }, [id, setLabelId]);
+    store.context.setLabelId(id);
+    return () => store.context.setLabelId(undefined);
+  }, [id, store]);
 
   return useRenderElement(Text, componentProps, {
-    state,
+    state: getSliderRootState(store),
     ref,
     props: [{ nativeID: id }, elementProps],
   });

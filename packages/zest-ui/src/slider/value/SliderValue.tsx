@@ -1,8 +1,10 @@
 'use client';
 import { Text } from 'react-native';
 import { useSliderRootContext } from '../root/SliderRootContext';
+import { useStoreState } from '../../store/ReactStore';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { formatNumber } from '../../utils/formatNumber';
+import { getSliderRootState } from '../store/SliderStore';
 import type { SliderRootState } from '../root/SliderRoot';
 import type { ZestUIComponentProps } from '../../types';
 
@@ -13,7 +15,11 @@ import type { ZestUIComponentProps } from '../../types';
 export function SliderValue(componentProps: SliderValue.Props) {
   const { render, className, style, children, ref, ...elementProps } = componentProps;
 
-  const { format, locale, state, values } = useSliderRootContext();
+  const store = useSliderRootContext();
+
+  const values = useStoreState(store, 'values');
+
+  const { format, locale } = store.context;
 
   const formatted = values.map((value) => formatValue(value, format, locale));
 
@@ -21,7 +27,7 @@ export function SliderValue(componentProps: SliderValue.Props) {
     typeof children === 'function' ? children(formatted, values) : (children ?? formatted.join(' – '));
 
   return useRenderElement(Text, componentProps, {
-    state,
+    state: getSliderRootState(store),
     ref,
     props: [elementProps, { children: resolvedChildren }],
   });

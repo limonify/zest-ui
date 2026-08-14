@@ -3,7 +3,9 @@ import * as React from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSliderRootContext } from '../root/SliderRootContext';
+import { useStoreState } from '../../store/ReactStore';
 import { useRenderElement } from '../../use-render/useRenderElement';
+import { getSliderRootState } from '../store/SliderStore';
 import type { SliderRootState } from '../root/SliderRoot';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
@@ -22,17 +24,14 @@ export function SliderControl(componentProps: SliderControl.Props) {
 
   const { testID } = elementProps;
 
-  const {
-    commitValue,
-    disabled,
-    getClosestThumbIndex,
-    getValueFromPosition,
-    orientation,
-    setControlSize,
-    setDragging,
-    setThumbValue,
-    state,
-  } = useSliderRootContext();
+  const store = useSliderRootContext();
+
+  // The control publishes `state.dragging`, so it subscribes to it — and nothing
+  // else. Its own visuals do not depend on the values, and a drag therefore does
+  // not re-render the control once per frame.
+  const dragging = useStoreState(store, 'dragging');
+
+  const { disabled, orientation } = store.context;
 
   // The gesture runs outside React's render, so the thumb being dragged is kept
   // in a ref rather than state.
@@ -41,14 +40,14 @@ export function SliderControl(componentProps: SliderControl.Props) {
   const handleLayout = React.useCallback(
     (event: LayoutChangeEvent) => {
       const { width, height } = event.nativeEvent.layout;
-      setControlSize(orientation === 'vertical' ? height : width);
+      store.context.setControlSize(orientation === 'vertical' ? height : width);
     },
-    [setControlSize, orientation],
+    [orientation, store],
   );
 
   const moveTo = React.useCallback(
     (position: number, index: number) => {
-      const value = getValueFromPosition(position);
+      const value = store.context.getValueFromPosition(position);
       if (value === undefined) {
         return;
       }
@@ -56,9 +55,13 @@ export function SliderControl(componentProps: SliderControl.Props) {
       // With `thumbCollisionBehavior="swap"` the dragged thumb changes index the
       // moment it passes another, so the drag follows it there — otherwise the
       // finger would silently pick up the thumb it just went past.
-      activeThumbRef.current = setThumbValue(index, value, createChangeEventDetails(REASONS.drag));
+      activeThumbRef.current = store.context.setThumbValue(
+        index,
+        value,
+        createChangeEventDetails(REASONS.drag),
+      );
     },
-    [setThumbValue, getValueFromPosition],
+    [store],
   );
 
   const follow = React.useCallback(
@@ -82,13 +85,13 @@ export function SliderControl(componentProps: SliderControl.Props) {
         // that same thumb follows the finger.
         .onBegin((event) => {
           const position = orientation === 'vertical' ? event.y : event.x;
-          const value = getValueFromPosition(position);
+          const value = store.context.getValueFromPosition(position);
           if (value === undefined) {
             return;
           }
 
-          activeThumbRef.current = getClosestThumbIndex(value);
-          setDragging(true);
+          activeThumbRef.current = store.context.getClosestThumbIndex(value);
+          store.context.setDragging(true);
           moveTo(position, activeThumbRef.current);
         })
         // The move that activates the pan arrives as `onStart`, and every move
@@ -96,8 +99,11 @@ export function SliderControl(componentProps: SliderControl.Props) {
         .onStart(follow)
         .onUpdate(follow)
         .onFinalize(() => {
-          setDragging(false);
-          commitValue(createChangeEventDetails(REASONS.drag));
+          // The drag is over: drop any frame-coalesced commit and apply the
+          // latest value right away, then let the value settle.
+          store.context.flushValues();
+          store.context.setDragging(false);
+          store.context.commitValue(createChangeEventDetails(REASONS.drag));
         })
         // The handlers touch React state, so they must not run on the UI thread.
         .runOnJS(true),
@@ -106,13 +112,12 @@ export function SliderControl(componentProps: SliderControl.Props) {
       testID,
       orientation,
       follow,
-      getClosestThumbIndex,
-      getValueFromPosition,
       moveTo,
-      setDragging,
-      commitValue,
+      store,
     ],
   );
+
+  const state: SliderControlState = { ...getSliderRootState(store), dragging };
 
   const element = useRenderElement(View, componentProps, {
     state,
