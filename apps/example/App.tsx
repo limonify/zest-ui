@@ -27,6 +27,7 @@ import {
   MultiSelectSection,
   NumberFieldSection,
   OTPFieldSection,
+  PerfSection,
   PopoverSection,
   ProgressSection,
   RadioSection,
@@ -72,6 +73,8 @@ export default function App() {
           </Text>
 
           <VerifySection />
+          <Separator style={styles.separator} />
+          <PerfSection />
           <Separator style={styles.separator} />
           <ButtonSection />
           <Separator style={styles.separator} />
