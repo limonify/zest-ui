@@ -1811,6 +1811,35 @@ export function PerfSection() {
           </Slider.Track>
         </Slider.Control>
       </Slider.Root>
+
+      <Text style={styles.label}>
+        The same meter measures a Drawer swipe: open the sheet and drag it — the app behind must not
+        re-render once per frame.
+      </Text>
+      <Drawer.Root>
+        <Drawer.Trigger style={(state) => [styles.button, state.pressed && styles.buttonPressed]}>
+          <Text style={styles.buttonText}>Open drawer</Text>
+        </Drawer.Trigger>
+        <Drawer.Portal>
+          <Drawer.Backdrop style={styles.backdrop} />
+          <Drawer.Viewport style={styles.drawerViewport}>
+            <Drawer.Popup
+              style={(state) => [
+                styles.drawerPopup,
+                { transform: [{ translateY: state.swipeMovement }] },
+              ]}
+            >
+              <View style={styles.drawerHandle} />
+              <Drawer.Description style={styles.dialogDescription}>
+                Drag this sheet while watching the meter above.
+              </Drawer.Description>
+              <Drawer.Close style={(state) => [styles.button, state.pressed && styles.buttonPressed]}>
+                <Text style={styles.buttonText}>Close</Text>
+              </Drawer.Close>
+            </Drawer.Popup>
+          </Drawer.Viewport>
+        </Drawer.Portal>
+      </Drawer.Root>
     </View>
   );
 }

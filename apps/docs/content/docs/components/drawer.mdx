@@ -140,6 +140,32 @@ contract](/docs/guides/animation-reanimated), zest publishes the numbers and you
 rather than snapping when it finally closes. `frontmostHeight` is the popup's measured height, for
 an indent that scales in proportion to how tall the sheet is.
 
+The indent re-renders its children only for the discrete `active`/`frontmostHeight` changes — never
+once per swipe frame. `swipeProgress` is a snapshot at the indent's last render, so styling the
+scale from it would not move with the finger. To follow the swipe on the UI thread, subscribe to the
+provider store directly and mirror it into your own shared value:
+
+```tsx
+import { useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
+import { useDrawerProviderContext } from '@limonify/zest-ui';
+
+function AppShell({ children }) {
+  const store = useDrawerProviderContext();
+  const progress = useSharedValue(0);
+  const scale = useAnimatedStyle(() => ({ transform: [{ scale: 1 - 0.06 * progress.value }] }));
+
+  React.useEffect(
+    () => store.subscribe(() => (progress.value = store.state.swipeProgress)),
+    [store, progress],
+  );
+
+  return <Animated.View style={scale}>{children}</Animated.View>;
+}
+```
+
+This is what keeps the whole app off the JS render path during a swipe: the store notifies your
+subscriber on the value's own clock, and the scale runs on the UI thread.
+
 Two drawers open at once both count: `active` stays `true` until the last one closes. Without a
 `Drawer.Provider` the parts still render, inertly — `active` is always `false`.
 
