@@ -32,8 +32,24 @@ import type { ZestUIComponentProps } from '../../types';
  * </Drawer.Provider>
  * ```
  *
- * `swipeProgress` is what lets the app scale *back* as the sheet is swiped away,
- * rather than snapping at the end.
+ * The indent wraps the whole app, so it re-renders its children only when
+ * `active` or `frontmostHeight` changes — discrete, once per open or close,
+ * never once per swipe frame. The one per-frame field, `swipeProgress`, is a
+ * snapshot read at the indent's last render.
+ *
+ * For a scale that follows the finger *while* the sheet is swiped away, do not
+ * style it from `state.swipeProgress` (that would re-render the app every frame).
+ * Subscribe to the provider store directly and mirror it into your animation
+ * library's shared value instead:
+ *
+ * ```tsx
+ * const store = useDrawerProviderContext();
+ * const progress = useSharedValue(0);
+ * useEffect(
+ *   () => store.subscribe(() => (progress.value = store.state.swipeProgress)),
+ *   [store, progress],
+ * );
+ * ```
  *
  * Requires a `Drawer.Provider` above it; without one `active` is always `false`.
  */
@@ -46,9 +62,13 @@ export function DrawerIndent(componentProps: DrawerIndent.Props) {
   const fallbackStore = useRefWithInit(() => new DrawerProviderStore()).current;
   const store = providerStore ?? fallbackStore;
 
+  // `active` and `frontmostHeight` flip once per open/close, so the indent
+  // subscribes to them and re-renders its children for those. `swipeProgress`
+  // changes every swipe frame; it is read as a snapshot so a swipe never
+  // re-renders the whole app through this part.
   const active = useStoreState(store, 'active');
-  const swipeProgress = useStoreState(store, 'swipeProgress');
   const frontmostHeight = useStoreState(store, 'frontmostHeight');
+  const swipeProgress = store.select('swipeProgress');
 
   const state: DrawerIndentState = React.useMemo(
     () => ({ active, swipeProgress, frontmostHeight }),
