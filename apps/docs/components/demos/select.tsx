@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Select } from '@limonify/zest-ui';
+import { FollowScroll } from './follow-scroll';
 import { s } from './styles';
 
 const FRUITS = [
@@ -29,30 +30,32 @@ export function SelectDemo() {
 
         <Select.Portal>
           <Select.Backdrop style={StyleSheet.absoluteFill} />
-          <Select.Positioner side="bottom" align="start" sideOffset={6}>
-            {/* `triggerWidth` is the trigger's measured width, so the list lines
-                up with the control that opened it. */}
-            <Select.Popup
-              style={(state) =>
-                [s.popup, state.triggerWidth ? { minWidth: state.triggerWidth } : undefined]
-              }
-            >
-              <Select.List>
-                {FRUITS.map((fruit) => (
-                  <Select.Item
-                    key={fruit.value}
-                    value={fruit.value}
-                    style={(state) => [s.item, state.pressed && s.itemPressed]}
-                  >
-                    <Select.ItemText style={s.label}>{fruit.label}</Select.ItemText>
-                    <Select.ItemIndicator>
-                      <Text style={s.label}>✓</Text>
-                    </Select.ItemIndicator>
-                  </Select.Item>
-                ))}
-              </Select.List>
-            </Select.Popup>
-          </Select.Positioner>
+          <FollowScroll>
+            <Select.Positioner side="bottom" align="start" sideOffset={6}>
+              {/* `triggerWidth` is the trigger's measured width, so the list lines
+                  up with the control that opened it. */}
+              <Select.Popup
+                style={(state) =>
+                  [s.popup, state.triggerWidth ? { minWidth: state.triggerWidth } : undefined]
+                }
+              >
+                <Select.List>
+                  {FRUITS.map((fruit) => (
+                    <Select.Item
+                      key={fruit.value}
+                      value={fruit.value}
+                      style={(state) => [s.item, state.pressed && s.itemPressed]}
+                    >
+                      <Select.ItemText style={s.label}>{fruit.label}</Select.ItemText>
+                      <Select.ItemIndicator>
+                        <Text style={s.label}>✓</Text>
+                      </Select.ItemIndicator>
+                    </Select.Item>
+                  ))}
+                </Select.List>
+              </Select.Popup>
+            </Select.Positioner>
+          </FollowScroll>
         </Select.Portal>
       </Select.Root>
     </View>

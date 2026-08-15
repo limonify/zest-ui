@@ -2,6 +2,7 @@
 
 import { Text, View } from 'react-native';
 import { Tooltip } from '@limonify/zest-ui';
+import { FollowScroll } from './follow-scroll';
 import { c, s } from './styles';
 
 export function TooltipDemo() {
@@ -13,20 +14,22 @@ export function TooltipDemo() {
         </Tooltip.Trigger>
 
         <Tooltip.Portal>
-          <Tooltip.Positioner side="top" sideOffset={8}>
-            {/* A tooltip inverts the theme: the foreground colour becomes the
-                surface and the surface becomes the text. */}
-            <Tooltip.Popup
-              style={{
-                backgroundColor: c.fg,
-                borderRadius: 8,
-                paddingHorizontal: 10,
-                paddingVertical: 6,
-              }}
-            >
-              <Text style={{ color: c.card, fontSize: 13 }}>Opened by press, not hover</Text>
-            </Tooltip.Popup>
-          </Tooltip.Positioner>
+          <FollowScroll>
+            <Tooltip.Positioner side="top" sideOffset={8}>
+              {/* A tooltip inverts the theme: the foreground colour becomes the
+                  surface and the surface becomes the text. */}
+              <Tooltip.Popup
+                style={{
+                  backgroundColor: c.fg,
+                  borderRadius: 8,
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                }}
+              >
+                <Text style={{ color: c.card, fontSize: 13 }}>Opened by press, not hover</Text>
+              </Tooltip.Popup>
+            </Tooltip.Positioner>
+          </FollowScroll>
         </Tooltip.Portal>
       </Tooltip.Root>
       <Text style={s.muted}>

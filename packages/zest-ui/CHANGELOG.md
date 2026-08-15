@@ -6,6 +6,27 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the package is
 pre-1.0, breaking changes are released as a **minor** bump.
 
+## [0.8.1] - 2026-08-15
+
+A one-line follow-up to 0.8.0, plus a docs-only fix for the live demos. No new dependencies, no
+breaking changes.
+
+### Fixed
+
+- **`Toast.Root`'s gesture memo now lists the stable callbacks it closes over.** The gesture
+  reads `publishMovement` and `resetMovement`, and they are in the dependency array — a no-op for
+  behaviour, since both are `useStableCallback`, but it is what the rules-of-hooks linter asks
+  for, and it keeps the memo honest.
+
+### Internal
+
+- **Anchored popups in the docs site no longer drift from their trigger on scroll.** Web demos
+  run through `react-native-web`, where a popup sits in a `position: fixed` Modal that the page
+  can scroll underneath — something a native `Modal` cannot do. The demos now wrap their
+  Positioner in a docs-only `FollowScroll` helper that re-measures the trigger on every scroll
+  frame; the library is untouched, and native consumers never need it (see the helper's doc
+  comment). Covers Popover, Tooltip, Menu, Select, Combobox and Autocomplete.
+
 ## [0.8.0] - 2026-08-14
 
 A 0.7.1 follow-up, still entirely inside the JS runtime: the Drawer/Toast swipe path stops
