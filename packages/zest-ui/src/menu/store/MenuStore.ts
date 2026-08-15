@@ -43,6 +43,14 @@ export type State = {
 type Context = {
   onOpenChange: ((open: boolean, eventDetails: MenuRoot.ChangeEventDetails) => void) | undefined;
   /**
+   * Called once an enter or exit animation has settled, reported by the consumer
+   * through `settled(open)`. zest does not animate anything, so it cannot know
+   * when an animation ends — the consumer drives it and owns the signal.
+   */
+  onOpenChangeComplete:
+    | ((open: boolean, eventDetails: MenuRoot.ChangeEventDetails) => void)
+    | undefined;
+  /**
    * Every trigger bound to this popup, by id. A handle resolves `open(id)`
    * through this, which is what lets a trigger rendered outside the root open it.
    */
@@ -78,7 +86,7 @@ export class MenuStore extends ReactStore<Readonly<State>, Context, typeof selec
         triggerIdProp: undefined,
         ...initialState,
       },
-      { onOpenChange: undefined, triggerNodes: new PopupTriggerMap() },
+      { onOpenChange: undefined, onOpenChangeComplete: undefined, triggerNodes: new PopupTriggerMap() },
       selectors,
     );
   }
@@ -100,6 +108,39 @@ export class MenuStore extends ReactStore<Readonly<State>, Context, typeof selec
       return;
     }
 
+    // Remember the reason so a later `settled(open)` can hand it to
+    // `onOpenChangeComplete`.
+    this.lastChangeEventDetails = eventDetails;
+
     this.set('open', nextOpen);
   };
+
+  /**
+   * Reports that the enter or exit animation for `open` has settled. zest never
+   * animates, so only the consumer knows when their animation finished; calling
+   * this fires `onOpenChangeComplete` with the reason of the last committed
+   * change. Fire-once per settle: a repeated call with the same value is ignored.
+   */
+  public settled = (open: boolean) => {
+    if (this.lastSettledOpen === open) {
+      return;
+    }
+
+    this.lastSettledOpen = open;
+    // A settle is only meaningful after a committed open/close, which is what
+    // records the details; without one there is nothing to complete.
+    if (this.lastChangeEventDetails) {
+      this.context.onOpenChangeComplete?.(open, this.lastChangeEventDetails);
+    }
+  };
+
+  /**
+   * The event details of the last committed open/close, for `onOpenChangeComplete`.
+   */
+  private lastChangeEventDetails: MenuRoot.ChangeEventDetails | undefined;
+
+  /**
+   * The last value `settled` fired for, so the same settle is not reported twice.
+   */
+  private lastSettledOpen: boolean | undefined;
 }

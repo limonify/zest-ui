@@ -51,6 +51,14 @@ type Context<Reason extends string> = {
     | ((open: boolean, eventDetails: ZestChangeEventDetails<Reason>) => void)
     | undefined;
   /**
+   * Called once an enter or exit animation has settled, reported by the consumer
+   * through `settled(open)`. zest does not animate anything, so it cannot know
+   * when an animation ends — the consumer drives it and owns the signal.
+   */
+  onOpenChangeComplete:
+    | ((open: boolean, eventDetails: ZestChangeEventDetails<Reason>) => void)
+    | undefined;
+  /**
    * Every trigger bound to this dialog, by id. A handle resolves `open(id)`
    * through this, which is what lets a trigger rendered outside the root open it.
    */
@@ -101,7 +109,7 @@ export class DialogStore<Reason extends string = DialogRootChangeEventReason> ex
         nestedOpenCount: 0,
         ...initialState,
       },
-      { onOpenChange: undefined, triggerNodes: new PopupTriggerMap() },
+      { onOpenChange: undefined, onOpenChangeComplete: undefined, triggerNodes: new PopupTriggerMap() },
       selectors,
     );
   }
@@ -117,8 +125,41 @@ export class DialogStore<Reason extends string = DialogRootChangeEventReason> ex
       return;
     }
 
+    // Remember the reason so a later `settled(open)` can hand it to
+    // `onOpenChangeComplete`.
+    this.lastChangeEventDetails = eventDetails;
+
     this.set('open', nextOpen);
   };
+
+  /**
+   * Reports that the enter or exit animation for `open` has settled. zest never
+   * animates, so only the consumer knows when their animation finished; calling
+   * this fires `onOpenChangeComplete` with the reason of the last committed
+   * change. Fire-once per settle: a repeated call with the same value is ignored.
+   */
+  public settled = (open: boolean) => {
+    if (this.lastSettledOpen === open) {
+      return;
+    }
+
+    this.lastSettledOpen = open;
+    // A settle is only meaningful after a committed open/close, which is what
+    // records the details; without one there is nothing to complete.
+    if (this.lastChangeEventDetails) {
+      this.context.onOpenChangeComplete?.(open, this.lastChangeEventDetails);
+    }
+  };
+
+  /**
+   * The event details of the last committed open/close, for `onOpenChangeComplete`.
+   */
+  private lastChangeEventDetails: ZestChangeEventDetails<Reason> | undefined;
+
+  /**
+   * The last value `settled` fired for, so the same settle is not reported twice.
+   */
+  private lastSettledOpen: boolean | undefined;
 
   /**
    * Records that a dialog nested inside this one opened or closed.

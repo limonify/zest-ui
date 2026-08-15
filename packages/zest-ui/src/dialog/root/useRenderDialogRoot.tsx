@@ -31,6 +31,7 @@ export function useRenderDialogRoot<Payload = unknown>(
     disablePointerDismissal: disablePointerDismissalProp = false,
     handle,
     onOpenChange,
+    onOpenChangeComplete,
     open,
     triggerId,
   } = props;
@@ -58,6 +59,7 @@ export function useRenderDialogRoot<Payload = unknown>(
   useControlledProp(store, 'openProp', open);
   useControlledProp(store, 'triggerIdProp', triggerId);
   useContextCallback(store, 'onOpenChange', onOpenChange);
+  useContextCallback(store, 'onOpenChangeComplete', onOpenChangeComplete);
   useSyncedValues(store, { disablePointerDismissal, role, nested });
 
   usePopupRootHandle({ store, handle, actionsRef });

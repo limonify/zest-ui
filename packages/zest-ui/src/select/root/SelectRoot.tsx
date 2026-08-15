@@ -37,6 +37,7 @@ export function SelectRoot<Value = any, Payload = unknown>(
     items,
     multiple = false,
     onOpenChange,
+    onOpenChangeComplete,
     onValueChange,
     open,
     readOnly = false,
@@ -105,6 +106,7 @@ export function SelectRoot<Value = any, Payload = unknown>(
   useControlledProp(store, 'valueProp', value);
   useControlledProp(store, 'triggerIdProp', triggerId);
   useContextCallback(store, 'onOpenChange', handleOpenChange);
+  useContextCallback(store, 'onOpenChangeComplete', onOpenChangeComplete);
   useContextCallback(store, 'onValueChange', handleValueChange);
   useSyncedValues(store, {
     disabled,
@@ -183,6 +185,17 @@ export interface SelectRootProps<Value = any, Payload = unknown> {
    * Event handler called when the popup is opened or closed.
    */
   onOpenChange?:
+    | ((open: boolean, eventDetails: SelectRoot.ChangeEventDetails) => void)
+    | undefined;
+  /**
+   * Event handler called once an enter or exit animation has settled.
+   *
+   * zest never animates, so it cannot report when an animation finishes — the
+   * consumer drives it and reports the settle through the store:
+   * `useSelectRootContext().settled(open)`. Call it when your enter animation
+   * (or exit, which needs `keepMounted` on the `Portal`) ends.
+   */
+  onOpenChangeComplete?:
     | ((open: boolean, eventDetails: SelectRoot.ChangeEventDetails) => void)
     | undefined;
   /**

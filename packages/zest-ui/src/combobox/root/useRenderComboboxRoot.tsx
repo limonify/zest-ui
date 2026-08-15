@@ -51,6 +51,9 @@ export interface UseRenderComboboxRootProps<Payload = unknown> {
   open?: boolean | undefined;
   defaultOpen?: boolean | undefined;
   onOpenChange?: ((open: boolean, eventDetails: ComboboxRoot.ChangeEventDetails) => void) | undefined;
+  onOpenChangeComplete?:
+    | ((open: boolean, eventDetails: ComboboxRoot.ChangeEventDetails) => void)
+    | undefined;
   openOnFocus?: boolean | undefined;
   filter?: ((item: ComboboxItem, query: string) => boolean) | undefined;
   disabled?: boolean | undefined;
@@ -90,6 +93,7 @@ export function useRenderComboboxRoot<Payload = unknown>(
     multiple = false,
     onInputValueChange,
     onOpenChange,
+    onOpenChangeComplete,
     onValueChange,
     open,
     openOnFocus = true,
@@ -216,6 +220,7 @@ export function useRenderComboboxRoot<Payload = unknown>(
   useControlledProp(store, 'inputValueProp', inputValue);
   useControlledProp(store, 'triggerIdProp', triggerId);
   useContextCallback(store, 'onOpenChange', handleOpenChange);
+  useContextCallback(store, 'onOpenChangeComplete', onOpenChangeComplete);
   useContextCallback(store, 'onValueChange', handleValueChange);
   useContextCallback(store, 'onInputValueChange', handleInputValueChange);
   useSyncedValues(store, {

@@ -116,6 +116,17 @@ export interface ComboboxRootProps<Payload = unknown> {
     | ((open: boolean, eventDetails: ComboboxRoot.ChangeEventDetails) => void)
     | undefined;
   /**
+   * Event handler called once an enter or exit animation has settled.
+   *
+   * zest never animates, so it cannot report when an animation finishes — the
+   * consumer drives it and reports the settle through the store:
+   * `useComboboxRootContext().settled(open)`. Call it when your enter animation
+   * (or exit, which needs `keepMounted` on the `Portal`) ends.
+   */
+  onOpenChangeComplete?:
+    | ((open: boolean, eventDetails: ComboboxRoot.ChangeEventDetails) => void)
+    | undefined;
+  /**
    * Whether focusing the input opens the list.
    * @default true
    */
