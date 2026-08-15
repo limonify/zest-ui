@@ -158,6 +158,46 @@ Reanimated drops right in for the same job — `useAnimatedStyle` reads the same
 UI thread and needs no `trackWidth` bookkeeping. The two are interchangeable because zest only
 publishes state; it never dictates which animation library you bring.
 
+### A Reanimated thumb
+
+The same follow, written with Reanimated instead of RN's `Animated`. `useAnimatedStyle` runs on the
+UI thread, so the transform never waits on a JS render:
+
+```tsx
+import * as React from 'react';
+import { StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { Slider } from '@limonify/zest-ui';
+
+const THUMB_WIDTH = 24;
+
+function Thumb({ props, state, trackWidth }) {
+  const position = useSharedValue(0);
+
+  React.useEffect(() => {
+    // `state.value` commits once per frame; copying it into a shared value is
+    // what lets the style below read it off the JS thread.
+    position.value =
+      ((trackWidth - THUMB_WIDTH) * (state.value - state.min)) / (state.max - state.min);
+  }, [position, state.value, state.min, state.max, trackWidth]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: position.value }],
+  }));
+
+  // `left: 0` overrides zest's percentage placement (your style wins), and the
+  // transform does the rest.
+  return <Animated.View {...props} style={[styles.thumb, animatedStyle]} />;
+}
+
+<Slider.Thumb render={(props, state) => <Thumb props={props} state={state} trackWidth={width} />} />
+```
+
+`trackWidth` is the consumer's own `onLayout` on `Slider.Control`; `styles.thumb` must carry
+`position: 'absolute', left: 0`. The value still commits on the JS thread — for a follow that never
+touches JS during the drag, feed `state.values` into the gesture-following pattern in the
+[Reanimated guide](/docs/guides/animation-reanimated) instead.
+
 A drag also re-renders only the parts whose values changed: each thumb subscribes to its own value,
 so in a range slider a drag re-renders the thumb being moved, the indicator and the value text —
 not every thumb on the track.
