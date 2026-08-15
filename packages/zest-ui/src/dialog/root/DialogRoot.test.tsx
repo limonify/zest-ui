@@ -168,7 +168,10 @@ describe('nested dialogs', () => {
           <Dialog.Backdrop
             testID="outer-backdrop"
             style={(state) => {
-              backdropStates.push({ nested: state.nested, nestedDialogOpen: state.nestedDialogOpen });
+              backdropStates.push({
+                nested: state.nested,
+                nestedDialogOpen: state.nestedDialogOpen,
+              });
               return undefined;
             }}
           />
@@ -179,6 +182,7 @@ describe('nested dialogs', () => {
                 outerStates.push({
                   nested: state.nested,
                   nestedDialogOpen: state.nestedDialogOpen,
+                  nestedDialogCount: state.nestedDialogCount,
                 });
                 return undefined;
               }}
@@ -192,6 +196,7 @@ describe('nested dialogs', () => {
                         innerStates.push({
                           nested: state.nested,
                           nestedDialogOpen: state.nestedDialogOpen,
+                          nestedDialogCount: state.nestedDialogCount,
                         });
                         return undefined;
                       }}
@@ -206,8 +211,8 @@ describe('nested dialogs', () => {
     );
   }
 
-  let outerStates: Array<{ nested: boolean; nestedDialogOpen: boolean }> = [];
-  let innerStates: Array<{ nested: boolean; nestedDialogOpen: boolean }> = [];
+  let outerStates: Array<{ nested: boolean; nestedDialogOpen: boolean; nestedDialogCount: number }> = [];
+  let innerStates: Array<{ nested: boolean; nestedDialogOpen: boolean; nestedDialogCount: number }> = [];
   let backdropStates: Array<{ nested: boolean; nestedDialogOpen: boolean }> = [];
 
   beforeEach(() => {
@@ -235,6 +240,14 @@ describe('nested dialogs', () => {
     expect(backdropStates.at(-1)!.nestedDialogOpen).toBe(true);
     // The inner dialog has nothing nested inside it.
     expect(innerStates.at(-1)!.nestedDialogOpen).toBe(false);
+  });
+
+  it('publishes the depth on nestedDialogCount', async () => {
+    await render(<NestedDialogs childOpen />);
+
+    // One dialog is nested inside the outer one.
+    expect(outerStates.at(-1)!.nestedDialogCount).toBe(1);
+    expect(innerStates.at(-1)!.nestedDialogCount).toBe(0);
   });
 
   it('clears the count again when the nested dialog closes', async () => {

@@ -75,6 +75,7 @@ const selectors = {
   role: createSelector((state: State) => state.role),
   nested: createSelector((state: State) => state.nested),
   nestedDialogOpen: createSelector((state: State) => state.nestedOpenCount > 0),
+  nestedDialogCount: createSelector((state: State) => state.nestedOpenCount),
 };
 
 /**

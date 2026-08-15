@@ -12,9 +12,10 @@ import { useDialogPopupProps } from './useDialogPopupProps';
 export function DialogPopup(componentProps: DialogPopup.Props) {
   const { render, className, style, ref, ...elementProps } = componentProps;
 
-  const { open, transitionStatus, nested, nestedDialogOpen, props } = useDialogPopupProps();
+  const { open, transitionStatus, nested, nestedDialogOpen, nestedDialogCount, props } =
+    useDialogPopupProps();
 
-  const state: DialogPopupState = { open, transitionStatus, nested, nestedDialogOpen };
+  const state: DialogPopupState = { open, transitionStatus, nested, nestedDialogOpen, nestedDialogCount };
 
   return useRenderElement(View, componentProps, {
     state,
@@ -42,6 +43,12 @@ export interface DialogPopupState {
    * this popup, which the web version drives with a CSS variable.
    */
   nestedDialogOpen: boolean;
+  /**
+   * How many dialogs nested inside this one are currently open. A count rather
+   * than the boolean above, for a stack that steps per level (e.g. nested
+   * drawers receding a fixed amount each).
+   */
+  nestedDialogCount: number;
 }
 
 export interface DialogPopupProps extends ZestUIComponentProps<typeof View, DialogPopupState> {}
