@@ -152,7 +152,7 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
         })
         // The handlers touch React state, so they must not run on the UI thread.
         .runOnJS(true),
-    [testID, toast.id, swipeDirection, swipeThreshold, store],
+    [testID, toast.id, swipeDirection, swipeThreshold, store, publishMovement, resetMovement],
   );
 
   const state: ToastRootState = React.useMemo(
