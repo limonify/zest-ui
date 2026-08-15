@@ -1026,6 +1026,9 @@ export function VerifySection() {
       <Combobox.Root items={VERIFY_GROUPS} value={picked} onValueChange={setPicked}>
         <Combobox.Trigger style={(s) => [styles.fieldControl, s.pressed && styles.buttonPressed]}>
           <Combobox.Value placeholder="Pick a city" style={styles.label} />
+          <Combobox.Icon style={styles.label}>
+            <Text style={styles.label}>▾</Text>
+          </Combobox.Icon>
         </Combobox.Trigger>
         <Combobox.Portal>
           <Combobox.Backdrop style={styles.transparentBackdrop} />

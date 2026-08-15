@@ -7,6 +7,7 @@ export type * from './chips/ComboboxChips';
 export type * from './chip/ComboboxChip';
 export type * from './chip-remove/ComboboxChipRemove';
 export type * from './clear/ComboboxClear';
+export type * from './icon/ComboboxIcon';
 export type * from './portal/ComboboxPortal';
 export type * from './backdrop/ComboboxBackdrop';
 export type * from './positioner/ComboboxPositioner';

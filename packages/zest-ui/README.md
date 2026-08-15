@@ -199,7 +199,7 @@ import { Dialog, Switch, Toast } from '@limonify/zest-ui';
 | `Form` | Form |
 | `Fieldset` | Root, Legend |
 | `Select` | Root, Label, Trigger, Value, Icon, Portal, Backdrop, Positioner, Arrow, Popup, List, Group, GroupLabel, Item, ItemText, ItemIndicator, Separator |
-| `Combobox` | Root, Trigger, Input, Chips, Chip, ChipRemove, Clear, Portal, Backdrop, Positioner, Popup, List, Group, GroupLabel, Collection, Item, ItemIndicator, Empty, Status, Value |
+| `Combobox` | Root, Trigger, Input, Chips, Chip, ChipRemove, Clear, Portal, Backdrop, Positioner, Popup, List, Group, GroupLabel, Collection, Item, ItemIndicator, Empty, Status, Value, Icon |
 | `Autocomplete` | Root, Trigger, Input, Clear, Portal, Backdrop, Positioner, Popup, List, Group, GroupLabel, Collection, Item, Empty, Status |
 
 ### Disclosure

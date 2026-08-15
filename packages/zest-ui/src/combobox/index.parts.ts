@@ -6,6 +6,7 @@ export { ComboboxChips as Chips } from './chips/ComboboxChips';
 export { ComboboxChip as Chip } from './chip/ComboboxChip';
 export { ComboboxChipRemove as ChipRemove } from './chip-remove/ComboboxChipRemove';
 export { ComboboxClear as Clear } from './clear/ComboboxClear';
+export { ComboboxIcon as Icon } from './icon/ComboboxIcon';
 export { ComboboxPortal as Portal } from './portal/ComboboxPortal';
 export { ComboboxBackdrop as Backdrop } from './backdrop/ComboboxBackdrop';
 export { ComboboxPositioner as Positioner } from './positioner/ComboboxPositioner';
