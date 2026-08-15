@@ -7,6 +7,7 @@ import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useRefWithInit } from '../../hooks/useRefWithInit';
+import { AnimationFrame } from '../../hooks/useAnimationFrame';
 import { clamp } from '../../utils/clamp';
 import { useDrawerProviderContext } from '../provider/DrawerProviderContext';
 import type { ZestUIComponentProps } from '../../types';
@@ -74,9 +75,20 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
   // not re-rendered yet by the time the release arrives.
   const swipeMovementRef = React.useRef(0);
 
+  // A swipe reports its position on every gesture event, which can land several
+  // times a frame. The ref is the synchronous truth; React state is committed at
+  // most once per frame and flushed synchronously when the gesture ends.
+  const movementFrame = useRefWithInit(AnimationFrame.create).current;
+
   const publishMovement = useStableCallback((movement: number) => {
     swipeMovementRef.current = movement;
-    setSwipeMovement(movement);
+    movementFrame.request(() => setSwipeMovement(swipeMovementRef.current));
+  });
+
+  const resetMovement = useStableCallback(() => {
+    movementFrame.cancel();
+    swipeMovementRef.current = 0;
+    setSwipeMovement(0);
   });
 
   const handleLayout = useStableCallback((event: LayoutChangeEvent) => {
@@ -183,11 +195,11 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
         )
         .onFinalize(() => {
           setSwiping(false);
-          publishMovement(0);
+          resetMovement();
         })
         // The handlers touch React state, so they must not run on the UI thread.
         .runOnJS(true),
-    [testID, move, release, publishMovement],
+    [testID, move, release, publishMovement, resetMovement],
   );
 
   const state: DrawerPopupState = {
