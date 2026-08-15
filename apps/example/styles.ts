@@ -571,4 +571,13 @@ export const styles = StyleSheet.create({
     color: '#555',
     lineHeight: 20,
   },
+  perfStats: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  perfStat: {
+    fontSize: 15,
+    fontWeight: '600',
+    fontVariant: ['tabular-nums'],
+  },
 });

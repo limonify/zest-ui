@@ -1,12 +1,15 @@
 'use client';
 import * as React from 'react';
 import { View } from 'react-native';
-import { useControlled } from '../../hooks/useControlled';
+import { useRefWithInit } from '../../hooks/useRefWithInit';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import { clamp } from '../../utils/clamp';
+import { AnimationFrame } from '../../hooks/useAnimationFrame';
+import { useControlledProp, useContextCallback, useStateSetter } from '../../store/ReactStore';
+import { SliderStore, getSliderRootState, toSliderValueArray } from '../store/SliderStore';
 import type { ZestUIComponentProps, Orientation } from '../../types';
 import type { ZestChangeEventDetails } from '../../utils/createChangeEventDetails';
 import type { REASONS } from '../../utils/reasons';
@@ -60,41 +63,86 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
   const disabled = disabledProp || fieldDisabled;
 
   const direction = useDirection();
-  const rtl = direction === 'rtl';
 
   // A range slider is just a slider whose value is an array; remember which
   // shape the consumer used so callbacks hand back the same one.
   const isRange = Array.isArray(value ?? defaultValue);
 
-  const controlledValues = React.useMemo(
-    () => (value === undefined ? undefined : toArray(value)),
-    [value],
-  );
-  const defaultValues = React.useMemo(
-    () => (value !== undefined ? undefined : toArray(defaultValue ?? (min as Value))),
-    [value, defaultValue, min],
-  );
+  const controlledValues = value === undefined ? undefined : value;
+  const defaultValues =
+    value !== undefined ? undefined : toSliderValueArray(defaultValue ?? (min as Value));
 
-  const [values, setValuesState] = useControlled<readonly number[]>({
-    controlled: controlledValues,
-    default: defaultValues,
-    name: 'Slider',
-    state: 'value',
-  });
+  // The store is created once and kept stable for the life of the root. Parts
+  // subscribe to their own slice of it via `useStoreState`, so a drag re-renders
+  // only the parts whose values actually changed instead of the whole subtree.
+  const store = useRefWithInit(
+    () =>
+      new SliderStore(
+        {
+          values: defaultValues ?? [min as number],
+          valuesProp: controlledValues,
+        },
+        {
+          direction,
+          disabled,
+          format,
+          getAccessibilityValueText,
+          locale,
+          max,
+          min,
+          minStepsBetweenValues,
+          orientation,
+          step,
+          thumbCollisionBehavior,
+          isRange,
+        },
+      ),
+  ).current;
 
-  const [dragging, setDragging] = React.useState(false);
-  const [controlSize, setControlSize] = React.useState<number | undefined>(undefined);
-  const [labelId, setLabelId] = React.useState<string | undefined>(undefined);
+  // Non-reactive props go into the store's context. The store reference never
+  // changes, so parts re-render only when the selector they subscribe to fires;
+  // these fields are read at event time (gesture math) or on a part's own render.
+  store.context.direction = direction;
+  store.context.disabled = disabled;
+  store.context.format = format;
+  store.context.getAccessibilityValueText = getAccessibilityValueText;
+  store.context.locale = locale;
+  store.context.max = max;
+  store.context.min = min;
+  store.context.minStepsBetweenValues = minStepsBetweenValues;
+  store.context.orientation = orientation;
+  store.context.step = step;
+  store.context.thumbCollisionBehavior = thumbCollisionBehavior;
+  store.context.isRange = isRange;
 
   // A drag emits several changes in one synchronous batch — its final move and
-  // its finalize land before React re-renders — so the value logic cannot read
-  // `values` from render or it would work against the previous batch's state.
-  // The effect has no dependency array on purpose: it must also resync when a
-  // controlled consumer ignores a change, which re-renders nothing.
-  const valuesRef = React.useRef(values);
+  // its finalize land before React re-renders — so the value logic reads and
+  // writes `store.liveValues`, never the committed state, which would otherwise
+  // work against the previous batch's values.
+  useControlledProp(store, 'valuesProp', value);
+  useContextCallback(
+    store,
+    'onValueChange',
+    onValueChange as
+      | ((value: number | readonly number[], eventDetails: SliderRoot.ChangeEventDetails) => void)
+      | undefined,
+  );
+  useContextCallback(
+    store,
+    'onValueCommitted',
+    onValueCommitted as
+      | ((value: number | readonly number[], eventDetails: SliderRoot.ChangeEventDetails) => void)
+      | undefined,
+  );
+
+  // When a controlled consumer changes the value, the next drag must start from
+  // where they put it — otherwise `liveValues` would still hold what the last
+  // drag left behind.
   useIsoLayoutEffect(() => {
-    valuesRef.current = values;
-  });
+    if (value !== undefined) {
+      store.liveValues = toSliderValueArray(value);
+    }
+  }, [value, store]);
 
   const roundToStep = useStableCallback((raw: number) => {
     const stepped = Math.round((raw - min) / step) * step + min;
@@ -108,6 +156,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
     // Nothing can be derived from a position until the control has reported its
     // size; callers must bail rather than fall back to a value, or a touch
     // landing before the first layout would snap the slider to `min`.
+    const controlSize = store.state.controlSize;
     if (!controlSize) {
       return undefined;
     }
@@ -118,7 +167,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
     // Native mirrors the layout, but the touch coordinate it reports is still
     // measured from the control's leading edge, so the value has to be flipped
     // here rather than left to the platform.
-    const inverted = orientation === 'vertical' || (orientation === 'horizontal' && rtl);
+    const inverted = orientation === 'vertical' || (orientation === 'horizontal' && direction === 'rtl');
     const percent = inverted ? 1 - ratio : ratio;
 
     return roundToStep(min + percent * (max - min));
@@ -128,7 +177,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
     let closest = 0;
     let smallestDistance = Number.POSITIVE_INFINITY;
 
-    valuesRef.current.forEach((thumbValue, index) => {
+    store.liveValues.forEach((thumbValue, index) => {
       const distance = Math.abs(thumbValue - target);
       if (distance < smallestDistance) {
         smallestDistance = distance;
@@ -139,19 +188,11 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
     return closest;
   });
 
-  const emit = useStableCallback(
-    (nextValues: readonly number[], eventDetails: SliderRoot.ChangeEventDetails) => {
-      onValueChange?.(fromArray(nextValues, isRange) as Value, eventDetails);
-
-      if (eventDetails.isCanceled) {
-        return;
-      }
-
-      valuesRef.current = nextValues;
-      setValuesState(nextValues);
-      markChanged(fromArray(nextValues, isRange));
-    },
-  );
+  // The frame-coalesced commit: `store.liveValues` is the synchronous truth, and
+  // `store.values` (what React sees) is updated at most once per frame. Gesture
+  // events can arrive several to a frame; without this every one would re-render
+  // every subscribed part.
+  const commitFrame = useRefWithInit(AnimationFrame.create).current;
 
   const setThumbValue = useStableCallback(
     (index: number, nextValue: number, eventDetails: SliderRoot.ChangeEventDetails): number => {
@@ -159,7 +200,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
         return index;
       }
 
-      const current = valuesRef.current;
+      const current = store.liveValues;
       const count = current.length;
       // `minStepsBetweenValues` is the gap thumbs must keep from each other.
       const gap = minStepsBetweenValues * step;
@@ -210,68 +251,50 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
         return nextIndex;
       }
 
-      emit(nextValues, eventDetails);
+      // The veto fires synchronously on every event, exactly as before — only
+      // the React-visible commit is deferred to the frame.
+      onValueChange?.(fromArray(nextValues, isRange) as Value, eventDetails);
+
+      if (eventDetails.isCanceled) {
+        return nextIndex;
+      }
+
+      store.liveValues = nextValues;
+      markChanged(fromArray(nextValues, isRange));
+
+      commitFrame.request(() => {
+        store.set('values', store.liveValues);
+      });
 
       return nextIndex;
     },
   );
 
-  const commitValue = useStableCallback((eventDetails: SliderRoot.ChangeEventDetails) => {
-    onValueCommitted?.(fromArray(valuesRef.current, isRange) as Value, eventDetails);
-    // Releasing the thumb is the end of the interaction — a slider's blur.
-    markTouched(fromArray(valuesRef.current, isRange));
+  const flushValues = useStableCallback(() => {
+    commitFrame.cancel();
+    store.set('values', store.liveValues);
   });
 
-  const state: SliderRootState = React.useMemo(
-    () => ({ direction, disabled, dragging, max, min, orientation, values }),
-    [direction, disabled, dragging, max, min, orientation, values],
-  );
+  const commitValue = useStableCallback((eventDetails: SliderRoot.ChangeEventDetails) => {
+    onValueCommitted?.(fromArray(store.liveValues, isRange) as Value, eventDetails);
+    // Releasing the thumb is the end of the interaction — a slider's blur.
+    markTouched(fromArray(store.liveValues, isRange));
+  });
 
-  const contextValue: SliderRootContext = React.useMemo(
-    () => ({
-      commitValue,
-      controlSize,
-      direction,
-      disabled,
-      dragging,
-      format,
-      getAccessibilityValueText,
-      getClosestThumbIndex,
-      getValueFromPosition,
-      labelId,
-      locale,
-      max,
-      min,
-      orientation,
-      setControlSize,
-      setDragging,
-      setLabelId,
-      setThumbValue,
-      state,
-      step,
-      values,
-    }),
-    [
-      commitValue,
-      controlSize,
-      direction,
-      disabled,
-      dragging,
-      format,
-      getAccessibilityValueText,
-      getClosestThumbIndex,
-      getValueFromPosition,
-      labelId,
-      locale,
-      max,
-      min,
-      orientation,
-      setThumbValue,
-      state,
-      step,
-      values,
-    ],
-  );
+  store.context.setControlSize = useStateSetter(store, 'controlSize');
+  store.context.setDragging = useStateSetter(store, 'dragging');
+  store.context.setLabelId = useStateSetter(store, 'labelId');
+  store.context.setThumbValue = setThumbValue;
+  store.context.getValueFromPosition = getValueFromPosition;
+  store.context.getClosestThumbIndex = getClosestThumbIndex;
+  store.context.commitValue = commitValue;
+  store.context.flushValues = flushValues;
+
+  // The root itself publishes a snapshot of the state. It deliberately does NOT
+  // subscribe to the value selectors: the root is the one stable node in the
+  // tree, and re-rendering it would re-render every part beneath it. Parts stay
+  // fresh through their own subscriptions.
+  const state = getSliderRootState(store);
 
   const element = useRenderElement(View, componentProps, {
     state,
@@ -279,11 +302,7 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
     props: [{ 'aria-orientation': orientation }, elementProps],
   });
 
-  return <SliderRootContext.Provider value={contextValue}>{element}</SliderRootContext.Provider>;
-}
-
-function toArray(value: number | readonly number[]): readonly number[] {
-  return Array.isArray(value) ? value : [value as number];
+  return <SliderRootContext.Provider value={store}>{element}</SliderRootContext.Provider>;
 }
 
 function fromArray(values: readonly number[], isRange: boolean): number | readonly number[] {

@@ -1,9 +1,11 @@
 'use client';
 import { View } from 'react-native';
 import { useSliderRootContext } from '../root/SliderRootContext';
+import { useStoreState } from '../../store/ReactStore';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import { formatNumber } from '../../utils/formatNumber';
+import { getSliderRootState } from '../store/SliderStore';
 import type { SliderRootState } from '../root/SliderRoot';
 import type { ZestUIComponentProps } from '../../types';
 
@@ -18,26 +20,30 @@ import type { ZestUIComponentProps } from '../../types';
 export function SliderThumb(componentProps: SliderThumb.Props) {
   const { render, className, style, index = 0, ref, ...elementProps } = componentProps;
 
+  const store = useSliderRootContext();
+
+  // A thumb subscribes to its own value and the drag flag — not to the whole
+  // values array. In a range slider a drag therefore re-renders only the thumb
+  // being moved, instead of every thumb on the track.
+  const value = useStoreState(store, 'valueByIndex', index) ?? store.context.min;
+  const dragging = useStoreState(store, 'dragging');
+  const labelId = useStoreState(store, 'labelId');
+
   const {
     direction,
     disabled,
     format,
     getAccessibilityValueText,
-    labelId,
     locale,
     max,
     min,
     orientation,
-    state,
-    values,
-  } =
-    useSliderRootContext();
+  } = store.context;
 
   // The thumb is what assistive tech announces and adjusts, so a surrounding
   // field's label and messages attach here rather than to the root.
   const { fieldProps } = useFieldControlRegistration();
 
-  const value = values[index] ?? min;
   const percent = max === min ? 0 : ((value - min) / (max - min)) * 100;
 
   // The formatted value is what a screen reader reads out; the consumer can
@@ -59,7 +65,7 @@ export function SliderThumb(componentProps: SliderThumb.Props) {
         ? { position: 'absolute' as const, right: `${percent}%` as const }
         : { position: 'absolute' as const, left: `${percent}%` as const };
 
-  const thumbState: SliderThumbState = { ...state, index, value, percent };
+  const thumbState: SliderThumbState = { ...getSliderRootState(store), index, value, percent, dragging };
 
   return useRenderElement(View, componentProps, {
     state: thumbState,

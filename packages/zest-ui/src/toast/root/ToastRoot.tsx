@@ -6,6 +6,7 @@ import { useToastProviderContext } from '../provider/ToastProviderContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
+import { useRefWithInit } from '../../hooks/useRefWithInit';
 import { AnimationFrame } from '../../hooks/useAnimationFrame';
 import type { ZestUIComponentProps } from '../../types';
 import type { ToastObject } from '../useToastManager';
@@ -58,6 +59,26 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
   const [swiping, setSwiping] = React.useState(false);
   const [swipeMovement, setSwipeMovement] = React.useState(0);
 
+  // The gesture callbacks read the movement they just published, which React has
+  // not re-rendered yet by the time the release arrives.
+  const swipeMovementRef = React.useRef(0);
+
+  // A swipe reports its position on every gesture event, which can land several
+  // times a frame. The ref is the synchronous truth; React state is committed at
+  // most once per frame and flushed synchronously when the gesture ends.
+  const movementFrame = useRefWithInit(AnimationFrame.create).current;
+
+  const publishMovement = useStableCallback((movement: number) => {
+    swipeMovementRef.current = movement;
+    movementFrame.request(() => setSwipeMovement(swipeMovementRef.current));
+  });
+
+  const resetMovement = useStableCallback(() => {
+    movementFrame.cancel();
+    swipeMovementRef.current = 0;
+    setSwipeMovement(0);
+  });
+
   const index = useStoreState(store, 'toastIndex', toast.id);
   const offsetY = useStoreState(store, 'toastOffsetY', toast.id);
   const visibleIndex = useStoreState(store, 'toastVisibleIndex', toast.id);
@@ -109,8 +130,8 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
           store.set('pressed', true);
           store.pauseTimers();
         })
-        .onStart((event) => setSwipeMovement(getDisplacement(swipeDirection, event)))
-        .onUpdate((event) => setSwipeMovement(getDisplacement(swipeDirection, event)))
+        .onStart((event) => publishMovement(getDisplacement(swipeDirection, event)))
+        .onUpdate((event) => publishMovement(getDisplacement(swipeDirection, event)))
         .onEnd((event) => {
           if (getDisplacement(swipeDirection, event) > swipeThreshold) {
             store.closeToast(toast.id);
@@ -118,7 +139,7 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
         })
         .onFinalize(() => {
           setSwiping(false);
-          setSwipeMovement(0);
+          resetMovement();
           store.set('pressed', false);
 
           // `expandedOrInactive`, not `expanded`: letting go while the app is in

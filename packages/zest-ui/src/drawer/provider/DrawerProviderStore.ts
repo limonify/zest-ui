@@ -27,9 +27,11 @@ const selectors = {
  * Tracks whether any drawer under a `Drawer.Provider` is open, and how far the
  * frontmost one has been swiped.
  *
- * This is a store rather than React state on purpose: a swipe reports progress
- * every frame, and only `Drawer.Indent` cares. A store keeps those updates from
- * re-rendering the whole app inside the provider.
+ * A store rather than React state so the per-frame `swipeProgress` never forces
+ * a React render: `Drawer.Indent`/`IndentBackground` read it as a snapshot (they
+ * re-render only for the discrete `active` flip), and a consumer who wants the
+ * scale to follow the finger subscribes non-reactively and mirrors it into their
+ * own animation library's shared value.
  */
 export class DrawerProviderStore extends ReactStore<Readonly<State>, {}, typeof selectors> {
   constructor(initialState?: Partial<State>) {

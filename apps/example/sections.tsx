@@ -1026,6 +1026,9 @@ export function VerifySection() {
       <Combobox.Root items={VERIFY_GROUPS} value={picked} onValueChange={setPicked}>
         <Combobox.Trigger style={(s) => [styles.fieldControl, s.pressed && styles.buttonPressed]}>
           <Combobox.Value placeholder="Pick a city" style={styles.label} />
+          <Combobox.Icon style={styles.label}>
+            <Text style={styles.label}>▾</Text>
+          </Combobox.Icon>
         </Combobox.Trigger>
         <Combobox.Portal>
           <Combobox.Backdrop style={styles.transparentBackdrop} />
@@ -1711,6 +1714,135 @@ export function SeparatorSection() {
 // the `matches` memo recompute every time. Named apart from the `FRUITS` used by
 // the Select sections, which it used to shadow.
 const FILTER_FRUITS = ['Apple', 'Apricot', 'Banana', 'Cherry', 'Crème brûlée', 'Jalapeño Popper'];
+
+interface FrameStats {
+  fps: number;
+  maxFrame: number;
+  jank: number;
+  frames: number;
+}
+
+/**
+ * A requestAnimationFrame-based frame-time meter. It reads the JS thread's own
+ * frame cadence — which is exactly what a gesture pays for — and publishes a
+ * summary every 30 frames (~2×/sec at 60fps), so the meter itself never
+ * distorts what it measures.
+ */
+function useFrameStats(): FrameStats {
+  const [stats, setStats] = React.useState<FrameStats>({
+    fps: 0,
+    maxFrame: 0,
+    jank: 0,
+    frames: 0,
+  });
+
+  React.useEffect(() => {
+    let frameId = 0;
+    let last = 0;
+    let frames = 0;
+    let maxFrame = 0;
+    let jank = 0;
+
+    const tick = (now: number) => {
+      if (last > 0) {
+        const dt = now - last;
+        frames += 1;
+        if (dt > maxFrame) {
+          maxFrame = dt;
+        }
+        if (dt > 16.7) {
+          jank += 1;
+        }
+        if (frames % 30 === 0) {
+          setStats({
+            fps: Math.round(1000 / dt),
+            maxFrame: Math.round(maxFrame),
+            jank,
+            frames,
+          });
+          maxFrame = 0;
+          jank = 0;
+        }
+      }
+      last = now;
+      frameId = requestAnimationFrame(tick);
+    };
+
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, []);
+
+  return stats;
+}
+
+/**
+ * The performance harness. It exists to make the library's drag path measurable:
+ * drag the thumbs and watch the frame time. Three thumbs is the stress case —
+ * each part subscribes to the whole slider state, so one move re-renders every
+ * thumb, the indicator and the value text.
+ */
+export function PerfSection() {
+  const stats = useFrameStats();
+  const [range, setRange] = React.useState<readonly number[]>([15, 35, 70]);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Performance</Text>
+      <Text style={styles.label}>
+        A requestAnimationFrame meter. Drag the thumbs below: a well-behaved drag keeps every frame
+        under ~16.7ms (60fps), so the FPS line stays at 60 and jank stays at 0.
+      </Text>
+
+      <View style={styles.perfStats}>
+        <Text style={styles.perfStat}>FPS {stats.fps}</Text>
+        <Text style={styles.perfStat}>max {stats.maxFrame}ms</Text>
+        <Text style={styles.perfStat}>jank {stats.jank}</Text>
+        <Text style={styles.perfStat}>frames {stats.frames}</Text>
+      </View>
+
+      <Slider.Root value={range} onValueChange={setRange} style={styles.group}>
+        <Slider.Value style={styles.label} />
+        <Slider.Control style={styles.sliderControl}>
+          <Slider.Track style={styles.sliderTrack}>
+            <Slider.Indicator style={styles.sliderIndicator} />
+            <Slider.Thumb index={0} style={styles.sliderThumb} />
+            <Slider.Thumb index={1} style={styles.sliderThumb} />
+            <Slider.Thumb index={2} style={styles.sliderThumb} />
+          </Slider.Track>
+        </Slider.Control>
+      </Slider.Root>
+
+      <Text style={styles.label}>
+        The same meter measures a Drawer swipe: open the sheet and drag it — the app behind must not
+        re-render once per frame.
+      </Text>
+      <Drawer.Root>
+        <Drawer.Trigger style={(state) => [styles.button, state.pressed && styles.buttonPressed]}>
+          <Text style={styles.buttonText}>Open drawer</Text>
+        </Drawer.Trigger>
+        <Drawer.Portal>
+          <Drawer.Backdrop style={styles.backdrop} />
+          <Drawer.Viewport style={styles.drawerViewport}>
+            <Drawer.Popup
+              style={(state) => [
+                styles.drawerPopup,
+                { transform: [{ translateY: state.swipeMovement }] },
+              ]}
+            >
+              <View style={styles.drawerHandle} />
+              <Drawer.Description style={styles.dialogDescription}>
+                Drag this sheet while watching the meter above.
+              </Drawer.Description>
+              <Drawer.Close style={(state) => [styles.button, state.pressed && styles.buttonPressed]}>
+                <Text style={styles.buttonText}>Close</Text>
+              </Drawer.Close>
+            </Drawer.Popup>
+          </Drawer.Viewport>
+        </Drawer.Portal>
+      </Drawer.Root>
+    </View>
+  );
+}
 
 export function FilterSection() {
   const [query, setQuery] = React.useState('');

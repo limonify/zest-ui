@@ -31,6 +31,7 @@ export function MenuRoot<Payload = unknown>(props: MenuRoot.Props<Payload>) {
     disablePointerDismissal = false,
     handle,
     onOpenChange,
+    onOpenChangeComplete,
     open,
     triggerId,
   } = props;
@@ -50,6 +51,7 @@ export function MenuRoot<Payload = unknown>(props: MenuRoot.Props<Payload>) {
   useControlledProp(store, 'openProp', open);
   useControlledProp(store, 'triggerIdProp', triggerId);
   useContextCallback(store, 'onOpenChange', onOpenChange);
+  useContextCallback(store, 'onOpenChangeComplete', onOpenChangeComplete);
   useSyncedValues(store, { disabled, disablePointerDismissal });
 
   usePopupRootHandle({ store, handle, actionsRef });
@@ -103,6 +105,17 @@ export interface MenuRootProps<Payload = unknown> {
    * Event handler called when the menu is opened or closed.
    */
   onOpenChange?: ((open: boolean, eventDetails: MenuRoot.ChangeEventDetails) => void) | undefined;
+  /**
+   * Event handler called once an enter or exit animation has settled.
+   *
+   * zest never animates, so it cannot report when an animation finishes — the
+   * consumer drives it and reports the settle through the store:
+   * `useMenuRootContext().settled(open)`. Call it when your enter animation
+   * (or exit, which needs `keepMounted` on the `Portal`) ends.
+   */
+  onOpenChangeComplete?:
+    | ((open: boolean, eventDetails: MenuRoot.ChangeEventDetails) => void)
+    | undefined;
   /**
    * Whether the component should ignore user interaction.
    *

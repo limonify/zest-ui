@@ -24,6 +24,7 @@ export function PopoverRoot<Payload = unknown>(props: PopoverRoot.Props<Payload>
     disablePointerDismissal = false,
     handle,
     onOpenChange,
+    onOpenChangeComplete,
     open,
     triggerId,
   } = props;
@@ -42,6 +43,7 @@ export function PopoverRoot<Payload = unknown>(props: PopoverRoot.Props<Payload>
   useControlledProp(store, 'openProp', open);
   useControlledProp(store, 'triggerIdProp', triggerId);
   useContextCallback(store, 'onOpenChange', onOpenChange);
+  useContextCallback(store, 'onOpenChangeComplete', onOpenChangeComplete);
   useSyncedValues(store, { disablePointerDismissal });
 
   usePopupRootHandle({ store, handle, actionsRef });
@@ -95,6 +97,17 @@ export interface PopoverRootProps<Payload = unknown> {
    * Event handler called when the popover is opened or closed.
    */
   onOpenChange?:
+    | ((open: boolean, eventDetails: PopoverRoot.ChangeEventDetails) => void)
+    | undefined;
+  /**
+   * Event handler called once an enter or exit animation has settled.
+   *
+   * zest never animates, so it cannot report when an animation finishes — the
+   * consumer drives it and reports the settle through the store:
+   * `usePopoverRootContext().settled(open)`. Call it when your enter animation
+   * (or exit, which needs `keepMounted` on the `Portal`) ends.
+   */
+  onOpenChangeComplete?:
     | ((open: boolean, eventDetails: PopoverRoot.ChangeEventDetails) => void)
     | undefined;
   /**

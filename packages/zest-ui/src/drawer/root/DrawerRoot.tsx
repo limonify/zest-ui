@@ -21,9 +21,7 @@ import {
  * reuses the dialog store and every dialog part but its own `Drawer.Popup`.
  *
  * **Not ported from upstream.** `modal` (a React Native `Modal` is always modal,
- * and there is no page behind it to scroll-lock) and `onOpenChangeComplete` (see
- * the animation contract in CLAUDE.md — nothing in RN reports that a closing
- * animation finished).
+ * and there is no page behind it to scroll-lock).
  * `Drawer.Indent`/`IndentBackground` *are* ported, but differently: upstream
  * drives them with CSS variables it writes on the element, and here the numbers
  * go on the state object for the consumer to animate. They need a
@@ -115,6 +113,17 @@ export interface DrawerRootProps<Payload = unknown> {
    * Event handler called when the drawer is opened or closed.
    */
   onOpenChange?:
+    | ((open: boolean, eventDetails: DrawerRoot.ChangeEventDetails) => void)
+    | undefined;
+  /**
+   * Event handler called once an enter or exit animation has settled.
+   *
+   * zest never animates, so it cannot report when an animation finishes — the
+   * consumer drives it and reports the settle through the store:
+   * `useDialogRootContext().settled(open)`. Call it when your enter animation
+   * (or exit, which needs `keepMounted` on the `Portal`) ends.
+   */
+  onOpenChangeComplete?:
     | ((open: boolean, eventDetails: DrawerRoot.ChangeEventDetails) => void)
     | undefined;
   /**

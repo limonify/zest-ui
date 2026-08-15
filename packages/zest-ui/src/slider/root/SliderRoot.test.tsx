@@ -328,6 +328,46 @@ describe('Slider', () => {
     });
   });
 
+  describe('render granularity', () => {
+    it('does not re-render a thumb per move when only a sibling value changes', async () => {
+      let thumb0Renders = 0;
+
+      await render(
+        <GestureHandlerRootView>
+          <Slider.Root defaultValue={[20, 80]}>
+            <Slider.Control testID="control">
+              <Slider.Track testID="track">
+                <Slider.Indicator testID="indicator" />
+                <Slider.Thumb
+                  index={0}
+                  testID="thumb-0"
+                  style={() => {
+                    thumb0Renders += 1;
+                    return undefined;
+                  }}
+                />
+                <Slider.Thumb index={1} testID="thumb-1" style={() => undefined} />
+              </Slider.Track>
+            </Slider.Control>
+          </Slider.Root>
+        </GestureHandlerRootView>,
+      );
+      await layoutControl();
+
+      const rendersBeforeDrag = thumb0Renders;
+
+      // Drag the second thumb across several positions — every one lands nearest
+      // it, so the first thumb's value never changes.
+      await drag(CONTROL_SIZE * 0.5, CONTROL_SIZE * 0.7, CONTROL_SIZE * 0.9);
+
+      expect(thumbValue(1)).toBe(90);
+      // The first thumb subscribes to its own value only, so the moves must not
+      // re-render it. The one render it may see is the drag-start `dragging`
+      // toggle, which fires once per drag — never once per move.
+      expect(thumb0Renders - rendersBeforeDrag).toBeLessThanOrEqual(1);
+    });
+  });
+
   describe('disabled', () => {
     it('ignores a drag', async () => {
       const onValueChange = jest.fn();

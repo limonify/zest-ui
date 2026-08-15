@@ -212,3 +212,39 @@ function Sheet({ props, state }) {
   The gesture drives dismissal on its own — this only adds the visual follow. Combine it with the
   `entering`/`exiting` slide presets above for the open/close transition.
 </Callout>
+
+## Sequencing after a transition (`onOpenChangeComplete`)
+
+zest never animates, so it cannot know when *your* enter or exit animation finished — and most
+overlays need to sequence something after a close (reset state, open the parent, unmount). Every
+popup root (`Dialog`, `Drawer`, `Popover`, `Tooltip`, `Menu`, `Select`, `Combobox`, …) accepts
+`onOpenChangeComplete`, and the consumer reports the settle through the store:
+
+```tsx
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { useDialogRootContext } from '@limonify/zest-ui';
+
+function Popup({ props }) {
+  const store = useDialogRootContext();
+
+  return (
+    <Animated.View
+      {...props}
+      entering={FadeIn.duration(150)}
+      // Report when the exit is done so `onOpenChangeComplete` can fire.
+      exiting={FadeOut.duration(150).withCallback(() => store.settled(false))}
+    />
+  );
+}
+
+<Dialog.Root onOpenChangeComplete={(open) => console.log('settled', open)}>
+  <Dialog.Portal keepMounted>
+    <Dialog.Popup render={(props) => <Popup props={props} />} />
+  </Dialog.Portal>
+</Dialog.Root>
+```
+
+Keep the popup mounted through the exit — `keepMounted` on the `Portal` (or the part's own lever,
+e.g. `Toast.Root`'s `removeOnClose`) — otherwise the tree unmounts before the exit can play. The
+`settled(open)` call fires `onOpenChangeComplete` once per settle, carrying the reason of the last
+committed open/close.

@@ -1,70 +1,8 @@
 'use client';
 import * as React from 'react';
-import type { Direction } from '../../direction-provider/DirectionContext';
-import type { Orientation } from '../../types';
-import type { SliderRoot, SliderRootState } from './SliderRoot';
+import type { SliderStore } from '../store/SliderStore';
 
-export interface SliderRootContext {
-  values: readonly number[];
-  min: number;
-  max: number;
-  step: number;
-  disabled: boolean;
-  orientation: Orientation;
-  dragging: boolean;
-  state: SliderRootState;
-  format: Intl.NumberFormatOptions | undefined;
-  locale: Intl.LocalesArgument | undefined;
-  /**
-   * The measured size of the control along its main axis, which is what turns a
-   * touch position into a value.
-   */
-  controlSize: number | undefined;
-  setControlSize: (size: number) => void;
-  setDragging: (dragging: boolean) => void;
-  /**
-   * The writing direction the slider is laid out for. `Slider.Thumb` and
-   * `Slider.Indicator` anchor from the track's start, which flips with it.
-   */
-  direction: Direction;
-  /**
-   * The consumer's text alternative for a thumb's value, if any.
-   */
-  getAccessibilityValueText:
-    | ((formattedValue: string, value: number, index: number) => string)
-    | undefined;
-  /**
-   * The id of the `Slider.Label`, associated with every thumb. `undefined` when
-   * there is no label.
-   */
-  labelId: string | undefined;
-  setLabelId: (id: string | undefined) => void;
-  /**
-   * Commits a value for one thumb, resolving collisions with its neighbours
-   * according to `thumbCollisionBehavior`.
-   *
-   * Returns the index the thumb ended up at — `'swap'` moves it, so a drag has
-   * to follow this to keep hold of the same thumb.
-   */
-  setThumbValue: (
-    index: number,
-    value: number,
-    eventDetails: SliderRoot.ChangeEventDetails,
-  ) => number;
-  /**
-   * Converts a position along the control into a value, or `undefined` while the
-   * control has not been measured yet.
-   */
-  getValueFromPosition: (position: number) => number | undefined;
-  /**
-   * The index of the thumb closest to a value, used to pick which thumb a drag
-   * should move.
-   */
-  getClosestThumbIndex: (value: number) => number;
-  commitValue: (eventDetails: SliderRoot.ChangeEventDetails) => void;
-}
-
-export const SliderRootContext = React.createContext<SliderRootContext | undefined>(undefined);
+export const SliderRootContext = React.createContext<SliderStore | undefined>(undefined);
 
 export function useSliderRootContext() {
   const context = React.useContext(SliderRootContext);

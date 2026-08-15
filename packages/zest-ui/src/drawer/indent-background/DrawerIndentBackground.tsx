@@ -23,8 +23,10 @@ export function DrawerIndentBackground(componentProps: DrawerIndentBackground.Pr
   const fallbackStore = useRefWithInit(() => new DrawerProviderStore()).current;
   const store = providerStore ?? fallbackStore;
 
+  // Same decoupling as `Drawer.Indent`: only `active` is reactive; `swipeProgress`
+  // is a snapshot so the background does not re-render once per swipe frame.
   const active = useStoreState(store, 'active');
-  const swipeProgress = useStoreState(store, 'swipeProgress');
+  const swipeProgress = store.select('swipeProgress');
 
   const state: DrawerIndentBackgroundState = React.useMemo(
     () => ({ active, swipeProgress }),

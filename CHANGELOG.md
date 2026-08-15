@@ -1,3 +1,95 @@
+## [0.8.0] - 2026-08-14
+
+A 0.7.1 follow-up, still entirely inside the JS runtime: the Drawer/Toast swipe path stops
+re-rendering the app, and the popup family gains the completion signal consumers have been
+reimplementing themselves. All additive — nothing existing breaks.
+
+### Changed
+
+- **`Drawer.Indent` and `Drawer.IndentBackground` no longer re-render on every swipe frame.**
+  They wrap the whole app, and the provider store's `swipeProgress` changes every frame while a
+  sheet is swiped — which previously re-rendered the entire app inside the indent once per frame,
+  even for consumers who never read it. They now subscribe only to the discrete fields
+  (`active`, and `frontmostHeight` on the indent) and read `swipeProgress` as a snapshot at their
+  last render. A scale that follows the finger is a per-frame value, so it belongs on your own
+  UI thread: subscribe to the provider store directly and mirror `swipeProgress` into your
+  animation library's shared value — documented in the Drawer docs and the `Drawer.Indent` JSDoc.
+- **`Drawer.Popup` and `Toast.Root` coalesce their swipe movement to one commit per frame.** The
+  gesture still fires per event; the React-visible `swipeMovement` is now written through
+  `requestAnimationFrame` and applied synchronously when the gesture ends, so a burst of events
+  no longer re-renders the popup several times a frame.
+- **`useSliderRootContext`'s per-field subscription note from 0.7.1 extends to the drawer's
+  indent** — the same "read the snapshot, subscribe to what you style" contract.
+
+### Added
+
+- **`Combobox.Icon`**, the counterpart of `Select.Icon` — a decorative, accessibility-hidden
+  part that publishes `open`, for the chevron on a `Combobox.Trigger`.
+- **`onOpenChangeComplete` on every popup root** (`Dialog`, `AlertDialog`, `Drawer`, `Popover`,
+  `Tooltip`, `Menu`, `ContextMenu`, `Select`, `Combobox`, `Autocomplete`). zest never animates,
+  so it cannot know when an enter or exit animation finishes — the consumer reports the settle
+  through the store: `useXRootContext().settled(open)`. Calling it fires `onOpenChangeComplete`
+  once per settle, with the reason of the last committed open/close. Fire-once per settle; the
+  exit path needs `keepMounted` (or the part's own lever) so the tree stays up while it plays.
+  This is the RN counterpart of the web's CSS-transition completion, built on the same precedent
+  as `Form`'s imperative `actionsRef.current.submit()`.
+- **`nestedDialogCount` on `Dialog.Popup` and `Drawer.Popup` state.** The store already tracked
+  the count internally; it is now published alongside the boolean, so a sheet stack can recede a
+  fixed step per nested level instead of approximating with "is something behind me".
+
+### Fixed
+
+- The `DrawerProviderStore` doc comment claimed the store kept a swipe from re-rendering the
+  whole app — false for any React subscriber. Corrected to describe the snapshot contract.
+
+## [0.7.1] - 2026-08-14
+
+A performance pass on the drag path, entirely inside the JS runtime — no new dependencies, no
+breaking changes. `Slider` state moved into a store, each part subscribes to its own slice of it,
+and a drag commits its value once per frame instead of once per gesture event.
+
+### Changed
+
+- **`Slider` parts subscribe to their own state instead of the whole slider.** `Slider.Root` now
+  owns a `SliderStore`, and the parts read it through per-field selectors (`useStoreState`). A
+  thumb subscribes to its own value (plus the drag flag), the indicator and value text to the
+  values array, and the track and label to nothing at all. Dragging a thumb in a range slider
+  therefore re-renders the thumb being moved, the indicator and the value — not every thumb on
+  the track, which is what the previous context broadcast forced. Public props, part names and
+  published state shapes are unchanged.
+- **A drag's value commits at most once per frame.** The gesture still fires `onValueChange`
+  synchronously on every event, so the cancel veto and controlled props behave exactly as before;
+  only the React-visible value is written through `requestAnimationFrame` and coalesced — several
+  gesture events that land in one frame now produce one render instead of several. On release the
+  final value applies synchronously.
+- **`useSliderRootContext` now returns the slider's store.** The setter/handler and static
+  surfaces (`setThumbValue`, `getValueFromPosition`, `getClosestThumbIndex`, `commitValue`,
+  `controlSize`, `disabled`, `orientation`, …) are preserved as getters, and the reactive fields
+  are available through `useStoreState(store, …)` instead of off a context object. The old
+  `state` field has no store counterpart and is not published — read the fields it carried
+  individually.
+- **`Slider.Thumb`'s published `state.values` reflects the latest snapshot at that thumb's last
+  render.** With per-field subscriptions a thumb whose own value did not change does not
+  re-render, so its copy of the values array can trail a sibling's drag. Style from the fresh
+  `state.value`/`state.percent`/`state.dragging` and subscribe explicitly when you need the whole
+  array.
+
+### Added
+
+- **A performance harness in the example app.** `apps/example` has a new `Performance` section
+  with a requestAnimationFrame meter (FPS, max frame time, jank count) and a three-thumb range
+  slider to drag, so a drag's cost is measurable rather than guessed.
+- **A "Smooth drags without Reanimated" section in the Slider docs**, covering RN's `Animated` +
+  `useNativeDriver: true` transform follow.
+- **An "Image caching" note on Avatar**, showing how to swap in `expo-image` through the `render`
+  prop.
+
+### Fixed
+
+- The virtualized `Combobox.List` test passed `children={undefined}` as a prop to `FlatList`. The
+  forwarded children are now dropped before spreading the props, which also clears a react-doctor
+  warning.
+
 ## [0.7.0] - 2026-08-07
 
 A Base UI parity pass: everything worth having that the port had left behind. Two new components

@@ -223,6 +223,14 @@ type Context = {
   onOpenChange:
     | ((open: boolean, eventDetails: ComboboxRoot.ChangeEventDetails) => void)
     | undefined;
+  /**
+   * Called once an enter or exit animation has settled, reported by the consumer
+   * through `settled(open)`. zest does not animate anything, so it cannot know
+   * when an animation ends — the consumer drives it and owns the signal.
+   */
+  onOpenChangeComplete:
+    | ((open: boolean, eventDetails: ComboboxRoot.ChangeEventDetails) => void)
+    | undefined;
   onValueChange:
     | ((value: any, eventDetails: ComboboxRoot.ChangeEventDetails) => void)
     | undefined;
@@ -317,6 +325,7 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
       },
       {
         onOpenChange: undefined,
+        onOpenChangeComplete: undefined,
         onValueChange: undefined,
         onInputValueChange: undefined,
         triggerNodes: new PopupTriggerMap(),
@@ -336,6 +345,10 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
       return;
     }
 
+    // Remember the reason so a later `settled(open)` can hand it to
+    // `onOpenChangeComplete`.
+    this.lastChangeEventDetails = eventDetails;
+
     this.set('open', nextOpen);
 
     // A multiple combobox never mirrors its selection in the input, so whatever
@@ -347,6 +360,35 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
       this.setInputValue('', createChangeEventDetails(REASONS.inputClear, eventDetails.event));
     }
   };
+
+  /**
+   * Reports that the enter or exit animation for `open` has settled. zest never
+   * animates, so only the consumer knows when their animation finished; calling
+   * this fires `onOpenChangeComplete` with the reason of the last committed
+   * change. Fire-once per settle: a repeated call with the same value is ignored.
+   */
+  public settled = (open: boolean) => {
+    if (this.lastSettledOpen === open) {
+      return;
+    }
+
+    this.lastSettledOpen = open;
+    // A settle is only meaningful after a committed open/close, which is what
+    // records the details; without one there is nothing to complete.
+    if (this.lastChangeEventDetails) {
+      this.context.onOpenChangeComplete?.(open, this.lastChangeEventDetails);
+    }
+  };
+
+  /**
+   * The event details of the last committed open/close, for `onOpenChangeComplete`.
+   */
+  private lastChangeEventDetails: ComboboxRoot.ChangeEventDetails | undefined;
+
+  /**
+   * The last value `settled` fired for, so the same settle is not reported twice.
+   */
+  private lastSettledOpen: boolean | undefined;
 
   public setValue = (nextValue: unknown, eventDetails: ComboboxRoot.ChangeEventDetails) => {
     this.context.onValueChange?.(nextValue, eventDetails);

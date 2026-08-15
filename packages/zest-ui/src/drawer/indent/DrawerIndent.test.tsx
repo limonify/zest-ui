@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Text } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, State } from 'react-native-gesture-handler';
+import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { act, fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { Drawer } from '../../index';
 
@@ -119,6 +120,49 @@ describe('Drawer.Indent', () => {
     await user.press(screen.getByTestId('close'));
 
     expect(screen.queryByTestId('popup')).toBeNull();
+  });
+
+  it('does not re-render during a swipe (swipeProgress is a snapshot)', async () => {
+    const styleFn = jest.fn(() => undefined);
+
+    await render(
+      <GestureHandlerRootView>
+        <Drawer.Provider>
+          <Drawer.Indent testID="indent" style={styleFn}>
+            <Text>App</Text>
+          </Drawer.Indent>
+          <Drawer.Root defaultOpen>
+            <Drawer.Portal>
+              <Drawer.Viewport>
+                <Drawer.Popup testID="popup" />
+              </Drawer.Viewport>
+            </Drawer.Portal>
+          </Drawer.Root>
+        </Drawer.Provider>
+      </GestureHandlerRootView>,
+    );
+
+    // The popup must report its height before a swipe can move `swipeProgress`.
+    await act(async () => {
+      fireEvent(screen.getByTestId('popup'), 'layout', {
+        nativeEvent: { layout: { x: 0, y: 0, width: 320, height: 240 } },
+      });
+    });
+
+    const rendersBeforeSwipe = styleFn.mock.calls.length;
+
+    await act(async () => {
+      fireGestureHandler(getByGestureTestId('popup'), [
+        { state: State.BEGAN, translationX: 0, translationY: 0 },
+        { state: State.ACTIVE, translationX: 0, translationY: 15 },
+        { state: State.ACTIVE, translationX: 0, translationY: 30 },
+        { state: State.END, translationX: 0, translationY: 30 },
+      ]);
+    });
+
+    // The swipe moved `swipeProgress` — a per-frame field the indent deliberately
+    // does not subscribe to — so it must not have re-rendered its children.
+    expect(styleFn.mock.calls.length).toBe(rendersBeforeSwipe);
   });
 
   it('renders inertly without a provider', async () => {

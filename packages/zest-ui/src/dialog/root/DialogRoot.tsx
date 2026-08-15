@@ -46,6 +46,18 @@ export interface DialogRootProps<Payload = unknown> {
     | ((open: boolean, eventDetails: DialogRoot.ChangeEventDetails) => void)
     | undefined;
   /**
+   * Event handler called once an enter or exit animation has settled.
+   *
+   * zest never animates, so it cannot report when an animation finishes — the
+   * consumer drives it and reports the settle through the store:
+   * `useDialogRootContext().settled(open)`. Call it when your enter animation
+   * (or exit, which needs `keepMounted` on the `Portal`) ends; this fires
+   * `onOpenChangeComplete` with the reason of the last committed change.
+   */
+  onOpenChangeComplete?:
+    | ((open: boolean, eventDetails: DialogRoot.ChangeEventDetails) => void)
+    | undefined;
+  /**
    * Whether to prevent the dialog from closing on presses outside the popup.
    * @default false
    */
