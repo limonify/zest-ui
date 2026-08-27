@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, type GestureType } from 'react-native-gesture-handler';
 import { useSliderRootContext } from '../root/SliderRootContext';
 import { useStoreState } from '../../store/ReactStore';
 import { useRenderElement } from '../../use-render/useRenderElement';
@@ -20,7 +20,7 @@ import { REASONS } from '../../utils/reasons';
  * `<GestureHandlerRootView>`.
  */
 export function SliderControl(componentProps: SliderControl.Props) {
-  const { render, className, style, ref, ...elementProps } = componentProps;
+  const { render, className, style, ref, simultaneousGesture, ...elementProps } = componentProps;
 
   const { testID } = elementProps;
 
@@ -125,13 +125,51 @@ export function SliderControl(componentProps: SliderControl.Props) {
     props: [{ onLayout: handleLayout }, elementProps],
   });
 
-  return <GestureDetector gesture={gesture}>{element}</GestureDetector>;
+  // **The consumer's own gesture runs beside this one, not instead of it.**
+  //
+  // zest's handlers touch React state, so they are `.runOnJS(true)` — every move
+  // crosses to JS, updates the store and re-renders before the thumb moves,
+  // because the thumb's position comes out of `state.value`. That round trip
+  // lands on every frame of a drag, which is the one place it is visible.
+  //
+  // zest cannot fix that itself without animating, which it does not do, or
+  // taking reanimated as a dependency, which it will not. What it can do is let
+  // a consumer attach a gesture of its OWN — one that stays on the UI thread and
+  // moves the thumb from a shared value — and run the two simultaneously. The
+  // arithmetic that consumer needs is exported from `../sliderValue` as
+  // worklet-safe pure functions, so its conversion cannot drift from this one.
+  //
+  // `Gesture.Simultaneous` rather than composing handlers onto zest's own
+  // gesture: `.runOnJS(true)` applies to the whole gesture, so a worklet added
+  // to this one would be dragged onto the JS thread with the rest.
+  const composed = React.useMemo(
+    () => (simultaneousGesture ? Gesture.Simultaneous(gesture, simultaneousGesture) : gesture),
+    [gesture, simultaneousGesture],
+  );
+
+  return <GestureDetector gesture={composed}>{element}</GestureDetector>;
 }
 
 export interface SliderControlState extends SliderRootState {}
 
-export interface SliderControlProps
-  extends ZestUIComponentProps<typeof View, SliderControlState> {}
+export interface SliderControlProps extends ZestUIComponentProps<typeof View, SliderControlState> {
+  /**
+   * A gesture of the consumer's own, run at the same time as the slider's.
+   *
+   * The slider's own drag handlers touch React state and therefore run on the JS
+   * thread, so the thumb cannot move without a render — visible as a stutter on
+   * a busy thread, once per frame of a drag. A consumer that wants the thumb to
+   * follow the finger can build a `Gesture.Pan()` whose handlers are worklets,
+   * convert the touch with the worklet-safe helpers this module exports
+   * (`sliderValueFromPosition`, `sliderPercentFromValue`), and drive the thumb
+   * from a shared value — all on the UI thread.
+   *
+   * Both gestures receive the same touch. The slider keeps updating its value in
+   * React exactly as before, so `onValueChange`, `state.value` and the rendered
+   * thumb position are unchanged for everyone who does not pass this.
+   */
+  simultaneousGesture?: GestureType;
+}
 
 export namespace SliderControl {
   export type State = SliderControlState;

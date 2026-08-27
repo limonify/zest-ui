@@ -1,3 +1,35 @@
+## [0.9.0]
+
+### Added
+
+- **`Slider.Control` takes a `simultaneousGesture`, so a consumer can move the thumb on the UI
+  thread.** The slider's own drag handlers touch the store, so the gesture is `.runOnJS(true)` and
+  the thumb's position comes out of `state.value` — every move crosses to JS, updates the store and
+  re-renders before the thumb can follow. That round trip lands on every frame of a drag, and it is
+  what makes a slider stutter on a busy JS thread. zest neither animates nor takes an animation
+  dependency, so instead it now runs a gesture of the consumer's own alongside its own through
+  `Gesture.Simultaneous`: both see the same touch, the value updates in React exactly as before, and
+  the thumb can follow the finger from a shared value with no render in the path. `Simultaneous`
+  rather than composing handlers onto zest's gesture, because `.runOnJS(true)` applies to the whole
+  gesture and would drag a worklet onto the JS thread with it.
+- **The position → value arithmetic is exported, and is worklet-safe.** `sliderValueFromPosition`,
+  `sliderPercentFromValue`, `roundValueToStep`, `countStepDecimals` and `clampValue` moved to
+  `slider/sliderValue.ts` as pure functions carrying the `'worklet'` directive; `SliderRoot` calls
+  them, so a consumer converting a touch on the UI thread runs the same code the store does rather
+  than reimplementing RTL/vertical inversion, step snapping and float-error rounding. **No new
+  dependency**: the directive is a marker reanimated's Babel plugin compiles, and RN consumers build
+  zest from source, so it is compiled by whoever installs the package — and where the plugin is
+  absent the functions stay plain.
+- **`SliderRootState` publishes `controlSize` and `step`**, completing the geometry that conversion
+  needs. A worklet cannot reach the store, so the geometry travels on the state object like
+  everything else a part needs.
+
+### Fixed
+
+- **`countDecimals` read an exponential step as having no decimals.** `String(1e-7)` is `"1e-7"`,
+  which the old split on `"."` counted as 0 — so a slider with a step that small rounded its value
+  to an integer. It now reads the exponent.
+
 ## [0.8.1] - 2026-08-15
 
 A one-line follow-up to 0.8.0, plus a docs-only fix for the live demos. No new dependencies, no
@@ -114,7 +146,7 @@ and a drag commits its value once per frame instead of once per gesture event.
 ## [0.7.0] - 2026-08-07
 
 A Base UI parity pass: everything worth having that the port had left behind. Two new components
-(`Form`, `DirectionProvider`), thirteen new parts, and the fix for the one gap that failed *silently*
+(`Form`, `DirectionProvider`), thirteen new parts, and the fix for the one gap that failed _silently_
 rather than being merely absent — object values in `Select` and `Combobox`.
 
 > **This release is breaking**, which is why it is a minor bump rather than a patch. Both breaks
@@ -185,7 +217,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 - **`isItemEqualToValue` on `Select.Root` and `Combobox.Root`.** Values were compared with
   `Object.is`, so an object value only ever matched itself — and `items` built inline is a new
   array every render, which quietly dropped the selection. This is the one gap that produced
-  *wrong behaviour* rather than a missing feature:
+  _wrong behaviour_ rather than a missing feature:
 
   ```tsx
   <Select.Root
@@ -203,7 +235,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 - **Multi-select `Combobox`** — `multiple` on the root, plus `Combobox.Chips`, `Combobox.Chip`,
   `Combobox.ChipRemove` and `Combobox.Clear`. The value becomes an array, pressing an item toggles
   it, and the list stays open for the next pick. The input is left to the query and is never filled
-  with a selected label; selecting out of a *filtered* list ends that query, so the list closes and
+  with a selected label; selecting out of a _filtered_ list ends that query, so the list closes and
   the input clears with the `input-clear` reason.
 
   `Combobox.Value` takes a function child in this mode, receiving the selected items and rendering
@@ -214,7 +246,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   that would reopen the list.
 
 - **Grouped combobox items** — `Combobox.Group`, `Combobox.GroupLabel` and `Combobox.Collection`.
-  An entry in `items` becomes a group when it carries its own `items`. Filtering runs *inside* each
+  An entry in `items` becomes a group when it carries its own `items`. Filtering runs _inside_ each
   group and a group whose items all filtered out is dropped, so a group never renders empty. A group
   is never matched on its own label — a query that happens to spell "Fruit" should not resurrect
   everything under it. `isComboboxGroup` is exported to tell the two apart.
@@ -246,7 +278,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 - **`DirectionProvider` and `useDirection`.** Direction defaults to React Native's own
   `I18nManager.isRTL`, so an app that has enabled RTL needs no wrapper; wrap a subtree to override
   it, which is what a language switcher inside an LTR app needs. It decides only what zest
-  *derives* from direction: `align="start"` anchors a popup to the right edge (and `alignOffset`
+  _derives_ from direction: `align="start"` anchors a popup to the right edge (and `alignOffset`
   flips sign) for every popup family, and a horizontal slider's value grows right to left, with
   `state.direction` published so you can mirror your own thumb. `state.align` still reports the
   alignment you asked for, never the physical edge RTL put it on. It does not turn RTL layout on —
@@ -255,7 +287,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 
 - **`Field.Item`.** A `Field.Root` labels one control, so a checkbox or radio group inside it had
   every item pointing at the same label. An item opens a nested labelling scope: the `Field.Label`
-  and `Field.Description` inside it associate with *its* control, while validity and `disabled`
+  and `Field.Description` inside it associate with _its_ control, while validity and `disabled`
   still come from the surrounding field.
 
 - **`Drawer.Provider`, `Drawer.Indent` and `Drawer.IndentBackground`** — the iOS-style effect where
@@ -263,7 +295,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   the app behind a transparent `Modal` is visible (that is how backdrop dimming already works).
   Upstream drives it with CSS variables; following the animation contract, zest publishes `active`,
   `swipeProgress` and `frontmostHeight` on the state object and you animate. `swipeProgress` is what
-  lets the app scale back *with the finger* rather than snapping when the sheet finally closes.
+  lets the app scale back _with the finger_ rather than snapping when the sheet finally closes.
   Two drawers open at once both count. The parts render inertly without a provider.
 
 - **`Tooltip` caught up with the other popup families.** Its root had four props; it now takes
@@ -329,13 +361,13 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   whatever gesture happened to sit beneath it. Opening a combobox over a `Slider` and picking a row
   moved the slider. Every `Portal` now renders its children inside their own
   `GestureHandlerRootView`, which is gesture-handler's documented requirement for `Modal` and also
-  what makes gestures work *inside* a popup — a swipeable `Drawer` needs a gesture root in its own
+  what makes gestures work _inside_ a popup — a swipeable `Drawer` needs a gesture root in its own
   window. Consumers need no change; it lives inside the portal. Verified on a simulator with the
   same tap before and after.
 
 - **A `Combobox` with a `Trigger` no longer positions its popup against itself.** `Combobox.Trigger`
   and `Combobox.Input` both wrote the same anchor slot from their ref callback, and in the shape the
-  docs recommend for a phone — a button outside, the search input *inside* the popup — the input
+  docs recommend for a phone — a button outside, the search input _inside_ the popup — the input
   mounts second and won. The popup was then anchored to an element it contains: it opened offset
   from its trigger, and moved again on every open. `state.triggerWidth` had the same problem, so
   sizing a popup to its trigger sized it to the input instead. The anchor is now the trigger
@@ -363,11 +395,11 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 
 - **A blur could validate against a stale value.** `Field.Control` read the value from its render
   closure, so a change and the blur it causes landing in one batch — before React re-rendered —
-  validated the value from *before* the change. The handler now writes the ref it reads, which is
+  validated the value from _before_ the change. The handler now writes the ref it reads, which is
   the pattern `Slider` already used for its gesture callbacks.
 
 - **Every arrow rendered in its popup's top-left corner.** floating-ui's `arrow` middleware needs the
-  arrow element to exist *and* to have been measured, and React Native measures asynchronously. The
+  arrow element to exist _and_ to have been measured, and React Native measures asynchronously. The
   first position is computed as soon as the anchor and the popup have their refs — before the arrow
   has laid out — and nothing observes layout globally to try again, so the middleware returned no
   data at all and `Popover.Arrow`, `Tooltip.Arrow`, `Menu.Arrow` and `Select.Arrow` fell back to
@@ -375,7 +407,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
   (and only once — reporting the same size again is dropped, or `update()` would loop).
 - **A popup could reopen at a stale position.** The anchor's screen position is read at compute
   time, and nothing re-measured on open. A popup whose content stayed mounted therefore reopened
-  wherever its trigger was the *last* time — after the page behind it had scrolled, somewhere
+  wherever its trigger was the _last_ time — after the page behind it had scrolled, somewhere
   unrelated. Opening now re-measures, and again on the next frame for the case where the Modal has
   not laid its children out yet.
 - **A combobox reopened its own list after you chose from it.** `Combobox.Item` blurs the input on
@@ -394,7 +426,7 @@ rather than being merely absent — object values in `Select` and `Combobox`.
 
 ### Changed
 
-- `Combobox.List`'s render function now receives a list *entry* — an item or a group — and its
+- `Combobox.List`'s render function now receives a list _entry_ — an item or a group — and its
   index. A flat list is unaffected: both shapes carry `value` and `label`, and an entry is still
   assignable to `Combobox.Item`'s `item` prop.
 - `Combobox.Item` no longer blurs the input in `multiple` mode. Dismissing the keyboard is right
@@ -510,9 +542,12 @@ The one that remains is deliberate and documented (see _Not changed_ below).
   Consumers who want caching swap the element, which costs one prop:
 
   ```tsx
-  import { Image as ExpoImage } from 'expo-image';
+  import { Image as ExpoImage } from "expo-image";
 
-  <Avatar.Image source={{ uri }} render={<ExpoImage cachePolicy="memory-disk" />} />;
+  <Avatar.Image
+    source={{ uri }}
+    render={<ExpoImage cachePolicy="memory-disk" />}
+  />;
   ```
 
 ### Internal

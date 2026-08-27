@@ -7,6 +7,7 @@ import { useStableCallback } from '../../hooks/useStableCallback';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
 import { clamp } from '../../utils/clamp';
+import { sliderValueFromPosition } from '../sliderValue';
 import { AnimationFrame } from '../../hooks/useAnimationFrame';
 import { useControlledProp, useContextCallback, useStateSetter } from '../../store/ReactStore';
 import { SliderStore, getSliderRootState, toSliderValueArray } from '../store/SliderStore';
@@ -144,34 +145,22 @@ export function SliderRoot<Value extends number | readonly number[] = number>(
     }
   }, [value, store]);
 
-  const roundToStep = useStableCallback((raw: number) => {
-    const stepped = Math.round((raw - min) / step) * step + min;
-    // Steps like 0.1 accumulate float error; round to the step's precision.
-    const decimals = countDecimals(step);
-    const rounded = Number(stepped.toFixed(decimals));
-    return clamp(rounded, min, max);
-  });
-
-  const getValueFromPosition = useStableCallback((position: number) => {
-    // Nothing can be derived from a position until the control has reported its
-    // size; callers must bail rather than fall back to a value, or a touch
-    // landing before the first layout would snap the slider to `min`.
-    const controlSize = store.state.controlSize;
-    if (!controlSize) {
-      return undefined;
-    }
-
-    const ratio = clamp(position / controlSize, 0, 1);
-    // A vertical slider grows upwards, so its position axis is inverted — and so
-    // is a horizontal one under RTL, where the track runs right to left. React
-    // Native mirrors the layout, but the touch coordinate it reports is still
-    // measured from the control's leading edge, so the value has to be flipped
-    // here rather than left to the platform.
-    const inverted = orientation === 'vertical' || (orientation === 'horizontal' && direction === 'rtl');
-    const percent = inverted ? 1 - ratio : ratio;
-
-    return roundToStep(min + percent * (max - min));
-  });
+  // The arithmetic lives in `../sliderValue`, as pure worklet-safe functions, so
+  // a consumer animating the thumb on the UI thread converts a touch exactly the
+  // way the store does. One copy, not two.
+  const getValueFromPosition = useStableCallback((position: number) =>
+    // Returns `undefined` until the control has reported its size; callers must
+    // bail rather than fall back to a value, or a touch landing before the first
+    // layout would snap the slider to `min`.
+    sliderValueFromPosition(position, {
+      controlSize: store.state.controlSize,
+      orientation,
+      direction,
+      min,
+      max,
+      step,
+    }),
+  );
 
   const getClosestThumbIndex = useStableCallback((target: number) => {
     let closest = 0;
@@ -309,12 +298,6 @@ function fromArray(values: readonly number[], isRange: boolean): number | readon
   return isRange ? values : values[0]!;
 }
 
-function countDecimals(value: number) {
-  const text = String(value);
-  const separator = text.indexOf('.');
-  return separator === -1 ? 0 : text.length - separator - 1;
-}
-
 export interface SliderRootState {
   /**
    * The writing direction the slider is laid out for. A horizontal slider runs
@@ -343,6 +326,21 @@ export interface SliderRootState {
    * The component orientation.
    */
   orientation: Orientation;
+  /**
+   * The control's length along its own axis, in points, or `undefined` before it
+   * has been laid out.
+   *
+   * Published so a consumer can convert a touch position into a value itself —
+   * see `sliderValueFromPosition` and `Slider.Control`'s `simultaneousGesture`.
+   * A worklet cannot reach the store, so the geometry has to travel on the state
+   * object like everything else a part needs.
+   */
+  controlSize: number | undefined;
+  /**
+   * The granularity the value moves in. Part of the same geometry as
+   * `controlSize`.
+   */
+  step: number;
   /**
    * The current value of every thumb.
    */

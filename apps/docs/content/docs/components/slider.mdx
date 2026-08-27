@@ -112,6 +112,60 @@ function Thumb({ props, state }) {
 
 To make the thumb *follow* the finger with spring physics instead, feed `state.values` into a shared value — see **Gesture-following values** in the [Reanimated guide](/docs/guides/animation-reanimated).
 
+### Following the finger on the UI thread
+
+The built-in drag updates the value through React: the gesture's handlers touch the store, so they
+run on the JS thread (`.runOnJS(true)`), and the thumb's position comes out of `state.value`. On a
+busy JS thread that round trip lands on **every frame of a drag**, and the thumb visibly lags the
+finger.
+
+zest will not animate for you and takes no animation dependency, so the fix is to let you attach a
+gesture of your own that stays on the UI thread. `Slider.Control` runs it alongside its own with
+`Gesture.Simultaneous`, so the value keeps updating exactly as before while your thumb follows the
+touch with no render in the path.
+
+The conversion you need is exported, so it cannot drift from the one the store runs:
+
+```tsx
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import { Slider, sliderPercentFromValue, sliderValueFromPosition } from '@limonify/zest-ui';
+
+function LiveSlider() {
+  const percent = useSharedValue(0);
+  // `controlSize`, `min`, `max`, `step`, `orientation` and `direction` all reach
+  // you on the state object; capture them where you build the gesture.
+  const geometry = { controlSize, orientation, direction, min, max, step };
+
+  const follow = React.useMemo(
+    () =>
+      Gesture.Pan().onUpdate((event) => {
+        'worklet';
+        const value = sliderValueFromPosition(event.x, geometry);
+        if (value !== undefined) {
+          percent.value = sliderPercentFromValue(value, geometry.min, geometry.max);
+        }
+      }),
+    [geometry, percent],
+  );
+
+  const thumbStyle = useAnimatedStyle(() => ({ left: `${percent.value * 100}%` }));
+
+  return (
+    <Slider.Root defaultValue={40}>
+      <Slider.Control simultaneousGesture={follow}>
+        <Slider.Track>
+          <Slider.Thumb render={(props) => <Animated.View {...props} style={[props.style, thumbStyle]} />} />
+        </Slider.Track>
+      </Slider.Control>
+    </Slider.Root>
+  );
+}
+```
+
+`onValueChange`, `state.value` and the rendered thumb position are unchanged for anyone who does
+not pass `simultaneousGesture` — this is opt-in, and costs nothing when unused.
+
 ### Smooth drags without Reanimated
 
 The built-in drag already moves the thumb (zest positions it with a percentage, updated from the
