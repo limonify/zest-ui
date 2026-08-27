@@ -1,3 +1,35 @@
+## [Unreleased]
+
+### Added
+
+- **`Slider.Control` takes a `simultaneousGesture`, so a consumer can move the thumb on the UI
+  thread.** The slider's own drag handlers touch the store, so the gesture is `.runOnJS(true)` and
+  the thumb's position comes out of `state.value` — every move crosses to JS, updates the store and
+  re-renders before the thumb can follow. That round trip lands on every frame of a drag, and it is
+  what makes a slider stutter on a busy JS thread. zest neither animates nor takes an animation
+  dependency, so instead it now runs a gesture of the consumer's own alongside its own through
+  `Gesture.Simultaneous`: both see the same touch, the value updates in React exactly as before, and
+  the thumb can follow the finger from a shared value with no render in the path. `Simultaneous`
+  rather than composing handlers onto zest's gesture, because `.runOnJS(true)` applies to the whole
+  gesture and would drag a worklet onto the JS thread with it.
+- **The position → value arithmetic is exported, and is worklet-safe.** `sliderValueFromPosition`,
+  `sliderPercentFromValue`, `roundValueToStep`, `countStepDecimals` and `clampValue` moved to
+  `slider/sliderValue.ts` as pure functions carrying the `'worklet'` directive; `SliderRoot` calls
+  them, so a consumer converting a touch on the UI thread runs the same code the store does rather
+  than reimplementing RTL/vertical inversion, step snapping and float-error rounding. **No new
+  dependency**: the directive is a marker reanimated's Babel plugin compiles, and RN consumers build
+  zest from source, so it is compiled by whoever installs the package — and where the plugin is
+  absent the functions stay plain.
+- **`SliderRootState` publishes `controlSize` and `step`**, completing the geometry that conversion
+  needs. A worklet cannot reach the store, so the geometry travels on the state object like
+  everything else a part needs.
+
+### Fixed
+
+- **`countDecimals` read an exponential step as having no decimals.** `String(1e-7)` is `"1e-7"`,
+  which the old split on `"."` counted as 0 — so a slider with a step that small rounded its value
+  to an integer. It now reads the exponent.
+
 ## [0.8.1] - 2026-08-15
 
 A one-line follow-up to 0.8.0, plus a docs-only fix for the live demos. No new dependencies, no
