@@ -180,6 +180,12 @@ export function getSliderRootState(store: SliderStore): SliderRootState {
     max: store.context.max,
     min: store.context.min,
     orientation: store.context.orientation,
+    // `controlSize` and `step` complete the geometry a consumer needs to convert
+    // a touch position itself — see `../sliderValue` and `Slider.Control`'s
+    // `simultaneousGesture`. They are published rather than left in the store
+    // because a worklet cannot reach the store.
+    controlSize: store.state.controlSize,
+    step: store.context.step,
     values: store.select('values'),
   };
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { GestureHandlerRootView, State } from 'react-native-gesture-handler';
+import { Gesture, GestureHandlerRootView, State } from 'react-native-gesture-handler';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { Slider } from '../index';
 import type { SliderRootProps } from './SliderRoot';
@@ -475,5 +475,59 @@ describe('Slider', () => {
 
       expect(screen.getByTestId('control')).toHaveStyle({ opacity: 1 });
     });
+  });
+});
+
+// **`simultaneousGesture` is what lets a consumer move the thumb on the UI
+// thread.** zest's own handlers touch React state and so run on JS
+// (`.runOnJS(true)`), which puts a render between the finger and the thumb —
+// visible as a stutter once per frame of a drag. zest will not animate and will
+// not take reanimated, so instead a consumer attaches a gesture of its own,
+// converts the touch with `sliderValueFromPosition`, and drives the thumb from a
+// shared value. Both gestures see the same touch.
+describe('Slider.Control simultaneousGesture', () => {
+  function WithConsumerGesture({ gesture }: { gesture: ReturnType<typeof Gesture.Pan> }) {
+    return (
+      <GestureHandlerRootView>
+        <Slider.Root testID="root" defaultValue={0}>
+          <Slider.Control testID="control" simultaneousGesture={gesture}>
+            <Slider.Track testID="track">
+              <Slider.Thumb testID="thumb-0" index={0} />
+            </Slider.Track>
+          </Slider.Control>
+        </Slider.Root>
+      </GestureHandlerRootView>
+    );
+  }
+
+  it('attaches the consumer gesture to the detector', async () => {
+    // A gesture is invisible in the tree; the only way to see whether it was
+    // attached is gesture-handler's own registry, which is keyed by test id and
+    // populated when the gesture reaches a `GestureDetector`. Drop the
+    // `Gesture.Simultaneous` and this id is never registered.
+    const gesture = Gesture.Pan().withTestId('consumer-pan');
+    await render(<WithConsumerGesture gesture={gesture} />);
+    await layoutControl();
+
+    expect(() => getByGestureTestId('consumer-pan')).not.toThrow();
+  });
+
+  it('still updates the value when a consumer gesture is attached', async () => {
+    // The point of `Simultaneous` over composing handlers: zest's own gesture
+    // keeps running. If the consumer's replaced it, the value would never move.
+    const gesture = Gesture.Pan();
+    await render(<WithConsumerGesture gesture={gesture} />);
+    await layoutControl();
+    await drag(CONTROL_SIZE / 2);
+
+    expect(thumbValue(0)).toBe(50);
+  });
+
+  it('renders without one, which is every existing consumer', async () => {
+    await render(<TestSlider defaultValue={20} />);
+    await layoutControl();
+    await drag(CONTROL_SIZE / 2);
+
+    expect(thumbValue(0)).toBe(50);
   });
 });
