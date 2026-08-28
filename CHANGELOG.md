@@ -1,3 +1,17 @@
+## [0.9.1]
+
+### Added
+
+- **`Combobox.Portal` (and `Autocomplete.Portal`) takes `modal`, so a consumer can render the
+  list without a React Native `Modal`.** A `Modal` presents in its own window, so opening a
+  combobox or autocomplete list steals first responder from the field behind it and dismisses the
+  keyboard — the field has to be re-tapped after every keystroke. `modal={false}` renders the
+  popup in a full-screen overlay instead (a `GestureHandlerRootView` with `absoluteFill`, a high
+  `zIndex` and `box-none` pointer events), which keeps the input focused and the keyboard up. The
+  consumer renders it where it can cover the screen (at the app root, not inside a clipped scroll
+  view) and gates the `Backdrop` on the open state the way the Modal's `visible` used to.
+  `modalProps` is ignored when `modal={false}`.
+
 ## [0.9.0]
 
 ### Added
