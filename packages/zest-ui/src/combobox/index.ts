@@ -22,9 +22,17 @@ export type * from './empty/ComboboxEmpty';
 export type * from './status/ComboboxStatus';
 export type * from './value/ComboboxValue';
 export {
+  ComboboxRootContext,
   useComboboxRootContext,
   type ComboboxItem as ComboboxItemData,
 } from './root/ComboboxRootContext';
+// The four contexts the root publishes, exported so a consumer can re-provide
+// them around a part rendered outside the root's own tree — e.g. a
+// `Combobox.Portal modal={false}` hoisted into a root-level overlay, which sits
+// above the `<Combobox.Root>` that supplies them.
+export { ComboboxItemsContext, useComboboxItemsContext } from './root/ComboboxItemsContext';
+export { ComboboxSelectionContext, useComboboxSelectionContext } from './root/ComboboxSelectionContext';
+export { ComboboxTransitionContext, useComboboxTransitionContext } from './root/ComboboxTransitionContext';
 export { createComboboxHandle, ComboboxHandle } from './store/ComboboxHandle';
 export type {
   ComboboxItems,

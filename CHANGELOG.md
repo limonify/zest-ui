@@ -1,3 +1,15 @@
+## [0.9.2]
+
+### Added
+
+- **The combobox root's four contexts are exported, so a consumer can re-provide them around a
+  part rendered outside the root's own tree.** `ComboboxRootContext`, `ComboboxItemsContext`,
+  `ComboboxSelectionContext` and `ComboboxTransitionContext`, together with their
+  `use…Context` hooks, are now named exports. They exist for the same reason as
+  `Combobox.Portal modal={false}`: hoisting a list into a root-level overlay moves it above the
+  `<Combobox.Root>` that supplies these contexts, so the consumer re-provides them around the
+  hoisted part.
+
 ## [0.9.1]
 
 ### Added
