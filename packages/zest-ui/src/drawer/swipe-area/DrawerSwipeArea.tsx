@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { View } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useDialogRootContext } from '../../dialog/root/DialogRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
@@ -73,24 +73,21 @@ export function DrawerSwipeArea(componentProps: DrawerSwipeArea.Props) {
     }
   });
 
-  const gesture = React.useMemo(
-    () =>
-      Gesture.Pan()
-        // A gesture is invisible to the rendered tree, so tests can only reach it
-        // through gesture-handler's registry, which is keyed by this id.
-        .withTestId(testID ?? 'drawer-swipe-area')
-        .enabled(!disabled)
-        .onBegin(() => {
-          setSwiping(true);
-        })
-        .onEnd((event) => release(event.translationX, event.translationY))
-        .onFinalize(() => {
-          setSwiping(false);
-        })
-        // The handlers touch React state, so they must not run on the UI thread.
-        .runOnJS(true),
-    [testID, disabled, release],
-  );
+  const gesture = usePanGesture({
+    // A gesture is invisible to the rendered tree, so tests can only reach it
+    // through gesture-handler's registry, which is keyed by this id.
+    testID: testID ?? 'drawer-swipe-area',
+    enabled: !disabled,
+    // The handlers touch React state, so they must not run on the UI thread.
+    runOnJS: true,
+    onBegin: () => {
+      setSwiping(true);
+    },
+    onDeactivate: (event) => release(event.translationX, event.translationY),
+    onFinalize: () => {
+      setSwiping(false);
+    },
+  });
 
   const state: DrawerSwipeAreaState = {
     open,

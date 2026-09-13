@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useDialogPopupProps } from '../../dialog/popup/useDialogPopupProps';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
@@ -178,30 +178,26 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
     },
   );
 
-  const gesture = React.useMemo(
-    () =>
-      Gesture.Pan()
-        // A gesture is invisible to the rendered tree, so tests can only reach it
-        // through gesture-handler's registry, which is keyed by this id.
-        .withTestId(testID ?? 'drawer-popup')
-        .onBegin(() => {
-          setSwiping(true);
-        })
-        // The move that activates the pan arrives as `onStart`, and every move
-        // after it as `onUpdate` — the drawer has to follow both.
-        .onStart((event) => move(event.translationX, event.translationY))
-        .onUpdate((event) => move(event.translationX, event.translationY))
-        .onEnd((event) =>
-          release(event.translationX, event.translationY, event.velocityX, event.velocityY),
-        )
-        .onFinalize(() => {
-          setSwiping(false);
-          resetMovement();
-        })
-        // The handlers touch React state, so they must not run on the UI thread.
-        .runOnJS(true),
-    [testID, move, release, resetMovement],
-  );
+  const gesture = usePanGesture({
+    // A gesture is invisible to the rendered tree, so tests can only reach it
+    // through gesture-handler's registry, which is keyed by this id.
+    testID: testID ?? 'drawer-popup',
+    // The handlers touch React state, so they must not run on the UI thread.
+    runOnJS: true,
+    onBegin: () => {
+      setSwiping(true);
+    },
+    // The move that activates the pan arrives as `onActivate`, and every move
+    // after it as `onUpdate` — the drawer has to follow both.
+    onActivate: (event) => move(event.translationX, event.translationY),
+    onUpdate: (event) => move(event.translationX, event.translationY),
+    onDeactivate: (event) =>
+      release(event.translationX, event.translationY, event.velocityX, event.velocityY),
+    onFinalize: () => {
+      setSwiping(false);
+      resetMovement();
+    },
+  });
 
   const state: DrawerPopupState = {
     open,

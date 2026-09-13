@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { Gesture, GestureHandlerRootView, State } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, State, usePanGesture } from 'react-native-gesture-handler';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
 import { Slider } from '../index';
 import type { SliderRootProps } from './SliderRoot';
@@ -486,7 +486,10 @@ describe('Slider', () => {
 // converts the touch with `sliderValueFromPosition`, and drives the thumb from a
 // shared value. Both gestures see the same touch.
 describe('Slider.Control simultaneousGesture', () => {
-  function WithConsumerGesture({ gesture }: { gesture: ReturnType<typeof Gesture.Pan> }) {
+  // The gesture is built INSIDE the component now: `usePanGesture` is a hook, so
+  // a test cannot hand one in from the outside the way the builder allowed.
+  function WithConsumerGesture({ gestureTestID }: { gestureTestID?: string }) {
+    const gesture = usePanGesture({ testID: gestureTestID });
     return (
       <GestureHandlerRootView>
         <Slider.Root testID="root" defaultValue={0}>
@@ -504,19 +507,17 @@ describe('Slider.Control simultaneousGesture', () => {
     // A gesture is invisible in the tree; the only way to see whether it was
     // attached is gesture-handler's own registry, which is keyed by test id and
     // populated when the gesture reaches a `GestureDetector`. Drop the
-    // `Gesture.Simultaneous` and this id is never registered.
-    const gesture = Gesture.Pan().withTestId('consumer-pan');
-    await render(<WithConsumerGesture gesture={gesture} />);
+    // composition and this id is never registered.
+    await render(<WithConsumerGesture gestureTestID="consumer-pan" />);
     await layoutControl();
 
     expect(() => getByGestureTestId('consumer-pan')).not.toThrow();
   });
 
   it('still updates the value when a consumer gesture is attached', async () => {
-    // The point of `Simultaneous` over composing handlers: zest's own gesture
-    // keeps running. If the consumer's replaced it, the value would never move.
-    const gesture = Gesture.Pan();
-    await render(<WithConsumerGesture gesture={gesture} />);
+    // The point of composing over adding handlers: zest's own gesture keeps
+    // running. If the consumer's replaced it, the value would never move.
+    await render(<WithConsumerGesture />);
     await layoutControl();
     await drag(CONTROL_SIZE / 2);
 

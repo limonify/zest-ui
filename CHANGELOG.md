@@ -1,3 +1,47 @@
+## [0.10.0]
+
+gesture-handler deprecated the `Gesture.*()` builder in v3 in favour of a hook API, and every
+gesture in this package has moved to it.
+
+> **This release is breaking**, which is why it is a minor bump rather than a patch. Both breaks
+> follow from the same fact: the builder and the hooks produce different gesture shapes, and
+> gesture-handler cannot compose one with the other. There is therefore no version of this package
+> that can support both.
+
+### Breaking
+
+- **`react-native-gesture-handler` is now a `>=3.1.0` peer, up from `>=2.32.0`.** The hooks do not
+  exist in 2.x. An app still on 2.x stays on `0.9.x`.
+
+- **`Slider.Control`'s `simultaneousGesture` takes a hook gesture, not a builder one.** It was typed
+  as the deprecated `GestureType` and composed with `Gesture.Simultaneous`, which meant a consumer
+  passing it was pinned to a deprecated API with no way out — a hook gesture did not fit the slot,
+  and casting one in would have handed `Gesture.Simultaneous` an object it calls builder methods on.
+  The prop is now `SingleGesture | ComposedGesture`:
+
+  ```diff
+  - const gesture = Gesture.Pan().onUpdate(…)
+  + const gesture = usePanGesture({ onUpdate: … })
+
+    <Slider.Control simultaneousGesture={gesture} />
+  ```
+
+  Note the gesture must now be built inside a component, because `usePanGesture` is a hook.
+
+### Changed
+
+- **The five parts that use gesture-handler are on the hook API.** `Slider.Control`,
+  `Drawer.Popup`, `Drawer.SwipeArea`, `Toast.Root` and `NumberField.ScrubArea` all build their pan
+  with `usePanGesture({ … })`. Behaviour is unchanged: the same `testID` reaches gesture-handler's
+  registry, so existing tests that find a gesture through it keep working, and the handlers still
+  run on the JS thread (`runOnJS: true`) because they touch React state. The callback renames are
+  gesture-handler's: `.onStart` is `onActivate` and `.onEnd` is `onDeactivate`.
+
+- **The example app needs a development build.** Expo Go ships gesture-handler 2.x, so it can no
+  longer load the example; `npx expo run:ios` replaces `expo start` for it. The docs site moved to
+  3.x for the same reason — its Next build resolves this package's source directly and failed on
+  `Export usePanGesture doesn't exist in target module`.
+
 ## [0.9.2]
 
 ### Added
