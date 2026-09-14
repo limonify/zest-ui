@@ -1,7 +1,13 @@
 'use client';
 import * as React from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
-import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
+import {
+  GestureDetector,
+  usePanGesture,
+  useSimultaneousGestures,
+  type ComposedGesture,
+  type SingleGesture,
+} from 'react-native-gesture-handler';
 import { useDialogPopupProps } from '../../dialog/popup/useDialogPopupProps';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
@@ -52,6 +58,7 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
     style,
     swipeThreshold = DEFAULT_SWIPE_THRESHOLD,
     ref,
+    simultaneousGesture,
     ...elementProps
   } = componentProps;
 
@@ -218,7 +225,30 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
     props: [{ ...props, onLayout: handleLayout }, elementProps],
   });
 
-  return <GestureDetector gesture={gesture}>{element}</GestureDetector>;
+  // **The consumer's own gesture runs beside this one, not instead of it.**
+  //
+  // This popup's handlers touch React state, so they are `runOnJS: true` and the
+  // sheet's position reaches the consumer as `state.swipeMovement` — a render
+  // sits between the finger and the sheet, once per frame of a drag, which is
+  // the one place it is visible. A sheet travels half a screen, so it shows up
+  // there more than anywhere else in this package.
+  //
+  // zest cannot fix that itself without animating, which it does not do, or
+  // taking reanimated as a dependency, which it will not. What it can do is let
+  // a consumer attach a gesture of its OWN — one that stays on the UI thread and
+  // moves the sheet from a shared value — and run the two simultaneously. Same
+  // arrangement `Slider.Control` has had since 0.9.0, for the same reason.
+  //
+  // Composed rather than having handlers added onto this gesture: `runOnJS`
+  // applies to the whole gesture, so a worklet added to this one would be
+  // dragged onto the JS thread with the rest.
+  //
+  // The hook is called unconditionally, as hooks must be, but its result is only
+  // used when there is something to compose with — wrapping a lone gesture is an
+  // extra node for every drawer that does not pass this prop.
+  const composed = useSimultaneousGestures(gesture, ...(simultaneousGesture ? [simultaneousGesture] : []));
+
+  return <GestureDetector gesture={simultaneousGesture ? composed : gesture}>{element}</GestureDetector>;
 }
 
 /** How far a translation has travelled towards `direction`. */
@@ -294,6 +324,21 @@ export interface DrawerPopupProps extends ZestUIComponentProps<typeof View, Draw
    * @default 40
    */
   swipeThreshold?: number | undefined;
+  /**
+   * A gesture of the consumer's own, run at the same time as the drawer's.
+   *
+   * The drawer's own drag handlers touch React state and therefore run on the JS
+   * thread, so the sheet cannot move without a render — visible as a lag behind
+   * the finger on a busy thread, once per frame of a drag. A consumer that wants
+   * the sheet to track the finger exactly can build a `usePanGesture` whose
+   * handlers are worklets and drive the transform from a shared value, all on
+   * the UI thread.
+   *
+   * Both gestures receive the same touch. The drawer keeps publishing
+   * `state.swipeMovement` and dismissing at `swipeThreshold` exactly as before,
+   * so nothing changes for anyone who does not pass this.
+   */
+  simultaneousGesture?: SingleGesture | ComposedGesture;
 }
 
 export namespace DrawerPopup {

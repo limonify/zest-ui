@@ -1,12 +1,26 @@
 ## [0.10.0]
 
 gesture-handler deprecated the `Gesture.*()` builder in v3 in favour of a hook API, and every
-gesture in this package has moved to it.
+gesture in this package has moved to it. `Drawer.Popup` gains the UI-thread escape hatch
+`Slider.Control` already had, which is the one place the JS-thread round trip is most visible.
 
 > **This release is breaking**, which is why it is a minor bump rather than a patch. Both breaks
 > follow from the same fact: the builder and the hooks produce different gesture shapes, and
 > gesture-handler cannot compose one with the other. There is therefore no version of this package
 > that can support both.
+
+### Added
+
+- **`Drawer.Popup` takes a `simultaneousGesture`, so a consumer can move the sheet on the UI
+  thread.** The same arrangement `Slider.Control` has had since 0.9.0, and it matters more here:
+  the popup's own handlers touch React state, so they run on JS (`runOnJS: true`) and the sheet's
+  position reaches the consumer as `state.swipeMovement` — a render sits between the finger and the
+  sheet, once per frame of a drag. A thumb travels twenty points and a sheet travels half a screen,
+  so the same lag is far more visible on a drawer. zest neither animates nor takes an animation
+  dependency, so instead it now runs a gesture of the consumer's own alongside its own: both see the
+  same touch, `state.swipeMovement` and dismissal at `swipeThreshold` are unchanged, and the sheet
+  can follow the finger from a shared value with no render in the path. Nothing changes for anyone
+  who does not pass the prop.
 
 ### Breaking
 
