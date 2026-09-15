@@ -26,15 +26,20 @@ bun add @limonify/zest-ui
 # or: npm install @limonify/zest-ui
 ```
 
-**Peers:** React 19+, React Native 0.79+.
+**Peers:** React 19+, React Native 0.79+, `react-native-gesture-handler` 2.32+.
 
-`react-native-gesture-handler` is a **required** peer — install it alongside zest. On Expo, use
-`npx expo install react-native-gesture-handler` so you get the version your SDK's Expo Go ships;
-a mismatch crashes at gesture attach rather than at build:
+`react-native-gesture-handler` is a **required** peer — install it alongside zest. It is native, so
+the JS version has to match the native one your app was built with; a mismatch crashes at gesture
+attach rather than at build. On Expo, let the SDK pick it and Expo Go keeps working:
 
 ```bash
-bun add react-native-gesture-handler
+npx expo install react-native-gesture-handler
+# bare RN: bun add react-native-gesture-handler
 ```
+
+zest works on both the 2.x and 3.x lines. It builds its gestures with the `Gesture.*()` API, which
+3.x still supports, so nothing here forces you off the version your Expo SDK pins — and a
+`simultaneousGesture` you pass in should be built the same way, whichever line you are on.
 
 It is required rather than optional because the package root re-exports every component, and Metro
 does not tree-shake: importing anything from `@limonify/zest-ui` pulls in `Slider`, `Drawer`,

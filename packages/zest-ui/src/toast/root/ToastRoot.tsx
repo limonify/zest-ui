@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
-import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useToastProviderContext } from '../provider/ToastProviderContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
@@ -115,42 +115,45 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
     }
   });
 
-  const gesture = usePanGesture({
-    // A gesture is invisible to the rendered tree, so tests can only reach it
-    // through gesture-handler's registry, which is keyed by this id.
-    testID: testID ?? `toast-${toast.id}`,
-    // The handlers touch React state, so they must not run on the UI thread.
-    runOnJS: true,
-    onBegin: () => {
-      setSwiping(true);
-      // A finger on the toast means "not yet" — the same intent hover carries on
-      // the web, where upstream pairs these two exactly like this. Setting
-      // `pressed` alone would only re-render; the timers keep running until they
-      // are told to stop.
-      store.set('pressed', true);
-      store.pauseTimers();
-    },
-    onActivate: (event) => publishMovement(getDisplacement(swipeDirection, event)),
-    onUpdate: (event) => publishMovement(getDisplacement(swipeDirection, event)),
-    onDeactivate: (event) => {
-      if (getDisplacement(swipeDirection, event) > swipeThreshold) {
-        store.closeToast(toast.id);
-      }
-    },
-    onFinalize: () => {
-      setSwiping(false);
-      resetMovement();
-      store.set('pressed', false);
+  const gesture = React.useMemo(
+    () =>
+      Gesture.Pan()
+        // A gesture is invisible to the rendered tree, so tests can only reach it
+        // through gesture-handler's registry, which is keyed by this id.
+        .withTestId(testID ?? `toast-${toast.id}`)
+        .onBegin(() => {
+          setSwiping(true);
+          // A finger on the toast means "not yet" — the same intent hover
+          // carries on the web, where upstream pairs these two exactly like this.
+          // Setting `pressed` alone would only re-render; the timers keep running
+          // until they are told to stop.
+          store.set('pressed', true);
+          store.pauseTimers();
+        })
+        .onStart((event) => publishMovement(getDisplacement(swipeDirection, event)))
+        .onUpdate((event) => publishMovement(getDisplacement(swipeDirection, event)))
+        .onEnd((event) => {
+          if (getDisplacement(swipeDirection, event) > swipeThreshold) {
+            store.closeToast(toast.id);
+          }
+        })
+        .onFinalize(() => {
+          setSwiping(false);
+          resetMovement();
+          store.set('pressed', false);
 
-      // `expandedOrInactive`, not `expanded`: letting go while the app is in the
-      // background must not restart the countdown, or the toast spends it where
-      // nobody can see it. Upstream guards the same way, on the window being
-      // focused.
-      if (!store.select('expandedOrInactive')) {
-        store.resumeTimers();
-      }
-    },
-  });
+          // `expandedOrInactive`, not `expanded`: letting go while the app is in
+          // the background must not restart the countdown, or the toast spends it
+          // where nobody can see it. Upstream guards the same way, on the window
+          // being focused.
+          if (!store.select('expandedOrInactive')) {
+            store.resumeTimers();
+          }
+        })
+        // The handlers touch React state, so they must not run on the UI thread.
+        .runOnJS(true),
+    [testID, toast.id, swipeDirection, swipeThreshold, store, publishMovement, resetMovement],
+  );
 
   const state: ToastRootState = React.useMemo(
     () => ({

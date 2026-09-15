@@ -1,3 +1,76 @@
+## [0.11.0] - 2026-09-15
+
+0.10.0 moved every gesture to gesture-handler's hook API and raised the peer to `>=3.1.0`. That put
+this package outside every stock Expo project, and this release undoes it. The peer is `>=2.32.0`
+again and the gestures are back on the `Gesture.*()` builder — which, it turns out, works on both
+lines, so nothing has to be given up to get there.
+
+> **This release is breaking**, which is why it is a minor bump. The break is narrow: only
+> `simultaneousGesture` changes shape, back to what it was in 0.9.x.
+
+### Fixed
+
+- **zest installs and runs in a stock Expo project again.** Expo SDK 57 pins
+  `react-native-gesture-handler` to `~2.32.0` in its `bundledNativeModules.json`, and the hook API
+  does not exist in 2.x, so 0.10.0's `>=3.1.0` peer was disjoint from the version Expo hands you.
+  Three things followed from that, all of them now gone: `npm install` failed outright with
+  `ERESOLVE` for anyone who had installed gesture-handler the way the docs say to; `expo-doctor`
+  reported the project off-SDK on every run and in every EAS build log; and **Expo Go could not
+  load the app at all**, because its binary embeds native 2.32 and installing JS 3.3 against it
+  crashes at gesture attach rather than at build. Trying zest now needs no development build.
+
+- **The `simultaneousGesture` "is it actually attached?" tests assert something again.** Under the
+  hook API a gesture registers with gesture-handler's jest registry when it is *created*, so
+  `getByGestureTestId` found gestures that had never reached a `GestureDetector` and the check
+  passed with the composition deleted — 0.10.0 removed the Slider's as worthless rather than
+  fixing it. The builder registers at attach time, so the assertion is real, and both
+  `Slider.Control` and `Drawer.Popup` now have one.
+
+### Breaking
+
+- **`react-native-gesture-handler` is a `>=2.32.0` peer, down from `>=3.1.0`.** No one needs to
+  change a version to take this: 2.32 satisfies it, and so does 3.x.
+
+- **`simultaneousGesture` takes a builder gesture again, on both `Slider.Control` and
+  `Drawer.Popup`.** The prop is `GestureType`, not `SingleGesture | ComposedGesture`:
+
+  ```diff
+  - const gesture = usePanGesture({ onUpdate: … })
+  + const gesture = Gesture.Pan().onUpdate(…)
+
+    <Slider.Control simultaneousGesture={gesture} />
+  ```
+
+  This only affects code written against 0.10.0, which was current for one day. `Gesture.Pan()` is
+  available on 2.x and 3.x alike, so the snippet above compiles on whichever line you are on, and
+  it no longer has to be built inside a component.
+
+### Changed
+
+- **The five gesture parts are back on the builder.** `Slider.Control`, `Drawer.Popup`,
+  `Drawer.SwipeArea`, `Toast.Root` and `NumberField.ScrubArea` build their pan with
+  `Gesture.Pan()` and compose with `Gesture.Simultaneous`. Behaviour is unchanged, and
+  `Drawer.Popup`'s `simultaneousGesture` — added in 0.10.0 — is kept, just expressed in builder
+  form.
+
+  The builder is deprecated in 3.x but **not removed, and it emits no runtime warning**: 3.x still
+  exports `Gesture.Pan()` and `Gesture.Simultaneous()`, and its `GestureDetector` branches to the
+  legacy detector when it is handed one (`props.gesture instanceof BaseGesture`). One code path
+  therefore covers 2.32 and 3.3, which is what makes the wide peer range honest rather than
+  optimistic. The one thing it costs is that a single `GestureDetector` is locked to one gesture
+  family, so a consumer's `simultaneousGesture` has to be a builder gesture too — available to
+  them on either line.
+
+  This is a deliberate hold, not an oversight: the hooks come back when Expo ships an SDK whose
+  pinned gesture-handler is 3.x, and doing it before that buys nothing but costs everyone Expo Go.
+
+- **The example app runs in Expo Go again**, and the docs site is back on gesture-handler 2.x with
+  it. Both pin `~2.32.0`, the version SDK 57 bundles, so `npx expo start` is enough — no
+  `npx expo run:ios`.
+
+- **The README documents the gesture-handler peer.** It listed only React and React Native, and
+  told Expo users to match their SDK's version, which 0.10.0 had quietly made impossible.
+
 ## [0.10.0]
 
 gesture-handler deprecated the `Gesture.*()` builder in v3 in favour of a hook API, and every

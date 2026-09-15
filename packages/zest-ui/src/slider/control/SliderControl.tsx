@@ -1,13 +1,7 @@
 'use client';
 import * as React from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
-import {
-  GestureDetector,
-  usePanGesture,
-  useSimultaneousGestures,
-  type ComposedGesture,
-  type SingleGesture,
-} from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, type GestureType } from 'react-native-gesture-handler';
 import { useSliderRootContext } from '../root/SliderRootContext';
 import { useStoreState } from '../../store/ReactStore';
 import { useRenderElement } from '../../use-render/useRenderElement';
@@ -77,41 +71,51 @@ export function SliderControl(componentProps: SliderControl.Props) {
     [moveTo, orientation],
   );
 
-  const gesture = usePanGesture({
-    enabled: !disabled,
-    // A gesture is invisible to the rendered tree, so `fireGestureHandler` can
-    // only reach it through gesture-handler's own registry, which is keyed by
-    // this id (and only populated under a test env). Forwarding the control's
-    // `testID` is what makes the drag testable at all — without it consumers
-    // could not test their own sliders either.
-    testID: testID ?? 'slider-control',
-    // The handlers touch React state, so they must not run on the UI thread.
-    runOnJS: true,
-    // A press anywhere on the control jumps the nearest thumb to it, then that
-    // same thumb follows the finger.
-    onBegin: (event) => {
-      const position = orientation === 'vertical' ? event.y : event.x;
-      const value = store.context.getValueFromPosition(position);
-      if (value === undefined) {
-        return;
-      }
+  const gesture = React.useMemo(
+    () =>
+      Gesture.Pan()
+        .enabled(!disabled)
+        // A gesture is invisible to the rendered tree, so `fireGestureHandler`
+        // can only reach it through gesture-handler's own registry, which is
+        // keyed by this id (and only populated under a test env). Forwarding the
+        // control's `testID` is what makes the drag testable at all — without it
+        // consumers could not test their own sliders either.
+        .withTestId(testID ?? 'slider-control')
+        // A press anywhere on the control jumps the nearest thumb to it, then
+        // that same thumb follows the finger.
+        .onBegin((event) => {
+          const position = orientation === 'vertical' ? event.y : event.x;
+          const value = store.context.getValueFromPosition(position);
+          if (value === undefined) {
+            return;
+          }
 
-      activeThumbRef.current = store.context.getClosestThumbIndex(value);
-      store.context.setDragging(true);
-      moveTo(position, activeThumbRef.current);
-    },
-    // The move that activates the pan arrives as `onActivate`, and every move
-    // after it as `onUpdate` — the thumb has to follow both.
-    onActivate: follow,
-    onUpdate: follow,
-    onFinalize: () => {
-      // The drag is over: drop any frame-coalesced commit and apply the latest
-      // value right away, then let the value settle.
-      store.context.flushValues();
-      store.context.setDragging(false);
-      store.context.commitValue(createChangeEventDetails(REASONS.drag));
-    },
-  });
+          activeThumbRef.current = store.context.getClosestThumbIndex(value);
+          store.context.setDragging(true);
+          moveTo(position, activeThumbRef.current);
+        })
+        // The move that activates the pan arrives as `onStart`, and every move
+        // after it as `onUpdate` — the thumb has to follow both.
+        .onStart(follow)
+        .onUpdate(follow)
+        .onFinalize(() => {
+          // The drag is over: drop any frame-coalesced commit and apply the
+          // latest value right away, then let the value settle.
+          store.context.flushValues();
+          store.context.setDragging(false);
+          store.context.commitValue(createChangeEventDetails(REASONS.drag));
+        })
+        // The handlers touch React state, so they must not run on the UI thread.
+        .runOnJS(true),
+    [
+      disabled,
+      testID,
+      orientation,
+      follow,
+      moveTo,
+      store,
+    ],
+  );
 
   const state: SliderControlState = { ...getSliderRootState(store), dragging };
 
@@ -135,16 +139,15 @@ export function SliderControl(componentProps: SliderControl.Props) {
   // arithmetic that consumer needs is exported from `../sliderValue` as
   // worklet-safe pure functions, so its conversion cannot drift from this one.
   //
-  // Composed rather than having handlers added onto zest's own gesture:
-  // `runOnJS` applies to the whole gesture, so a worklet added to this one would
-  // be dragged onto the JS thread with the rest.
-  //
-  // The hook is called unconditionally, as hooks must be, but its result is only
-  // used when there is something to compose with — wrapping a lone gesture is an
-  // extra node for every slider that does not pass this prop.
-  const composed = useSimultaneousGestures(gesture, ...(simultaneousGesture ? [simultaneousGesture] : []));
+  // `Gesture.Simultaneous` rather than composing handlers onto zest's own
+  // gesture: `.runOnJS(true)` applies to the whole gesture, so a worklet added
+  // to this one would be dragged onto the JS thread with the rest.
+  const composed = React.useMemo(
+    () => (simultaneousGesture ? Gesture.Simultaneous(gesture, simultaneousGesture) : gesture),
+    [gesture, simultaneousGesture],
+  );
 
-  return <GestureDetector gesture={simultaneousGesture ? composed : gesture}>{element}</GestureDetector>;
+  return <GestureDetector gesture={composed}>{element}</GestureDetector>;
 }
 
 export interface SliderControlState extends SliderRootState {}
@@ -156,7 +159,7 @@ export interface SliderControlProps extends ZestUIComponentProps<typeof View, Sl
    * The slider's own drag handlers touch React state and therefore run on the JS
    * thread, so the thumb cannot move without a render — visible as a stutter on
    * a busy thread, once per frame of a drag. A consumer that wants the thumb to
-   * follow the finger can build a `usePanGesture` whose handlers are worklets,
+   * follow the finger can build a `Gesture.Pan()` whose handlers are worklets,
    * convert the touch with the worklet-safe helpers this module exports
    * (`sliderValueFromPosition`, `sliderPercentFromValue`), and drive the thumb
    * from a shared value — all on the UI thread.
@@ -164,15 +167,8 @@ export interface SliderControlProps extends ZestUIComponentProps<typeof View, Sl
    * Both gestures receive the same touch. The slider keeps updating its value in
    * React exactly as before, so `onValueChange`, `state.value` and the rendered
    * thumb position are unchanged for everyone who does not pass this.
-   *
-   * **Takes a hook-API gesture, not the deprecated `Gesture.Pan()` builder.**
-   * The two are different shapes and gesture-handler cannot compose across them,
-   * so while zest's own gesture was a builder one this slot could not accept a
-   * hook gesture — which pinned every consumer of this prop to an API
-   * gesture-handler has deprecated, with no way out short of a cast that lies at
-   * runtime.
    */
-  simultaneousGesture?: SingleGesture | ComposedGesture;
+  simultaneousGesture?: GestureType;
 }
 
 export namespace SliderControl {

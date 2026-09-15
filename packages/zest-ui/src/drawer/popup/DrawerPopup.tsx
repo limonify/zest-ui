@@ -1,13 +1,7 @@
 'use client';
 import * as React from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
-import {
-  GestureDetector,
-  usePanGesture,
-  useSimultaneousGestures,
-  type ComposedGesture,
-  type SingleGesture,
-} from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, type GestureType } from 'react-native-gesture-handler';
 import { useDialogPopupProps } from '../../dialog/popup/useDialogPopupProps';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
@@ -185,26 +179,30 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
     },
   );
 
-  const gesture = usePanGesture({
-    // A gesture is invisible to the rendered tree, so tests can only reach it
-    // through gesture-handler's registry, which is keyed by this id.
-    testID: testID ?? 'drawer-popup',
-    // The handlers touch React state, so they must not run on the UI thread.
-    runOnJS: true,
-    onBegin: () => {
-      setSwiping(true);
-    },
-    // The move that activates the pan arrives as `onActivate`, and every move
-    // after it as `onUpdate` — the drawer has to follow both.
-    onActivate: (event) => move(event.translationX, event.translationY),
-    onUpdate: (event) => move(event.translationX, event.translationY),
-    onDeactivate: (event) =>
-      release(event.translationX, event.translationY, event.velocityX, event.velocityY),
-    onFinalize: () => {
-      setSwiping(false);
-      resetMovement();
-    },
-  });
+  const gesture = React.useMemo(
+    () =>
+      Gesture.Pan()
+        // A gesture is invisible to the rendered tree, so tests can only reach it
+        // through gesture-handler's registry, which is keyed by this id.
+        .withTestId(testID ?? 'drawer-popup')
+        .onBegin(() => {
+          setSwiping(true);
+        })
+        // The move that activates the pan arrives as `onStart`, and every move
+        // after it as `onUpdate` — the drawer has to follow both.
+        .onStart((event) => move(event.translationX, event.translationY))
+        .onUpdate((event) => move(event.translationX, event.translationY))
+        .onEnd((event) =>
+          release(event.translationX, event.translationY, event.velocityX, event.velocityY),
+        )
+        .onFinalize(() => {
+          setSwiping(false);
+          resetMovement();
+        })
+        // The handlers touch React state, so they must not run on the UI thread.
+        .runOnJS(true),
+    [testID, move, release, resetMovement],
+  );
 
   const state: DrawerPopupState = {
     open,
@@ -227,7 +225,7 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
 
   // **The consumer's own gesture runs beside this one, not instead of it.**
   //
-  // This popup's handlers touch React state, so they are `runOnJS: true` and the
+  // This popup's handlers touch React state, so they are `.runOnJS(true)` and the
   // sheet's position reaches the consumer as `state.swipeMovement` — a render
   // sits between the finger and the sheet, once per frame of a drag, which is
   // the one place it is visible. A sheet travels half a screen, so it shows up
@@ -239,16 +237,15 @@ export function DrawerPopup(componentProps: DrawerPopup.Props) {
   // moves the sheet from a shared value — and run the two simultaneously. Same
   // arrangement `Slider.Control` has had since 0.9.0, for the same reason.
   //
-  // Composed rather than having handlers added onto this gesture: `runOnJS`
-  // applies to the whole gesture, so a worklet added to this one would be
-  // dragged onto the JS thread with the rest.
-  //
-  // The hook is called unconditionally, as hooks must be, but its result is only
-  // used when there is something to compose with — wrapping a lone gesture is an
-  // extra node for every drawer that does not pass this prop.
-  const composed = useSimultaneousGestures(gesture, ...(simultaneousGesture ? [simultaneousGesture] : []));
+  // `Gesture.Simultaneous` rather than composing handlers onto zest's own
+  // gesture: `.runOnJS(true)` applies to the whole gesture, so a worklet added
+  // to this one would be dragged onto the JS thread with the rest.
+  const composed = React.useMemo(
+    () => (simultaneousGesture ? Gesture.Simultaneous(gesture, simultaneousGesture) : gesture),
+    [gesture, simultaneousGesture],
+  );
 
-  return <GestureDetector gesture={simultaneousGesture ? composed : gesture}>{element}</GestureDetector>;
+  return <GestureDetector gesture={composed}>{element}</GestureDetector>;
 }
 
 /** How far a translation has travelled towards `direction`. */
@@ -330,7 +327,7 @@ export interface DrawerPopupProps extends ZestUIComponentProps<typeof View, Draw
    * The drawer's own drag handlers touch React state and therefore run on the JS
    * thread, so the sheet cannot move without a render — visible as a lag behind
    * the finger on a busy thread, once per frame of a drag. A consumer that wants
-   * the sheet to track the finger exactly can build a `usePanGesture` whose
+   * the sheet to track the finger exactly can build a `Gesture.Pan()` whose
    * handlers are worklets and drive the transform from a shared value, all on
    * the UI thread.
    *
@@ -338,7 +335,7 @@ export interface DrawerPopupProps extends ZestUIComponentProps<typeof View, Draw
    * `state.swipeMovement` and dismissing at `swipeThreshold` exactly as before,
    * so nothing changes for anyone who does not pass this.
    */
-  simultaneousGesture?: SingleGesture | ComposedGesture;
+  simultaneousGesture?: GestureType;
 }
 
 export namespace DrawerPopup {

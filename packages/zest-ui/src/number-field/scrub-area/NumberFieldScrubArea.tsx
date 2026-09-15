@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { View } from 'react-native';
-import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNumberFieldRootContext } from '../root/NumberFieldRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
@@ -69,29 +69,41 @@ export function NumberFieldScrubArea(componentProps: NumberFieldScrubArea.Props)
     });
   });
 
-  const gesture = usePanGesture({
-    enabled: !disabled && !readOnly,
-    // A gesture is invisible to the rendered tree, so tests can only reach it
-    // through gesture-handler's registry, which is keyed by this id.
-    testID: testID ?? 'number-field-scrub-area',
-    // The handlers touch React state, so they must not run on the UI thread.
-    runOnJS: true,
-    onBegin: () => {
-      appliedRef.current = 0;
-      setScrubbing(true);
-    },
-    // The move that activates the pan arrives as `onActivate`, and every move
-    // after it as `onUpdate`.
-    onActivate: (event) => scrub(event.translationX, event.translationY),
-    onUpdate: (event) => scrub(event.translationX, event.translationY),
-    onFinalize: () => {
-      setScrubbing(false);
-      onValueCommitted(
-        lastChangedValueRef.current ?? valueRef.current,
-        createChangeEventDetails(REASONS.scrub),
-      );
-    },
-  });
+  const gesture = React.useMemo(
+    () =>
+      Gesture.Pan()
+        .enabled(!disabled && !readOnly)
+        // A gesture is invisible to the rendered tree, so tests can only reach it
+        // through gesture-handler's registry, which is keyed by this id.
+        .withTestId(testID ?? 'number-field-scrub-area')
+        .onBegin(() => {
+          appliedRef.current = 0;
+          setScrubbing(true);
+        })
+        // The move that activates the pan arrives as `onStart`, and every move
+        // after it as `onUpdate`.
+        .onStart((event) => scrub(event.translationX, event.translationY))
+        .onUpdate((event) => scrub(event.translationX, event.translationY))
+        .onFinalize(() => {
+          setScrubbing(false);
+          onValueCommitted(
+            lastChangedValueRef.current ?? valueRef.current,
+            createChangeEventDetails(REASONS.scrub),
+          );
+        })
+        // The handlers touch React state, so they must not run on the UI thread.
+        .runOnJS(true),
+    [
+      disabled,
+      readOnly,
+      testID,
+      scrub,
+      setScrubbing,
+      onValueCommitted,
+      lastChangedValueRef,
+      valueRef,
+    ],
+  );
 
   const element = useRenderElement(View, componentProps, {
     state,
