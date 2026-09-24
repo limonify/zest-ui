@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { render, screen, userEvent } from '@testing-library/react-native';
-import { Checkbox, CheckboxGroup } from '../index';
+import { act, render, screen, userEvent } from '@testing-library/react-native';
+import { Checkbox, CheckboxGroup, Field, Form } from '../index';
 
 const ALL = ['red', 'green', 'blue'];
 
@@ -186,6 +186,67 @@ describe('CheckboxGroup', () => {
       for (const color of ALL) {
         expect(screen.getByTestId(color).props.accessibilityState).toMatchObject({ checked: false });
       }
+    });
+  });
+
+  describe('in a Field', () => {
+    // The field's value is the group's array. Each checkbox used to register its
+    // own boolean instead, so `validate` saw `true`/`false` per box and a submit
+    // validated the field once per checkbox, never against what it submits.
+    const atLeastTwo = (value: unknown) =>
+      Array.isArray(value) && value.length >= 2 ? null : 'Pick two';
+
+    it('validates the array, on every press', async () => {
+      const validate = jest.fn(atLeastTwo);
+      await render(
+        <Field.Root name="colors" validate={validate}>
+          <TestGroup />
+          <Field.Error testID="error" />
+        </Field.Root>,
+      );
+
+      const user = userEvent.setup();
+      await user.press(screen.getByTestId('red'));
+
+      expect(validate).toHaveBeenLastCalledWith(['red']);
+      expect(validate.mock.calls.every(([value]) => Array.isArray(value))).toBe(true);
+      expect(screen.getByTestId('error')).toHaveTextContent('Pick two');
+
+      await user.press(screen.getByTestId('blue'));
+      expect(validate).toHaveBeenLastCalledWith(['red', 'blue']);
+      expect(screen.queryByTestId('error')).toBeNull();
+    });
+
+    it('is validated once on submit, against the array', async () => {
+      const validate = jest.fn(atLeastTwo);
+      const onSubmit = jest.fn();
+      const actionsRef = React.createRef<Form.Actions>();
+      await render(
+        <Form actionsRef={actionsRef} onSubmit={onSubmit}>
+          <Field.Root name="colors" validate={validate}>
+            <TestGroup defaultValue={['red', 'green']} />
+          </Field.Root>
+        </Form>,
+      );
+
+      await act(async () => {
+        actionsRef.current!.submit();
+      });
+
+      expect(validate).toHaveBeenCalledTimes(1);
+      expect(validate).toHaveBeenCalledWith(['red', 'green']);
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    it('inherits the field\'s disabled', async () => {
+      await render(
+        <Field.Root disabled>
+          <TestGroup />
+        </Field.Root>,
+      );
+
+      expect(screen.getByTestId('group').props.accessibilityState).toMatchObject({ disabled: true });
+      expect(screen.getByTestId('red').props.accessibilityState).toMatchObject({ disabled: true });
     });
   });
 });

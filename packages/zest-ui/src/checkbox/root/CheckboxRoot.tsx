@@ -44,9 +44,13 @@ export function CheckboxRoot(componentProps: CheckboxRoot.Props) {
   const parentContext = groupContext?.parent;
   const isGroupedWithParent = parentContext != null && groupContext?.allValues != null;
 
+  // Inside a group the field's value is the group's array, not this checkbox's
+  // boolean: the group registers and reports it (see CheckboxGroup), so a field
+  // validates once, against what it will submit.
+  const ownsFieldValue = groupContext == null;
   const { fieldDisabled, fieldProps, markChanged, markTouched } = useFieldControlRegistration({
     initialValue: defaultChecked ?? checkedProp ?? false,
-    ownsValue: true,
+    ownsValue: ownsFieldValue,
   });
 
   const disabled = (groupContext?.disabled || disabledProp || fieldDisabled) ?? false;
@@ -138,8 +142,10 @@ export function CheckboxRoot(componentProps: CheckboxRoot.Props) {
           setCheckedState(nextChecked);
           // A press is both the change and the end of the interaction: there is
           // no blur on a checkbox to mark it touched later.
-          markChanged(nextChecked);
-          markTouched(nextChecked);
+          if (ownsFieldValue) {
+            markChanged(nextChecked);
+            markTouched(nextChecked);
+          }
 
           if (value && groupValue && setGroupValue && !parent && !isGroupedWithParent) {
             const nextGroupValue = nextChecked

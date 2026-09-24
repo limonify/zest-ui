@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { useControlled } from '../hooks/useControlled';
 import { useStableCallback } from '../hooks/useStableCallback';
 import { useRenderElement } from '../use-render/useRenderElement';
+import { useFieldControlRegistration } from '../internals/field/useFieldControlRegistration';
 import type { ZestUIComponentProps } from '../types';
 import type { ZestChangeEventDetails } from '../utils/createChangeEventDetails';
 import { REASONS } from '../utils/reasons';
@@ -21,7 +22,7 @@ export function CheckboxGroup(componentProps: CheckboxGroup.Props) {
     allValues,
     className,
     defaultValue: defaultValueProp,
-    disabled = false,
+    disabled: disabledProp = false,
     onValueChange,
     render,
     style,
@@ -40,6 +41,13 @@ export function CheckboxGroup(componentProps: CheckboxGroup.Props) {
     state: 'value',
   });
 
+  // The group, not each checkbox, is the field's control: its value is the
+  // array a form submits and a field's `validate` receives.
+  const { fieldDisabled, fieldProps, markChanged, markTouched } = useFieldControlRegistration({
+    initialValue: value,
+    ownsValue: true,
+  });
+
   const setValue = useStableCallback((v: string[], eventDetails: CheckboxGroup.ChangeEventDetails) => {
     onValueChange?.(v, eventDetails);
 
@@ -48,7 +56,13 @@ export function CheckboxGroup(componentProps: CheckboxGroup.Props) {
     }
 
     setValueUnwrapped(v);
+    // Every change is a press, and a press is also the end of the interaction:
+    // there is no blur on a checkbox to mark the field touched later.
+    markChanged(v);
+    markTouched(v);
   });
+
+  const disabled = disabledProp || fieldDisabled;
 
   const parent = useCheckboxGroupParent({ allValues, value, onValueChange: setValue });
 
@@ -76,6 +90,7 @@ export function CheckboxGroup(componentProps: CheckboxGroup.Props) {
       {
         role: 'group' as const,
         accessibilityState: { disabled: disabled || undefined },
+        ...fieldProps,
       },
       elementProps,
     ],
