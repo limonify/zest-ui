@@ -38,8 +38,10 @@ export function TooltipPopup(componentProps: TooltipPopup.Props) {
     ref,
     props: [
       {
+        // `role` only. `accessibilityRole: 'tooltip'` is not a value Android's
+        // accessibility delegate knows, and the popup crashed there on open;
+        // React Native maps the `role` onto each platform itself.
         role: 'tooltip' as const,
-        accessibilityRole: 'tooltip' as const,
         // Claim the touch responder so presses inside the popup don't reach the
         // portal's dismissal surface.
         onStartShouldSetResponder: () => true,

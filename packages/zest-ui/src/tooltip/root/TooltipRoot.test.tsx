@@ -179,6 +179,9 @@ describe('Tooltip', () => {
     );
 
     expect(screen.getByTestId('popup').props.role).toBe('tooltip');
+    // Android's accessibility delegate has no 'tooltip' accessibilityRole and
+    // crashes on it; `role` is mapped per platform by React Native.
+    expect(screen.getByTestId('popup').props.accessibilityRole).toBeUndefined();
     expect(screen.getByTestId('positioner')).toHaveStyle({ position: 'absolute' });
     expect(styleFn).toHaveBeenLastCalledWith(expect.objectContaining({ side: 'top', open: true }));
   });
