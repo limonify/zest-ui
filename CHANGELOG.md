@@ -1,3 +1,39 @@
+## [Unreleased]
+
+Two fixes found while building the `@limonify/ui-native` docs app on a device, and one behaviour
+brought in line with Base UI 1.8. No new dependencies and no API changes.
+
+### Fixed
+
+- **Opening a `Tooltip` no longer crashes on Android.** `Tooltip.Popup` set both `role` and
+  `accessibilityRole` to `'tooltip'`, and `'tooltip'` is not an `accessibilityRole` Android's
+  accessibility delegate knows, so the app went down the moment a tooltip opened. The popup now sets
+  `role` alone, which React Native maps onto each platform itself; the tooltip semantics are
+  unchanged on iOS.
+
+- **`CheckboxGroup` inside a `Field` validates the array it submits.** Every `Checkbox.Root` in the
+  group registered its own boolean with the surrounding `Field`, so a field's `validate` saw
+  `true`/`false` per box instead of the group's value, and a `Form` submit validated the field once
+  per checkbox. The group now registers with the field and reports the array, marking it changed and
+  touched on every press, and it inherits the field's `disabled`. A checkbox inside a group leaves
+  the field alone; a standalone `Checkbox` is unaffected.
+
+  ```tsx
+  <Field.Root name="colors" validate={(value) => (value.length >= 2 ? null : 'Pick two')}>
+    <CheckboxGroup>…</CheckboxGroup>  {/* validate receives ['red', 'blue'] */}
+    <Field.Error />
+  </Field.Root>
+  ```
+
+### Changed
+
+- **A read-only `Select` opens for browsing.** `readOnly` now locks the value, not the interaction,
+  as Base UI 1.8 does: pressing `Select.Trigger` opens the list so the options and the current choice
+  can be seen, and pressing a `Select.Item` does nothing. Until now the trigger ignored the press, so
+  a read-only select showed its value and nothing else, while the same prop on the web opened.
+  `aria-readonly` still marks the trigger. If a read-only field should not open at all, that is
+  `disabled`.
+
 ## [0.11.0] - 2026-09-15
 
 0.10.0 moved every gesture to gesture-handler's hook API and raised the peer to `>=3.1.0`. That put
