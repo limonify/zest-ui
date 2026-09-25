@@ -156,15 +156,25 @@ describe('Select', () => {
     expect(screen.getByTestId('popup')).toBeTruthy();
   });
 
-  it('ignores interaction when readOnly', async () => {
+  // Base UI 1.8: `readOnly` locks the value, not the interaction. The list opens for browsing,
+  // and choosing from it does nothing.
+  it('opens for browsing when readOnly but keeps the value', async () => {
     const onOpenChange = jest.fn();
-    await render(<TestSelect readOnly onOpenChange={onOpenChange} />);
+    const onValueChange = jest.fn();
+    await render(
+      <TestSelect readOnly defaultValue="apple" onOpenChange={onOpenChange} onValueChange={onValueChange} />,
+    );
+    expect(screen.getByTestId('trigger').props['aria-readonly']).toBe(true);
 
     const user = userEvent.setup();
     await user.press(screen.getByTestId('trigger'));
 
-    expect(onOpenChange).not.toHaveBeenCalled();
-    expect(screen.getByTestId('trigger').props['aria-readonly']).toBe(true);
+    expect(onOpenChange).toHaveBeenCalledWith(true, expect.anything());
+    expect(screen.getByTestId('popup')).toBeTruthy();
+
+    await user.press(screen.getByTestId('item-banana'));
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(screen.getByTestId('value')).toHaveTextContent('apple');
   });
 
   it('propagates disabled from the root to the trigger', async () => {

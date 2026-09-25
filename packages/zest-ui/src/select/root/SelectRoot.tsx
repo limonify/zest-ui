@@ -228,7 +228,8 @@ export interface SelectRootProps<Value = any, Payload = unknown> {
    */
   disabled?: boolean | undefined;
   /**
-   * Whether the user should be unable to choose a different item.
+   * Whether the user should be unable to choose a different item. The list still opens, so the
+   * options and the current choice can be browsed.
    * @default false
    */
   readOnly?: boolean | undefined;

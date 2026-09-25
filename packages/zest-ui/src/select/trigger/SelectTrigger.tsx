@@ -101,10 +101,9 @@ export function SelectTrigger<Payload = unknown>(componentProps: SelectTrigger.P
       {
         nativeID: id,
         onPress(event: GestureResponderEvent) {
-          if (readOnly) {
-            return;
-          }
-
+          // `readOnly` locks the value, not the interaction, as in Base UI 1.8: the list
+          // opens so the user can see the options and which one is chosen, and
+          // `Select.Item` refuses the press that would change it.
           if (payload !== undefined) {
             store.set('payload', payload);
           }
