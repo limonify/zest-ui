@@ -1,7 +1,4 @@
-## [Unreleased]
-
-Two fixes found while building the `@limonify/ui-native` docs app on a device, and one behaviour
-brought in line with Base UI 1.8. No new dependencies and no API changes.
+## [0.12.0] - 2026-09-25
 
 ### Fixed
 
