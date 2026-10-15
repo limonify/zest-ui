@@ -1,3 +1,20 @@
+## [0.12.1] - 2026-10-16
+
+### Fixed
+
+- **A popup with no room on either side of its axis drops below (or above) its anchor instead of
+  running off the screen.** The clearest case is a `Menu.SubmenuRoot` on a phone: the submenu opens
+  `inline-end` of a row in a menu that already spans most of a 393pt screen, so neither the right nor
+  the left has room, and it stayed on the side it overflowed least — half of it past the edge, since
+  `shift` only moves a popup along its anchor. `flip` now takes `fallbackAxisSideDirection: 'end'`, as
+  Base UI's `collisionAvoidance` default does, so floating-ui tries the perpendicular sides too.
+
+- **Cross-axis overflow no longer flips a popup.** `flip` ran with floating-ui's default
+  `crossAxis: true`, under which a popover that was only too wide for the screen counted as
+  overflowing its side and could be moved to the opposite one. It is `crossAxis: 'alignment'` now,
+  as in Base UI: a popup leaves its side only when that side has no room along the main axis, and
+  overflow across the axis is `shift`'s to correct.
+
 ## [0.12.0] - 2026-09-25
 
 ### Fixed

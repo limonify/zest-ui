@@ -37,6 +37,32 @@ function resolveSide(side: Side, direction: Direction): PhysicalSide {
 export type Align = 'start' | 'center' | 'end';
 
 /**
+ * How `flip` chooses a side, as Base UI's `collisionAvoidance` default
+ * (`side: 'flip', align: 'flip', fallbackAxisSide: 'end'`) sets it up.
+ *
+ * `fallbackAxisSideDirection: 'end'` is the part that matters on a phone. When
+ * neither side of the requested axis has room — a submenu anchored `right` of a
+ * row in a menu that already spans most of a 393pt screen — floating-ui tries the
+ * perpendicular sides too, and the popup drops below (or above) the anchor.
+ * Without it the popup stayed on the side it overflowed least and ran off the
+ * screen edge, since `shift` only moves it along the anchor.
+ *
+ * `crossAxis: 'alignment'` is what keeps that from leaking into ordinary
+ * placements. With floating-ui's default `true`, ANY cross-axis overflow counts
+ * against a side, so a `bottom` popover a few points too wide for the screen
+ * could be moved to `left`/`right` instead of being shifted back in. Under
+ * `'alignment'` the perpendicular sides are only tried once every placement on
+ * the requested axis overflows its MAIN axis; cross-axis overflow is `shift`'s.
+ */
+export function anchorFlipOptions(collisionPadding: Padding) {
+  return {
+    padding: collisionPadding,
+    crossAxis: 'alignment',
+    fallbackAxisSideDirection: 'end',
+  } as const;
+}
+
+/**
  * Positions a floating element against an anchor.
  *
  * Upstream vendors `floating-ui-react` and drives it from
@@ -100,7 +126,7 @@ export function useAnchorPositioning(
         sideOffset,
         resolvedAlignOffset,
       ]),
-      flip({ padding: collisionPadding }, [collisionPadding]),
+      flip(anchorFlipOptions(collisionPadding), [collisionPadding]),
       shift(
         {
           padding: collisionPadding,

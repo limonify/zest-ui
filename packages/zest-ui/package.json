@@ -247,6 +247,7 @@
   },
   "devDependencies": {
     "@babel/runtime": "^8.0.0",
+    "@floating-ui/core": "^1.8.0",
     "@size-limit/preset-small-lib": "^12.1.0",
     "@testing-library/react-native": "^14.0.1",
     "@types/jest": "^29.5.14",
