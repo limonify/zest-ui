@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { render } from '@testing-library/react-native';
 import { AlertDialog, Combobox, Dialog, Drawer, Menu, Popover, Select, Tooltip } from '../../index';
 
@@ -44,7 +44,7 @@ function expectGestureRoot(container: unknown) {
 
   const root = children[0]!;
   expect(root.type).toBe('View');
-  expect(root.props?.style).toEqual({ flex: 1 });
+  expect(StyleSheet.flatten(root.props?.style)).toEqual({ flex: 1, direction: 'ltr' });
   expect(Object.keys(root.props ?? {}).sort()).toEqual(['children', 'style']);
 }
 
@@ -156,5 +156,31 @@ describe('every Portal wraps its children in a gesture root', () => {
     );
 
     expectGestureRoot(view.container);
+  });
+});
+
+/**
+ * A `Modal` is its own layout root, so it does not inherit the direction of the
+ * tree that opened it — Yoga resolves a root's direction from `I18nManager`.
+ * Under a `DirectionProvider` that disagrees with the device, the popup's rows
+ * stayed LTR while its chevrons flipped. The root has to carry it.
+ */
+describe('portal direction', () => {
+  it('lays the popup out in the provided direction, not the device one', async () => {
+    const { DirectionProvider } = jest.requireActual('../../direction-provider');
+    const view = await render(
+      <DirectionProvider direction="rtl">
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <Dialog.Popup>
+              <Text>Hello</Text>
+            </Dialog.Popup>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </DirectionProvider>,
+    );
+    const modal = findModal(view.toJSON() as TreeNode);
+    const root = ((modal!.children ?? []) as TreeNode[])[0]!;
+    expect(StyleSheet.flatten(root.props?.style).direction).toBe('rtl');
   });
 });

@@ -1,3 +1,14 @@
+## [0.12.2] - 2026-10-16
+
+### Fixed
+
+- **Popups lay themselves out in the provided direction.** A `Modal` is a new layout root, and a
+  new root takes its direction from `I18nManager` rather than from the tree that opened it. Under a
+  `DirectionProvider` that disagreed with the device, every portalled popup — `Dialog`,
+  `AlertDialog`, `Drawer`, `Popover`, `Menu`, `Select`, `Combobox`, `Tooltip` — kept the device's
+  direction: rows, padding and text alignment stayed LTR in an RTL app while the parts that read the
+  context flipped. The portal's gesture root now carries `useDirection()` as its `direction` style.
+
 ## [0.12.1] - 2026-10-16
 
 ### Fixed
