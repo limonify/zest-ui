@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppState, Text, type AppStateStatus } from 'react-native';
+import { AppState, Text, View, type AppStateStatus } from 'react-native';
 import { act, fireEvent, render, screen, userEvent } from '@testing-library/react-native';
 import { GestureHandlerRootView, State } from 'react-native-gesture-handler';
 import { fireGestureHandler, getByGestureTestId } from 'react-native-gesture-handler/jest-utils';
@@ -39,6 +39,28 @@ function ToastList({ removeOnClose }: { removeOnClose?: boolean }) {
             <Text>Close</Text>
           </Toast.Close>
         </Toast.Root>
+      ))}
+    </Toast.Viewport>
+  );
+}
+
+/** Prints each toast's `swipeMovement`, kept in the list by `removeOnClose={false}`. */
+function MovementList() {
+  const { toasts } = Toast.useToastManager();
+  return (
+    <Toast.Viewport>
+      {toasts.map((toast) => (
+        <Toast.Root
+          key={toast.id}
+          toast={toast}
+          testID={`toast-${toast.id}`}
+          removeOnClose={false}
+          render={(props, state) => (
+            <View {...props}>
+              <Text testID="movement">{String(state.swipeMovement)}</Text>
+            </View>
+          )}
+        />
       ))}
     </Toast.Viewport>
   );
@@ -653,6 +675,48 @@ describe('Toast', () => {
       await swipe(`toast-${id}`, 20);
 
       expect(toastIds()).toEqual([id]);
+    });
+
+    // An exit animation carries on from where the finger let go. Reset to 0, a
+    // thrown toast snapped back to the middle before it left.
+    it('keeps the distance a dismissing swipe reached', async () => {
+      const manager = createToastManager();
+      await render(
+        <GestureHandlerRootView>
+          <Toast.Provider toastManager={manager} timeout={0}>
+            <MovementList />
+          </Toast.Provider>
+        </GestureHandlerRootView>,
+      );
+
+      let id = '';
+      await act(async () => {
+        id = manager.add({ title: 'Saved' });
+      });
+
+      await swipe(`toast-${id}`, 100);
+
+      expect(screen.getByTestId('movement').props.children).toBe('100');
+    });
+
+    it('springs back when a swipe is released short of the threshold', async () => {
+      const manager = createToastManager();
+      await render(
+        <GestureHandlerRootView>
+          <Toast.Provider toastManager={manager} timeout={0}>
+            <MovementList />
+          </Toast.Provider>
+        </GestureHandlerRootView>,
+      );
+
+      let id = '';
+      await act(async () => {
+        id = manager.add({ title: 'Saved' });
+      });
+
+      await swipe(`toast-${id}`, 20);
+
+      expect(screen.getByTestId('movement').props.children).toBe('0');
     });
 
     it('ignores a swipe against the dismiss direction', async () => {

@@ -79,6 +79,18 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
     setSwipeMovement(0);
   });
 
+  // A swipe that CLOSED the toast keeps the distance it reached, so an exit
+  // animation can carry on from where the finger let go. Reset to 0, a thrown
+  // toast snapped back to its resting place and left from there. The web reads
+  // the same value on a closing toast (`--toast-swipe-movement-*` inside its
+  // ending style). Only a swipe released short of the threshold springs back.
+  const dismissedBySwipeRef = React.useRef(false);
+
+  const settleMovement = useStableCallback(() => {
+    movementFrame.cancel();
+    setSwipeMovement(swipeMovementRef.current);
+  });
+
   const index = useStoreState(store, 'toastIndex', toast.id);
   const offsetY = useStoreState(store, 'toastOffsetY', toast.id);
   const visibleIndex = useStoreState(store, 'toastVisibleIndex', toast.id);
@@ -122,6 +134,7 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
         // through gesture-handler's registry, which is keyed by this id.
         .withTestId(testID ?? `toast-${toast.id}`)
         .onBegin(() => {
+          dismissedBySwipeRef.current = false;
           setSwiping(true);
           // A finger on the toast means "not yet" — the same intent hover
           // carries on the web, where upstream pairs these two exactly like this.
@@ -133,13 +146,20 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
         .onStart((event) => publishMovement(getDisplacement(swipeDirection, event)))
         .onUpdate((event) => publishMovement(getDisplacement(swipeDirection, event)))
         .onEnd((event) => {
-          if (getDisplacement(swipeDirection, event) > swipeThreshold) {
+          const displacement = getDisplacement(swipeDirection, event);
+          if (displacement > swipeThreshold) {
+            dismissedBySwipeRef.current = true;
+            swipeMovementRef.current = displacement;
             store.closeToast(toast.id);
           }
         })
         .onFinalize(() => {
           setSwiping(false);
-          resetMovement();
+          if (dismissedBySwipeRef.current) {
+            settleMovement();
+          } else {
+            resetMovement();
+          }
           store.set('pressed', false);
 
           // `expandedOrInactive`, not `expanded`: letting go while the app is in
@@ -152,7 +172,7 @@ export function ToastRoot(componentProps: ToastRoot.Props) {
         })
         // The handlers touch React state, so they must not run on the UI thread.
         .runOnJS(true),
-    [testID, toast.id, swipeDirection, swipeThreshold, store, publishMovement, resetMovement],
+    [testID, toast.id, swipeDirection, swipeThreshold, store, publishMovement, resetMovement, settleMovement],
   );
 
   const state: ToastRootState = React.useMemo(
@@ -283,6 +303,8 @@ export interface ToastRootState {
   swiping: boolean;
   /**
    * How far the current swipe has travelled towards `swipeDirection`, in pixels.
+   * Kept, not reset, when the swipe closed the toast, so an exit animation can
+   * continue from it. Back to 0 when a swipe is released short of the threshold.
    */
   swipeMovement: number;
   /**
