@@ -1,3 +1,14 @@
+## [0.12.4] - 2026-10-18
+
+### Fixed
+
+- **A swipe that dismisses a toast keeps the distance it reached.** `Toast.Root` reset
+  `state.swipeMovement` to 0 as the finger lifted, right after the same swipe had closed the toast,
+  so an exit animation reading it started from the resting place: a thrown toast snapped back to the
+  middle before it left. The distance is now kept on a toast a swipe closed, so the exit can carry on
+  the way it was thrown, as the web's does with `--toast-swipe-movement-*`. A swipe released short of
+  the threshold still springs back to 0.
+
 ## [0.12.3] - 2026-10-17
 
 ### Fixed
