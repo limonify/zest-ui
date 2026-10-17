@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Toast, createToastManager } from '../index';
+import type { ViewInstance } from '../../utils/reactNativeTypes';
 
 /**
  * The viewport learns its screen origin through `measureInWindow`, which the RN
@@ -10,7 +11,9 @@ import { Toast, createToastManager } from '../index';
  */
 function mockViewportOrigin(x: number, y: number) {
   return jest
-    .spyOn(View.prototype, 'measureInWindow')
+    // Typed as the instance: since RN 0.88 `View` is a function, not the class whose
+    // prototype carried `measureInWindow`.
+    .spyOn(View.prototype as ViewInstance, 'measureInWindow')
     .mockImplementation((callback: (x: number, y: number, w: number, h: number) => void) => {
       callback(x, y, 0, 0);
     });

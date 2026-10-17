@@ -7,6 +7,7 @@ import { useMergedRefs } from '../../hooks/useMergedRefs';
 import { useStableCallback } from '../../hooks/useStableCallback';
 import type { ZestUIComponentProps } from '../../types';
 import { useStoreState } from '../../store/ReactStore';
+import type { ViewInstance } from '../../utils/reactNativeTypes';
 
 /**
  * A container viewport for toasts.
@@ -34,7 +35,7 @@ export function ToastViewport(componentProps: ToastViewport.Props) {
   const toasts = useStoreState(store, 'toasts');
   const expanded = useStoreState(store, 'expanded');
 
-  const viewportRef = React.useRef<View | null>(null);
+  const viewportRef = React.useRef<ViewInstance | null>(null);
   const mergedRef = useMergedRefs(ref, viewportRef);
 
   const handleLayout = useStableCallback(() => {

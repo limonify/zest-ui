@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { render, screen } from '@testing-library/react-native';
 import { useRenderElement } from './useRenderElement';
+import type { ViewInstance } from '../utils/reactNativeTypes';
 
 interface TestComponentProps {
   className?: string | ((state: { active: boolean }) => string | undefined);
@@ -90,8 +91,8 @@ describe('useRenderElement', () => {
   });
 
   it('merges the forwarded ref with the render element ref', async () => {
-    const outerRef = React.createRef<View>();
-    const innerRef = React.createRef<View>();
+    const outerRef = React.createRef<ViewInstance>();
+    const innerRef = React.createRef<ViewInstance>();
 
     await render(<TestComponent ref={outerRef} render={<View ref={innerRef} />} />);
 

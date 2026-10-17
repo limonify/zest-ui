@@ -1,4 +1,3 @@
-import type { TextInput } from 'react-native';
 import { createSelector } from '../../store/createSelector';
 import { ReactStore } from '../../store/ReactStore';
 import {
@@ -10,6 +9,7 @@ import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { PopupTriggerMap } from '../../utils/popups/PopupTriggerMap';
 import { REASONS } from '../../utils/reasons';
 import { isValueSelected, toggleSelectedValue } from '../../utils/selection';
+import type { TextInputInstance } from '../../utils/reactNativeTypes';
 import type { ComboboxRoot } from '../root/ComboboxRoot';
 
 /**
@@ -203,7 +203,7 @@ export type State = {
   /**
    * Ref to the input element, for programmatic blur.
    */
-  inputRef: React.RefObject<TextInput | null> | undefined;
+  inputRef: React.RefObject<TextInputInstance | null> | undefined;
   /**
    * The payload of the trigger the popup was opened by, handed to the root's
    * children when they are a function.

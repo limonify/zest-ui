@@ -1,5 +1,5 @@
 'use client';
-import { TextInput, type NativeSyntheticEvent, type TextInputFocusEventData } from 'react-native';
+import { TextInput } from 'react-native';
 import { useNumberFieldRootContext } from '../root/NumberFieldRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useFieldControlRegistration } from '../../internals/field/useFieldControlRegistration';
@@ -9,6 +9,7 @@ import type { NumberFieldRootState } from '../root/NumberFieldRoot';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import type { TextInputBlurEventType } from '../../utils/reactNativeTypes';
 import { parseNumber } from '../utils/parse';
 import { hasNumberFormatRoundingOptions, removeFloatingPointErrors } from '../utils/validate';
 
@@ -70,7 +71,7 @@ export function NumberFieldInput(componentProps: NumberFieldInput.Props) {
     setValue(parsedValue, createChangeEventDetails(REASONS.inputChange));
   });
 
-  const handleBlur = useStableCallback((event: NativeSyntheticEvent<TextInputFocusEventData>) => {
+  const handleBlur = useStableCallback((event: TextInputBlurEventType) => {
     if (disabled || readOnly) {
       return;
     }
@@ -150,7 +151,7 @@ export function NumberFieldInput(componentProps: NumberFieldInput.Props) {
         onFocus() {
           markFocused(true);
         },
-        onBlur(event: NativeSyntheticEvent<TextInputFocusEventData>) {
+        onBlur(event: TextInputBlurEventType) {
           markFocused(false);
           // Leaving the input is what ends the interaction, the same way it does
           // for a text control — so this is where `onBlur` validation runs.

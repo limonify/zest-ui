@@ -7,6 +7,7 @@ import { useFieldRootContext } from '../root/FieldRootContext';
 import type { FieldRoot } from '../root/FieldRoot';
 import type { ZestUIComponentProps } from '../../types';
 import { useFieldControl } from './useFieldControl';
+import type { TextInputInstance } from '../../utils/reactNativeTypes';
 
 /**
  * The field's text input.
@@ -29,7 +30,7 @@ export function FieldControl(componentProps: FieldControl.Props) {
 
   // The form focuses the first invalid field on submit, and needs a handle on
   // the input to do it.
-  const inputRef = React.useRef<TextInput>(null);
+  const inputRef = React.useRef<TextInputInstance>(null);
   const mergedRef = useMergedRefs(ref, inputRef);
 
   const { props } = useFieldControl({

@@ -1,3 +1,23 @@
+## [0.12.3] - 2026-10-17
+
+### Fixed
+
+- **Types hold on React Native 0.88.** RN 0.88 made `View` and `TextInput` function components, so
+  `TextInput` used as a type names the component, not its instance. The public
+  `Combobox` store's `inputRef` and `useFieldControl`'s `inputRef` were typed
+  `RefObject<TextInput | null>`, and a consumer calling `.focus()` / `.blur()` on them failed to
+  type-check. They are now typed from the component's own `ref` prop (`React.ComponentRef`). That
+  resolves to the class instance on older RN, so the `react-native >=0.79` peer range is unchanged.
+  The source type-checks against RN 0.79, 0.83, 0.86 and 0.88. The handler event types RN 0.88 renamed
+  (`TextInputFocusEventData`, `TextInputKeyPressEventData`, `ImageErrorEventData`) and the
+  narrowed `Modal` `onRequestClose` event are derived from the props in the same way.
+
+- **`preventZestUIHandler` works in a menu item's `onPress`.** `Menu.Item`, `Menu.LinkItem`,
+  `Menu.CheckboxItem` and `Menu.RadioItem` call the consumer's `onPress` themselves rather than
+  through `mergeProps`, so the event never got the method its type promised, and calling it threw.
+  The event is now preventable, and preventing it skips the item's own close, as `mergeProps` skips
+  Zest's handler everywhere else.
+
 ## [0.12.2] - 2026-10-16
 
 ### Fixed

@@ -97,6 +97,65 @@ describe('Menu', () => {
     expect(screen.getByTestId('popup')).toBeTruthy();
   });
 
+  // The items pull `onPress` out of their props, so it never went through
+  // `mergeProps`: the event had no `preventZestUIHandler` and calling it threw.
+  // `closeOnPress` is explicit where it defaults to false, or "stays open" would
+  // pass without proving anything.
+  describe.each([
+    ['Item', (onPress: (e: any) => void) => <Menu.Item testID="target" onPress={onPress} />],
+    [
+      'LinkItem',
+      (onPress: (e: any) => void) => <Menu.LinkItem testID="target" closeOnPress onPress={onPress} />,
+    ],
+    [
+      'CheckboxItem',
+      (onPress: (e: any) => void) => <Menu.CheckboxItem testID="target" closeOnPress onPress={onPress} />,
+    ],
+    [
+      'RadioItem',
+      (onPress: (e: any) => void) => (
+        <Menu.RadioGroup defaultValue="a">
+          <Menu.RadioItem testID="target" value="b" closeOnPress onPress={onPress} />
+        </Menu.RadioGroup>
+      ),
+    ],
+  ])('%s', (_name, renderItem) => {
+    async function renderWith(onPress: (e: any) => void) {
+      const onOpenChange = jest.fn();
+      await render(
+        <Menu.Root defaultOpen onOpenChange={onOpenChange}>
+          <Menu.Portal>
+            <Menu.Positioner>
+              <Menu.Popup testID="popup">{renderItem(onPress)}</Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>,
+      );
+      return onOpenChange;
+    }
+
+    it('keeps the menu open when onPress calls preventZestUIHandler', async () => {
+      const onOpenChange = await renderWith((event) => event.preventZestUIHandler());
+
+      await userEvent.setup().press(screen.getByTestId('target'));
+
+      expect(onOpenChange).not.toHaveBeenCalled();
+      expect(screen.getByTestId('popup')).toBeTruthy();
+    });
+
+    it('still closes when onPress does not prevent it', async () => {
+      let received: any;
+      const onOpenChange = await renderWith((event) => {
+        received = event;
+      });
+
+      await userEvent.setup().press(screen.getByTestId('target'));
+
+      expect(typeof received.preventZestUIHandler).toBe('function');
+      expect(onOpenChange).toHaveBeenLastCalledWith(false, expect.anything());
+    });
+  });
+
   it('ignores presses on a disabled item', async () => {
     const onOpenChange = jest.fn();
     await render(<TestMenu defaultOpen onOpenChange={onOpenChange} />);

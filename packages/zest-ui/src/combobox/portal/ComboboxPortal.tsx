@@ -1,12 +1,13 @@
 'use client';
 import * as React from 'react';
-import { Modal, type NativeSyntheticEvent, type ViewStyle } from 'react-native';
+import { Modal, type ViewStyle } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { ComboboxPortalContext } from './ComboboxPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ZestPortalModalProps } from '../../types';
+import type { ModalRequestCloseEventType } from '../../utils/reactNativeTypes';
 import { useStoreState } from '../../store/ReactStore';
 import { PortalGestureRoot } from '../../internals/portal/PortalGestureRoot';
 
@@ -52,7 +53,7 @@ export function ComboboxPortal(props: ComboboxPortal.Props) {
         navigationBarTranslucent
         {...modalProps}
         visible={open}
-        onRequestClose={(event: NativeSyntheticEvent<unknown>) => {
+        onRequestClose={(event: ModalRequestCloseEventType) => {
           modalProps?.onRequestClose?.(event);
           store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
         }}

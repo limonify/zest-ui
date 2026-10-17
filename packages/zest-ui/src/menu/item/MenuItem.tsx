@@ -6,7 +6,8 @@ import { useMenuSubmenuRootContext } from '../submenu-root/MenuSubmenuRootContex
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
-import type { ZestUIComponentProps } from '../../types';
+import type { ZestUIComponentProps, ZestUIEvent } from '../../types';
+import { makeEventPreventable } from '../../merge-props/mergeProps';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 
@@ -61,9 +62,13 @@ export function MenuItem(componentProps: MenuItem.Props) {
             return;
           }
 
-          onPressProp?.(event);
+          // The consumer's handler is pulled out of the props, so it never passes
+          // through `mergeProps`: make the event preventable here, and honour it
+          // the way `mergeProps` does: theirs runs, ours only if not prevented.
+          const zestEvent = makeEventPreventable(event as ZestUIEvent<GestureResponderEvent>);
+          onPressProp?.(zestEvent);
 
-          if (closeOnPress) {
+          if (closeOnPress && !zestEvent.baseUIHandlerPrevented) {
             store.setOpen(false, createChangeEventDetails(REASONS.itemPress, event));
             // Choosing an item dismisses the whole menu, not just the submenu it
             // happens to sit in.

@@ -13,6 +13,7 @@ import { REASONS } from '../../utils/reasons';
 import type { ComboboxHandle } from '../store/ComboboxHandle';
 import type { ComboboxStore } from '../store/ComboboxStore';
 import type { ZestUIComponentProps } from '../../types';
+import type { TextInputInstance } from '../../utils/reactNativeTypes';
 import { useStoreState } from '../../store/ReactStore';
 
 /**
@@ -59,7 +60,7 @@ export function ComboboxInput<Payload = unknown>(componentProps: ComboboxInput.P
   const openOnFocus = useStoreState(store, 'openOnFocus');
   const update = useStoreState(store, 'update');
 
-  const internalRef = React.useRef<TextInput>(null);
+  const internalRef = React.useRef<TextInputInstance>(null);
 
   useIsoLayoutEffect(() => {
     store.set('inputRef', internalRef);

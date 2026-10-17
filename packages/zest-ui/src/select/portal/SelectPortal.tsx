@@ -1,11 +1,12 @@
 'use client';
 import * as React from 'react';
-import { Modal, type NativeSyntheticEvent } from 'react-native';
+import { Modal } from 'react-native';
 import { useSelectRootContext } from '../root/SelectRootContext';
 import { SelectPortalContext } from './SelectPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import type { ZestPortalModalProps } from '../../types';
+import type { ModalRequestCloseEventType } from '../../utils/reactNativeTypes';
 import { useStoreState } from '../../store/ReactStore';
 import { PortalGestureRoot } from '../../internals/portal/PortalGestureRoot';
 
@@ -34,7 +35,7 @@ export function SelectPortal(props: SelectPortal.Props) {
         navigationBarTranslucent
         {...modalProps}
         visible={open}
-        onRequestClose={(event: NativeSyntheticEvent<unknown>) => {
+        onRequestClose={(event: ModalRequestCloseEventType) => {
           modalProps?.onRequestClose?.(event);
           store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
         }}

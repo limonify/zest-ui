@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { Image, type ImageErrorEventData, type NativeSyntheticEvent } from 'react-native';
+import { Image } from 'react-native';
 import { useAvatarRootContext } from '../root/AvatarRootContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useStableCallback } from '../../hooks/useStableCallback';
@@ -8,6 +8,7 @@ import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useTransitionStatus, type TransitionStatus } from '../../internals/useTransitionStatus';
 import type { AvatarRootState, ImageLoadingStatus } from '../root/AvatarRoot';
 import type { ZestUIComponentProps } from '../../types';
+import type { ImageErrorEventType } from '../../utils/reactNativeTypes';
 
 /**
  * The image to be displayed in the avatar.
@@ -70,7 +71,7 @@ export function AvatarImage(componentProps: AvatarImage.Props) {
   // infinite loop, and React ends it with "Maximum update depth exceeded".
   const handleLoadStart = useStableCallback(() => publishStatus('loading'));
   const handleLoad = useStableCallback(() => publishStatus('loaded'));
-  const handleError = useStableCallback((_event: NativeSyntheticEvent<ImageErrorEventData>) =>
+  const handleError = useStableCallback((_event: ImageErrorEventType) =>
     publishStatus('error'),
   );
 

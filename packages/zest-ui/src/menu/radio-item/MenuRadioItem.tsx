@@ -7,7 +7,8 @@ import { useMenuSubmenuRootContext } from '../submenu-root/MenuSubmenuRootContex
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useButton } from '../../internals/use-button/useButton';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
-import type { ZestUIComponentProps } from '../../types';
+import type { ZestUIComponentProps, ZestUIEvent } from '../../types';
+import { makeEventPreventable } from '../../merge-props/mergeProps';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
 import { MenuRadioItemContext } from './MenuRadioItemContext';
@@ -73,9 +74,13 @@ export function MenuRadioItem<Value = any>(componentProps: MenuRadioItem.Props<V
           }
 
           group.setValue(value, event);
-          onPressProp?.(event);
+          // The consumer's handler is pulled out of the props, so it never passes
+          // through `mergeProps`: make the event preventable here, and honour it
+          // the way `mergeProps` does: theirs runs, ours only if not prevented.
+          const zestEvent = makeEventPreventable(event as ZestUIEvent<GestureResponderEvent>);
+          onPressProp?.(zestEvent);
 
-          if (closeOnPress) {
+          if (closeOnPress && !zestEvent.baseUIHandlerPrevented) {
             store.setOpen(false, createChangeEventDetails(REASONS.itemPress, event));
             submenuRootContext?.closeAncestors(REASONS.itemPress, event);
           }

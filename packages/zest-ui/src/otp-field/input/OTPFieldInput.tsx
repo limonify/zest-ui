@@ -1,10 +1,6 @@
 'use client';
 import * as React from 'react';
-import {
-  TextInput,
-  type NativeSyntheticEvent,
-  type TextInputKeyPressEventData,
-} from 'react-native';
+import { TextInput } from 'react-native';
 import { getOTPFieldInputState, useOTPFieldRootContext } from '../root/OTPFieldRootContext';
 import { useCompositeListItem } from '../../internals/composite/list/useCompositeListItem';
 import { useRenderElement } from '../../use-render/useRenderElement';
@@ -13,6 +9,7 @@ import { useMergedRefs } from '../../hooks/useMergedRefs';
 import type { OTPFieldRootState } from '../root/OTPFieldRoot';
 import type { ZestUIComponentProps } from '../../types';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
+import type { TextInputInstance, TextInputKeyPressEventType } from '../../utils/reactNativeTypes';
 import { REASONS } from '../../utils/reasons';
 import { normalizeOTPValueWithDetails, removeOTPCharacter, replaceOTPValue } from '../utils/otp';
 
@@ -57,7 +54,7 @@ export function OTPFieldInput(componentProps: OTPFieldInput.Props) {
 
   const { index, onLayout } = useCompositeListItem();
 
-  const inputRef = React.useRef<TextInput | null>(null);
+  const inputRef = React.useRef<TextInputInstance | null>(null);
   const mergedRef = useMergedRefs(ref, inputRef);
 
   React.useEffect(() => {
@@ -122,7 +119,7 @@ export function OTPFieldInput(componentProps: OTPFieldInput.Props) {
   });
 
   const handleKeyPress = useStableCallback(
-    (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+    (event: TextInputKeyPressEventType) => {
       if (disabled || readOnly || event.nativeEvent.key !== 'Backspace' || slotValue !== '') {
         return;
       }

@@ -1,10 +1,10 @@
 'use client';
 import * as React from 'react';
-import type { NativeSyntheticEvent, TextInput, TextInputFocusEventData } from 'react-native';
 import { useControlled } from '../../hooks/useControlled';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useStableCallback } from '../../hooks/useStableCallback';
+import type { TextInputBlurEventType, TextInputInstance } from '../../utils/reactNativeTypes';
 import { useFieldRootContext, type FieldRootContext } from '../root/FieldRootContext';
 
 export interface UseFieldControlParameters {
@@ -16,7 +16,7 @@ export interface UseFieldControlParameters {
    * The input element, so a surrounding `Form` can focus it when submission
    * stops here.
    */
-  inputRef?: React.RefObject<TextInput | null> | undefined;
+  inputRef?: React.RefObject<TextInputInstance | null> | undefined;
   /**
    * Whether a surrounding `Field.Root` is required. `Field.Control` passes
    * `true`; a standalone `Input` passes `false` and works without one.
@@ -110,7 +110,7 @@ export function useFieldControl(parameters: UseFieldControlParameters) {
     field?.setFocused(true);
   });
 
-  const handleBlur = useStableCallback((_event: NativeSyntheticEvent<TextInputFocusEventData>) => {
+  const handleBlur = useStableCallback((_event: TextInputBlurEventType) => {
     field?.setFocused(false);
     field?.setTouched(true);
 
