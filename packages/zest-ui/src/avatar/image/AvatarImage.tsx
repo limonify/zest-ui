@@ -69,11 +69,28 @@ export function AvatarImage(componentProps: AvatarImage.Props) {
   // the load on them — a fresh closure each render restarts the load, which
   // publishes a status, which renders, which makes fresh closures. That is an
   // infinite loop, and React ends it with "Maximum update depth exceeded".
-  const handleLoadStart = useStableCallback(() => publishStatus('loading'));
-  const handleLoad = useStableCallback(() => publishStatus('loaded'));
-  const handleError = useStableCallback((_event: ImageErrorEventType) =>
-    publishStatus('error'),
-  );
+  //
+  // A load that has settled stays settled until the source changes. iOS
+  // delivers a cached image's `onLoad` BEFORE its `onLoadStart`, so a plain
+  // "start means loading" took a loaded avatar back to 'loading' and left the
+  // Fallback showing beside the picture for good. Android keeps the order.
+  const settled = React.useRef(false);
+  const sourceKey = sourceIdentity(elementProps.source);
+  useIsoLayoutEffect(() => {
+    settled.current = false;
+  }, [sourceKey]);
+
+  const handleLoadStart = useStableCallback(() => {
+    if (!settled.current) publishStatus('loading');
+  });
+  const handleLoad = useStableCallback(() => {
+    settled.current = true;
+    publishStatus('loaded');
+  });
+  const handleError = useStableCallback((_event: ImageErrorEventType) => {
+    settled.current = true;
+    publishStatus('error');
+  });
 
   const state: AvatarImageState = { imageLoadingStatus, transitionStatus };
 
@@ -113,4 +130,17 @@ export interface AvatarImageProps extends ZestUIComponentProps<typeof Image, Ava
 export namespace AvatarImage {
   export type State = AvatarImageState;
   export type Props = AvatarImageProps;
+}
+
+/**
+ * What a load is OF: a remote `{ uri }` by its address, a bundled asset by its
+ * module number, a list of resolutions by their addresses. Two renders passing
+ * equal sources are one load.
+ */
+function sourceIdentity(source: unknown): string {
+  if (source == null) return '';
+  if (typeof source === 'number' || typeof source === 'string') return String(source);
+  if (Array.isArray(source)) return source.map(sourceIdentity).join('|');
+  if (typeof source === 'object' && 'uri' in source) return String((source as { uri?: unknown }).uri);
+  return JSON.stringify(source);
 }
