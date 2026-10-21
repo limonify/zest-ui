@@ -184,6 +184,75 @@ describe('Avatar', () => {
     });
   });
 
+  describe('event order', () => {
+    // iOS delivers a cached image's `load` BEFORE its `loadStart`. A loaded
+    // avatar must not drop back to loading, or the Fallback shows for good.
+    it('stays loaded when loadStart arrives after load', async () => {
+      const seen: string[] = [];
+      await render(
+        <Avatar.Root>
+          <Avatar.Image testID="image" source={SOURCE} onLoadingStatusChange={(s) => seen.push(s)} />
+          <Avatar.Fallback testID="fallback">
+            <Text>EB</Text>
+          </Avatar.Fallback>
+        </Avatar.Root>,
+      );
+
+      await loaded();
+      await loadStart();
+
+      expect(seen).toEqual(['loaded']);
+      expect(screen.queryByTestId('fallback')).toBeNull();
+    });
+
+    it('stays errored when loadStart arrives after error', async () => {
+      await render(<TestAvatar />);
+      await errored();
+      await loadStart();
+      expect(screen.getByTestId('fallback')).toBeTruthy();
+    });
+
+    it('loads again when the source changes', async () => {
+      const seen: string[] = [];
+      const view = (uri: string) => (
+        <Avatar.Root>
+          <Avatar.Image testID="image" source={{ uri }} onLoadingStatusChange={(s) => seen.push(s)} />
+          <Avatar.Fallback testID="fallback">
+            <Text>EB</Text>
+          </Avatar.Fallback>
+        </Avatar.Root>
+      );
+      const { rerender } = await render(view('https://example.com/a.png'));
+      await loaded();
+
+      await rerender(view('https://example.com/b.png'));
+      await loadStart();
+      expect(seen).toEqual(['loaded', 'loading']);
+      expect(screen.getByTestId('fallback')).toBeTruthy();
+
+      await loaded();
+      expect(screen.queryByTestId('fallback')).toBeNull();
+    });
+
+    it('treats an equal source on a new render as the same load', async () => {
+      const seen: string[] = [];
+      const view = () => (
+        <Avatar.Root>
+          <Avatar.Image
+            testID="image"
+            source={{ uri: 'https://example.com/a.png' }}
+            onLoadingStatusChange={(s) => seen.push(s)}
+          />
+        </Avatar.Root>
+      );
+      const { rerender } = await render(view());
+      await loaded();
+      await rerender(view());
+      await loadStart();
+      expect(seen).toEqual(['loaded']);
+    });
+  });
+
   describe('Avatar.Image', () => {
     it('stays mounted before it loads, unlike the web', async () => {
       await render(<TestAvatar />);
