@@ -1,3 +1,14 @@
+## [0.12.5] - 2026-10-22
+
+### Fixed
+
+- **A cached avatar hides its fallback on iOS.** iOS delivers a cached image's `onLoad` before its
+  `onLoadStart`, and `Avatar.Image` mapped every load start to `'loading'`, so the status went
+  `loaded` → `loading` and stayed there: `Avatar.Fallback` never hid, and the initials showed beside
+  the picture. A load that has settled (loaded or errored) now stays settled until the image's source
+  changes, compared by what it points at (a uri, an asset number), so an equal source on a new render
+  is the same load. Android, which keeps the order, is unchanged.
+
 ## [0.12.4] - 2026-10-18
 
 ### Fixed
