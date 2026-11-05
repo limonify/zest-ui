@@ -65,7 +65,12 @@ export default function App() {
           ]}
         >
         <SafeAreaView style={styles.safeArea}>
-          <ScrollView contentContainerStyle={styles.container}>
+          {/*
+            A Modal stays in this React tree, so this ScrollView sees touches inside
+            every popup. Without "handled", the first tap on a row in a combobox only
+            dismisses the keyboard.
+          */}
+          <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           <Text style={styles.heading}>@limonify/zest-ui</Text>
           <Text style={styles.subheading}>
             Headless Base UI primitives for React Native. All styling below is plain StyleSheet,

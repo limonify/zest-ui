@@ -719,16 +719,34 @@ export function ComboboxSection() {
       </Text>
       {value != null ? <Text style={styles.label}>Selected: {String(value)}</Text> : null}
 
+      {/*
+        The input lives inside the popup: the popup's Modal is a separate window,
+        so an input left outside it loses focus the moment the list opens.
+      */}
       <Combobox.Root items={COUNTRIES} value={value} onValueChange={setValue}>
-        <Combobox.Input placeholder="Pick a country" style={styles.fieldControl} />
+        <Combobox.Trigger style={(state) => [styles.fieldControl, state.pressed && styles.buttonPressed]}>
+          <Combobox.Value placeholder="Pick a country" style={styles.label} />
+        </Combobox.Trigger>
         <Combobox.Portal>
           <Combobox.Backdrop style={styles.transparentBackdrop} />
-          <Combobox.Positioner>
+          <Combobox.Positioner
+            style={(state) => (state.triggerWidth ? { width: state.triggerWidth } : undefined)}
+          >
             <Combobox.Popup style={[styles.floatingPopup, styles.comboboxPopup]}>
+              <Combobox.Input
+                autoFocus
+                autoCorrect={false}
+                placeholder="Search"
+                style={styles.fieldControl}
+              />
               <Combobox.Empty style={styles.comboboxEmpty}>
                 <Text style={styles.label}>No match</Text>
               </Combobox.Empty>
-              <Combobox.List>
+              <Combobox.List
+                render={(elementProps) => (
+                  <ScrollView {...elementProps} keyboardShouldPersistTaps="handled" />
+                )}
+              >
                 {(item) => (
                   <Combobox.Item
                     key={String(item.value)}
@@ -750,10 +768,23 @@ export function ComboboxSection() {
         inputValue={tag}
         onInputValueChange={setTag}
       >
-        <Autocomplete.Input placeholder="Add a tag" style={styles.fieldControl} />
+        <Autocomplete.Trigger
+          style={(state) => [styles.fieldControl, state.pressed && styles.buttonPressed]}
+        >
+          <Text style={styles.label}>{tag || 'Add a tag'}</Text>
+        </Autocomplete.Trigger>
         <Autocomplete.Portal>
-          <Autocomplete.Positioner>
+          <Autocomplete.Backdrop style={styles.transparentBackdrop} />
+          <Autocomplete.Positioner
+            style={(state) => (state.triggerWidth ? { width: state.triggerWidth } : undefined)}
+          >
             <Autocomplete.Popup style={[styles.floatingPopup, styles.comboboxPopup]}>
+              <Autocomplete.Input
+                autoFocus
+                autoCorrect={false}
+                placeholder="Add a tag"
+                style={styles.fieldControl}
+              />
               <Autocomplete.List>
                 {(item) => (
                   <Autocomplete.Item
@@ -787,7 +818,8 @@ export function MultiComboboxSection() {
       <Text style={styles.sectionTitle}>Combobox (multiple)</Text>
       <Text style={styles.label}>
         A multiple combobox toggles items instead of replacing, stays open for the next pick, and
-        leaves the input to the query. Chips render the selection.
+        leaves the input to the query. Chips render the selection, and the input lives in the popup
+        so it keeps focus while the list is open.
       </Text>
 
       <Combobox.Root items={LANGUAGES} multiple value={values} onValueChange={setValues}>
@@ -810,11 +842,11 @@ export function MultiComboboxSection() {
               ))
             }
           </Combobox.Value>
-          <Combobox.Input
-            placeholder={selected.length > 0 ? '' : 'Pick languages'}
-            style={styles.comboboxChipsInput}
-          />
         </Combobox.Chips>
+
+        <Combobox.Trigger style={(state) => [styles.fieldControl, state.pressed && styles.buttonPressed]}>
+          <Text style={styles.label}>{selected.length > 0 ? 'Add more' : 'Pick languages'}</Text>
+        </Combobox.Trigger>
 
         <Combobox.Clear accessibilityLabel="Clear selection" style={styles.comboboxClear}>
           <Text style={styles.label}>Clear all</Text>
@@ -822,12 +854,24 @@ export function MultiComboboxSection() {
 
         <Combobox.Portal>
           <Combobox.Backdrop style={styles.transparentBackdrop} />
-          <Combobox.Positioner>
+          <Combobox.Positioner
+            style={(state) => (state.triggerWidth ? { width: state.triggerWidth } : undefined)}
+          >
             <Combobox.Popup style={[styles.floatingPopup, styles.comboboxPopup]}>
+              <Combobox.Input
+                autoFocus
+                autoCorrect={false}
+                placeholder="Search"
+                style={styles.fieldControl}
+              />
               <Combobox.Empty style={styles.comboboxEmpty}>
                 <Text style={styles.label}>No match</Text>
               </Combobox.Empty>
-              <Combobox.List>
+              <Combobox.List
+                render={(elementProps) => (
+                  <ScrollView {...elementProps} keyboardShouldPersistTaps="handled" />
+                )}
+              >
                 {(item) => (
                   <Combobox.Item
                     key={String(item.value)}
@@ -1041,7 +1085,12 @@ export function VerifySection() {
             style={(state) => (state.triggerWidth ? { width: state.triggerWidth } : undefined)}
           >
             <Combobox.Popup style={[styles.floatingPopup, styles.comboboxPopup]}>
-              <Combobox.Input placeholder="Search" style={styles.fieldControl} />
+              <Combobox.Input
+                autoFocus
+                autoCorrect={false}
+                placeholder="Search"
+                style={styles.fieldControl}
+              />
               <Combobox.Status style={styles.label} />
               <Combobox.Empty style={styles.comboboxEmpty}>
                 <Text style={styles.label}>No match</Text>
@@ -1051,7 +1100,11 @@ export function VerifySection() {
                 than spill: `Combobox.List` is headless, and here that means a
                 ScrollView.
               */}
-              <Combobox.List render={(elementProps) => <ScrollView {...elementProps} />}>
+              <Combobox.List
+                render={(elementProps) => (
+                  <ScrollView {...elementProps} keyboardShouldPersistTaps="handled" />
+                )}
+              >
                 {(entry) =>
                   isComboboxGroup(entry) ? (
                     <Combobox.Group key={String(entry.value)} items={entry.items}>
@@ -1775,6 +1828,118 @@ function useFrameStats(): FrameStats {
   return stats;
 }
 
+// Labels of about 20 characters, accented so the collator has real folding to do.
+const FILTER_PROBE_WORDS = ['Istanbul', 'Résumé', 'Jalapeño', 'Çanakkale', 'Göreme', 'Şırnak'];
+const FILTER_PROBE_ITEMS = Array.from(
+  { length: 1000 },
+  (_, index) =>
+    `${FILTER_PROBE_WORDS[index % FILTER_PROBE_WORDS.length]} branch ${String(index).padStart(4, '0')}`,
+);
+const FILTER_PROBE_FIRST = FILTER_PROBE_ITEMS[0];
+const FILTER_PROBE_LAST = FILTER_PROBE_ITEMS[FILTER_PROBE_ITEMS.length - 1];
+const FILTER_PROBE_VISIBLE_ROWS = 5;
+
+interface FilterProbeItem {
+  value: unknown;
+  label: string;
+}
+
+/**
+ * Times a keystroke in a long Combobox, split into the filter itself and
+ * everything up to the next frame, so the cost can be attributed before anyone
+ * optimizes it. The filter is the same `contains` Combobox uses by default, timed
+ * from the first item to the last so the clock adds nothing per comparison.
+ *
+ * The list is inline, capped, and plain text: rendering 1000 rows would drown out
+ * the filter, and the default Modal popup takes focus from the input, which ends
+ * the typing being measured. So `keystroke` excludes the popup and `Combobox.Item`.
+ *
+ * Memoized because `useFrameStats` re-renders `PerfSection` twice a second.
+ */
+const FilterProbe = React.memo(function FilterProbe() {
+  const [query, setQuery] = React.useState('');
+  const [result, setResult] = React.useState({ filterMs: 0, totalMs: 0 });
+  const { contains } = useFilter();
+
+  const keystrokeAtRef = React.useRef(0);
+  const filterStartedAtRef = React.useRef(0);
+  const filterMsRef = React.useRef(0);
+
+  const filter = React.useCallback(
+    (item: FilterProbeItem, itemQuery: string) => {
+      if (item.value === FILTER_PROBE_FIRST) {
+        filterStartedAtRef.current = performance.now();
+      }
+
+      const matched = contains(item.label, itemQuery);
+
+      if (item.value === FILTER_PROBE_LAST) {
+        filterMsRef.current = performance.now() - filterStartedAtRef.current;
+      }
+
+      return matched;
+    },
+    [contains],
+  );
+
+  const handleInputValueChange = (nextQuery: string) => {
+    keystrokeAtRef.current = performance.now();
+    filterMsRef.current = 0;
+    setQuery(nextQuery);
+  };
+
+  React.useLayoutEffect(() => {
+    if (keystrokeAtRef.current === 0) {
+      return undefined;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      setResult({
+        filterMs: filterMsRef.current,
+        totalMs: performance.now() - keystrokeAtRef.current,
+      });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [query]);
+
+  return (
+    <View style={styles.group}>
+      <Text style={styles.label}>
+        Combobox search over 1000 items. Type zzz: nothing matches, so every label is scanned in
+        full, which is the slowest case.
+      </Text>
+      <View style={styles.perfStats}>
+        <Text style={styles.perfStat}>filter {result.filterMs.toFixed(1)}ms</Text>
+        <Text style={styles.perfStat}>keystroke {result.totalMs.toFixed(1)}ms</Text>
+      </View>
+      <Combobox.Root
+        items={FILTER_PROBE_ITEMS}
+        inputValue={query}
+        onInputValueChange={handleInputValueChange}
+        filter={filter}
+      >
+        <Combobox.Input placeholder="Search 1000 items" style={styles.fieldControl} />
+        <Combobox.List
+          render={(elementProps, state) => {
+            const { children: _children, ...listProps } = elementProps;
+            const rows = (state.items as FilterProbeItem[]).slice(0, FILTER_PROBE_VISIBLE_ROWS);
+            return (
+              <View {...listProps}>
+                {rows.map((item) => (
+                  <Text key={String(item.value)} style={styles.label}>
+                    {item.label}
+                  </Text>
+                ))}
+              </View>
+            );
+          }}
+        />
+      </Combobox.Root>
+    </View>
+  );
+});
+
 /**
  * The performance harness. It exists to make the library's drag path measurable:
  * drag the thumbs and watch the frame time. Three thumbs is the stress case —
@@ -1840,6 +2005,8 @@ export function PerfSection() {
           </Drawer.Viewport>
         </Drawer.Portal>
       </Drawer.Root>
+
+      <FilterProbe />
     </View>
   );
 }

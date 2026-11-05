@@ -228,12 +228,6 @@ export const styles = StyleSheet.create({
   comboboxChipRemove: {
     paddingHorizontal: 2,
   },
-  comboboxChipsInput: {
-    flexGrow: 1,
-    minWidth: 120,
-    paddingVertical: 6,
-    fontSize: 15,
-  },
   comboboxClear: {
     alignSelf: 'flex-start',
     paddingVertical: 6,
