@@ -79,12 +79,10 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      # Only the package being published. The docs build fetches Google Fonts, and
+      # an outage there should not be able to stop a release.
       - name: Verify (typecheck · lint · test · build)
-        run: |
-          bun run typecheck
-          bun run lint
-          bun run test
-          bun run build
+        run: bunx turbo run typecheck lint test build --filter=@limonify/zest-ui
 
       - name: Publish to npm
         working-directory: packages/zest-ui
