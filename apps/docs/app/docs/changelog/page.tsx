@@ -14,11 +14,11 @@ import defaultMdxComponents from 'fumadocs-ui/mdx';
 const { Markdown } = createMarkdownRenderer({ remarkPlugins: [remarkHeading] });
 
 // The repo-root CHANGELOG.md is the single source of truth — this page renders
-// it verbatim, so it can never drift from the file.
-const changelog = fs.readFileSync(
-  path.join(process.cwd(), '..', '..', 'CHANGELOG.md'),
-  'utf8',
-);
+// it verbatim, so it can never drift from the file. Only its title and intro go,
+// which release-please needs in the file and which this page renders itself.
+const changelog = fs
+  .readFileSync(path.join(process.cwd(), '..', '..', 'CHANGELOG.md'), 'utf8')
+  .replace(/^# Changelog[\s\S]*?(?=^## )/m, '');
 
 const toc = getTableOfContents(changelog);
 

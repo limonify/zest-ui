@@ -1,3 +1,7 @@
+# Changelog
+
+All notable changes to `@limonify/zest-ui` are documented here.
+
 ## [0.12.6] - 2026-11-05
 
 ### Fixed

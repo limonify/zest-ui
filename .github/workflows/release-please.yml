@@ -1,0 +1,46 @@
+name: Release Please
+
+# Watches `main` and keeps one open release PR: the version bumped and CHANGELOG.md
+# written, both derived from the conventional commits since the last release
+# (`fix:` is a patch, `feat:` a minor, and below 1.0 `feat!:` is a minor too). Nothing
+# ships until that PR is merged, which tags `vX.Y.Z`, creates the GitHub Release and
+# publishes. Edit the changelog on the PR's branch to improve the generated notes.
+#
+# This workflow publishes itself instead of handing off to release.yml: a Release
+# created with the default `GITHUB_TOKEN` does not trigger other workflows, so
+# release.yml would silently never run.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release-please-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    outputs:
+      release_created: ${{ steps.rp.outputs.release_created }}
+
+    steps:
+      - uses: googleapis/release-please-action@v5
+        id: rp
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    permissions:
+      contents: write
+      id-token: write
+      packages: write
+    uses: ./.github/workflows/publish.yml
+    secrets: inherit
