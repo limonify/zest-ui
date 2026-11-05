@@ -2,6 +2,13 @@
 
 All notable changes to `@limonify/zest-ui` are documented here.
 
+## [0.12.7](https://github.com/limonify/zest-ui/compare/v0.12.6...v0.12.7) (2026-11-05)
+
+
+### Bug Fixes
+
+* **combobox:** hear a keyboard that started showing before the popup mounted ([#15](https://github.com/limonify/zest-ui/issues/15)) ([6576a48](https://github.com/limonify/zest-ui/commit/6576a48436038a6a3583d18cea7e8c4790ecef1e))
+
 ## [0.12.6] - 2026-11-05
 
 ### Fixed
