@@ -1,3 +1,36 @@
+## [0.12.6] - 2026-11-05
+
+### Fixed
+
+- **A `Combobox` popup no longer opens underneath the keyboard.** The positioner only knew the size
+  of the window, so a popup opened from low on the screen sat behind the on-screen keyboard, along
+  with the input inside it. `Combobox.Positioner` and `Autocomplete.Positioner` now raise the bottom
+  of the collision boundary by the keyboard's height, so the popup moves above its anchor.
+- **`autoFocus` opens the keyboard inside a `Modal` on Android.** A `Combobox.Input` in the popup got
+  the caret but no keyboard, because the Modal's window does not have input focus yet when it appears,
+  and the user had to tap the input. `Combobox.Portal` now applies `autoFocus` itself, shortly after
+  the Modal has shown. `modalProps.onShow` is chained rather than replaced.
+- **A query no longer shows on `Combobox.Trigger`.** `Combobox.Value` rendered the input text, so what
+  the user typed into the popup replaced the selection on the trigger, and stayed there if the list
+  was dismissed. As in Base UI, a single-selection combobox with a trigger now shows the selected
+  label, and its input is cleared whenever the list opens or closes, so every open starts blank. This
+  also means choosing a row no longer fires `onInputValueChange` in that shape. A combobox without a
+  trigger, a `multiple` one and `Autocomplete` are unchanged, and `state.value` is still the input text.
+
+### Added
+
+- **A development warning for an input the user cannot type into.** A `Combobox.Input` outside
+  `Combobox.Portal` loses focus when the list opens, because a `Modal` is a separate window. The
+  portal now says so on iOS and Android, and names the two ways out: a `Combobox.Trigger` with the
+  input in the popup, or `modal={false}`.
+
+### Documentation
+
+- **"Keeping the input focused" on the Combobox page**, with a warning under the first example, whose
+  shape has this problem. It also covers `keyboardShouldPersistTaps="handled"`, which every
+  `ScrollView` above a combobox needs or the first tap on a row only dismisses the keyboard, and
+  `autoCorrect={false}`, since an iOS autocorrect suggestion takes that tap as well.
+
 ## [0.12.5] - 2026-10-22
 
 ### Fixed
