@@ -1,143 +1,51 @@
 name: Release
 
+# The MANUAL route. `release-please.yml` is the usual one: it derives the version from
+# conventional commits, writes the changelog and publishes when its PR merges. This
+# exists for a release cut by hand.
+#
+# Fires when a GitHub Release is PUBLISHED (not on a draft), so a draft can be written
+# and reviewed without shipping anything. Releases created by release-please use
+# `GITHUB_TOKEN` and do not fire this, so nothing publishes twice.
 on:
   release:
     types: [published]
   workflow_dispatch:
-
-permissions:
-  contents: write # commit the version bump back to main
-  id-token: write # npm provenance
-  packages: write # push @limonify/zest-ui to GitHub Packages
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  publish:
-    name: Publish @limonify/zest-ui to npm + GitHub Packages
+  resolve:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.target.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          # Needed so the version-bump commit can push to main after a tag release.
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Guard against re-publishing an existing version
+      # A publish cannot be taken back, so a malformed tag is rejected before any work
+      # starts. A manual dispatch has no tag: it publishes package.json's version.
+      - name: Resolve the version from the tag
+        id: target
         if: github.event_name == 'release'
-        # Both registries reject a publish whose version already exists. Fail
-        # early (before the version-bump commit) when the release tag is equal
-        # to or lower than the latest version published on npm. Manual dispatch
-        # is not guarded — there is no release tag to compare.
-        run: |
-          set -euo pipefail
-          VERSION="${GITHUB_REF_NAME#v}"
-
-          LATEST="$(npm view @limonify/zest-ui version 2>/dev/null || true)"
-          if [ -z "${LATEST}" ]; then
-            echo "No published version on npm yet — will publish ${VERSION}"
-            exit 0
-          fi
-
-          if [ "${VERSION}" = "${LATEST}" ]; then
-            echo "::error::Release ${VERSION} is already published on npm (latest: ${LATEST}); refusing to publish."
-            exit 1
-          fi
-
-          LOWER="$(printf '%s\n%s\n' "${VERSION}" "${LATEST}" | sort -V | head -n1)"
-          if [ "${LOWER}" = "${VERSION}" ]; then
-            echo "::error::Release ${VERSION} is older than the latest published version (${LATEST}); refusing to publish."
-            exit 1
-          fi
-
-          echo "Publishing ${VERSION} (latest published: ${LATEST})"
-
-      - name: Set up Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.14
-
-      - name: Set up Node (npm auth)
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: https://registry.npmjs.org
-
-      - name: Sync package version from release tag
-        if: github.event_name == 'release'
-        run: |
-          TAG="${GITHUB_REF_NAME#v}"
-          if ! [[ "$TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
-            echo "::error::Release tag ${GITHUB_REF_NAME} is not a semver version (expected vX.Y.Z)"
-            exit 1
-          fi
-          # Do not use `npm version` here: npm walks the bun workspace and dies on
-          # `workspace:*` (EUNSUPPORTEDPROTOCOL). Just rewrite the version field.
-          TAG="$TAG" node <<'EOF'
-          const fs = require('fs');
-          const path = 'packages/zest-ui/package.json';
-          const version = process.env.TAG;
-          const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
-          pkg.version = version;
-          fs.writeFileSync(path, `${JSON.stringify(pkg, null, 2)}\n`);
-          console.log(`Publishing @limonify/zest-ui@${version}`);
-          EOF
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Verify (typecheck · test · build)
-        run: |
-          bun run typecheck
-          bun run test
-          bun run build
-
-      - name: Publish to npm
-        working-directory: packages/zest-ui
-        run: npm publish --access public --provenance
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish to GitHub Packages
-        # Mirrors @limonify/zest-ui to npm.pkg.github.com under the limonify org.
-        # Configure a scoped npmrc for the GitHub Packages registry (this
-        # overwrites the npmjs one, which is fine — the npm publish above is
-        # already done). The `@limonify` scope mapping makes a plain
-        # `npm publish` target npm.pkg.github.com. GitHub Packages does not
-        # support npm provenance, so no --provenance here.
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: https://npm.pkg.github.com
-          scope: '@limonify'
-
-      - name: Publish to GitHub Packages
-        working-directory: packages/zest-ui
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit version bump to main
-        if: github.event_name == 'release'
+          TAG: ${{ github.event.release.tag_name }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git fetch origin main
-          git checkout -B main origin/main
-          TAG="$VERSION" node <<'EOF'
-          const fs = require('fs');
-          const path = 'packages/zest-ui/package.json';
-          const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
-          pkg.version = process.env.TAG;
-          fs.writeFileSync(path, `${JSON.stringify(pkg, null, 2)}\n`);
-          EOF
-          git add packages/zest-ui/package.json
-          if git diff --staged --quiet; then
-            echo "main already at $VERSION — nothing to commit"
-            exit 0
+          VERSION="${TAG#v}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Release tag ${TAG} is not a semver version (expected vX.Y.Z)"
+            exit 1
           fi
-          git commit -m "chore: release v${VERSION}"
-          git push origin main
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: resolve
+    permissions:
+      contents: write
+      id-token: write
+      packages: write
+    uses: ./.github/workflows/publish.yml
+    with:
+      version: ${{ needs.resolve.outputs.version }}
+    secrets: inherit
