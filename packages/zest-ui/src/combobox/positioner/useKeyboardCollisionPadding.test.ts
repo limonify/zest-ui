@@ -68,6 +68,33 @@ describe('useKeyboardCollisionPadding', () => {
     expect(result.current).toEqual({ top: 5, right: 5, bottom: 205, left: 5 });
   });
 
+  // The list opens on focus, which is when the keyboard starts to show: the popup
+  // mounts after `keyboardWillShow` has fired, and `metrics()` stays empty until
+  // `keyboardDidShow`. With only the will-event it read 0 for as long as it was open.
+  it('hears a keyboard that started showing before it mounted', async () => {
+    const { result } = await renderHook(() => useKeyboardCollisionPadding(5));
+
+    await act(async () => {
+      listeners.get('keyboardDidShow')?.({ endCoordinates: { height: 300 } });
+    });
+
+    expect(result.current).toEqual({ top: 5, right: 5, bottom: 305, left: 5 });
+  });
+
+  it('does not keep a height from a did-show that lands after a will-hide', async () => {
+    const { result } = await renderHook(() => useKeyboardCollisionPadding(5));
+
+    await act(async () => {
+      listeners.get('keyboardWillHide')?.({ endCoordinates: { height: 0 } });
+      listeners.get('keyboardDidShow')?.({ endCoordinates: { height: 300 } });
+    });
+    await act(async () => {
+      listeners.get('keyboardDidHide')?.({ endCoordinates: { height: 0 } });
+    });
+
+    expect(result.current).toBe(5);
+  });
+
   it('uses the did-events on Android, which has no will-events', async () => {
     Platform.OS = 'android';
     await renderHook(() => useKeyboardCollisionPadding(5));
@@ -80,6 +107,6 @@ describe('useKeyboardCollisionPadding', () => {
 
     await unmount();
 
-    expect(remove).toHaveBeenCalledTimes(2);
+    expect(remove).toHaveBeenCalledTimes(4);
   });
 });

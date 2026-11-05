@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { Keyboard, Platform } from 'react-native';
+import { Keyboard, Platform, type KeyboardEvent } from 'react-native';
 import type { Padding } from '@floating-ui/react-native';
 
 /**
@@ -8,7 +8,10 @@ import type { Padding } from '@floating-ui/react-native';
  * keyboard, so `flip` moves the popup above its anchor instead of leaving it, and
  * the input inside it, underneath the keyboard. floating-ui only knows the window.
  *
- * Android has no `keyboardWill*` events, and iOS moves earlier with them.
+ * Android has no `keyboardWill*` events, and iOS moves earlier with them. iOS needs
+ * the `keyboardDid*` events as well: a list that opens on focus mounts after
+ * `keyboardWillShow` has fired and before `Keyboard.metrics()` has a value, which
+ * only `keyboardDidShow` sets, so this is the first it hears of that keyboard.
  */
 export function useKeyboardCollisionPadding(collisionPadding: Padding): Padding {
   const [keyboardHeight, setKeyboardHeight] = React.useState(
@@ -16,19 +19,22 @@ export function useKeyboardCollisionPadding(collisionPadding: Padding): Padding 
   );
 
   React.useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const show = (event: KeyboardEvent) => setKeyboardHeight(event.endCoordinates.height);
+    const hide = () => setKeyboardHeight(0);
 
-    const show = Keyboard.addListener(showEvent, (event) => {
-      setKeyboardHeight(event.endCoordinates.height);
-    });
-    const hide = Keyboard.addListener(hideEvent, () => {
-      setKeyboardHeight(0);
-    });
+    const subscriptions = [
+      Keyboard.addListener('keyboardDidShow', show),
+      Keyboard.addListener('keyboardDidHide', hide),
+    ];
+    if (Platform.OS === 'ios') {
+      subscriptions.push(
+        Keyboard.addListener('keyboardWillShow', show),
+        Keyboard.addListener('keyboardWillHide', hide),
+      );
+    }
 
     return () => {
-      show.remove();
-      hide.remove();
+      subscriptions.forEach((subscription) => subscription.remove());
     };
   }, []);
 
