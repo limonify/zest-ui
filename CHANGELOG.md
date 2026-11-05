@@ -13,9 +13,10 @@
 - **A query no longer shows on `Combobox.Trigger`.** `Combobox.Value` rendered the input text, so what
   the user typed into the popup replaced the selection on the trigger, and stayed there if the list
   was dismissed. As in Base UI, a single-selection combobox with a trigger now shows the selected
-  label, and its input is cleared whenever the list opens or closes, so every open starts blank. This
-  also means choosing a row no longer fires `onInputValueChange` in that shape. A combobox without a
-  trigger, a `multiple` one and `Autocomplete` are unchanged, and `state.value` is still the input text.
+  label, and its input is cleared whenever the list opens or closes, so every open starts blank. In
+  that shape `onInputValueChange` no longer reports the chosen label, and clearing a query reports the
+  `input-clear` reason. A combobox without a trigger, a `multiple` one and `Autocomplete` are unchanged,
+  and `state.value` is still the input text.
 
 ### Added
 
