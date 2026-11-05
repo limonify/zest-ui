@@ -242,6 +242,16 @@ type Context = {
    * through this, which is what lets an input rendered outside the root open it.
    */
   triggerNodes: PopupTriggerMap;
+  /**
+   * Whether the input is rendered outside `Combobox.Portal`. A `Modal` portal
+   * takes focus from such an input, which `ComboboxPortal` warns about.
+   */
+  inputOutsidePortal: boolean;
+  /**
+   * Whether the Modal should focus the input once it has shown, because the input
+   * asked for `autoFocus` from inside it.
+   */
+  focusInputOnShow: boolean;
 };
 
 const selectors = {
@@ -329,8 +339,24 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
         onValueChange: undefined,
         onInputValueChange: undefined,
         triggerNodes: new PopupTriggerMap(),
+        inputOutsidePortal: false,
+        focusInputOnShow: false,
       },
       selectors,
+    );
+  }
+
+  /**
+   * Whether the input holds nothing but a filter query: a single-selection
+   * combobox with a `Combobox.Trigger`, whose input lives inside the popup and
+   * whose selection shows on the trigger. Upstream clears that input so the next
+   * open is blank, rather than syncing it to the selected label.
+   */
+  private inputIsOnlyAQuery() {
+    return (
+      this.select('mode') === 'combobox' &&
+      !this.select('multiple') &&
+      this.select('triggerNode') != null
     );
   }
 
@@ -357,6 +383,12 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
     // close (item press, outside press, escape, imperative) at once. It is a
     // change of its own, so it carries its own reason rather than sharing one.
     if (!nextOpen && this.select('multiple') && this.select('inputValue') !== '') {
+      this.setInputValue('', createChangeEventDetails(REASONS.inputClear, eventDetails.event));
+    }
+
+    // On open as well as on close: an initial or controlled `value` also fills
+    // the input, and that label must not show up as a query in the popup.
+    if (this.inputIsOnlyAQuery() && this.select('inputValue') !== '') {
       this.setInputValue('', createChangeEventDetails(REASONS.inputClear, eventDetails.event));
     }
   };
@@ -461,10 +493,12 @@ export class ComboboxStore extends ReactStore<Readonly<State>, Context, typeof s
       return;
     }
 
-    this.setInputValue(item.label, eventDetails);
+    if (!this.inputIsOnlyAQuery()) {
+      this.setInputValue(item.label, eventDetails);
 
-    if (eventDetails.isCanceled) {
-      return;
+      if (eventDetails.isCanceled) {
+        return;
+      }
     }
 
     this.set('suppressFocusOpen', true);

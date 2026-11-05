@@ -10,7 +10,8 @@ import { useStoreState } from '../../store/ReactStore';
 
 /**
  * Displays the current input text (the selected label in a single-selection
- * combobox).
+ * combobox). Under a `Combobox.Trigger` a single-selection combobox shows the
+ * selected label itself, since its input only holds a filter query.
  * Renders a `<Text>`. Reads `state.value` in a style/render function for custom
  * formatting.
  *
@@ -32,10 +33,20 @@ export function ComboboxValue(componentProps: ComboboxValue.Props) {
   const store = useComboboxRootContext();
   const { selectedItems } = useComboboxSelectionContext();
   const inputValue = useStoreState(store, 'inputValue');
+  const mode = useStoreState(store, 'mode');
+  const multiple = useStoreState(store, 'multiple');
+  const triggerNode = useStoreState(store, 'triggerNode');
 
   const rendersSelection = typeof children === 'function';
 
-  const showsPlaceholder = !rendersSelection && children == null && inputValue === '';
+  // With a trigger the input only holds a filter query, so what the trigger shows
+  // is the selection. Without one the input and the selection are the same text.
+  const text =
+    mode === 'combobox' && !multiple && triggerNode != null
+      ? (selectedItems[0]?.label ?? '')
+      : inputValue;
+
+  const showsPlaceholder = !rendersSelection && children == null && text === '';
 
   const state: ComboboxValueState = {
     value: inputValue,
@@ -48,7 +59,7 @@ export function ComboboxValue(componentProps: ComboboxValue.Props) {
     ref,
     props: [
       {
-        children: rendersSelection ? undefined : (children ?? (showsPlaceholder ? placeholder : inputValue)),
+        children: rendersSelection ? undefined : (children ?? (showsPlaceholder ? placeholder : text)),
       },
       elementProps,
     ],

@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
 import { useComboboxPortalContext } from '../portal/ComboboxPortalContext';
 import { ComboboxPositionerContext } from './ComboboxPositionerContext';
+import { useKeyboardCollisionPadding } from './useKeyboardCollisionPadding';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
 import { useMergedRefs } from '../../hooks/useMergedRefs';
@@ -61,12 +62,14 @@ export function ComboboxPositioner(componentProps: ComboboxPositioner.Props) {
   const triggerWidth = anchorIsTrigger ? measuredTriggerWidth : measuredInputWidth;
   const triggerHeight = anchorIsTrigger ? measuredTriggerHeight : measuredInputHeight;
 
+  const keyboardCollisionPadding = useKeyboardCollisionPadding(collisionPadding);
+
   const positioning = useAnchorPositioning({
     align,
     open,
     alignOffset,
     arrowPadding,
-    collisionPadding,
+    collisionPadding: keyboardCollisionPadding,
     side,
     sideOffset,
     sticky,

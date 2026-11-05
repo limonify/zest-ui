@@ -103,6 +103,76 @@ describe('Combobox.Trigger', () => {
     expect(screen.getByTestId('value', hidden)).toHaveTextContent('Banana');
   });
 
+  it('keeps a query off the trigger, whether or not the list is dismissed', async () => {
+    const user = userEvent.setup();
+    await render(<TestTrigger defaultOpen />);
+
+    await user.type(screen.getByTestId('input'), 'Ban');
+    expect(screen.getByTestId('value', hidden)).toHaveTextContent('');
+
+    await user.press(screen.getByTestId('backdrop'));
+
+    expect(screen.queryByTestId('popup')).toBeNull();
+    expect(screen.getByTestId('value', hidden)).toHaveTextContent('');
+  });
+
+  it('keeps the selection on the trigger while a new query is typed', async () => {
+    const user = userEvent.setup();
+    await render(<TestTrigger defaultValue="Apple" defaultOpen />);
+
+    await user.type(screen.getByTestId('input'), 'Ban');
+
+    expect(screen.getByTestId('value', hidden)).toHaveTextContent('Apple');
+  });
+
+  it('shows the placeholder until something is selected, ignoring the query', async () => {
+    const user = userEvent.setup();
+    await render(
+      <Combobox.Root items={FRUITS} defaultOpen>
+        <Combobox.Trigger>
+          <Combobox.Value testID="value" placeholder="Pick a fruit" />
+        </Combobox.Trigger>
+        <Combobox.Portal>
+          <Combobox.Positioner>
+            <Combobox.Popup>
+              <Combobox.Input testID="input" />
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Portal>
+      </Combobox.Root>,
+    );
+
+    await user.type(screen.getByTestId('input'), 'Ban');
+
+    expect(screen.getByTestId('value', hidden)).toHaveTextContent('Pick a fruit');
+  });
+
+  it('opens with an empty input, every time and with every item listed', async () => {
+    const user = userEvent.setup();
+    await render(<TestTrigger defaultValue="Apple" />);
+
+    await user.press(screen.getByTestId('trigger'));
+    expect(screen.getByTestId('input').props.value).toBe('');
+    expect(screen.getByTestId('item-Banana')).toBeTruthy();
+
+    await user.type(screen.getByTestId('input'), 'Ban');
+    await user.press(screen.getByTestId('item-Banana'));
+    await user.press(screen.getByTestId('trigger'));
+
+    expect(screen.getByTestId('input').props.value).toBe('');
+    expect(screen.getByTestId('item-Apple')).toBeTruthy();
+  });
+
+  it('does not report the selected label as an input change', async () => {
+    const user = userEvent.setup();
+    const onInputValueChange = jest.fn();
+    await render(<TestTrigger defaultOpen onInputValueChange={onInputValueChange} />);
+
+    await user.press(screen.getByTestId('item-Banana'));
+
+    expect(onInputValueChange).not.toHaveBeenCalled();
+  });
+
   it('opens through a handle from a detached trigger', async () => {
     const handle = Combobox.createHandle();
 

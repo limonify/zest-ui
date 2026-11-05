@@ -1,15 +1,24 @@
 'use client';
 import * as React from 'react';
-import { Modal, type ViewStyle } from 'react-native';
+import { Modal, Platform, type NativeSyntheticEvent, type ViewStyle } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useComboboxRootContext } from '../root/ComboboxRootContext';
-import { ComboboxPortalContext } from './ComboboxPortalContext';
+import { ComboboxPortalContext, ComboboxPortalModalContext } from './ComboboxPortalContext';
 import { createChangeEventDetails } from '../../utils/createChangeEventDetails';
 import { REASONS } from '../../utils/reasons';
+import { warn } from '../../utils/warn';
+import { useTimeout } from '../../hooks/useTimeout';
 import type { ZestPortalModalProps } from '../../types';
 import type { ModalRequestCloseEventType } from '../../utils/reactNativeTypes';
 import { useStoreState } from '../../store/ReactStore';
 import { PortalGestureRoot } from '../../internals/portal/PortalGestureRoot';
+
+// When Android fires a Modal's `onShow`, its window does not have input focus yet, so
+// a focus() at that moment ends in "Ignoring showSoftInput() as view is not served":
+// the caret appears and the keyboard does not. No event reports the window gaining
+// focus, so this waits for it. Measured on an emulator only. If it is ever too short,
+// the user taps the input, which is what they had to do without it.
+const ANDROID_MODAL_FOCUS_DELAY = 100;
 
 /**
  * Moves the popup to the top of the app, as an RN `Modal` like the rest of the
@@ -21,6 +30,24 @@ export function ComboboxPortal(props: ComboboxPortal.Props) {
 
   const store = useComboboxRootContext();
   const open = useStoreState(store, 'open');
+  const focusTimeout = useTimeout();
+
+  // A layout effect in the input has already recorded where it is by now. Only iOS
+  // and Android are known to lose focus this way, so the web does not warn.
+  React.useEffect(() => {
+    if (open && modal && store.context.inputOutsidePortal && Platform.OS !== 'web') {
+      warn(
+        'A Combobox.Input outside Combobox.Portal loses focus when the list opens, because a Modal is a separate window, so the user cannot keep typing.',
+        'Move the input into the popup with a Combobox.Trigger, or pass modal={false} to Combobox.Portal.',
+      );
+    }
+  }, [open, modal, store]);
+
+  React.useEffect(() => {
+    if (!open) {
+      focusTimeout.clear();
+    }
+  }, [open, focusTimeout]);
 
   const shouldRender = open || keepMounted;
   if (!shouldRender) {
@@ -53,12 +80,27 @@ export function ComboboxPortal(props: ComboboxPortal.Props) {
         navigationBarTranslucent
         {...modalProps}
         visible={open}
+        onShow={(event: NativeSyntheticEvent<unknown>) => {
+          modalProps?.onShow?.(event);
+          if (!store.context.focusInputOnShow) {
+            return;
+          }
+
+          const focusInput = () => store.select('inputRef')?.current?.focus();
+          if (Platform.OS === 'android') {
+            focusTimeout.start(ANDROID_MODAL_FOCUS_DELAY, focusInput);
+          } else {
+            focusInput();
+          }
+        }}
         onRequestClose={(event: ModalRequestCloseEventType) => {
           modalProps?.onRequestClose?.(event);
           store.setOpen(false, createChangeEventDetails(REASONS.escapeKey, event));
         }}
       >
-        <PortalGestureRoot>{children}</PortalGestureRoot>
+        <ComboboxPortalModalContext.Provider value>
+          <PortalGestureRoot>{children}</PortalGestureRoot>
+        </ComboboxPortalModalContext.Provider>
       </Modal>
     </ComboboxPortalContext.Provider>
   );
@@ -103,8 +145,8 @@ export interface ComboboxPortalProps {
    * Props forwarded to the underlying React Native `Modal`. Lets you replace
    * the default `animationType="none"` with a native `"fade"`/`"slide"`, or reach
    * the rest of the Modal API.
-   * `visible` stays owned by the combobox's open state, and `onRequestClose` is
-   * chained rather than replaced. Ignored when `modal={false}`.
+   * `visible` stays owned by the combobox's open state, and `onRequestClose` and
+   * `onShow` are chained rather than replaced. Ignored when `modal={false}`.
    */
   modalProps?: ZestPortalModalProps | undefined;
 }

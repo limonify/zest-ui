@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { TextInput, type LayoutChangeEvent } from 'react-native';
 import { ComboboxRootContext } from '../root/ComboboxRootContext';
+import { ComboboxPortalContext, ComboboxPortalModalContext } from '../portal/ComboboxPortalContext';
 import { useRenderElement } from '../../use-render/useRenderElement';
 import { useId } from '../../hooks/useId';
 import { useIsoLayoutEffect } from '../../hooks/useIsoLayoutEffect';
@@ -65,6 +66,20 @@ export function ComboboxInput<Payload = unknown>(componentProps: ComboboxInput.P
   useIsoLayoutEffect(() => {
     store.set('inputRef', internalRef);
   }, [store]);
+
+  const insidePortal = React.useContext(ComboboxPortalContext) !== undefined;
+  useIsoLayoutEffect(() => {
+    store.context.inputOutsidePortal = !insidePortal;
+  }, [store, insidePortal]);
+
+  // A TextInput that autofocuses while its Modal window is still appearing gets the
+  // caret but not the Android keyboard, and `focus()` is a no-op once it is focused.
+  // So inside a Modal the native prop stays off and the portal focuses on `onShow`.
+  const insideModal = React.useContext(ComboboxPortalModalContext);
+  const focusOnShow = insideModal && elementProps.autoFocus === true;
+  useIsoLayoutEffect(() => {
+    store.context.focusInputOnShow = focusOnShow;
+  }, [store, focusOnShow]);
 
   const triggerRef = React.useRef<unknown>(null);
   // Its own slot, not `triggerNode`: with a `Combobox.Trigger` the input lives
@@ -153,6 +168,7 @@ export function ComboboxInput<Payload = unknown>(componentProps: ComboboxInput.P
         ...fieldProps,
       },
       elementProps,
+      focusOnShow ? { autoFocus: false } : undefined,
     ],
   });
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Text } from 'react-native';
-import { render, screen } from '@testing-library/react-native';
+import { Platform, Text } from 'react-native';
+import { act, render, screen } from '@testing-library/react-native';
 import { Autocomplete, Combobox } from '../../index';
 
 const FRUITS = ['Apple', 'Banana', 'Cherry'];
@@ -77,5 +77,130 @@ describe('Combobox.Portal', () => {
 
     expect(JSON.stringify(screen.toJSON())).not.toContain('Modal');
     expect(screen.getByTestId('popup')).toBeTruthy();
+  });
+});
+
+/** The native Modal node, found by the `onShow` the portal gives it. */
+function findModal(node: unknown): { props: { onShow: (event: unknown) => void } } | undefined {
+  if (!node || typeof node !== 'object') {
+    return undefined;
+  }
+  const element = node as { props?: Record<string, unknown>; children?: unknown[] };
+  if (typeof element.props?.onShow === 'function') {
+    return element as { props: { onShow: (event: unknown) => void } };
+  }
+  for (const child of element.children ?? []) {
+    const found = findModal(child);
+    if (found) {
+      return found;
+    }
+  }
+  return undefined;
+}
+
+describe('Combobox.Input autoFocus inside a Modal', () => {
+  function AutoFocusInput(props: {
+    inputRef: React.RefObject<any>;
+    autoFocus?: boolean;
+    modal?: boolean;
+    onShow?: () => void;
+  }) {
+    return (
+      <Combobox.Root defaultOpen>
+        <Combobox.Trigger />
+        <Combobox.Portal modal={props.modal} modalProps={{ onShow: props.onShow }}>
+          <Combobox.Positioner>
+            <Combobox.Popup>
+              <Combobox.Input testID="input" ref={props.inputRef} autoFocus={props.autoFocus} />
+            </Combobox.Popup>
+          </Combobox.Positioner>
+        </Combobox.Portal>
+      </Combobox.Root>
+    );
+  }
+
+  it('moves autoFocus from the native prop to the moment the Modal has shown', async () => {
+    const inputRef = React.createRef<any>();
+    const view = await render(<AutoFocusInput inputRef={inputRef} autoFocus />);
+
+    expect(screen.getByTestId('input', { includeHiddenElements: true }).props.autoFocus).toBe(false);
+
+    const focus = jest.spyOn(inputRef.current, 'focus');
+    focus.mockClear();
+    await act(async () => {
+      findModal(view.container)?.props.onShow({});
+    });
+
+    expect(focus).toHaveBeenCalledTimes(1);
+  });
+
+  describe('on Android', () => {
+    const originalOS = Platform.OS;
+
+    beforeEach(() => {
+      Platform.OS = 'android';
+    });
+
+    afterEach(() => {
+      Platform.OS = originalOS;
+      jest.useRealTimers();
+    });
+
+    async function showModal(view: { container: unknown }) {
+      jest.useFakeTimers();
+      await act(async () => {
+        findModal(view.container)?.props.onShow({});
+      });
+    }
+
+    it('waits for the Modal window to have input focus', async () => {
+      const inputRef = React.createRef<any>();
+      const view = await render(<AutoFocusInput inputRef={inputRef} autoFocus />);
+      const focus = jest.spyOn(inputRef.current, 'focus');
+      focus.mockClear();
+
+      await showModal(view);
+      expect(focus).not.toHaveBeenCalled();
+
+      await act(async () => {
+        jest.advanceTimersByTime(100);
+      });
+      expect(focus).toHaveBeenCalledTimes(1);
+    });
+
+    it('drops the pending focus when it unmounts first', async () => {
+      const inputRef = React.createRef<any>();
+      const view = await render(<AutoFocusInput inputRef={inputRef} autoFocus />);
+      const focus = jest.spyOn(inputRef.current, 'focus');
+      focus.mockClear();
+
+      await showModal(view);
+      await view.unmount();
+      jest.advanceTimersByTime(100);
+
+      expect(focus).not.toHaveBeenCalled();
+    });
+  });
+
+  it('still calls the consumer onShow, and focuses nothing without autoFocus', async () => {
+    const inputRef = React.createRef<any>();
+    const onShow = jest.fn();
+    const view = await render(<AutoFocusInput inputRef={inputRef} onShow={onShow} />);
+
+    const focus = jest.spyOn(inputRef.current, 'focus');
+    focus.mockClear();
+    await act(async () => {
+      findModal(view.container)?.props.onShow({});
+    });
+
+    expect(onShow).toHaveBeenCalledTimes(1);
+    expect(focus).not.toHaveBeenCalled();
+  });
+
+  it('leaves the native prop alone in the non-Modal overlay', async () => {
+    const inputRef = React.createRef<any>();
+    await render(<AutoFocusInput inputRef={inputRef} autoFocus modal={false} />);
+
+    expect(screen.getByTestId('input', { includeHiddenElements: true }).props.autoFocus).toBe(true);
   });
 });
