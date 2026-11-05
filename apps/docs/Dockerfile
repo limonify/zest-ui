@@ -12,6 +12,10 @@ RUN bun install --frozen-lockfile --ignore-scripts
 FROM oven/bun:1.3.9-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
+# Next has to run on Node, as it does in CI. This image's `node` is otherwise a
+# fallback to Bun, on which `next build` fails since Next 16.4 with "Expected
+# CommonJS module to have a function wrapper".
+RUN apk add --no-cache nodejs
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/docs/node_modules ./apps/docs/node_modules
 # The docs bundle zest from source, so TypeScript reads that source and has to
