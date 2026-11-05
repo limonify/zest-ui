@@ -94,6 +94,10 @@ import { Combobox } from '@limonify/zest-ui';
 
 </Tabs>
 
+<Callout type="warn">
+  In the example above the input sits outside the popup, which on iOS and Android stops typing once
+  the list opens. See [Keeping the input focused](#keeping-the-input-focused) before you ship it.
+</Callout>
 
 ## Anatomy
 
@@ -124,6 +128,58 @@ import { Combobox } from '@limonify/zest-ui';
 `Combobox.Input` and the portal. `Combobox.Group`/`Collection` are only for grouped `items` — a
 flat list renders items straight from `Combobox.List`.
 
+## Keeping the input focused
+
+`Combobox.Portal` renders a React Native `Modal`, which presents in its own window. Opening one takes
+focus from an input left outside it and dismisses the keyboard, so the user cannot keep typing. There
+are two ways to avoid that:
+
+- **Put the input inside the popup**, with a [`Combobox.Trigger`](#a-button-instead-of-a-text-field)
+  as the closed state. The input shares the Modal's window, so it keeps focus. This is the simpler
+  choice, and it works wherever the combobox is mounted.
+- **Pass `modal={false}` to `Combobox.Portal`**, which renders a plain full-screen overlay and leaves
+  the input where it is. Use it when the closed state has to be a text field:
+
+```tsx
+<Combobox.Root items={COUNTRIES}>
+  <Combobox.Input placeholder="Pick a country" style={styles.input} />
+  <Combobox.Portal modal={false}>
+    <Combobox.Backdrop style={styles.transparent} />
+    <Combobox.Positioner>{/* … */}</Combobox.Positioner>
+  </Combobox.Portal>
+</Combobox.Root>
+```
+
+The overlay renders where the Portal is mounted and the popup is positioned in screen coordinates, so
+the Portal needs a parent that fills the screen. Inside a `ScrollView` or a clipped parent the popup
+is cut off or lands in the wrong place; hoisting it to the app root means re-providing the combobox
+contexts around it, which is why `ComboboxRootContext` and its siblings are exported. With
+`keepMounted`, also render the `Backdrop` only while the list is open.
+
+### Choosing a row after typing
+
+While an input is focused, a `ScrollView` claims the next tap to dismiss the keyboard, so the row
+under the finger is only chosen on a second tap. A `Modal` stays in the React tree it was rendered
+from, so this applies to **every** `ScrollView` above the combobox, not just one inside the popup.
+Set `keyboardShouldPersistTaps="handled"` on each of them, including the screen's own scroll view and
+any `ScrollView` or `FlatList` that renders the rows:
+
+```tsx
+<ScrollView keyboardShouldPersistTaps="handled">
+  <Combobox.Root items={COUNTRIES}>{/* … */}</Combobox.Root>
+</ScrollView>
+```
+
+iOS has a second way to lose that tap: an autocorrect suggestion takes the next touch to dismiss
+itself. Search text is rarely a real word, so pass `autoCorrect={false}` to `Combobox.Input`.
+
+### Opening with the keyboard up
+
+Pass `autoFocus` to a `Combobox.Input` inside the popup to open the keyboard along with the list.
+Inside a `Modal` the portal applies it once the Modal has appeared, because focusing any earlier on
+Android moves the caret without opening the keyboard. The popup then moves above its anchor when the
+keyboard would otherwise cover it.
+
 ## A button instead of a text field
 
 `Combobox.Input` makes the closed state a text field. On a phone that often reads wrong — a bare
@@ -140,13 +196,17 @@ input moves *inside* the popup where it filters:
     <Combobox.Backdrop style={styles.transparent} />
     <Combobox.Positioner>
       <Combobox.Popup style={styles.popup}>
-        <Combobox.Input placeholder="Search" style={styles.input} />
+        <Combobox.Input autoFocus autoCorrect={false} placeholder="Search" style={styles.input} />
         <Combobox.List>{/* … */}</Combobox.List>
       </Combobox.Popup>
     </Combobox.Positioner>
   </Combobox.Portal>
 </Combobox.Root>
 ```
+
+In a single-selection combobox, this shape separates the two pieces of text. `Combobox.Value` shows
+the selected label and never the query, and the input is cleared whenever the list opens or closes,
+so every open starts blank. `Autocomplete.Trigger` keeps the input text, since that is its value.
 
 The trigger is `role="combobox"` with `aria-haspopup="listbox"` and reports `state.open`.
 `Autocomplete.Trigger` is the same part, re-exported.
@@ -159,12 +219,15 @@ always the width of the control the user pressed.
 Two things are worth knowing about the popup's height in this shape. React Native does not clip a
 child to its parent's bounds, so a `maxHeight` popup needs `overflow: 'hidden'`; and once it is
 clipped, the rows have to scroll — `Combobox.List` is headless, so that is a `ScrollView` (or a
-`FlatList`, see [Long lists](#long-lists)) you supply:
+`FlatList`, see [Long lists](#long-lists)) you supply. Set `keyboardShouldPersistTaps="handled"` on
+it, or the first tap on a row only dismisses the keyboard instead of choosing the row:
 
 ```tsx
 <Combobox.Popup style={{ maxHeight: 240, overflow: 'hidden' }}>
-  <Combobox.Input placeholder="Search" />
-  <Combobox.List render={(props) => <ScrollView {...props} />}>{/* … */}</Combobox.List>
+  <Combobox.Input autoFocus autoCorrect={false} placeholder="Search" />
+  <Combobox.List render={(props) => <ScrollView {...props} keyboardShouldPersistTaps="handled" />}>
+    {/* … */}
+  </Combobox.List>
 </Combobox.Popup>
 ```
 
@@ -232,6 +295,7 @@ import { FlatList, Text } from 'react-native';
       {...props}
       children={undefined}
       data={state.items}
+      keyboardShouldPersistTaps="handled"
       keyExtractor={(item) => String(item.value)}
       renderItem={({ item }) => (
         <Combobox.Item item={item} style={styles.item}>
@@ -457,7 +521,7 @@ it, and build your own predicate with [`useFilter`](/docs/utilities/use-filter).
 
 ### Placeholders and disabled items
 
-`Combobox.Value` takes a `placeholder` shown while the input is empty, and reports
+`Combobox.Value` takes a `placeholder` shown while the input is empty (under a `Combobox.Trigger`, while nothing is selected), and reports
 `state.placeholder` so it can be styled differently. `Combobox.Item` takes `disabled` — a disabled
 item ignores presses and reports itself to assistive technology; a disabled `Combobox.Root` disables
 all of them.

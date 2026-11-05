@@ -108,6 +108,12 @@ import { Autocomplete } from '@limonify/zest-ui';
 from `Autocomplete.List`. The chip parts a combobox has are absent here on purpose — an
 autocomplete's value *is* the typed text, so there is no separate selection to render.
 
+<Callout type="warn">
+  In the usage example the input sits outside the popup, which on iOS and Android stops typing once
+  the list opens. Move the input into the popup with `Autocomplete.Trigger`, or pass `modal={false}`
+  to the portal. See [Keeping the input focused](/docs/components/combobox#keeping-the-input-focused).
+</Callout>
+
 ## State
 
 These fields reach your `style` and `render` functions on **Autocomplete.Input** (`style={(state) => ...}`).
